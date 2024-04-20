@@ -1,0 +1,6 @@
+lerna-debug.log
+.nx/
+
+**/node_modules/
+
+packages/*/dist/
