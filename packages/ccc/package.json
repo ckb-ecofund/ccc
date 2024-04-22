@@ -8,7 +8,9 @@
   "main": "dist/index.js",
   "exports": {
     ".": "./dist/index.js",
-    "./barrel": "./dist/barrel.js"
+    "./barrel": "./dist/barrel.js",
+    "./advancedBarrel": "./dist/advancedBarrel.js",
+    "./advanced": "./dist/advanced.js"
   },
   "scripts": {
     "build": "tsc",
@@ -27,6 +29,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@ckb-ccc/core": "workspace:*"
+    "@ckb-ccc/core": "workspace:*",
+    "@ckb-ccc/eip6963": "workspace:*"
   }
 }

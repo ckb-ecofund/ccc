@@ -1,4 +1,4 @@
-import { TransactionSkeletonType } from "./types/lumos";
+import { TransactionSkeletonType } from "./types/advanced";
 import { Client } from "./client";
 
 export abstract class Viewer {

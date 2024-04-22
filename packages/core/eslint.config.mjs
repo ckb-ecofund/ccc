@@ -13,6 +13,10 @@ export default tseslint.config({
     eslint.configs.recommended,
     ...tseslint.configs.recommendedTypeChecked,
   ],
+  rules: {
+    "@typescript-eslint/require-await": "off",
+    "@typescript-eslint/no-redundant-type-constituents": "off",
+  },
   plugins: { prettier: eslintPluginPrettierRecommended },
   languageOptions: {
     parserOptions: {

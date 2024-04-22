@@ -2,7 +2,7 @@ import { encodeScriptToAddress } from "../address";
 import { Client } from "../client";
 import { Script } from "../types";
 import { Viewer } from "../viewer";
-import { TransactionSkeletonType } from "../types/lumos";
+import { TransactionSkeletonType } from "../types/advanced";
 
 export class ViewerCkbAddress extends Viewer {
   constructor(

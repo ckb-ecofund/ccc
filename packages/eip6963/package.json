@@ -1,15 +1,13 @@
 {
-  "name": "@ckb-ccc/core",
+  "name": "@ckb-ccc/eip6963",
   "version": "0.0.2-alpha.0",
-  "description": "Common Chains Connector Core",
+  "description": "Common Chains Connector's support for EIP6963",
   "author": "Hanssen0 <hanssen0@hanssen0.com>",
   "license": "MIT",
   "private": false,
   "main": "dist/index.js",
   "exports": {
     ".": "./dist/index.js",
-    "./barrel": "./dist/barrel.js",
-    "./advancedBarrel": "./dist/advancedBarrel.js",
     "./advanced": "./dist/advanced.js"
   },
   "scripts": {
@@ -29,8 +27,6 @@
     "access": "public"
   },
   "dependencies": {
-    "bech32": "^2.0.0",
-    "buffer": "^6.0.3",
-    "immutable": "5.0.0-beta.5"
+    "@ckb-ccc/core": "workspace:*"
   }
 }

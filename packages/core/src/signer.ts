@@ -1,16 +1,18 @@
-import { TransactionSkeletonType } from "./types/lumos";
+import { TransactionSkeletonType } from "./types/advanced";
 import { Viewer } from "./viewer";
 import { BytesLike, HexString } from "./types";
 
 export abstract class Signer extends Viewer {
+  abstract connect(): Promise<void>;
+
   abstract signMessage(message: string | BytesLike): Promise<HexString>;
 
   // Will be deprecated in the future
-  signLumosTransaction(
+  async signLumosTransaction(
     tx: TransactionSkeletonType,
   ): Promise<TransactionSkeletonType> {
-    const completedTx = this.completeLumosTransaction(tx);
-    return this.signOnlyLumosTransaction(tx);
+    const completedTx = await this.completeLumosTransaction(tx);
+    return this.signOnlyLumosTransaction(completedTx);
   }
 
   // Will be deprecated in the future

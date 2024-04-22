@@ -8,7 +8,7 @@ export function toBytes(bytes: BytesLike | string): Uint8Array {
 
   if (Array.isArray(bytes)) {
     if (bytes.some((v) => v < 0 || 0xff < v)) {
-      throw new Error(`Invalid bytes ${bytes}`);
+      throw new Error(`Invalid bytes ${JSON.stringify(bytes)}`);
     }
     return new Uint8Array(bytes);
   }
