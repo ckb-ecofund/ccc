@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
     "target": "es2020",
-    "module": "commonjs",
-    "outDir": "./dist",
+    "moduleResolution": "Node",
+    "importHelpers": false,
     "declaration": true,
     "declarationMap": true,
     "esModuleInterop": true,

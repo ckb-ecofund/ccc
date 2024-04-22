@@ -1,6 +1,6 @@
 node_modules/
 
-dist/
 tsconfig.json
-eslint.config.js
+tsconfig.*.json
+eslint.config.mjs
 .prettierrc

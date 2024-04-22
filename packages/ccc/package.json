@@ -5,11 +5,12 @@
   "author": "Hanssen0 <hanssen0@hanssen0.com>",
   "license": "MIT",
   "private": false,
-  "main": "dist/src/index.js",
-  "types": "dist/src/index.d.ts",
-  "type": "module",
+  "main": "dist.cjs/index.js",
+  "module": "dist.esm/index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "$npm_execpath run build:cjs && $npm_execpath run build:esm",
+    "build:cjs": "tsc --project tsconfig.cjs.json",
+    "build:esm": "tsc --project tsconfig.esm.json",
     "lint": "eslint ."
   },
   "devDependencies": {
