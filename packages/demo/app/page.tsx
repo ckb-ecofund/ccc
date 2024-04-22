@@ -35,6 +35,7 @@ export default function Home() {
   const signers = useSyncExternalStore(
     (...args) => eip6963Manager.subscribeEIP6963Signers(...args),
     () => eip6963Manager.getSigners(),
+    () => eip6963Manager.getSigners(),
   );
   const [connectedSigner, setConnectedSigner] =
     useState<ccc.EIP6963Signer | null>(null);
