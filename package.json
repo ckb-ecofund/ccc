@@ -4,7 +4,7 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "lerna run build",
+    "build": "lerna run --no-private build",
     "publish": "lerna publish --no-private"
   },
   "dependencies": {},

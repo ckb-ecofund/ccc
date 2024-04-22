@@ -1,7 +1,7 @@
 {
-  "name": "@ckb-ccc/ccc",
+  "name": "@ckb-ccc/core",
   "version": "0.0.1",
-  "description": "Common Chains Connector",
+  "description": "Common Chains Connector Core",
   "author": "Hanssen0 <hanssen0@hanssen0.com>",
   "license": "MIT",
   "private": false,
@@ -27,6 +27,8 @@
     "access": "public"
   },
   "dependencies": {
-    "@ckb-ccc/core": "workspace:*"
+    "bech32": "^2.0.0",
+    "buffer": "^6.0.3",
+    "immutable": "5.0.0-beta.5"
   }
 }
