@@ -1,25 +1,26 @@
 import { Client, KnownScript } from "../client";
-import { Script } from "../types";
-import { Address } from "./address";
-import { encodeScriptToAddress } from "./converter";
+import { HexString, Script } from "../types";
+import { BaseAddress } from "./baseAddress.advanced";
 
-export class AddressKnownScript extends Address {
+export class AddressKnownScript extends BaseAddress {
   constructor(
     private readonly script: KnownScript,
-    private readonly args: Script["args"],
+    private readonly args: HexString,
     private readonly client: Client,
   ) {
     super();
   }
 
-  async getClient(): Promise<Client> {
-    return this.client;
+  getKnownScript(): KnownScript {
+    return this.script;
   }
 
-  async getAddress(): Promise<string> {
-    const prefix = await (await this.getClient()).getAddressPrefix();
+  getArgs(): HexString {
+    return this.args;
+  }
 
-    return encodeScriptToAddress(prefix, await this.getScript());
+  async getClient(): Promise<Client> {
+    return this.client;
   }
 
   async getScript(): Promise<Script> {

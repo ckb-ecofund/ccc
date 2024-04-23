@@ -1,16 +1,13 @@
-import { Client } from "../client";
-import { Script } from "../types";
-import { encodeScript } from "../codec";
+import { Client, KnownScript } from "../client";
+import { HexString, Script } from "../types";
 import { AddressPlain } from "./addressPlain";
 import {
-  AddressFormat,
-  BECH32_LIMIT,
   decodeAddressInfo,
   getClientFromAddressPrefix,
   parseAddress,
-} from "./advanced";
+} from "./factory.advanced";
 import { Address } from "./address";
-import { bech32m } from "bech32";
+import { AddressKnownScript } from ".";
 
 export function decodeAddressFromString(
   address: string,
@@ -33,8 +30,10 @@ export function decodeAddressFromScript(
   return new AddressPlain(script, client);
 }
 
-export function encodeScriptToAddress(prefix: string, script: Script) {
-  const data = [AddressFormat.Full, ...encodeScript(script)];
-
-  return bech32m.encode(prefix, bech32m.toWords(data), BECH32_LIMIT);
+export function decodeAddressFromKnownScript(
+  script: KnownScript,
+  args: HexString,
+  client: Client,
+): AddressKnownScript {
+  return new AddressKnownScript(script, args, client);
 }

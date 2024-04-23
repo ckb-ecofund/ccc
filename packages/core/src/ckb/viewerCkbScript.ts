@@ -1,10 +1,13 @@
-import { encodeScriptToAddress } from "../address";
+import {
+  Address,
+  decodeAddressFromScript,
+} from "../address";
 import { Client } from "../client";
 import { Script } from "../types";
 import { Viewer } from "../viewer";
 import { TransactionSkeletonType } from "../types/advanced";
 
-export class ViewerCkbAddress extends Viewer {
+export class ViewerCkbScript extends Viewer {
   constructor(
     private readonly script: Script,
     private readonly client: Client,
@@ -16,13 +19,15 @@ export class ViewerCkbAddress extends Viewer {
     return this.client;
   }
 
-  async getRecommendedAddress(): Promise<string> {
-    return (await this.getAddresses())[0];
+  async getInternalAddress(): Promise<string> {
+    return this.getRecommendedAddress();
   }
-  async getAddresses(): Promise<string[]> {
-    return [
-      encodeScriptToAddress(await this.client.getAddressPrefix(), this.script),
-    ];
+
+  async getRecommendedAddressObj(): Promise<Address> {
+    return (await this.getAddressObjs())[0];
+  }
+  async getAddressObjs(): Promise<Address[]> {
+    return [decodeAddressFromScript(this.script, this.client)];
   }
 
   // Will be deprecated in the future

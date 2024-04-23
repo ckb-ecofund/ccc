@@ -1,9 +1,8 @@
 import { Client } from "../client";
 import { Script } from "../types";
-import { Address } from "./address";
-import { encodeScriptToAddress } from "./converter";
+import { BaseAddress } from "./baseAddress.advanced";
 
-export class AddressPlain extends Address {
+export class AddressPlain extends BaseAddress {
   constructor(
     private readonly script: Script,
     private readonly client: Client,
@@ -13,12 +12,6 @@ export class AddressPlain extends Address {
 
   async getClient(): Promise<Client> {
     return this.client;
-  }
-
-  async getAddress(): Promise<string> {
-    const prefix = await (await this.getClient()).getAddressPrefix();
-
-    return encodeScriptToAddress(prefix, this.script);
   }
 
   async getScript(): Promise<Script> {

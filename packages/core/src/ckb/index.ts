@@ -1,1 +1,1 @@
-export * from "./viewerCkbAddress";
+export * from "./viewerCkbScript";

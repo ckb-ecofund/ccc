@@ -18,13 +18,26 @@ export class EIP6963Signer extends ccc.Signer {
     return this.detail.provider.request({ method: "eth_accounts" });
   }
 
-  async getRecommendedAddress(): Promise<string> {
-    const [address] = await this.getAddresses();
+  async getInternalAddress(): Promise<string> {
+    return (await this.getEVMAccounts())[0];
+  }
+
+  async getRecommendedAddressObj(): Promise<ccc.Address> {
+    const [address] = await this.getAddressObjs();
     return address;
   }
 
-  async getAddresses(): Promise<string[]> {
-    return this.getEVMAccounts();
+  async getAddressObjs(): Promise<ccc.Address[]> {
+    const accounts = await this.getEVMAccounts();
+    return Promise.all(
+      accounts.map((account) =>
+        ccc.decodeAddressFromKnownScript(
+          ccc.KnownScript.OmniLock,
+          ccc.toHex([0x12, ...ccc.toBytes(account)]),
+          this.client,
+        ),
+      ),
+    );
   }
 
   async connect(): Promise<void> {
