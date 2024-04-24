@@ -151,7 +151,7 @@ export default function Home() {
   const [connectedAddress, setConnectedAddress] = useState<string | null>(null);
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-24">
+    <main className="flex min-h-screen flex-col items-center justify-center bg-white p-24">
       {connectedSigner ? (
         <>
           <SignerIcon signer={connectedSigner} className="mb-1" />
