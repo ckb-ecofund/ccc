@@ -1,4 +1,6 @@
-import { Script } from "../types";
+import { Hex } from "../primitive";
+import { Script, Transaction } from "../ckb";
+import { OutputsValidator } from "./clientTypes";
 
 export enum KnownScript {
   Secp256k1Blake160,
@@ -8,7 +10,12 @@ export enum KnownScript {
   OmniLock,
 }
 
-export abstract class Client {
-  abstract getAddressPrefix(): Promise<string>;
-  abstract getKnownScript(script: KnownScript): Promise<Omit<Script, "args">>;
+export interface Client {
+  getAddressPrefix(): Promise<string>;
+  getKnownScript(script: KnownScript): Promise<Omit<Script, "args">>;
+
+  sendTransaction(
+    transaction: Transaction,
+    validator?: OutputsValidator,
+  ): Promise<Hex>;
 }

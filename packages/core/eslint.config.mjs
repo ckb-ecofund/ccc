@@ -16,6 +16,8 @@ export default tseslint.config({
   rules: {
     "@typescript-eslint/require-await": "off",
     "@typescript-eslint/no-redundant-type-constituents": "off",
+    "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
+    "@typescript-eslint/unbound-method": ["error", { "ignoreStatic": true }],
   },
   plugins: { prettier: eslintPluginPrettierRecommended },
   languageOptions: {

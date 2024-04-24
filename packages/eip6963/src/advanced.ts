@@ -1,4 +1,4 @@
-import { HexString } from "@ckb-ccc/core";
+import { Hex } from "@ckb-ccc/core";
 
 export interface EIP6963AnnounceProviderEvent {
   detail: EIP6963ProviderDetail;
@@ -28,16 +28,16 @@ export interface EIP1193Provider {
 export interface EIP1193RequestMethod {
   (request: {
     method: "personal_sign";
-    params: [string, HexString];
-  }): Promise<HexString>;
+    params: [string, Hex];
+  }): Promise<Hex>;
   (request: {
     method: "eth_requestAccounts";
     params?: undefined;
-  }): Promise<HexString[]>;
+  }): Promise<Hex[]>;
   (request: {
     method: "eth_accounts";
     params?: undefined;
-  }): Promise<HexString[]>;
+  }): Promise<Hex[]>;
   (request: {
     method: string;
     params?: Array<unknown> | Record<string, unknown>;

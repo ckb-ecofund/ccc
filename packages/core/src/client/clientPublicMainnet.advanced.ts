@@ -1,4 +1,4 @@
-import { Script } from "../types";
+import { Script } from "../ckb";
 import { KnownScript } from "./client";
 
 export const MAINNET_SCRIPTS: Record<KnownScript, Omit<Script, "args">> = {

@@ -1,4 +1,4 @@
-import { Script } from "../types";
+import { Script } from "../ckb";
 import { KnownScript } from "./client";
 
 export const TESTNET_SCRIPTS: Record<KnownScript, Omit<Script, "args">> = {

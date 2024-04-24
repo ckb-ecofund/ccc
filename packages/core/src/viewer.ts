@@ -1,26 +1,22 @@
-import { TransactionSkeletonType } from "./types/advanced";
-import { Client } from "./client";
 import { Address } from "./address";
+import { Client } from "./client";
 
 export abstract class Viewer {
-  abstract getClient(): Promise<Client>;
+  constructor(public readonly client: Client) {}
 
   abstract getInternalAddress(): Promise<string>;
 
-  abstract getRecommendedAddressObj(preference?: unknown): Promise<Address>;
   abstract getAddressObjs(): Promise<Address[]>;
+  async getRecommendedAddressObj(_preference?: unknown): Promise<Address> {
+    return (await this.getAddressObjs())[0];
+  }
 
   async getRecommendedAddress(preference?: unknown): Promise<string> {
-    return (await this.getRecommendedAddressObj(preference)).getAddress();
+    return Address.toString(await this.getRecommendedAddressObj(preference));
   }
   async getAddresses(): Promise<string[]> {
-    return Promise.all(
-      (await this.getAddressObjs()).map((address) => address.getAddress()),
+    return this.getAddressObjs().then((addresses) =>
+      addresses.map((address) => Address.toString(address)),
     );
   }
-
-  // Will be deprecated in the future
-  abstract completeLumosTransaction(
-    tx: TransactionSkeletonType,
-  ): Promise<TransactionSkeletonType>;
 }
