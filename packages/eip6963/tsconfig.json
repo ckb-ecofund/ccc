@@ -4,6 +4,7 @@
     "module": "Node16",
     "moduleResolution": "Node16",
     "outDir": "./dist",
+    "allowJs": true,
     "importHelpers": false,
     "declaration": true,
     "declarationMap": true,

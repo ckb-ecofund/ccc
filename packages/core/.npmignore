@@ -3,3 +3,6 @@ node_modules/
 tsconfig.json
 eslint.config.mjs
 .prettierrc
+
+tsconfig.tsbuildinfo
+.github/
