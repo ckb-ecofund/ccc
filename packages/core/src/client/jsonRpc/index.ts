@@ -1,8 +1,7 @@
-import type { Client } from "../client";
 import fetch from "cross-fetch";
+import type { Client } from "../client";
 import { CkbRpcMethods, JsonRpcMethod, JsonRpcPayload } from "./advanced";
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export interface ClientJsonRpc extends Pick<Client, "sendTransaction"> {}
 
 async function transform(
@@ -15,7 +14,6 @@ async function transform(
   return value;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export abstract class ClientJsonRpc implements Pick<Client, "sendTransaction"> {
   constructor(
     private readonly url: string,

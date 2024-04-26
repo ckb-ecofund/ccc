@@ -237,7 +237,9 @@ export class ScriptOpt {
   hasValue(): boolean;
 }
 
-export function SerializeProposalShortId(value: CanCastToArrayBuffer): ArrayBuffer;
+export function SerializeProposalShortId(
+  value: CanCastToArrayBuffer,
+): ArrayBuffer;
 export class ProposalShortId {
   constructor(reader: CanCastToArrayBuffer, options?: CreateOptions);
   validate(compatible?: boolean): void;
@@ -246,7 +248,9 @@ export class ProposalShortId {
   static size(): Number;
 }
 
-export function SerializeUncleBlockVec(value: Array<UncleBlockType>): ArrayBuffer;
+export function SerializeUncleBlockVec(
+  value: Array<UncleBlockType>,
+): ArrayBuffer;
 export class UncleBlockVec {
   constructor(reader: CanCastToArrayBuffer, options?: CreateOptions);
   validate(compatible?: boolean): void;
@@ -254,7 +258,9 @@ export class UncleBlockVec {
   length(): number;
 }
 
-export function SerializeTransactionVec(value: Array<TransactionType>): ArrayBuffer;
+export function SerializeTransactionVec(
+  value: Array<TransactionType>,
+): ArrayBuffer;
 export class TransactionVec {
   constructor(reader: CanCastToArrayBuffer, options?: CreateOptions);
   validate(compatible?: boolean): void;
@@ -262,7 +268,9 @@ export class TransactionVec {
   length(): number;
 }
 
-export function SerializeProposalShortIdVec(value: Array<ProposalShortIdType>): ArrayBuffer;
+export function SerializeProposalShortIdVec(
+  value: Array<ProposalShortIdType>,
+): ArrayBuffer;
 export class ProposalShortIdVec {
   constructor(reader: CanCastToArrayBuffer, options?: CreateOptions);
   validate(compatible?: boolean): void;
@@ -286,7 +294,9 @@ export class CellInputVec {
   length(): number;
 }
 
-export function SerializeCellOutputVec(value: Array<CellOutputType>): ArrayBuffer;
+export function SerializeCellOutputVec(
+  value: Array<CellOutputType>,
+): ArrayBuffer;
 export class CellOutputVec {
   constructor(reader: CanCastToArrayBuffer, options?: CreateOptions);
   validate(compatible?: boolean): void;
@@ -414,7 +424,9 @@ export class BlockV1 {
   getExtension(): Bytes;
 }
 
-export function SerializeCellbaseWitness(value: CellbaseWitnessType): ArrayBuffer;
+export function SerializeCellbaseWitness(
+  value: CellbaseWitnessType,
+): ArrayBuffer;
 export class CellbaseWitness {
   constructor(reader: CanCastToArrayBuffer, options?: CreateOptions);
   validate(compatible?: boolean): void;
@@ -430,4 +442,3 @@ export class WitnessArgs {
   getInputType(): BytesOpt;
   getOutputType(): BytesOpt;
 }
-

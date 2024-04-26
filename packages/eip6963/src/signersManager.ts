@@ -20,9 +20,7 @@ export class EIP6963Manager {
         (event as unknown as EIP6963AnnounceProviderEvent).detail,
       );
       if (
-        this.signers.some(
-          (p) => p.detail.info.uuid === signer.detail.info.uuid,
-        )
+        this.signers.some((p) => p.detail.info.uuid === signer.detail.info.uuid)
       ) {
         return;
       }

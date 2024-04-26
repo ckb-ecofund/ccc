@@ -1,14 +1,18 @@
-import { Client } from "../client";
-import { Script } from "./types";
-import { Viewer } from "../viewer";
 import { Address } from "../address";
+import { Script } from "../ckb";
+import { Client } from "../client";
+import { SignerReadonly } from "./signerReadonly";
 
-export class ViewerCkbScript extends Viewer {
+export class SignerReadonlyCkbScript extends SignerReadonly {
   constructor(
     private readonly script: Script,
     client: Client,
   ) {
     super(client);
+  }
+
+  async connect(): Promise<void> {
+    return;
   }
 
   async getInternalAddress(): Promise<string> {

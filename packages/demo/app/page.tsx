@@ -113,7 +113,7 @@ function Transfer({ signer }: { signer: ccc.Signer }) {
               txSkeleton,
               [await signer.getRecommendedAddress()],
               transferTo,
-              ccc.parseFixedPoint(amount),
+              ccc.fixedPointFrom(amount),
               undefined,
               undefined,
               { config: predefined.AGGRON4 },

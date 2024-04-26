@@ -1,13 +1,16 @@
-import { Hasher, Script, Transaction } from "../ckb";
-import { Hex } from "../primitive";
+import { Script, ScriptLike, Transaction, TransactionLike } from "../ckb";
+import { Hasher } from "../hasher";
+import { Hex } from "../hex";
 
 export async function getSignHashInfo(
-  tx: Transaction,
-  script: Script,
+  txLike: TransactionLike,
+  scriptLike: ScriptLike,
 ): Promise<{ message: Hex; position: number } | undefined> {
+  const tx = Transaction.from(txLike);
+  const script = Script.from(scriptLike);
   let position = -1;
   const hasher = new Hasher();
-  hasher.update(Transaction.hashRaw(tx));
+  hasher.update(tx.hash());
 
   tx.witnesses.forEach((witness, i) => {
     const input = tx.inputs[i];
@@ -16,7 +19,7 @@ export async function getSignHashInfo(
         throw Error("Incomplete inputs info");
       }
 
-      if (!Script.eq(input.cellOutput?.lock, script)) {
+      if (!script.eq(input.cellOutput?.lock)) {
         return;
       }
 

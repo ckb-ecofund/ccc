@@ -1,7 +1,7 @@
-import { Script } from "../ckb";
+import { ScriptLike } from "../ckb";
 import { KnownScript } from "./client";
 
-export const TESTNET_SCRIPTS: Record<KnownScript, Omit<Script, "args">> = {
+export const TESTNET_SCRIPTS: Record<KnownScript, Omit<ScriptLike, "args">> = {
   [KnownScript.Secp256k1Blake160]: {
     codeHash:
       "0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8",

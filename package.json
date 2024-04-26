@@ -6,6 +6,7 @@
   "scripts": {
     "build": "lerna run --no-private build",
     "lint": "lerna run lint",
+    "format": "lerna run format",
     "sync:config": "lerna exec --no-private cp ../../config/* . && lerna exec --no-private cp ../../config/.* .",
     "publish": "lerna publish --no-private"
   },

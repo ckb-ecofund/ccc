@@ -1,7 +1,7 @@
 import blake2b, { Blake2b } from "blake2b";
-import { BytesLike, Hex } from "../primitive";
-import { encodeUtf8, toBytes } from "../bytes";
-import { CKB_BLAKE2B_PERSONAL } from "./hasher.advanced";
+import { BytesLike, bytesFrom, bytesFromUtf8 } from "../bytes";
+import { Hex } from "../hex";
+import { CKB_BLAKE2B_PERSONAL } from "./advanced";
 
 export class Hasher {
   hasher: Blake2b;
@@ -11,12 +11,12 @@ export class Hasher {
       outLength,
       undefined,
       undefined,
-      encodeUtf8(personal),
+      bytesFromUtf8(personal),
     );
   }
 
   update(data: BytesLike): Hasher {
-    this.hasher.update(toBytes(data));
+    this.hasher.update(bytesFrom(data));
     return this;
   }
 

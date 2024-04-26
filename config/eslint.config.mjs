@@ -8,7 +8,7 @@ import { fileURLToPath } from "url";
 import { dirname } from "path";
 
 export default tseslint.config({
-  files: ["src/**/*.ts"],
+  files: ["./src/**/*.ts"],
   extends: [
     eslint.configs.recommended,
     ...tseslint.configs.recommendedTypeChecked,

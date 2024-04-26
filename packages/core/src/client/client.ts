@@ -1,5 +1,5 @@
-import { Hex } from "../primitive";
-import { Script, Transaction } from "../ckb";
+import { ScriptLike, TransactionLike } from "../ckb";
+import { Hex } from "../hex";
 import { OutputsValidator } from "./clientTypes";
 
 export enum KnownScript {
@@ -12,10 +12,10 @@ export enum KnownScript {
 
 export interface Client {
   getAddressPrefix(): Promise<string>;
-  getKnownScript(script: KnownScript): Promise<Omit<Script, "args">>;
+  getKnownScript(script: KnownScript): Promise<Omit<ScriptLike, "args">>;
 
   sendTransaction(
-    transaction: Transaction,
+    transaction: TransactionLike,
     validator?: OutputsValidator,
   ): Promise<Hex>;
 }

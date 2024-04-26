@@ -1,13 +1,16 @@
 import {
-  CellDep,
-  CellInput,
-  CellOutput,
-  DepType,
-  OutPoint,
-  Script,
-  Transaction,
+  CellDepLike,
+  CellInputLike,
+  CellOutputLike,
+  DepTypeLike,
+  OutPointLike,
+  ScriptLike,
+  TransactionLike,
+  depTypeFrom,
 } from "../../ckb";
-import { toHex } from "../../bytes";
+import { hexFrom } from "../../hex";
+import { numToHex } from "../../num";
+import { apply } from "../../utils";
 import type { Client } from "../client";
 
 export type JsonRpcPayload = {
@@ -27,52 +30,49 @@ export type JsonRpcMethod = {
 };
 
 export class JsonRpcTransformers {
-  static toDepType(depType: DepType) {
-    switch (depType) {
+  static toDepType(depType: DepTypeLike) {
+    switch (depTypeFrom(depType)) {
       case "code":
         return "code";
       case "depGroup":
         return "dep_group";
     }
   }
-  static toScript(script?: Script) {
-    if (!script) {
-      return null;
-    }
+  static toScript(script: ScriptLike) {
     return {
       code_hash: script.codeHash,
       hash_type: script.hashType,
       args: script.args,
     };
   }
-  static toOutPoint(outPoint: OutPoint) {
+  static toOutPoint(outPoint: OutPointLike) {
     return {
-      index: toHex(outPoint.index),
+      index: numToHex(outPoint.index),
       tx_hash: outPoint.txHash,
     };
   }
-  static toCellInput(cellInput: CellInput) {
+  static toCellInput(cellInput: CellInputLike) {
     return {
       previous_output: JsonRpcTransformers.toOutPoint(cellInput.previousOutput),
-      since: toHex(cellInput.since),
+      since: numToHex(cellInput.since),
     };
   }
-  static toCellOutput(cellOutput: CellOutput) {
+  static toCellOutput(cellOutput: CellOutputLike) {
     return {
-      capacity: toHex(cellOutput.capacity),
+      capacity: numToHex(cellOutput.capacity),
       lock: JsonRpcTransformers.toScript(cellOutput.lock),
-      type: JsonRpcTransformers.toScript(cellOutput.type),
+      type: apply(JsonRpcTransformers.toScript, cellOutput.type),
     };
   }
-  static toCellDep(cellDep: CellDep) {
+  static toCellDep(cellDep: CellDepLike) {
     return {
       out_point: JsonRpcTransformers.toOutPoint(cellDep.outPoint),
       dep_type: JsonRpcTransformers.toDepType(cellDep.depType),
     };
   }
-  static toTransaction(tx: Transaction) {
+  static toTransaction(tx: TransactionLike) {
     return {
-      version: toHex(tx.version),
+      version: numToHex(tx.version),
       cell_deps: tx.cellDeps.map((c) => JsonRpcTransformers.toCellDep(c)),
       header_deps: tx.headerDeps,
       inputs: tx.inputs.map((i) => JsonRpcTransformers.toCellInput(i)),
@@ -88,6 +88,6 @@ export const CkbRpcMethods: JsonRpcMethod[] = [
     method: "sendTransaction",
     rpcMethod: "send_transaction",
     inTransformers: [JsonRpcTransformers.toTransaction],
-    outTransformer: toHex,
+    outTransformer: hexFrom,
   },
 ];

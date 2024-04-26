@@ -26,18 +26,12 @@ export interface EIP1193Provider {
 }
 
 export interface EIP1193RequestMethod {
-  (request: {
-    method: "personal_sign";
-    params: [string, Hex];
-  }): Promise<Hex>;
+  (request: { method: "personal_sign"; params: [string, Hex] }): Promise<Hex>;
   (request: {
     method: "eth_requestAccounts";
     params?: undefined;
   }): Promise<Hex[]>;
-  (request: {
-    method: "eth_accounts";
-    params?: undefined;
-  }): Promise<Hex[]>;
+  (request: { method: "eth_accounts"; params?: undefined }): Promise<Hex[]>;
   (request: {
     method: string;
     params?: Array<unknown> | Record<string, unknown>;

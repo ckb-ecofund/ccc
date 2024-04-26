@@ -1,4 +1,4 @@
-import { Script } from "../ckb";
+import { ScriptLike } from "../ckb";
 import { KnownScript } from "./client";
 import { TESTNET_SCRIPTS } from "./clientPublicTestnet.advanced";
 import { ClientJsonRpc } from "./jsonRpc";
@@ -12,7 +12,7 @@ export class ClientPublicTestnet extends ClientJsonRpc {
     return "ckt";
   }
 
-  async getKnownScript(script: KnownScript): Promise<Omit<Script, "args">> {
+  async getKnownScript(script: KnownScript): Promise<Omit<ScriptLike, "args">> {
     return { ...TESTNET_SCRIPTS[script] };
   }
 }

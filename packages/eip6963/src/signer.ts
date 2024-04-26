@@ -23,7 +23,7 @@ export class EIP6963Signer extends ccc.Signer {
       accounts.map((account) =>
         ccc.Address.fromKnownScript(
           ccc.KnownScript.OmniLock,
-          ccc.toHex([0x12, ...ccc.toBytes(account), 0x00]),
+          ccc.hexFrom([0x12, ...ccc.bytesFrom(account), 0x00]),
           this.client,
         ),
       ),
@@ -36,7 +36,7 @@ export class EIP6963Signer extends ccc.Signer {
 
   async signMessage(message: string | ccc.BytesLike): Promise<ccc.Hex> {
     const challenge =
-      typeof message === "string" ? message : ccc.toHex(message);
+      typeof message === "string" ? message : ccc.hexFrom(message);
     const [address] = await this.getEVMAccounts();
 
     return this.detail.provider.request({
@@ -52,26 +52,26 @@ export class EIP6963Signer extends ccc.Signer {
       return tx;
     }
 
-    const signature = ccc.toBytes(
+    const signature = ccc.bytesFrom(
       await this.signMessage(`CKB transaction: ${info.message}`),
     );
     if (signature[signature.length - 1] >= 27) {
       signature[signature.length - 1] -= 27;
     }
 
-    const witness = ccc.WitnessArgs.decode(tx.witnesses[info.position]);
-    witness.lock = ccc.toHex(
-      ccc.concatBytes(
-        ccc.toBytesFromNumber(5 * 4 + signature.length, 4),
-        ccc.toBytesFromNumber(4 * 4, 4),
-        ccc.toBytesFromNumber(5 * 4 + signature.length, 4),
-        ccc.toBytesFromNumber(5 * 4 + signature.length, 4),
-        ccc.toBytesFromNumber(signature.length, 4),
+    const witness = ccc.WitnessArgs.fromBytes(tx.witnesses[info.position]);
+    witness.lock = ccc.hexFrom(
+      ccc.bytesConcat(
+        ccc.numToBytes(5 * 4 + signature.length, 4),
+        ccc.numToBytes(4 * 4, 4),
+        ccc.numToBytes(5 * 4 + signature.length, 4),
+        ccc.numToBytes(5 * 4 + signature.length, 4),
+        ccc.numToBytes(signature.length, 4),
         signature,
       ),
     );
 
-    tx.witnesses[info.position] = ccc.toHex(ccc.WitnessArgs.encode(witness));
+    tx.witnesses[info.position] = ccc.hexFrom(witness.toBytes());
 
     return tx;
   }

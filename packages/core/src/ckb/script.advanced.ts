@@ -12,3 +12,4 @@ export const NUM_TO_HASH_TYPE: Record<number, HashType> = {
   0x02: "data1",
   0x04: "data2",
 };
+export const HASH_TYPES: string[] = Object.keys(HASH_TYPE_TO_NUM);
