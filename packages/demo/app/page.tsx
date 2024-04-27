@@ -1,26 +1,24 @@
 "use client";
 
-import { EIP6963Signer, ccc } from "@ckb-ccc/ccc";
-import React, { useState, useSyncExternalStore } from "react";
+import { ccc } from "@ckb-ccc/connector-react";
+import React, { useState } from "react";
 import { common } from "@ckb-lumos/common-scripts";
 import { TransactionSkeleton } from "@ckb-lumos/helpers";
 import { Indexer } from "@ckb-lumos/ckb-indexer";
 import { predefined } from "@ckb-lumos/config-manager";
 
-const eip6963Manager = new ccc.EIP6963Manager(new ccc.ClientPublicTestnet());
-
 function SignerIcon({
   signer,
   className,
 }: {
-  signer: EIP6963Signer;
+  signer: ccc.SignerInfo;
   className?: string;
 }) {
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      src={signer.detail.info.icon}
-      alt={signer.detail.info.name}
+      src={signer.icon}
+      alt={signer.name}
       className={`h-8 w-8 rounded-full ${className}`}
     />
   );
@@ -35,7 +33,7 @@ function Button(props: React.ButtonHTMLAttributes<HTMLButtonElement>) {
   );
 }
 
-function Sign({ signer }: { signer: ccc.Signer }) {
+function Sign({ signerInfo: { signer } }: { signerInfo: ccc.SignerInfo }) {
   const [messageToSign, setMessageToSign] = useState<string>("");
   const [signature, setSignature] = useState<string>("");
 
@@ -70,7 +68,7 @@ function Sign({ signer }: { signer: ccc.Signer }) {
   );
 }
 
-function Transfer({ signer }: { signer: ccc.Signer }) {
+function Transfer({ signerInfo: { signer } }: { signerInfo: ccc.SignerInfo }) {
   const [transferTo, setTransferTo] = useState<string>("");
   const [amount, setAmount] = useState<string>("");
   const [hash, setHash] = useState<string>("");
@@ -138,13 +136,9 @@ function Transfer({ signer }: { signer: ccc.Signer }) {
 }
 
 export default function Home() {
-  const signers = useSyncExternalStore(
-    (...args) => eip6963Manager.subscribeEIP6963Signers(...args),
-    () => eip6963Manager.getSigners(),
-    () => eip6963Manager.getSigners(),
+  const [connectedSigner, setConnectedSigner] = useState<ccc.SignerInfo | null>(
+    null,
   );
-  const [connectedSigner, setConnectedSigner] =
-    useState<ccc.EIP6963Signer | null>(null);
   const [connectedInternalAddress, setConnectedInternalAddress] = useState<
     string | null
   >(null);
@@ -155,15 +149,13 @@ export default function Home() {
       {connectedSigner ? (
         <>
           <SignerIcon signer={connectedSigner} className="mb-1" />
-          <p className="mb-1">
-            Connected to {connectedSigner.detail.info.name}
-          </p>
+          <p className="mb-1">Connected to {connectedSigner.name}</p>
           <p className="mb-1">{connectedInternalAddress}</p>
           <p className="mb-1 text-balance break-all text-center">
             {connectedAddress}
           </p>
-          <Sign signer={connectedSigner} />
-          <Transfer signer={connectedSigner} />
+          <Sign signerInfo={connectedSigner} />
+          <Transfer signerInfo={connectedSigner} />
           <Button
             className="mb-4"
             onClick={async () => {
@@ -176,22 +168,15 @@ export default function Home() {
           </Button>
         </>
       ) : null}
-      {signers.map((signer) => (
-        <Button
-          key={signer.detail.info.uuid}
-          onClick={async () => {
-            await signer.connect();
-            const address = await signer.getRecommendedAddress();
-            const internalAddress = await signer.getInternalAddress();
-            setConnectedSigner(signer);
-            setConnectedInternalAddress(internalAddress);
-            setConnectedAddress(address);
-          }}
-        >
-          <SignerIcon signer={signer} className="mr-3" />
-          Connect {signer.detail.info.name}
-        </Button>
-      ))}
+      <ccc.Connector
+        onConnected={async ({ signerInfo }) => {
+          const address = await signerInfo.signer.getRecommendedAddress();
+          const internalAddress = await signerInfo.signer.getInternalAddress();
+          setConnectedSigner(signerInfo);
+          setConnectedInternalAddress(internalAddress);
+          setConnectedAddress(address);
+        }}
+      />
     </main>
   );
 }

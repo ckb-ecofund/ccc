@@ -1,7 +1,7 @@
 import { ccc } from "@ckb-ccc/core";
-import { EIP6963ProviderDetail } from "./advanced";
+import { ProviderDetail as EIP6963ProviderDetail } from "./eip6963.advanced";
 
-export class EIP6963Signer extends ccc.Signer {
+export class Signer extends ccc.Signer {
   constructor(
     client: ccc.Client,
     public readonly detail: EIP6963ProviderDetail,

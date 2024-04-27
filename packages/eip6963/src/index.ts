@@ -1,2 +1,1 @@
-export * from "./signer";
-export * from "./signersManager";
+export * as Eip6963 from "./barrel";
