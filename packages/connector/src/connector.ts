@@ -1,4 +1,4 @@
-import { ClientPublicMainnet, Eip6963 } from "@ckb-ccc/ccc";
+import { ClientPublicTestnet, Eip6963 } from "@ckb-ccc/ccc";
 import { LitElement, css, html } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { repeat } from "lit/directives/repeat.js";
@@ -16,7 +16,7 @@ export class WebComponentConnector extends LitElement {
   connectedCallback(): void {
     super.connectedCallback();
 
-    const client = new ClientPublicMainnet();
+    const client = new ClientPublicTestnet();
     const eip6963Manager = new Eip6963.SignerFactory(client);
     eip6963Manager.subscribeSigners((signer) => {
       if (this.signers.some((s) => s.id === signer.detail.info.uuid)) {
