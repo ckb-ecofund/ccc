@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { ccc } from "@ckb-ccc/connector-react";
 import { Inter } from "next/font/google";
 import "./globals.css";
 
@@ -17,9 +16,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <ccc.Provider>{children}</ccc.Provider>
-      </body>
+      <body className={inter.className}>{children}</body>
     </html>
   );
 }

@@ -5,6 +5,11 @@
   "author": "Hanssen0 <hanssen0@hanssen0.com>",
   "license": "MIT",
   "private": false,
+  "homepage": "https://github.com/Hanssen0/ccc",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Hanssen0/ccc.git"
+  },
   "main": "dist/index.js",
   "exports": {
     ".": "./dist/index.js",

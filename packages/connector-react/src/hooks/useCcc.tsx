@@ -1,5 +1,3 @@
-"use client";
-
 import { SignerInfo } from "@ckb-ccc/connector";
 import * as React from "react";
 import { ReactNode, createContext, useState } from "react";
