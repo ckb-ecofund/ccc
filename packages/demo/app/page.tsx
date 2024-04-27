@@ -1,24 +1,24 @@
 "use client";
 
 import { ccc } from "@ckb-ccc/connector-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { common } from "@ckb-lumos/common-scripts";
 import { TransactionSkeleton } from "@ckb-lumos/helpers";
 import { Indexer } from "@ckb-lumos/ckb-indexer";
 import { predefined } from "@ckb-lumos/config-manager";
 
 function SignerIcon({
-  signer,
+  signerInfo,
   className,
 }: {
-  signer: ccc.SignerInfo;
+  signerInfo: ccc.SignerInfo;
   className?: string;
 }) {
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      src={signer.icon}
-      alt={signer.name}
+      src={signerInfo.icon}
+      alt={signerInfo.name}
       className={`h-8 w-8 rounded-full ${className}`}
     />
   );
@@ -33,7 +33,8 @@ function Button(props: React.ButtonHTMLAttributes<HTMLButtonElement>) {
   );
 }
 
-function Sign({ signerInfo: { signer } }: { signerInfo: ccc.SignerInfo }) {
+function Sign() {
+  const signer = ccc.useSigner();
   const [messageToSign, setMessageToSign] = useState<string>("");
   const [signature, setSignature] = useState<string>("");
 
@@ -58,6 +59,9 @@ function Sign({ signerInfo: { signer } }: { signerInfo: ccc.SignerInfo }) {
         <Button
           className="ml-2"
           onClick={async () => {
+            if (!signer) {
+              return;
+            }
             setSignature(await signer.signMessage(messageToSign));
           }}
         >
@@ -68,7 +72,8 @@ function Sign({ signerInfo: { signer } }: { signerInfo: ccc.SignerInfo }) {
   );
 }
 
-function Transfer({ signerInfo: { signer } }: { signerInfo: ccc.SignerInfo }) {
+function Transfer() {
+  const signer = ccc.useSigner();
   const [transferTo, setTransferTo] = useState<string>("");
   const [amount, setAmount] = useState<string>("");
   const [hash, setHash] = useState<string>("");
@@ -100,10 +105,12 @@ function Transfer({ signerInfo: { signer } }: { signerInfo: ccc.SignerInfo }) {
         <Button
           className="ml-2"
           onClick={async () => {
-            const client = new ccc.ClientPublicTestnet();
-            await ccc.Address.fromString(transferTo, client);
+            if (!signer) {
+              return;
+            }
+            await ccc.Address.fromString(transferTo, signer.client);
 
-            const indexer = new Indexer(client.getUrl());
+            const indexer = new Indexer(signer.client.getUrl());
             let txSkeleton = new TransactionSkeleton({
               cellProvider: indexer,
             });
@@ -136,47 +143,41 @@ function Transfer({ signerInfo: { signer } }: { signerInfo: ccc.SignerInfo }) {
 }
 
 export default function Home() {
-  const [connectedSigner, setConnectedSigner] = useState<ccc.SignerInfo | null>(
-    null,
-  );
-  const [connectedInternalAddress, setConnectedInternalAddress] = useState<
-    string | null
-  >(null);
-  const [connectedAddress, setConnectedAddress] = useState<string | null>(null);
+  const { signerInfo, open, disconnect } = ccc.useCcc();
+
+  const [internalAddress, setInternalAddress] = useState("");
+  const [address, setAddress] = useState("");
+
+  useEffect(() => {
+    if (!signerInfo) {
+      setInternalAddress("");
+      setAddress("");
+      return;
+    }
+
+    (async () => {
+      setInternalAddress(await signerInfo.signer.getInternalAddress());
+      setAddress(await signerInfo.signer.getRecommendedAddress());
+    })();
+  }, [signerInfo]);
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-white p-24">
-      {connectedSigner ? (
+      {signerInfo ? (
         <>
-          <SignerIcon signer={connectedSigner} className="mb-1" />
-          <p className="mb-1">Connected to {connectedSigner.name}</p>
-          <p className="mb-1">{connectedInternalAddress}</p>
-          <p className="mb-1 text-balance break-all text-center">
-            {connectedAddress}
-          </p>
-          <Sign signerInfo={connectedSigner} />
-          <Transfer signerInfo={connectedSigner} />
-          <Button
-            className="mb-4"
-            onClick={async () => {
-              setConnectedSigner(null);
-              setConnectedInternalAddress(null);
-              setConnectedAddress(null);
-            }}
-          >
+          <SignerIcon signerInfo={signerInfo} className="mb-1" />
+          <p className="mb-1">Connected to {signerInfo.name}</p>
+          <p className="mb-1">{internalAddress}</p>
+          <p className="mb-1 text-balance break-all text-center">{address}</p>
+          <Sign />
+          <Transfer />
+          <Button className="mt-4" onClick={disconnect}>
             Disconnect
           </Button>
         </>
-      ) : null}
-      <ccc.Connector
-        onConnected={async ({ signerInfo }) => {
-          const address = await signerInfo.signer.getRecommendedAddress();
-          const internalAddress = await signerInfo.signer.getInternalAddress();
-          setConnectedSigner(signerInfo);
-          setConnectedInternalAddress(internalAddress);
-          setConnectedAddress(address);
-        }}
-      />
+      ) : (
+        <Button onClick={open}>Connect Wallet</Button>
+      )}
     </main>
   );
 }

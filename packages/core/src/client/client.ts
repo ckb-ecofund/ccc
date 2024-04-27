@@ -11,6 +11,8 @@ export enum KnownScript {
 }
 
 export interface Client {
+  getUrl(): string;
+
   getAddressPrefix(): Promise<string>;
   getKnownScript(script: KnownScript): Promise<Omit<ScriptLike, "args">>;
 

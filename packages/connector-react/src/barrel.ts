@@ -1,2 +1,3 @@
 export * from "@ckb-ccc/connector/barrel";
-export * from "./connector";
+export * from "./components";
+export * from "./hooks";
