@@ -36,12 +36,12 @@ export class Signer extends ccc.Signer {
 
   async signMessage(message: string | ccc.BytesLike): Promise<ccc.Hex> {
     const challenge =
-      typeof message === "string" ? message : ccc.hexFrom(message);
+      typeof message === "string" ? ccc.bytesFromUtf8(message) : message;
     const [address] = await this.getEVMAccounts();
 
     return this.detail.provider.request({
       method: "personal_sign",
-      params: [challenge, address],
+      params: [ccc.hexFrom(challenge), address],
     });
   }
 
