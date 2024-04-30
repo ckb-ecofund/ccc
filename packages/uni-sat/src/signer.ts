@@ -1,46 +1,50 @@
 import { ccc } from "@ckb-ccc/core";
-import { ProviderDetail as EIP6963ProviderDetail } from "./eip6963.advanced";
+import { ripemd160 } from "@noble/hashes/ripemd160";
+import { sha256 } from "@noble/hashes/sha256";
+import { Provider } from "./uni-sat.advanced";
 
 export class Signer extends ccc.Signer {
   constructor(
     client: ccc.Client,
-    public readonly detail: EIP6963ProviderDetail,
+    public readonly provider: Provider,
   ) {
     super(client);
   }
 
-  async getEVMAccount() {
-    return (await this.detail.provider.request({ method: "eth_accounts" }))[0];
+  async getBTCAccount() {
+    return (await this.provider.getAccounts())[0];
+  }
+
+  async getBTCPublicKey(): Promise<ccc.Hex> {
+    return ccc.hexFrom(await this.provider.getPublicKey());
   }
 
   async getInternalAddress(): Promise<string> {
-    return this.getEVMAccount();
+    return this.getBTCAccount();
   }
 
   async getAddressObjs(): Promise<ccc.Address[]> {
-    const account = await this.getEVMAccount();
+    const publicKey = await this.getBTCPublicKey();
+    const hash = ripemd160(sha256(ccc.bytesFrom(publicKey)));
+
     return [
       await ccc.Address.fromKnownScript(
         ccc.KnownScript.OmniLock,
-        ccc.hexFrom([0x12, ...ccc.bytesFrom(account), 0x00]),
+        ccc.hexFrom([0x04, ...hash, 0x00]),
         this.client,
       ),
     ];
   }
 
   async connect(): Promise<void> {
-    await this.detail.provider.request({ method: "eth_requestAccounts" });
+    await this.provider.requestAccounts();
   }
 
-  async signMessage(message: string | ccc.BytesLike): Promise<ccc.Hex> {
+  async signMessage(message: string | ccc.BytesLike): Promise<string> {
     const challenge =
-      typeof message === "string" ? ccc.bytesFrom(message, "utf8") : message;
-    const address = await this.getEVMAccount();
+      typeof message === "string" ? message : ccc.hexFrom(message).slice(2);
 
-    return this.detail.provider.request({
-      method: "personal_sign",
-      params: [ccc.hexFrom(challenge), address],
-    });
+    return this.provider.signMessage(challenge, "ecdsa");
   }
 
   async signOnlyTransaction(tx: ccc.Transaction): Promise<ccc.Transaction> {
@@ -51,11 +55,14 @@ export class Signer extends ccc.Signer {
     }
 
     const signature = ccc.bytesFrom(
-      await this.signMessage(`CKB transaction: ${info.message}`),
+      await this.signMessage(
+        `CKB (Bitcoin Layer) transaction: ${info.message}`,
+      ),
+      "base64",
     );
-    if (signature[signature.length - 1] >= 27) {
-      signature[signature.length - 1] -= 27;
-    }
+    signature[0] = 31 + ((signature[0] - 27) % 4);
+
+    console.log(ccc.hexFrom(signature));
 
     const witness = ccc.WitnessArgs.fromBytes(tx.witnesses[info.position]);
     witness.lock = ccc.hexFrom(

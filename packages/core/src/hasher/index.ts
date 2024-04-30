@@ -1,5 +1,5 @@
 import blake2b, { Blake2b } from "blake2b";
-import { BytesLike, bytesFrom, bytesFromUtf8 } from "../bytes";
+import { BytesLike, bytesFrom } from "../bytes";
 import { Hex } from "../hex";
 import { CKB_BLAKE2B_PERSONAL } from "./advanced";
 
@@ -11,7 +11,7 @@ export class Hasher {
       outLength,
       undefined,
       undefined,
-      bytesFromUtf8(personal),
+      bytesFrom(personal, "utf8"),
     );
   }
 

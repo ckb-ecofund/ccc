@@ -1,7 +1,8 @@
-import { ClientPublicTestnet, Eip6963 } from "@ckb-ccc/ccc";
+import { ClientPublicTestnet, Eip6963, UniSat } from "@ckb-ccc/ccc";
 import { LitElement, css, html } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { repeat } from "lit/directives/repeat.js";
+import { UNI_SAT_SVG } from "./assets/uni-sat.svg";
 import { CloseEvent, ConnectedEvent } from "./events";
 import { SignerInfo, SignerType } from "./signers";
 
@@ -17,6 +18,20 @@ export class WebComponentConnector extends LitElement {
     super.connectedCallback();
 
     const client = new ClientPublicTestnet();
+    const uniSatSigner = UniSat.getUniSatSigner(client);
+    if (uniSatSigner) {
+      this.signers = [
+        ...this.signers,
+        {
+          id: "uni-sat",
+          name: "UniSat",
+          icon: UNI_SAT_SVG,
+          type: SignerType.UniSat,
+          signer: uniSatSigner,
+        },
+      ];
+    }
+
     const eip6963Manager = new Eip6963.SignerFactory(client);
     eip6963Manager.subscribeSigners((signer) => {
       if (this.signers.some((s) => s.id === signer.detail.info.uuid)) {
@@ -68,18 +83,22 @@ export class WebComponentConnector extends LitElement {
     }
 
     .wallet-button {
+      width: 100%;
       display: flex;
       align-items: center;
-      justify-content: center;
+      justify-content: start;
       padding: 0.75rem 1.25rem;
       color: #fff;
       background: #000;
       background-image: none;
       border-radius: 9999px;
       border: none;
+      margin-bottom: 0.5rem;
     }
 
     .wallet-button img {
+      width: 1.5rem;
+      height: 1.5rem;
       padding-right: 0.5rem;
     }
   `;
@@ -113,7 +132,7 @@ export class WebComponentConnector extends LitElement {
                 }}
               >
                 <img src=${signer.icon} alt=${signer.name} />
-                Connect ${signer.name}
+                ${signer.name}
               </button>
             `,
           )}

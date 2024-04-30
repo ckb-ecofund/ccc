@@ -337,10 +337,10 @@ export class Transaction {
       mol.SerializeRawTransaction({
         version: numToBytes(this.version, 4),
         cellDeps: this.cellDeps.map((d) => d._toMolData()),
-        headerDeps: this.headerDeps.map(bytesFrom),
+        headerDeps: this.headerDeps.map((header) => bytesFrom(header)),
         inputs: this.inputs.map((i) => i._toMolData()),
         outputs: this.outputs.map((o) => o._toMolData()),
-        outputsData: this.outputsData.map(bytesFrom),
+        outputsData: this.outputsData.map((header) => bytesFrom(header)),
       }),
     );
   }

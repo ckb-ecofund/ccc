@@ -2,6 +2,7 @@ import { Signer } from "@ckb-ccc/ccc";
 
 export enum SignerType {
   Eip6963 = "Eip6963",
+  UniSat = "UniSat",
 }
 
 export class SignerInfo {

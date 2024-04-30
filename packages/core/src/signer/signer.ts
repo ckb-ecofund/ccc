@@ -25,7 +25,7 @@ export abstract class Signer {
     );
   }
 
-  abstract signMessage(message: string | BytesLike): Promise<Hex>;
+  abstract signMessage(message: string | BytesLike): Promise<string>;
 
   async sendTransaction(tx: Transaction): Promise<Hex> {
     return this.client.sendTransaction(await this.signTransaction(tx));

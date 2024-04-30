@@ -1,9 +1,8 @@
 import { Signer } from ".";
 import { Transaction } from "../ckb";
-import { Hex } from "../hex";
 
 export abstract class SignerReadonly extends Signer {
-  signMessage(): Promise<Hex> {
+  signMessage(): Promise<string> {
     throw new Error("Method not implemented.");
   }
 
