@@ -1,8 +1,9 @@
-import { Signer } from "@ckb-ccc/ccc";
+import { Signer } from "@ckb-ccc/core";
 
 export enum SignerType {
   Eip6963 = "Eip6963",
   UniSat = "UniSat",
+  OkxBitcoin = "OkxBitcoin",
 }
 
 export class SignerInfo {

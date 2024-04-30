@@ -20,6 +20,9 @@ importers:
       '@ckb-ccc/eip6963':
         specifier: workspace:*
         version: link:../eip6963
+      '@ckb-ccc/okx':
+        specifier: workspace:*
+        version: link:../okx
       '@ckb-ccc/uni-sat':
         specifier: workspace:*
         version: link:../uni-sat
@@ -293,6 +296,43 @@ importers:
       '@ckb-ccc/core':
         specifier: workspace:*
         version: link:../core
+    devDependencies:
+      '@eslint/js':
+        specifier: ^9.1.1
+        version: 9.1.1
+      eslint:
+        specifier: ^9.1.0
+        version: 9.1.0
+      eslint-config-prettier:
+        specifier: ^9.1.0
+        version: 9.1.0(eslint@9.1.0)
+      eslint-plugin-prettier:
+        specifier: ^5.1.3
+        version: 5.1.3(eslint-config-prettier@9.1.0(eslint@9.1.0))(eslint@9.1.0)(prettier@3.2.5)
+      prettier:
+        specifier: ^3.2.5
+        version: 3.2.5
+      prettier-plugin-organize-imports:
+        specifier: ^3.2.4
+        version: 3.2.4(prettier@3.2.5)(typescript@5.4.5)
+      rimraf:
+        specifier: ^5.0.5
+        version: 5.0.5
+      typescript:
+        specifier: ^5.4.5
+        version: 5.4.5
+      typescript-eslint:
+        specifier: ^7.7.0
+        version: 7.7.0(eslint@9.1.0)(typescript@5.4.5)
+
+  packages/okx:
+    dependencies:
+      '@ckb-ccc/core':
+        specifier: workspace:*
+        version: link:../core
+      '@ckb-ccc/uni-sat':
+        specifier: workspace:*
+        version: link:../uni-sat
     devDependencies:
       '@eslint/js':
         specifier: ^9.1.1

@@ -1,4 +1,4 @@
-import { SignerInfo } from "./signers";
+import { SignerInfo } from "@ckb-ccc/ccc";
 
 export class ConnectedEvent extends Event {
   constructor(public readonly signerInfo: SignerInfo) {

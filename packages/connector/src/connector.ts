@@ -1,15 +1,15 @@
-import { ClientPublicTestnet, Eip6963, UniSat } from "@ckb-ccc/ccc";
+import { ccc } from "@ckb-ccc/ccc";
 import { LitElement, css, html } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { repeat } from "lit/directives/repeat.js";
+import { OKX_SVG } from "./assets/okx.svg";
 import { UNI_SAT_SVG } from "./assets/uni-sat.svg";
 import { CloseEvent, ConnectedEvent } from "./events";
-import { SignerInfo, SignerType } from "./signers";
 
 @customElement("ccc-connector")
 export class WebComponentConnector extends LitElement {
   @state()
-  private signers: SignerInfo[] = [];
+  private signers: ccc.SignerInfo[] = [];
 
   @property()
   public isOpen: boolean = false;
@@ -17,22 +17,36 @@ export class WebComponentConnector extends LitElement {
   connectedCallback(): void {
     super.connectedCallback();
 
-    const client = new ClientPublicTestnet();
-    const uniSatSigner = UniSat.getUniSatSigner(client);
+    const client = new ccc.ClientPublicTestnet();
+    const uniSatSigner = ccc.UniSat.getUniSatSigner(client);
     if (uniSatSigner) {
       this.signers = [
         ...this.signers,
         {
           id: "uni-sat",
-          name: "UniSat",
+          name: "BTC: UniSat",
           icon: UNI_SAT_SVG,
-          type: SignerType.UniSat,
+          type: ccc.SignerType.UniSat,
           signer: uniSatSigner,
         },
       ];
     }
 
-    const eip6963Manager = new Eip6963.SignerFactory(client);
+    const okxBitcoinSigner = ccc.Okx.getOKXBitcoinSigner(client);
+    if (okxBitcoinSigner) {
+      this.signers = [
+        ...this.signers,
+        {
+          id: "okx-bitcoin",
+          name: "BTC: OKX",
+          icon: OKX_SVG,
+          type: ccc.SignerType.OkxBitcoin,
+          signer: okxBitcoinSigner,
+        },
+      ];
+    }
+
+    const eip6963Manager = new ccc.Eip6963.SignerFactory(client);
     eip6963Manager.subscribeSigners((signer) => {
       if (this.signers.some((s) => s.id === signer.detail.info.uuid)) {
         return;
@@ -41,9 +55,9 @@ export class WebComponentConnector extends LitElement {
         ...this.signers,
         {
           id: signer.detail.info.uuid,
-          name: signer.detail.info.name,
+          name: `ETH: ${signer.detail.info.name}`,
           icon: signer.detail.info.icon,
-          type: SignerType.Eip6963,
+          type: ccc.SignerType.Eip6963,
           signer,
         },
       ];
