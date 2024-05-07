@@ -26,7 +26,7 @@ export class WebComponentConnector extends LitElement {
           id: "uni-sat",
           name: "BTC: UniSat",
           icon: UNI_SAT_SVG,
-          type: ccc.SignerType.UniSat,
+          type: ccc.SignerType.BTC,
           signer: uniSatSigner,
         },
       ];
@@ -40,7 +40,7 @@ export class WebComponentConnector extends LitElement {
           id: "okx-bitcoin",
           name: "BTC: OKX",
           icon: OKX_SVG,
-          type: ccc.SignerType.OkxBitcoin,
+          type: ccc.SignerType.BTC,
           signer: okxBitcoinSigner,
         },
       ];
@@ -57,7 +57,7 @@ export class WebComponentConnector extends LitElement {
           id: signer.detail.info.uuid,
           name: `ETH: ${signer.detail.info.name}`,
           icon: signer.detail.info.icon,
-          type: ccc.SignerType.Eip6963,
+          type: ccc.SignerType.EVM,
           signer,
         },
       ];

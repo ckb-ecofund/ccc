@@ -171,6 +171,9 @@ importers:
 
   packages/core:
     dependencies:
+      '@noble/hashes':
+        specifier: ^1.4.0
+        version: 1.4.0
       abort-controller:
         specifier: ^3.0.0
         version: 3.0.0
@@ -367,9 +370,6 @@ importers:
       '@ckb-ccc/core':
         specifier: workspace:*
         version: link:../core
-      '@noble/hashes':
-        specifier: ^1.4.0
-        version: 1.4.0
     devDependencies:
       '@eslint/js':
         specifier: ^9.1.1

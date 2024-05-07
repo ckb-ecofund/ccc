@@ -35,7 +35,6 @@
     "access": "public"
   },
   "dependencies": {
-    "@ckb-ccc/core": "workspace:*",
-    "@noble/hashes": "^1.4.0"
+    "@ckb-ccc/core": "workspace:*"
   }
 }

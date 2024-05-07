@@ -40,6 +40,7 @@
     "access": "public"
   },
   "dependencies": {
+    "@noble/hashes": "^1.4.0",
     "abort-controller": "^3.0.0",
     "bech32": "^2.0.0",
     "blake2b": "^2.1.4",

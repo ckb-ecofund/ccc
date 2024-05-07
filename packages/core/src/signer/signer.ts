@@ -37,3 +37,18 @@ export abstract class Signer {
 
   abstract signOnlyTransaction(tx: Transaction): Promise<Transaction>;
 }
+
+export enum SignerType {
+  EVM = "EVM",
+  BTC = "BTC",
+}
+
+export class SignerInfo {
+  constructor(
+    public type: SignerType,
+    public id: string,
+    public name: string,
+    public icon: string,
+    public signer: Signer,
+  ) {}
+}
