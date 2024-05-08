@@ -46,9 +46,12 @@ export enum SignerType {
 export class SignerInfo {
   constructor(
     public type: SignerType,
-    public id: string,
-    public name: string,
-    public icon: string,
     public signer: Signer,
   ) {}
 }
+
+export type Wallet = {
+  name: string;
+  icon: string;
+  signers: SignerInfo[];
+};

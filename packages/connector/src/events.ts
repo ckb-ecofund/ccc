@@ -1,7 +1,10 @@
-import { SignerInfo } from "@ckb-ccc/ccc";
+import { ccc } from "@ckb-ccc/ccc";
 
 export class ConnectedEvent extends Event {
-  constructor(public readonly signerInfo: SignerInfo) {
+  constructor(
+    public readonly wallet: ccc.Wallet,
+    public readonly signerInfo: ccc.SignerInfo,
+  ) {
     super("connected", { composed: true });
   }
 }

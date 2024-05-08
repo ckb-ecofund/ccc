@@ -7,18 +7,18 @@ import { TransactionSkeleton } from "@ckb-lumos/helpers";
 import { Indexer } from "@ckb-lumos/ckb-indexer";
 import { predefined } from "@ckb-lumos/config-manager";
 
-function SignerIcon({
-  signerInfo,
+function WalletIcon({
+  wallet,
   className,
 }: {
-  signerInfo: ccc.SignerInfo;
+  wallet: ccc.Wallet;
   className?: string;
 }) {
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      src={signerInfo.icon}
-      alt={signerInfo.name}
+      src={wallet.icon}
+      alt={wallet.name}
       className={`h-8 w-8 rounded-full ${className}`}
     />
   );
@@ -145,30 +145,31 @@ function Transfer() {
 }
 
 export default function Home() {
-  const { signerInfo, open, disconnect } = ccc.useCcc();
+  const { wallet, open, disconnect } = ccc.useCcc();
+  const signer = ccc.useSigner();
 
   const [internalAddress, setInternalAddress] = useState("");
   const [address, setAddress] = useState("");
 
   useEffect(() => {
-    if (!signerInfo) {
+    if (!signer) {
       setInternalAddress("");
       setAddress("");
       return;
     }
 
     (async () => {
-      setInternalAddress(await signerInfo.signer.getInternalAddress());
-      setAddress(await signerInfo.signer.getRecommendedAddress());
+      setInternalAddress(await signer.getInternalAddress());
+      setAddress(await signer.getRecommendedAddress());
     })();
-  }, [signerInfo]);
+  }, [signer]);
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-white p-24">
-      {signerInfo ? (
+      {wallet ? (
         <>
-          <SignerIcon signerInfo={signerInfo} className="mb-1" />
-          <p className="mb-1">Connected to {signerInfo.name}</p>
+          <WalletIcon wallet={wallet} className="mb-1" />
+          <p className="mb-1">Connected to {wallet.name}</p>
           <p className="mb-1">{internalAddress}</p>
           <p className="mb-1 text-balance break-all text-center">{address}</p>
           <Sign />
