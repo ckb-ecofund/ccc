@@ -1,21 +1,21 @@
-import { Address } from "../address";
-import { bytesConcat, bytesFrom } from "../bytes";
-import { Transaction, WitnessArgs } from "../ckb";
-import { KnownScript } from "../client";
-import { hexFrom } from "../hex";
-import { numToBytes } from "../num";
-import { getSignHashInfo } from "./helpers";
-import { Signer } from "./signer";
+import { Address } from "../../address";
+import { bytesConcat, bytesFrom } from "../../bytes";
+import { Transaction, WitnessArgs } from "../../ckb";
+import { KnownScript } from "../../client";
+import { hexFrom } from "../../hex";
+import { numToBytes } from "../../num";
+import { getSignHashInfo } from "../helpers";
+import { Signer } from "../signer";
 
-export abstract class SignerEVM extends Signer {
-  abstract getEVMAccount(): Promise<string>;
+export abstract class SignerEvm extends Signer {
+  abstract getEvmAccount(): Promise<string>;
 
   async getInternalAddress(): Promise<string> {
-    return this.getEVMAccount();
+    return this.getEvmAccount();
   }
 
   async getAddressObjs(): Promise<Address[]> {
-    const account = await this.getEVMAccount();
+    const account = await this.getEvmAccount();
     return [
       await Address.fromKnownScript(
         KnownScript.OmniLock,

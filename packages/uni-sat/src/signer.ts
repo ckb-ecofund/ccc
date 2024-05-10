@@ -1,7 +1,7 @@
 import { ccc } from "@ckb-ccc/core";
 import { Provider } from "./uni-sat.advanced";
 
-export class Signer extends ccc.SignerBTC {
+export class Signer extends ccc.SignerBtc {
   constructor(
     client: ccc.Client,
     public readonly provider: Provider,
@@ -9,11 +9,11 @@ export class Signer extends ccc.SignerBTC {
     super(client);
   }
 
-  async getBTCAccount() {
+  async getBtcAccount() {
     return (await this.provider.getAccounts())[0];
   }
 
-  async getBTCPublicKey(): Promise<ccc.Hex> {
+  async getBtcPublicKey(): Promise<ccc.Hex> {
     return ccc.hexFrom(await this.provider.getPublicKey());
   }
 

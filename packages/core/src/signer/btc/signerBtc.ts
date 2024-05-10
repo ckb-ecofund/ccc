@@ -1,25 +1,25 @@
 import { ripemd160 } from "@noble/hashes/ripemd160";
 import { sha256 } from "@noble/hashes/sha256";
-import { Address } from "../address";
-import { bytesConcat, bytesFrom } from "../bytes";
-import { Transaction, WitnessArgs } from "../ckb";
-import { KnownScript } from "../client";
-import { HexLike, hexFrom } from "../hex";
-import { numToBytes } from "../num";
-import { getSignHashInfo } from "./helpers";
-import { Signer } from "./signer";
+import { Address } from "../../address";
+import { bytesConcat, bytesFrom } from "../../bytes";
+import { Transaction, WitnessArgs } from "../../ckb";
+import { KnownScript } from "../../client";
+import { HexLike, hexFrom } from "../../hex";
+import { numToBytes } from "../../num";
+import { getSignHashInfo } from "../helpers";
+import { Signer } from "../signer";
 
-export abstract class SignerBTC extends Signer {
-  abstract getBTCAccount(): Promise<string>;
+export abstract class SignerBtc extends Signer {
+  abstract getBtcAccount(): Promise<string>;
 
-  abstract getBTCPublicKey(): Promise<HexLike>;
+  abstract getBtcPublicKey(): Promise<HexLike>;
 
   async getInternalAddress(): Promise<string> {
-    return this.getBTCAccount();
+    return this.getBtcAccount();
   }
 
   async getAddressObjs(): Promise<Address[]> {
-    const publicKey = await this.getBTCPublicKey();
+    const publicKey = await this.getBtcPublicKey();
     const hash = ripemd160(sha256(bytesFrom(publicKey)));
 
     return [

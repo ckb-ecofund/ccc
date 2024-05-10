@@ -25,7 +25,9 @@ export abstract class Signer {
     );
   }
 
-  abstract signMessage(message: string | BytesLike): Promise<string>;
+  signMessage(_: string | BytesLike): Promise<string> {
+    throw Error("Signer.signMessage not implemented");
+  }
 
   async sendTransaction(tx: Transaction): Promise<Hex> {
     return this.client.sendTransaction(await this.signTransaction(tx));
@@ -35,7 +37,9 @@ export abstract class Signer {
     return this.signOnlyTransaction(tx);
   }
 
-  abstract signOnlyTransaction(tx: Transaction): Promise<Transaction>;
+  signOnlyTransaction(_: Transaction): Promise<Transaction> {
+    throw Error("Signer.signOnlyTransaction not implemented");
+  }
 }
 
 export enum SignerType {
