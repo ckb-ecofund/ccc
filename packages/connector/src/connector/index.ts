@@ -1,25 +1,32 @@
 import { ccc } from "@ckb-ccc/ccc";
 import { LitElement, css, html } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
-import { CLOSE_SVG } from "./assets/close.svg";
-import { OKX_SVG } from "./assets/okx.svg";
-import { UNI_SAT_SVG } from "./assets/uni-sat.svg";
-import { CloseEvent, ConnectedEvent } from "./events";
-import { generateWalletsScene } from "./scenes";
+import { CLOSE_SVG } from "../assets/close.svg";
+import { OKX_SVG } from "../assets/okx.svg";
+import { UNI_SAT_SVG } from "../assets/uni-sat.svg";
+import { CloseEvent, SignerChangedEvent, StatusChangedEvent } from "../events";
+import {
+  generateConnectingScene,
+  generateSignersScene,
+  generateWalletsScene,
+} from "../scenes";
+import { ConnectorStatus } from "../status";
 
 @customElement("ccc-connector")
 export class WebComponentConnector extends LitElement {
   @state()
   private wallets: ccc.Wallet[] = [];
-  @state()
-  private wallet?: ccc.Wallet;
-  @state()
-  private signer?: ccc.SignerInfo;
-
   private existedEip6963: string[] = [];
 
   @property()
   public isOpen: boolean = false;
+
+  @property()
+  public wallet?: ccc.Wallet;
+  @property()
+  public signer?: ccc.SignerInfo;
+  @property()
+  public status: ConnectorStatus = ConnectorStatus.SelectingSigner;
 
   connectedCallback(): void {
     super.connectedCallback();
@@ -86,7 +93,14 @@ export class WebComponentConnector extends LitElement {
           this.onSignerSelected,
         );
       }
-      return [];
+      if (!this.signer) {
+        return generateSignersScene(this.wallet, this.onSignerSelected);
+      }
+      return generateConnectingScene(
+        this.wallet,
+        this.signer,
+        this.onSignerSelected,
+      );
     })();
 
     return html`<style>
@@ -94,48 +108,49 @@ export class WebComponentConnector extends LitElement {
           ${this.isOpen ? "" : "display: none;"}
           --background: #fff;
           --divider: #eee;
-          --wallet: #f8f8f8;
-          --wallet-hover: #efeeee;
-          --wallet-icon: #e9e4de;
+          --btn-primary: #f8f8f8;
+          --btn-primary-hover: #efeeee;
+          --btn-secondary: #ddd;
+          --btn-icon: #e9e4de;
           color: #1e1e1e;
+          --tip-color: #666;
         }
       </style>
       <div
         class="background"
         @click=${(event: Event) => {
           if (event.target === event.currentTarget) {
-            this.dispatchEvent(new CloseEvent());
+            this.onClose();
           }
         }}
       >
         <div class="main">
-          <div class="header">
+          <div class="header text-bold fs-big">
             <div class="back"></div>
             ${title}
-            <img
-              class="close"
-              src=${CLOSE_SVG}
-              @click=${() => {
-                this.dispatchEvent(new CloseEvent());
-              }}
-            />
+            <img class="close" src=${CLOSE_SVG} @click=${this.onClose} />
           </div>
           <div class="body">${body}</div>
         </div>
       </div>`;
   }
 
+  private onClose = () => {
+    this.dispatchEvent(new SignerChangedEvent());
+    this.dispatchEvent(new CloseEvent());
+  };
+
   private onWalletSelected = (wallet: ccc.Wallet) => {
-    this.wallet = wallet;
+    this.dispatchEvent(new SignerChangedEvent(wallet, this.signer));
   };
 
   private onSignerSelected = (wallet: ccc.Wallet, signer: ccc.SignerInfo) => {
-    this.onWalletSelected(wallet);
-    this.signer = signer;
+    this.dispatchEvent(new StatusChangedEvent(ConnectorStatus.Connecting));
+    this.dispatchEvent(new SignerChangedEvent(wallet, signer));
 
     (async () => {
       await signer.signer.connect();
-      this.dispatchEvent(new ConnectedEvent(wallet, signer));
+      this.dispatchEvent(new StatusChangedEvent(ConnectorStatus.Idle));
       this.dispatchEvent(new CloseEvent());
     })();
   };
@@ -159,6 +174,31 @@ export class WebComponentConnector extends LitElement {
       outline: inherit;
     }
 
+    .text-bold {
+      font-weight: bold;
+    }
+
+    .text-tip {
+      color: var(--tip-color);
+    }
+
+    .fs-big {
+      font-size: 1.2rem;
+    }
+
+    .mb-1 {
+      margin-bottom: 0.7rem;
+    }
+    .mb-2 {
+      margin-bottom: 1rem;
+    }
+    .mt-1 {
+      margin-top: 0.7rem;
+    }
+    .mt-2 {
+      margin-top: 1rem;
+    }
+
     .background {
       width: 100%;
       height: 100%;
@@ -179,8 +219,6 @@ export class WebComponentConnector extends LitElement {
       justify-content: space-between;
       align-items: center;
       padding: 1rem 1.3rem;
-      font-size: 1.2rem;
-      font-weight: bold;
       border-bottom: 1px solid var(--divider);
     }
 
@@ -193,31 +231,62 @@ export class WebComponentConnector extends LitElement {
 
     .body {
       padding: 1.4rem 1.3rem;
+      min-width: 20rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
-    .wallet {
-      min-width: 20rem;
+    .btn-primary {
       width: 100%;
       display: flex;
       align-items: center;
       justify-content: start;
       padding: 0.75rem 1rem;
-      background: var(--wallet);
-      margin-bottom: 0.7rem;
+      background: var(--btn-primary);
       border-radius: 0.4rem;
       transition: background 0.3s ease-in-out;
     }
 
-    .wallet:hover {
-      background: var(--wallet-hover);
-    }
-
-    .wallet img {
+    .btn-primary img {
       width: 2rem;
       height: 2rem;
-      border-radius: 0.4rem;
       margin-right: 1rem;
-      background: var(--wallet-icon);
+      border-radius: 0.4rem;
+      background: var(--btn-icon);
+    }
+
+    .btn-primary:hover {
+      background: var(--btn-primary-hover);
+    }
+
+    .btn-secondary {
+      display: flex;
+      align-items: center;
+      padding: 0.25rem 1rem;
+      background: var(--btn-secondary);
+      border-radius: 9999px;
+      transition: background 0.3s ease-in-out;
+    }
+
+    .btn-secondary img {
+      width: 0.8rem;
+      height: 0.8rem;
+      margin-right: 0.5rem;
+    }
+
+    .wallet-icon {
+      width: 4rem;
+      height: 4rem;
+      margin-bottom: 0.5rem;
+      border-radius: 0.8rem;
+      background: var(--btn-icon);
+    }
+
+    .connecting-wallet-icon {
+      width: 5rem;
+      height: 5rem;
+      border-radius: 1rem;
     }
   `;
 }

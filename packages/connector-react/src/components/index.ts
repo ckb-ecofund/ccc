@@ -9,7 +9,8 @@ export const Connector = createComponent({
   elementClass: ccc.WebComponentConnector,
   react: React,
   events: {
-    onConnected: "connected" as EventName<ccc.ConnectedEvent>,
+    onSignerChanged: "signerChanged" as EventName<ccc.SignerChangedEvent>,
+    onStatusChanged: "statusChanged" as EventName<ccc.StatusChangedEvent>,
     onClose: "close" as EventName<ccc.CloseEvent>,
   },
 });

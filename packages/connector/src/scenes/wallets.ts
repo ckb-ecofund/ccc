@@ -14,13 +14,12 @@ export function generateWalletsScene(
       (wallet) => wallet.name,
       (wallet) => html`
         <button
-          class="wallet"
+          class="btn-primary mb-1"
           @click=${async () => {
             if (wallet.signers.length === 1) {
               onSignerSelected(wallet, wallet.signers[0]);
             } else {
               onWalletSelected(wallet);
-              onSignerSelected(wallet, wallet.signers[0]);
             }
           }}
         >

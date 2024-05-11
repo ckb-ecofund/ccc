@@ -8,29 +8,57 @@ const CCC_CONTEXT = createContext<{
   disconnect: () => unknown;
   wallet?: ccc.Wallet;
   signerInfo?: ccc.SignerInfo;
-}>({ open: () => {}, disconnect: () => {} });
+  status: ccc.ConnectorStatus;
+}>({
+  open: () => {},
+  disconnect: () => {},
+  status: ccc.ConnectorStatus.SelectingSigner,
+});
 
 export function Provider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
   const [wallet, setWallet] = useState<ccc.Wallet | undefined>();
   const [signerInfo, setSignerInfo] = useState<ccc.SignerInfo | undefined>();
+  const [status, setStatus] = useState<ccc.ConnectorStatus>(
+    ccc.ConnectorStatus.SelectingSigner,
+  );
 
   return (
     <CCC_CONTEXT.Provider
       value={{
         open: () => setIsOpen(true),
-        disconnect: () => setSignerInfo(undefined),
-        wallet,
-        signerInfo,
+        disconnect: () => {
+          setWallet(undefined);
+          setSignerInfo(undefined);
+          setStatus(ccc.ConnectorStatus.SelectingSigner);
+        },
+
+        ...([
+          ccc.ConnectorStatus.SelectingSigner,
+          ccc.ConnectorStatus.Connecting,
+        ].includes(status)
+          ? {
+              wallet: undefined,
+              signerInfo: undefined,
+            }
+          : {
+              wallet,
+              signerInfo,
+            }),
+        status,
       }}
     >
       <Connector
         isOpen={isOpen}
+        wallet={wallet}
+        signer={signerInfo}
+        status={status}
         onClose={() => setIsOpen(false)}
-        onConnected={({ wallet, signerInfo }) => {
+        onSignerChanged={({ wallet, signerInfo }) => {
           setWallet(wallet);
           setSignerInfo(signerInfo);
         }}
+        onStatusChanged={({ status }) => setStatus(status)}
       />
       {children}
     </CCC_CONTEXT.Provider>
