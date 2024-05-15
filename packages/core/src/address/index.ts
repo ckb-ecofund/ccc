@@ -45,9 +45,7 @@ export class Address {
       );
     }
 
-    return Address.from(
-      await addressFromPayload(prefix, format, payload, client),
-    );
+    return addressFromPayload(prefix, format, payload, client);
   }
 
   static async fromScript(
