@@ -1,8 +1,8 @@
 import { bech32, bech32m } from "bech32";
-import { Script, hashTypeFromBytes } from "../ckb";
+import { hashTypeFromBytes } from "../ckb";
 import { Client, KnownScript } from "../client";
 import { hexFrom } from "../hex";
-import { type Address } from "./index";
+import { type AddressLike } from "./index";
 
 export function addressPayloadFromString(address: string): {
   prefix: string;
@@ -42,7 +42,7 @@ export async function addressFromPayload(
   format: AddressFormat,
   payload: number[],
   client: Client,
-): Promise<Address> {
+): Promise<AddressLike> {
   if (format === AddressFormat.Full) {
     if (payload.length < 32 + 1) {
       throw new Error(
@@ -51,11 +51,11 @@ export async function addressFromPayload(
     }
 
     return {
-      script: Script.from({
-        codeHash: hexFrom(payload.slice(0, 32)),
+      script: {
+        codeHash: payload.slice(0, 32),
         hashType: hashTypeFromBytes(payload.slice(32, 33)),
-        args: hexFrom(payload.slice(33)),
-      }),
+        args: payload.slice(33),
+      },
       prefix,
     };
   }
@@ -68,11 +68,11 @@ export async function addressFromPayload(
     }
 
     return {
-      script: Script.from({
-        codeHash: hexFrom(payload.slice(0, 32)),
+      script: {
+        codeHash: payload.slice(0, 32),
         hashType: "data",
-        args: hexFrom(payload.slice(32)),
-      }),
+        args: payload.slice(32),
+      },
       prefix,
     };
   }
@@ -85,11 +85,11 @@ export async function addressFromPayload(
     }
 
     return {
-      script: Script.from({
-        codeHash: hexFrom(payload.slice(0, 32)),
+      script: {
+        codeHash: payload.slice(0, 32),
         hashType: "type",
-        args: hexFrom(payload.slice(32)),
-      }),
+        args: payload.slice(32),
+      },
       prefix,
     };
   }
@@ -112,10 +112,10 @@ export async function addressFromPayload(
   }
 
   return {
-    script: Script.from({
+    script: {
       ...(await client.getKnownScript(script)),
-      args: hexFrom(payload.slice(1)),
-    }),
+      args: payload.slice(1),
+    },
     prefix,
   };
 }

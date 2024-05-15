@@ -27,8 +27,8 @@ export function depTypeFrom(val: DepTypeLike): DepType {
   }
   return depType;
 }
-export function depTypeToBytes(depType: DepType): Bytes {
-  return bytesFrom([DEP_TYPE_TO_NUM[depType]]);
+export function depTypeToBytes(depType: DepTypeLike): Bytes {
+  return bytesFrom([DEP_TYPE_TO_NUM[depTypeFrom(depType)]]);
 }
 export function depTypeFromBytes(bytes: BytesLike): DepType {
   return NUM_TO_DEP_TYPE[bytesFrom(bytes)[0]];

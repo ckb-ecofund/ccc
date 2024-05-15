@@ -1,6 +1,6 @@
 import { Address } from "../../address";
 import { bytesConcat, bytesFrom } from "../../bytes";
-import { Transaction, WitnessArgs } from "../../ckb";
+import { Transaction, TransactionLike, WitnessArgs } from "../../ckb";
 import { KnownScript } from "../../client";
 import { hexFrom } from "../../hex";
 import { numToBytes } from "../../num";
@@ -25,7 +25,9 @@ export abstract class SignerEvm extends Signer {
     ];
   }
 
-  async signOnlyTransaction(tx: Transaction): Promise<Transaction> {
+  async signOnlyTransaction(txLike: TransactionLike): Promise<Transaction> {
+    const tx = Transaction.from(txLike);
+
     const { script } = await this.getRecommendedAddressObj();
     const info = await getSignHashInfo(tx, script);
     if (!info) {

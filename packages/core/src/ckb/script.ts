@@ -29,8 +29,8 @@ export function hashTypeFrom(val: HashTypeLike): HashType {
   }
   return hashType;
 }
-export function hashTypeToBytes(hashType: HashType): Bytes {
-  return bytesFrom([HASH_TYPE_TO_NUM[hashType]]);
+export function hashTypeToBytes(hashType: HashTypeLike): Bytes {
+  return bytesFrom([HASH_TYPE_TO_NUM[hashTypeFrom(hashType)]]);
 }
 export function hashTypeFromBytes(bytes: BytesLike): HashType {
   return NUM_TO_HASH_TYPE[bytesFrom(bytes)[0]];

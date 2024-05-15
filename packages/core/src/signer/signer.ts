@@ -1,6 +1,6 @@
 import { Address } from "../address";
 import { BytesLike } from "../bytes";
-import { Transaction } from "../ckb";
+import { Transaction, TransactionLike } from "../ckb";
 import { Client } from "../client";
 import { Hex } from "../hex";
 
@@ -29,15 +29,15 @@ export abstract class Signer {
     throw Error("Signer.signMessage not implemented");
   }
 
-  async sendTransaction(tx: Transaction): Promise<Hex> {
+  async sendTransaction(tx: TransactionLike): Promise<Hex> {
     return this.client.sendTransaction(await this.signTransaction(tx));
   }
 
-  async signTransaction(tx: Transaction): Promise<Transaction> {
+  async signTransaction(tx: TransactionLike): Promise<Transaction> {
     return this.signOnlyTransaction(tx);
   }
 
-  signOnlyTransaction(_: Transaction): Promise<Transaction> {
+  signOnlyTransaction(_: TransactionLike): Promise<Transaction> {
     throw Error("Signer.signOnlyTransaction not implemented");
   }
 }

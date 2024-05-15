@@ -1,8 +1,8 @@
 export type FixedPoint = bigint;
 export type FixedPointLike = bigint | string | number;
 
-export function fixedPointToString(val: FixedPoint, decimals = 8): string {
-  const str = val.toString();
+export function fixedPointToString(val: FixedPointLike, decimals = 8): string {
+  const str = fixedPointFrom(val).toString();
   const l = str.length <= decimals ? "0" : str.slice(0, -decimals);
   const r = str.slice(-decimals).padStart(decimals, "0").replace(/0*$/, "");
   if (r === "") {

@@ -45,14 +45,16 @@ export class Address {
       );
     }
 
-    return addressFromPayload(prefix, format, payload, client);
+    return Address.from(
+      await addressFromPayload(prefix, format, payload, client),
+    );
   }
 
   static async fromScript(
     script: ScriptLike,
     client: Client,
   ): Promise<Address> {
-    return new Address(Script.from(script), await client.getAddressPrefix());
+    return Address.from({ script, prefix: await client.getAddressPrefix() });
   }
 
   static async fromKnownScript(
@@ -60,13 +62,13 @@ export class Address {
     args: HexLike,
     client: Client,
   ) {
-    return new Address(
-      Script.from({
+    return Address.from({
+      script: {
         ...(await client.getKnownScript(script)),
         args,
-      }),
-      await client.getAddressPrefix(),
-    );
+      },
+      prefix: await client.getAddressPrefix(),
+    });
   }
 
   toString(): string {
