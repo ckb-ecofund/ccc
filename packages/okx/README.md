@@ -1,8 +1,9 @@
-<h1 align="center" style="font-size: 64px;">
-  CCC
+<h1 align="center" style="font-size: 48px;">
+  CCC's support for OKX
 </h1>
 
 <p align="center">
+  <img alt="NPM Version" src="https://img.shields.io/npm/v/%40ckb-ccc%2okx?link=https%3A%2F%2Fwww.npmjs.com%2Fpackage%2F%40ckb-ccc%2Fokx">
   <img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/m/ckb-ecofund/ccc">
   <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/ckb-ecofund/ccc/master">
   <img alt="GitHub deployments" src="https://img.shields.io/github/deployments/ckb-ecofund/ccc/production">
