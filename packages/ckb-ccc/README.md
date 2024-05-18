@@ -3,11 +3,15 @@
 </h1>
 
 <p align="center">
-  <img alt="NPM Version" src="https://img.shields.io/npm/v/ckb-ccc?link=https%3A%2F%2Fwww.npmjs.com%2Fpackage%2Fckb-ccc">
+  <a href="https://www.npmjs.com/package/ckb-ccc">
+    <img alt="NPM Version" src="https://img.shields.io/npm/v/ckb-ccc">
+  </a>
   <img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/m/ckb-ecofund/ccc">
   <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/ckb-ecofund/ccc/master">
   <img alt="GitHub deployments" src="https://img.shields.io/github/deployments/ckb-ecofund/ccc/production">
-  <img alt="Demo" src="https://img.shields.io/website?url=https%3A%2F%2Fckbccc-demo.vercel.app%2F&label=Demo">
+  <a href="https://ckbccc-demo.vercel.app/">
+    <img alt="Demo" src="https://img.shields.io/website?url=https%3A%2F%2Fckbccc-demo.vercel.app%2F&label=Demo">
+  </a>
 </p>
 
 <p align="center">
