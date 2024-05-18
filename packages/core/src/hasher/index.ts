@@ -4,7 +4,7 @@ import { Hex } from "../hex";
 import { CKB_BLAKE2B_PERSONAL } from "./advanced";
 
 export class Hasher {
-  hasher: Blake2b;
+  private readonly hasher: Blake2b;
 
   constructor(outLength = 32, personal = CKB_BLAKE2B_PERSONAL) {
     this.hasher = blake2b(
