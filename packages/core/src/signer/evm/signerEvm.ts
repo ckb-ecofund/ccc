@@ -7,13 +7,32 @@ import { numToBytes } from "../../num";
 import { getSignHashInfo } from "../helpers";
 import { Signer } from "../signer";
 
+/**
+ * An abstract class extending Signer for Ethereum Virtual Machine (EVM) based signing operations.
+ * This class provides methods to get EVM account, internal address, and signing transactions.
+ */
 export abstract class SignerEvm extends Signer {
+  /**
+   * Gets the EVM account associated with the signer.
+   * 
+   * @returns A promise that resolves to a string representing the EVM account.
+   */
   abstract getEvmAccount(): Promise<string>;
 
+  /**
+   * Gets the internal address, which is the EVM account in this case.
+   * 
+   * @returns A promise that resolves to a string representing the internal address.
+   */
   async getInternalAddress(): Promise<string> {
     return this.getEvmAccount();
   }
 
+  /**
+   * Gets an array of Address objects representing the known script addresses for the signer.
+   * 
+   * @returns A promise that resolves to an array of Address objects.
+   */
   async getAddressObjs(): Promise<Address[]> {
     const account = await this.getEvmAccount();
     return [
@@ -25,6 +44,12 @@ export abstract class SignerEvm extends Signer {
     ];
   }
 
+  /**
+   * Signs a transaction without modifying it.
+   * 
+   * @param txLike - The transaction to sign, represented as a TransactionLike object.
+   * @returns A promise that resolves to a signed Transaction object.
+   */
   async signOnlyTransaction(txLike: TransactionLike): Promise<Transaction> {
     const tx = Transaction.from(txLike);
 

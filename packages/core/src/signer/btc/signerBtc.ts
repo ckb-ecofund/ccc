@@ -9,15 +9,40 @@ import { numToBytes } from "../../num";
 import { getSignHashInfo } from "../helpers";
 import { Signer } from "../signer";
 
+/**
+ * An abstract class extending the Signer class for Bitcoin-like signing operations.
+ * This class provides methods to get Bitcoin account, public key, and internal address,
+ * as well as signing transactions.
+ */
 export abstract class SignerBtc extends Signer {
+  /**
+   * Gets the Bitcoin account associated with the signer.
+   * 
+   * @returns A promise that resolves to a string representing the Bitcoin account.
+   */
   abstract getBtcAccount(): Promise<string>;
 
+  /**
+   * Gets the Bitcoin public key associated with the signer.
+   * 
+   * @returns A promise that resolves to a HexLike value representing the Bitcoin public key.
+   */
   abstract getBtcPublicKey(): Promise<HexLike>;
 
+  /**
+   * Gets the internal address, which is the Bitcoin account in this case.
+   * 
+   * @returns A promise that resolves to a string representing the internal address.
+   */
   async getInternalAddress(): Promise<string> {
     return this.getBtcAccount();
   }
 
+  /**
+   * Gets an array of Address objects representing the known script addresses for the signer.
+   * 
+   * @returns A promise that resolves to an array of Address objects.
+   */
   async getAddressObjs(): Promise<Address[]> {
     const publicKey = await this.getBtcPublicKey();
     const hash = ripemd160(sha256(bytesFrom(publicKey)));
@@ -31,6 +56,12 @@ export abstract class SignerBtc extends Signer {
     ];
   }
 
+  /**
+   * Signs a transaction without modifying it.
+   * 
+   * @param txLike - The transaction to sign, represented as a TransactionLike object.
+   * @returns A promise that resolves to a signed Transaction object.
+   */
   async signOnlyTransaction(txLike: TransactionLike): Promise<Transaction> {
     const tx = Transaction.from(txLike);
     const { script } = await this.getRecommendedAddressObj();

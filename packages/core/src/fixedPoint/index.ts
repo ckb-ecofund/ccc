@@ -1,5 +1,30 @@
+/**
+ * Represents a fixed point value as a bigint.
+ */
+
 export type FixedPoint = bigint;
+
+/**
+ * Represents a value that can be converted to a fixed point value.
+ * It can be a bigint, string, or number.
+ */
+
 export type FixedPointLike = bigint | string | number;
+
+/**
+ * Converts a FixedPointLike value to its string representation with fixed-point decimals.
+ *
+ * @param val - The value to convert, which can be a bigint, string, or number.
+ * @param decimals - The number of decimal places for the fixed-point representation. Default is 8.
+ * @returns A string representing the fixed-point value.
+ *
+ * @example
+ * ```typescript
+ * const str = fixedPointToString(123456789n, 8); // Outputs "1.23456789"
+ * const strFromString = fixedPointToString("123456789", 8); // Outputs "1.23456789"
+ * const strFromNumber = fixedPointToString(123456789, 8); // Outputs "1.23456789"
+ * ```
+ */
 
 export function fixedPointToString(val: FixedPointLike, decimals = 8): string {
   const str = fixedPointFrom(val).toString();
@@ -11,6 +36,21 @@ export function fixedPointToString(val: FixedPointLike, decimals = 8): string {
 
   return `${l}.${r}`;
 }
+
+/**
+ * Converts a FixedPointLike value to a FixedPoint (bigint) with fixed-point decimals.
+ *
+ * @param val - The value to convert, which can be a bigint, string, or number.
+ * @param decimals - The number of decimal places for the fixed-point representation. Default is 8.
+ * @returns A FixedPoint (bigint) representing the value with fixed-point decimals.
+ *
+ * @example
+ * ```typescript
+ * const fixedPoint = fixedPointFrom(1.23456789, 8); // Outputs 123456789n
+ * const fixedPointFromString = fixedPointFrom("1.23456789", 8); // Outputs 123456789n
+ * const fixedPointFromNumber = fixedPointFrom(1.23456789, 8); // Outputs 123456789n
+ * ```
+ */
 
 export function fixedPointFrom(val: FixedPointLike, decimals = 8): FixedPoint {
   if (typeof val === "bigint") {
@@ -26,5 +66,15 @@ export function fixedPointFrom(val: FixedPointLike, decimals = 8): FixedPoint {
   return lVal + BigInt(r.slice(0, decimals).padEnd(decimals, "0"));
 }
 
+/**
+ * Represents the fixed point value of zero as a bigint.
+ */
+
 export const Zero = 0n;
+
+/**
+ * Represents the fixed point value of one as a FixedPoint (bigint).
+ * Equivalent to 1 in fixed-point representation with default decimals (8).
+ */
+ 
 export const One = fixedPointFrom("1");

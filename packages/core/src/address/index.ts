@@ -14,11 +14,29 @@ export type AddressLike = {
   script: ScriptLike;
   prefix: string;
 };
+
+/**
+ * Represents a ckb address with associated script and prefix.
+ */
+
 export class Address {
+  /**
+   * Creates an instance of Address.
+   *
+   * @param script - The script associated with the address.
+   * @param prefix - The address prefix.
+   */
   constructor(
     public script: Script,
     public prefix: string,
   ) {}
+
+  /**
+   * Creates an Address instance from an AddressLike object.
+   *
+   * @param address - An AddressLike object or an instance of Address.
+   * @returns An Address instance.
+   */
 
   static from(address: AddressLike): Address {
     if (address instanceof Address) {
@@ -27,6 +45,16 @@ export class Address {
 
     return new Address(Script.from(address.script), address.prefix);
   }
+
+  /**
+   * Creates an Address instance from an address string.
+   *
+   * @param address - The address string to parse.
+   * @param clients - A Client instance or a record of Client instances keyed by prefix.
+   * @returns A promise that resolves to an Address instance.
+   *
+   * @throws Will throw an error if the address prefix is unknown or mismatched.
+   */
 
   static async fromString(
     address: string,
@@ -50,6 +78,14 @@ export class Address {
     );
   }
 
+  /**
+   * Creates an Address instance from a script and client.
+   *
+   * @param script - The script-like object.
+   * @param client - The client instance used to fetch the address prefix.
+   * @returns A promise that resolves to an Address instance.
+   */
+
   static async fromScript(
     script: ScriptLike,
     client: Client,
@@ -70,6 +106,12 @@ export class Address {
       prefix: await client.getAddressPrefix(),
     });
   }
+
+  /**
+   * Converts the Address instance to a string.
+   *
+   * @returns The address as a string.
+   */
 
   toString(): string {
     const data = bytesConcat(
