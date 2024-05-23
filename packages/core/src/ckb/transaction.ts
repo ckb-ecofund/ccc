@@ -10,6 +10,22 @@ import { DEP_TYPE_TO_NUM, NUM_TO_DEP_TYPE } from "./transaction.advanced";
 
 export type DepTypeLike = string | number | bigint;
 export type DepType = "depGroup" | "code";
+
+/**
+ * Converts a DepTypeLike value to a DepType.
+ *
+ * @param val - The value to convert, which can be a string, number, or bigint.
+ * @returns The corresponding DepType.
+ *
+ * @throws Will throw an error if the input value is not a valid dep type.
+ *
+ * @example
+ * ```typescript
+ * const depType = depTypeFrom(1); // Outputs "code"
+ * const depType = depTypeFrom("depGroup"); // Outputs "depGroup"
+ * ```
+ */
+
 export function depTypeFrom(val: DepTypeLike): DepType {
   const depType = (() => {
     if (typeof val === "number") {
@@ -27,9 +43,37 @@ export function depTypeFrom(val: DepTypeLike): DepType {
   }
   return depType;
 }
+
+/**
+ * Converts a DepTypeLike value to its corresponding byte representation.
+ *
+ * @param depType - The dep type value to convert.
+ * @returns A Uint8Array containing the byte representation of the dep type.
+ *
+ * @example
+ * ```typescript
+ * const depTypeBytes = depTypeToBytes("code"); // Outputs Uint8Array [1]
+ * ```
+ */
+
 export function depTypeToBytes(depType: DepTypeLike): Bytes {
   return bytesFrom([DEP_TYPE_TO_NUM[depTypeFrom(depType)]]);
 }
+
+/**
+ * Converts a byte-like value to a DepType.
+ *
+ * @param bytes - The byte-like value to convert.
+ * @returns The corresponding DepType.
+ *
+ * @throws Will throw an error if the input bytes do not correspond to a valid dep type.
+ *
+ * @example
+ * ```typescript
+ * const depType = depTypeFromBytes(new Uint8Array([1])); // Outputs "code"
+ * ```
+ */
+
 export function depTypeFromBytes(bytes: BytesLike): DepType {
   return NUM_TO_DEP_TYPE[bytesFrom(bytes)[0]];
 }
@@ -39,10 +83,30 @@ export type OutPointLike = {
   index: NumLike;
 };
 export class OutPoint {
+
+  /**
+   * Creates an instance of OutPoint.
+   *
+   * @param txHash - The transaction hash.
+   * @param index - The index of the output in the transaction.
+   */
+
   constructor(
     public txHash: Hex,
     public index: Num,
   ) {}
+
+  /**
+   * Creates an OutPoint instance from an OutPointLike object.
+   *
+   * @param outPoint - An OutPointLike object or an instance of OutPoint.
+   * @returns An OutPoint instance.
+   *
+   * @example
+   * ```typescript
+   * const outPoint = OutPoint.from({ txHash: "0x...", index: 0 });
+   * ```
+   */
 
   static from(outPoint: OutPointLike): OutPoint {
     if (outPoint instanceof OutPoint) {
@@ -51,6 +115,12 @@ export class OutPoint {
     return new OutPoint(hexFrom(outPoint.txHash), numFrom(outPoint.index));
   }
 
+  /**
+   * Converts the OutPoint instance to molecule data format.
+   *
+   * @returns An object representing the outpoint in molecule data format.
+   */
+
   _toMolData() {
     return {
       txHash: bytesFrom(this.txHash),
@@ -58,9 +128,32 @@ export class OutPoint {
     };
   }
 
+  /**
+   * Converts the OutPoint instance to bytes.
+   *
+   * @returns A Uint8Array containing the outpoint bytes.
+   *
+   * @example
+   * ```typescript
+   * const outPointBytes = outPoint.encode();
+   * ```
+   */
+
   encode(): Bytes {
     return bytesFrom(mol.SerializeOutPoint(this._toMolData()));
   }
+
+  /**
+   * Creates an OutPoint instance from a byte-like value or molecule OutPoint.
+   *
+   * @param bytes - The byte-like value or molecule OutPoint to convert.
+   * @returns An OutPoint instance.
+   *
+   * @example
+   * ```typescript
+   * const outPoint = OutPoint.fromBytes(new Uint8Array([/* outpoint bytes *\/]));
+   * ```
+   */
 
   static fromBytes(bytes: BytesLike | mol.OutPoint): OutPoint {
     const view =
@@ -81,11 +174,36 @@ export type CellOutputLike = {
   type?: ScriptLike;
 };
 export class CellOutput {
+  
+  /**
+   * Creates an instance of CellOutput.
+   *
+   * @param capacity - The capacity of the cell.
+   * @param lock - The lock script of the cell.
+   * @param type - The optional type script of the cell.
+   */
+
   constructor(
     public capacity: Num,
     public lock: Script,
     public type?: Script,
   ) {}
+
+  /**
+   * Creates a CellOutput instance from a CellOutputLike object.
+   *
+   * @param cellOutput - A CellOutputLike object or an instance of CellOutput.
+   * @returns A CellOutput instance.
+   *
+   * @example
+   * ```typescript
+   * const cellOutput = CellOutput.from({
+   *   capacity: 1000n,
+   *   lock: { codeHash: "0x...", hashType: "type", args: "0x..." },
+   *   type: { codeHash: "0x...", hashType: "type", args: "0x..." }
+   * });
+   * ```
+   */
 
   static from(cellOutput: CellOutputLike): CellOutput {
     if (cellOutput instanceof CellOutput) {
@@ -99,6 +217,12 @@ export class CellOutput {
     );
   }
 
+  /**
+   * Converts the CellOutput instance to molecule data format.
+   *
+   * @returns An object representing the cell output in molecule data format.
+   */
+  
   _toMolData() {
     return {
       capacity: numToBytes(this.capacity, 8),
@@ -107,9 +231,32 @@ export class CellOutput {
     };
   }
 
+  /**
+   * Converts the CellOutput instance to bytes.
+   *
+   * @returns A Uint8Array containing the cell output bytes.
+   *
+   * @example
+   * ```typescript
+   * const cellOutputBytes = cellOutput.toBytes();
+   * ```
+   */
+
   toBytes(): Bytes {
     return bytesFrom(mol.SerializeCellOutput(this._toMolData()));
   }
+
+  /**
+   * Creates a CellOutput instance from a byte-like value or molecule CellOutput.
+   *
+   * @param bytes - The byte-like value or molecule CellOutput to convert.
+   * @returns A CellOutput instance.
+   *
+   * @example
+   * ```typescript
+   * const cellOutput = CellOutput.fromBytes(new Uint8Array([/* cell output bytes *\/]));
+   * ```
+   */
 
   static fromBytes(bytes: BytesLike | mol.CellOutput): CellOutput {
     const view =
@@ -132,13 +279,38 @@ export type CellInputLike = {
   outputData?: HexLike;
 };
 export class CellInput {
+
+  /**
+   * Creates an instance of CellInput.
+   *
+   * @param previousOutput - The previous outpoint of the cell.
+   * @param since - The since value of the cell input.
+   * @param cellOutput - The optional cell output associated with the cell input.
+   * @param outputData - The optional output data associated with the cell input.
+   */
+
   constructor(
     public previousOutput: OutPoint,
     public since: Num,
     public cellOutput?: CellOutput,
     public outputData?: Hex,
   ) {}
-
+  
+  /**
+   * Creates a CellInput instance from a CellInputLike object.
+   *
+   * @param cellInput - A CellInputLike object or an instance of CellInput.
+   * @returns A CellInput instance.
+   *
+   * @example
+   * ```typescript
+   * const cellInput = CellInput.from({
+   *   previousOutput: { txHash: "0x...", index: 0 },
+   *   since: 0n
+   * });
+   * ```
+   */
+  
   static from(cellInput: CellInputLike): CellInput {
     if (cellInput instanceof CellInput) {
       return cellInput;
@@ -152,6 +324,12 @@ export class CellInput {
     );
   }
 
+  /**
+   * Converts the CellInput instance to molecule data format.
+   *
+   * @returns An object representing the cell input in molecule data format.
+   */
+
   _toMolData() {
     return {
       previousOutput: this.previousOutput._toMolData(),
@@ -159,9 +337,32 @@ export class CellInput {
     };
   }
 
+  /**
+   * Converts the CellInput instance to bytes.
+   *
+   * @returns A Uint8Array containing the cell input bytes.
+   *
+   * @example
+   * ```typescript
+   * const cellInputBytes = cellInput.toBytes();
+   * ```
+   */
+
   toBytes(): Bytes {
     return bytesFrom(mol.SerializeCellInput(this._toMolData()));
   }
+
+  /**
+   * Creates a CellInput instance from a byte-like value or molecule CellInput.
+   *
+   * @param bytes - The byte-like value or molecule CellInput to convert.
+   * @returns A CellInput instance.
+   *
+   * @example
+   * ```typescript
+   * const cellInput = CellInput.fromBytes(new Uint8Array([/* cell input bytes *\/]));
+   * ```
+   */
 
   static fromBytes(bytes: BytesLike | mol.CellInput): CellInput {
     const view =
@@ -181,10 +382,33 @@ export type CellDepLike = {
   depType: DepTypeLike;
 };
 export class CellDep {
+
+  /**
+   * Creates an instance of CellDep.
+   *
+   * @param outPoint - The outpoint of the cell dependency.
+   * @param depType - The dependency type.
+   */
+
   constructor(
     public outPoint: OutPoint,
     public depType: DepType,
   ) {}
+
+  /**
+   * Creates a CellDep instance from a CellDepLike object.
+   *
+   * @param cellDep - A CellDepLike object or an instance of CellDep.
+   * @returns A CellDep instance.
+   *
+   * @example
+   * ```typescript
+   * const cellDep = CellDep.from({
+   *   outPoint: { txHash: "0x...", index: 0 },
+   *   depType: "depGroup"
+   * });
+   * ```
+   */
 
   static from(cellDep: CellDepLike): CellDep {
     if (cellDep instanceof CellDep) {
@@ -197,6 +421,12 @@ export class CellDep {
     );
   }
 
+  /**
+   * Converts the CellDep instance to molecule data format.
+   *
+   * @returns An object representing the cell dependency in molecule data format.
+   */
+
   _toMolData() {
     return {
       outPoint: this.outPoint._toMolData(),
@@ -204,9 +434,32 @@ export class CellDep {
     };
   }
 
+  /**
+   * Converts the CellDep instance to bytes.
+   *
+   * @returns A Uint8Array containing the cell dependency bytes.
+   *
+   * @example
+   * ```typescript
+   * const cellDepBytes = cellDep.toBytes();
+   * ```
+   */
+
   toBytes(): Bytes {
     return bytesFrom(mol.SerializeCellDep(this._toMolData()));
   }
+
+  /**
+   * Creates a CellDep instance from a byte-like value or molecule CellDep.
+   *
+   * @param bytes - The byte-like value or molecule CellDep to convert.
+   * @returns A CellDep instance.
+   *
+   * @example
+   * ```typescript
+   * const cellDep = CellDep.fromBytes(new Uint8Array([/* cell dep bytes *\/]));
+   * ```
+   */
 
   fromBytes(bytes: BytesLike | mol.CellDep): CellDep {
     const view =
@@ -225,11 +478,36 @@ export type WitnessArgsLike = {
   outputType?: HexLike;
 };
 export class WitnessArgs {
+
+  /**
+   * Creates an instance of WitnessArgs.
+   *
+   * @param lock - The optional lock field of the witness.
+   * @param inputType - The optional input type field of the witness.
+   * @param outputType - The optional output type field of the witness.
+   */
+
   constructor(
     public lock?: Hex,
     public inputType?: Hex,
     public outputType?: Hex,
   ) {}
+
+  /**
+   * Creates a WitnessArgs instance from a WitnessArgsLike object.
+   *
+   * @param witnessArgs - A WitnessArgsLike object or an instance of WitnessArgs.
+   * @returns A WitnessArgs instance.
+   *
+   * @example
+   * ```typescript
+   * const witnessArgs = WitnessArgs.from({
+   *   lock: "0x...",
+   *   inputType: "0x...",
+   *   outputType: "0x..."
+   * });
+   * ```
+   */
 
   static from(witnessArgs: WitnessArgsLike): WitnessArgs {
     if (witnessArgs instanceof WitnessArgs) {
@@ -243,6 +521,12 @@ export class WitnessArgs {
     );
   }
 
+  /**
+   * Converts the WitnessArgs instance to molecule data format.
+   *
+   * @returns An object representing the witness arguments in molecule data format.
+   */
+
   _toMolData() {
     return {
       lock: apply(bytesFrom, this.lock),
@@ -251,9 +535,32 @@ export class WitnessArgs {
     };
   }
 
+  /**
+   * Converts the WitnessArgs instance to bytes.
+   *
+   * @returns A Uint8Array containing the witness arguments bytes.
+   *
+   * @example
+   * ```typescript
+   * const witnessArgsBytes = witnessArgs.toBytes();
+   * ```
+   */
+
   toBytes(): Bytes {
     return bytesFrom(mol.SerializeWitnessArgs(this._toMolData()));
   }
+
+  /**
+   * Creates a WitnessArgs instance from a byte-like value or molecule WitnessArgs.
+   *
+   * @param bytes - The byte-like value or molecule WitnessArgs to convert.
+   * @returns A WitnessArgs instance.
+   *
+   * @example
+   * ```typescript
+   * const witnessArgs = WitnessArgs.fromBytes(new Uint8Array([/* witness args bytes *\/]));
+   * ```
+   */
 
   static fromBytes(bytes: BytesLike | mol.WitnessArgs): WitnessArgs {
     const view =
@@ -279,6 +586,19 @@ export type TransactionLike = {
   witnesses: HexLike[];
 };
 export class Transaction {
+
+  /**
+   * Creates an instance of Transaction.
+   *
+   * @param version - The version of the transaction.
+   * @param cellDeps - The cell dependencies of the transaction.
+   * @param headerDeps - The header dependencies of the transaction.
+   * @param inputs - The inputs of the transaction.
+   * @param outputs - The outputs of the transaction.
+   * @param outputsData - The data associated with the outputs.
+   * @param witnesses - The witnesses of the transaction.
+   */
+
   constructor(
     public version: Num,
     public cellDeps: CellDep[],
@@ -289,9 +609,40 @@ export class Transaction {
     public witnesses: Hex[],
   ) {}
 
+  /**
+   * Creates a default Transaction instance with empty fields.
+   *
+   * @returns A default Transaction instance.
+   *
+   * @example
+   * ```typescript
+   * const defaultTx = Transaction.default();
+   * ```
+   */
+
   static default(): Transaction {
     return new Transaction(0n, [], [], [], [], [], []);
   }
+
+  /**
+   * Creates a Transaction instance from a TransactionLike object.
+   *
+   * @param tx - A TransactionLike object or an instance of Transaction.
+   * @returns A Transaction instance.
+   *
+   * @example
+   * ```typescript
+   * const transaction = Transaction.from({
+   *   version: 0,
+   *   cellDeps: [],
+   *   headerDeps: [],
+   *   inputs: [],
+   *   outputs: [],
+   *   outputsData: [],
+   *   witnesses: []
+   * });
+   * ```
+   */
 
   static from(tx: TransactionLike): Transaction {
     if (tx instanceof Transaction) {
@@ -308,6 +659,20 @@ export class Transaction {
       tx.witnesses.map(hexFrom),
     );
   }
+
+  /**
+   * Creates a Transaction instance from a Lumos skeleton.
+   *
+   * @param skeleton - The Lumos transaction skeleton.
+   * @returns A Transaction instance.
+   *
+   * @throws Will throw an error if an input's outPoint is missing.
+   *
+   * @example
+   * ```typescript
+   * const transaction = Transaction.fromLumosSkeleton(skeleton);
+   * ```
+   */
 
   static fromLumosSkeleton(skeleton: TransactionSkeletonType): Transaction {
     return Transaction.from({
@@ -332,6 +697,17 @@ export class Transaction {
     });
   }
 
+  /**
+   * Converts the raw transaction data to bytes.
+   *
+   * @returns A Uint8Array containing the raw transaction bytes.
+   *
+   * @example
+   * ```typescript
+   * const rawTxBytes = transaction.rawToBytes();
+   * ```
+   */
+
   rawToBytes(): Bytes {
     return bytesFrom(
       mol.SerializeRawTransaction({
@@ -345,9 +721,32 @@ export class Transaction {
     );
   }
 
+  /**
+   * Calculates the hash of the transaction.
+   *
+   * @returns The hash of the transaction.
+   *
+   * @example
+   * ```typescript
+   * const txHash = transaction.hash();
+   * ```
+   */
+
   hash() {
     return ckbHash(this.rawToBytes());
   }
+
+  /**
+   * Hashes a witness and updates the hasher.
+   *
+   * @param witness - The witness to hash.
+   * @param hasher - The hasher instance to update.
+   *
+   * @example
+   * ```typescript
+   * Transaction.hashWitnessToHasher("0x...", hasher);
+   * ```
+   */
 
   static hashWitnessToHasher(witness: HexLike, hasher: Hasher) {
     const raw = bytesFrom(hexFrom(witness));
