@@ -14,7 +14,7 @@ import { type AddressLike } from "./index";
  *
  * @example
  * ```typescript
- * const addressInfo = addressPayloadFromString("bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kygt080");
+ * const addressInfo = addressPayloadFromString("ckt1112139193129");
  * console.log(addressInfo.prefix); // Outputs the address prefix
  * console.log(addressInfo.format); // Outputs the address format
  * console.log(addressInfo.payload); // Outputs the payload array
