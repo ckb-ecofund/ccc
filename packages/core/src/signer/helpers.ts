@@ -2,6 +2,23 @@ import { Script, ScriptLike, Transaction, TransactionLike } from "../ckb";
 import { Hasher } from "../hasher";
 import { Hex } from "../hex";
 
+/**
+ * Computes the signing hash information for a given transaction and script.
+ *
+ * @param txLike - The transaction to sign, represented as a TransactionLike object.
+ * @param scriptLike - The script associated with the transaction, represented as a ScriptLike object.
+ * @returns A promise that resolves to an object containing the signing message and the witness position,
+ *          or undefined if no matching input is found.
+ *
+ * @example
+ * ```typescript
+ * const signHashInfo = await getSignHashInfo(transactionLike, scriptLike);
+ * if (signHashInfo) {
+ *   console.log(signHashInfo.message); // Outputs the signing message
+ *   console.log(signHashInfo.position); // Outputs the witness position
+ * }
+ * ```
+ */
 export async function getSignHashInfo(
   txLike: TransactionLike,
   scriptLike: ScriptLike,
