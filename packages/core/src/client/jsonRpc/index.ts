@@ -4,6 +4,20 @@ import { CkbRpcMethods, JsonRpcMethod, JsonRpcPayload } from "./advanced";
 
 export interface ClientJsonRpc extends Pick<Client, "sendTransaction"> {}
 
+/**
+ * Applies a transformation function to a value if the transformer is provided.
+ *
+ * @param value - The value to be transformed.
+ * @param transformer - An optional transformation function.
+ * @returns The transformed value if a transformer is provided, otherwise the original value.
+ *
+ * @example
+ * ```typescript
+ * const result = await transform(5, (x) => x * 2); // Outputs 10
+ * const resultWithoutTransformer = await transform(5); // Outputs 5
+ * ```
+ */
+
 async function transform(
   value: unknown,
   transformer?: (i: unknown) => unknown,
@@ -14,7 +28,20 @@ async function transform(
   return value;
 }
 
+/**
+ * An abstract class implementing JSON-RPC client functionality for a specific URL and timeout.
+ * Provides methods for sending transactions and building JSON-RPC payloads.
+ */
+
 export abstract class ClientJsonRpc implements Pick<Client, "sendTransaction"> {
+
+  /**
+   * Creates an instance of ClientJsonRpc.
+   *
+   * @param url - The URL of the JSON-RPC server.
+   * @param timeout - The timeout for requests in milliseconds, default is 30000.
+   */
+
   constructor(
     private readonly url: string,
     private readonly timeout = 30000,
@@ -27,9 +54,24 @@ export abstract class ClientJsonRpc implements Pick<Client, "sendTransaction"> {
     );
   }
 
+  /**
+   * Returns the URL of the JSON-RPC server.
+   *
+   * @returns The URL of the JSON-RPC server.
+   */
+
   getUrl() {
     return this.url;
   }
+
+  /**
+   * Builds a sender function for a JSON-RPC method.
+   *
+   * @param rpcMethod - The JSON-RPC method.
+   * @param inTransformers - An array of input transformers.
+   * @param outTransformer - An output transformer function.
+   * @returns A function that sends a JSON-RPC request with the given method and transformed parameters.
+   */
 
   buildSender({ rpcMethod, inTransformers, outTransformer }: JsonRpcMethod) {
     return async (...req: unknown[]) => {
@@ -41,6 +83,15 @@ export abstract class ClientJsonRpc implements Pick<Client, "sendTransaction"> {
       return transform(await this.send(payload), outTransformer);
     };
   }
+
+  /**
+   * Sends a JSON-RPC request to the server.
+   *
+   * @param payload - The JSON-RPC payload to send.
+   * @returns The result of the JSON-RPC request.
+   *
+   * @throws Will throw an error if the response ID does not match the request ID, or if the response contains an error.
+   */
 
   async send(payload: JsonRpcPayload) {
     const aborter = new AbortController();
@@ -69,6 +120,14 @@ export abstract class ClientJsonRpc implements Pick<Client, "sendTransaction"> {
     }
     return res.result;
   }
+  
+  /**
+   * Builds a JSON-RPC payload for the given method and parameters.
+   *
+   * @param method - The JSON-RPC method name.
+   * @param req - The parameters for the JSON-RPC method.
+   * @returns The JSON-RPC payload.
+   */
 
   static buildPayload(method: string, req: unknown[]): JsonRpcPayload {
     return {
