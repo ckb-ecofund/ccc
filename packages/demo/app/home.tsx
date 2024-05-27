@@ -77,6 +77,7 @@ function Transfer() {
   const [transferTo, setTransferTo] = useState<string>("");
   const [amount, setAmount] = useState<string>("");
   const [hash, setHash] = useState<string>("");
+  const [data, setData] = useState<string>("");
 
   return (
     <>
@@ -103,6 +104,12 @@ function Transfer() {
             onInput={(e) => setAmount(e.currentTarget.value)}
             placeholder="Enter amount to transfer"
           />
+          <textarea
+            className="mt-1 rounded-3xl border border-black px-4 py-2"
+            value={data}
+            onInput={(e) => setData(e.currentTarget.value)}
+            placeholder="Enter data in the cell. Hex string will be parsed."
+          />
         </div>
         <Button
           className="ml-2"
@@ -110,8 +117,10 @@ function Transfer() {
             if (!signer) {
               return;
             }
+            // Verify address
             await ccc.Address.fromString(transferTo, signer.client);
 
+            // === Composing transaction with Lumos ===
             const indexer = new Indexer(signer.client.getUrl());
             let txSkeleton = new TransactionSkeleton({
               cellProvider: indexer,
@@ -132,8 +141,24 @@ function Transfer() {
               undefined,
               { config: predefined.AGGRON4 },
             );
+            // ======
 
             const tx = ccc.Transaction.fromLumosSkeleton(txSkeleton);
+
+            // CCC transactions are easy to be edited
+            const dataBytes = (() => {
+              try {
+                return ccc.bytesFrom(data);
+              } catch (e) {}
+
+              return ccc.bytesFrom(data, "utf8");
+            })();
+            if (tx.outputs[0].capacity < ccc.fixedPointFrom(dataBytes.length)) {
+              throw new Error("Insufficient capacity to store data");
+            }
+            tx.outputsData[0] = ccc.hexFrom(dataBytes);
+
+            // Sign and send the transaction
             setHash(await signer.sendTransaction(tx));
           }}
         >
