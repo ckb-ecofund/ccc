@@ -22,28 +22,28 @@ export abstract class SignerEvmAddressReadonly extends SignerEvm {
   }
 
   /**
-  * Connects to the client. This implementation does nothing as the class is read-only.
-  * 
-  * @returns A promise that resolves when the connection is complete.
-  *
-  * @example
-    * ```typescript
-    * await signer.connect();
-    * ```
-  */
+   * Connects to the client. This implementation does nothing as the class is read-only.
+   *
+   * @returns A promise that resolves when the connection is complete.
+   *
+   * @example
+   * ```typescript
+   * await signer.connect();
+   * ```
+   */
 
   async connect(): Promise<void> {}
 
   /**
-  * Gets the EVM account associated with the signer.
-  * 
-  * @returns A promise that resolves to a string representing the EVM account.
-  *
-  * @example
-  * ```typescript
-  * const account = await signer.getEvmAccount(); // Outputs the EVM account
-  * ```
-  */
+   * Gets the EVM account associated with the signer.
+   *
+   * @returns A promise that resolves to a string representing the EVM account.
+   *
+   * @example
+   * ```typescript
+   * const account = await signer.getEvmAccount(); // Outputs the EVM account
+   * ```
+   */
   async getEvmAccount(): Promise<string> {
     return this.address;
   }

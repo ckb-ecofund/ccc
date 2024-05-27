@@ -1,4 +1,4 @@
-import { ScriptLike } from "../ckb";
+import { Script } from "../ckb";
 import { KnownScript } from "./client";
 import { MAINNET_SCRIPTS } from "./clientPublicMainnet.advanced";
 import { ClientJsonRpc } from "./jsonRpc";
@@ -12,7 +12,9 @@ export class ClientPublicMainnet extends ClientJsonRpc {
     return "ckb";
   }
 
-  async getKnownScript(script: KnownScript): Promise<Omit<ScriptLike, "args">> {
+  async getKnownScript(
+    script: KnownScript,
+  ): Promise<Pick<Script, "codeHash" | "hashType">> {
     return { ...MAINNET_SCRIPTS[script] };
   }
 }

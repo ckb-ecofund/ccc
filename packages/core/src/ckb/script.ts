@@ -86,7 +86,6 @@ export type ScriptLike = {
   args: BytesLike;
 };
 export class Script {
-
   /**
    * Creates an instance of Script.
    *

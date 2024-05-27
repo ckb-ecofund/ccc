@@ -1,4 +1,5 @@
 import { Script, ScriptLike, Transaction, TransactionLike } from "../ckb";
+import { Client } from "../client";
 import { Hasher } from "../hasher";
 import { Hex } from "../hex";
 
@@ -22,6 +23,7 @@ import { Hex } from "../hex";
 export async function getSignHashInfo(
   txLike: TransactionLike,
   scriptLike: ScriptLike,
+  client: Client,
 ): Promise<{ message: Hex; position: number } | undefined> {
   const tx = Transaction.from(txLike);
   const script = Script.from(scriptLike);
@@ -29,14 +31,15 @@ export async function getSignHashInfo(
   const hasher = new Hasher();
   hasher.update(tx.hash());
 
-  tx.witnesses.forEach((witness, i) => {
-    const input = tx.inputs[i];
-    if (input) {
-      if (!input.cellOutput?.lock) {
-        throw Error("Incomplete inputs info");
+  for (let i = 0; i < tx.witnesses.length; i += 1) {
+    if (tx.inputs[i]) {
+      const input = await tx.inputs[i].completeExtraInfos(client);
+
+      if (!input.cellOutput) {
+        throw Error("Unable to resolve inputs info");
       }
 
-      if (!script.eq(input.cellOutput?.lock)) {
+      if (!script.eq(input.cellOutput.lock)) {
         return;
       }
 
@@ -49,8 +52,8 @@ export async function getSignHashInfo(
       return undefined;
     }
 
-    Transaction.hashWitnessToHasher(witness, hasher);
-  });
+    Transaction.hashWitnessToHasher(tx.witnesses[i], hasher);
+  }
 
   if (position === -1) {
     return undefined;

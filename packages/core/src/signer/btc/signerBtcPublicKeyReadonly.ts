@@ -28,14 +28,14 @@ export class SignerBtcPublicKeyReadonly extends SignerBtc {
 
   /**
    * Connects to the client. This implementation does nothing as the class is read-only.
-   * 
+   *
    * @returns A promise that resolves when the connection is complete.
    */
   async connect(): Promise<void> {}
 
   /**
    * Gets the Bitcoin account associated with the signer.
-   * 
+   *
    * @returns A promise that resolves to a string representing the Bitcoin account.
    *
    * @example
@@ -49,7 +49,7 @@ export class SignerBtcPublicKeyReadonly extends SignerBtc {
 
   /**
    * Gets the Bitcoin public key associated with the signer.
-   * 
+   *
    * @returns A promise that resolves to a Hex string representing the Bitcoin public key.
    *
    * @example

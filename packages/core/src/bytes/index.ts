@@ -42,7 +42,7 @@ export function bytesConcat(...args: BytesLike[]): Bytes {
  * ```typescript
  * const encodedString = bytesTo(new Uint8Array([104, 101, 108, 108, 111]), "utf8");
  * console.log(encodedString); // Outputs "hello"
- * 
+ *
  * const base64String = bytesTo(new Uint8Array([104, 101, 108, 108, 111]), "base64");
  * console.log(base64String); // Outputs "aGVsbG8="
  * ```

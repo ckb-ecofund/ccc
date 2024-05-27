@@ -13,28 +13,28 @@ export abstract class Signer {
 
   /**
    * Connects to the client.
-   * 
+   *
    * @returns A promise that resolves when the connection is complete.
    */
   abstract connect(): Promise<void>;
 
   /**
    * Gets the internal address associated with the signer.
-   * 
+   *
    * @returns A promise that resolves to a string representing the internal address.
    */
   abstract getInternalAddress(): Promise<string>;
 
   /**
    * Gets an array of Address objects associated with the signer.
-   * 
+   *
    * @returns A promise that resolves to an array of Address objects.
    */
   abstract getAddressObjs(): Promise<Address[]>;
 
   /**
    * Gets the recommended Address object for the signer.
-   * 
+   *
    * @param _preference - Optional preference parameter.
    * @returns A promise that resolves to the recommended Address object.
    */
@@ -44,17 +44,17 @@ export abstract class Signer {
 
   /**
    * Gets the recommended address for the signer as a string.
-   * 
+   *
    * @param preference - Optional preference parameter.
    * @returns A promise that resolves to the recommended address as a string.
    */
   async getRecommendedAddress(preference?: unknown): Promise<string> {
     return (await this.getRecommendedAddressObj(preference)).toString();
   }
-  
+
   /**
    * Gets an array of addresses associated with the signer as strings.
-   * 
+   *
    * @returns A promise that resolves to an array of addresses as strings.
    */
   async getAddresses(): Promise<string[]> {
@@ -65,7 +65,7 @@ export abstract class Signer {
 
   /**
    * Signs a message. This method is not implemented and should be overridden by subclasses.
-   * 
+   *
    * @param _ - The message to sign, as a string or BytesLike object.
    * @returns A promise that resolves to the signed message as a string.
    * @throws Will throw an error if not implemented.
@@ -76,7 +76,7 @@ export abstract class Signer {
 
   /**
    * Sends a transaction after signing it.
-   * 
+   *
    * @param tx - The transaction to send, represented as a TransactionLike object.
    * @returns A promise that resolves to the transaction hash as a Hex string.
    */
@@ -86,7 +86,7 @@ export abstract class Signer {
 
   /**
    * Signs a transaction.
-   * 
+   *
    * @param tx - The transaction to sign, represented as a TransactionLike object.
    * @returns A promise that resolves to the signed Transaction object.
    */
@@ -96,7 +96,7 @@ export abstract class Signer {
 
   /**
    * Signs a transaction without sending it. This method is not implemented and should be overridden by subclasses.
-   * 
+   *
    * @param _ - The transaction to sign, represented as a TransactionLike object.
    * @returns A promise that resolves to the signed Transaction object.
    * @throws Will throw an error if not implemented.

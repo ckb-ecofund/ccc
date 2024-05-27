@@ -24,14 +24,14 @@ export class SignerCkbScriptReadonly extends Signer {
 
   /**
    * Connects to the client. This implementation does nothing as the class is read-only.
-   * 
+   *
    * @returns A promise that resolves when the connection is complete.
    */
   async connect(): Promise<void> {}
 
   /**
    * Gets the internal address for the script.
-   * 
+   *
    * @returns A promise that resolves to a string representing the internal address.
    *
    * @example
@@ -45,7 +45,7 @@ export class SignerCkbScriptReadonly extends Signer {
 
   /**
    * Gets an array of Address objects representing the script address.
-   * 
+   *
    * @returns A promise that resolves to an array of Address objects.
    *
    * @example

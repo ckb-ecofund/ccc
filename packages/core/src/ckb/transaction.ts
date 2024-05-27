@@ -1,5 +1,6 @@
 import type { TransactionSkeletonType } from "@ckb-lumos/helpers";
 import { Bytes, BytesLike, bytesFrom } from "../bytes";
+import { Client } from "../client";
 import { Hasher, ckbHash } from "../hasher";
 import { Hex, HexLike, hexFrom } from "../hex";
 import { Num, NumLike, numFrom, numFromBytes, numToBytes } from "../num";
@@ -83,7 +84,6 @@ export type OutPointLike = {
   index: NumLike;
 };
 export class OutPoint {
-
   /**
    * Creates an instance of OutPoint.
    *
@@ -174,7 +174,6 @@ export type CellOutputLike = {
   type?: ScriptLike;
 };
 export class CellOutput {
-  
   /**
    * Creates an instance of CellOutput.
    *
@@ -222,7 +221,7 @@ export class CellOutput {
    *
    * @returns An object representing the cell output in molecule data format.
    */
-  
+
   _toMolData() {
     return {
       capacity: numToBytes(this.capacity, 8),
@@ -272,6 +271,39 @@ export class CellOutput {
   }
 }
 
+export type CellLike = {
+  cellOutput: CellOutputLike;
+  outputData: HexLike;
+};
+export class Cell {
+  /**
+   * Creates an instance of Cell.
+   *
+   * @param cellOutput - The cell output of the cell.
+   * @param outputData - The output data of the cell.
+   */
+
+  constructor(
+    public cellOutput: CellOutput,
+    public outputData: Hex,
+  ) {}
+
+  /**
+   * Creates a Cell instance from a CellLike object.
+   *
+   * @param cell - A CellLike object or an instance of Cell.
+   * @returns A Cell instance.
+   */
+
+  static from(cell: CellLike): Cell {
+    if (cell instanceof Cell) {
+      return cell;
+    }
+
+    return new Cell(CellOutput.from(cell.cellOutput), hexFrom(cell.outputData));
+  }
+}
+
 export type CellInputLike = {
   previousOutput: OutPointLike;
   since: NumLike;
@@ -279,7 +311,6 @@ export type CellInputLike = {
   outputData?: HexLike;
 };
 export class CellInput {
-
   /**
    * Creates an instance of CellInput.
    *
@@ -295,7 +326,7 @@ export class CellInput {
     public cellOutput?: CellOutput,
     public outputData?: Hex,
   ) {}
-  
+
   /**
    * Creates a CellInput instance from a CellInputLike object.
    *
@@ -310,7 +341,7 @@ export class CellInput {
    * });
    * ```
    */
-  
+
   static from(cellInput: CellInputLike): CellInput {
     if (cellInput instanceof CellInput) {
       return cellInput;
@@ -322,6 +353,32 @@ export class CellInput {
       apply(CellOutput.from, cellInput.cellOutput),
       apply(hexFrom, cellInput.outputData),
     );
+  }
+
+  /**
+   * Complete extra infos in the input. Like the output of the out point.
+   * The instance will be modified.
+   *
+   * @returns The completed instance.
+   * @example
+   * ```typescript
+   * if (!cellInput.cellOutput) {
+   *   await cellInput.completeExtraInfos();
+   * }
+   * ```
+   */
+
+  async completeExtraInfos(client: Client): Promise<CellInput> {
+    if (this.cellOutput && this.outputData) {
+      return this;
+    }
+
+    const cell = await client.getCell(this.previousOutput);
+    if (cell) {
+      this.cellOutput = cell.cellOutput;
+      this.outputData = cell.outputData;
+    }
+    return this;
   }
 
   /**
@@ -382,7 +439,6 @@ export type CellDepLike = {
   depType: DepTypeLike;
 };
 export class CellDep {
-
   /**
    * Creates an instance of CellDep.
    *
@@ -478,7 +534,6 @@ export type WitnessArgsLike = {
   outputType?: HexLike;
 };
 export class WitnessArgs {
-
   /**
    * Creates an instance of WitnessArgs.
    *
@@ -586,7 +641,6 @@ export type TransactionLike = {
   witnesses: HexLike[];
 };
 export class Transaction {
-
   /**
    * Creates an instance of Transaction.
    *

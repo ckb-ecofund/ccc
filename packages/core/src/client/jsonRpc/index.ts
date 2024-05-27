@@ -1,8 +1,9 @@
 import fetch from "cross-fetch";
-import type { Client } from "../client";
-import { CkbRpcMethods, JsonRpcMethod, JsonRpcPayload } from "./advanced";
-
-export interface ClientJsonRpc extends Pick<Client, "sendTransaction"> {}
+import { TransactionLike } from "../../ckb";
+import { Hex, HexLike, hexFrom } from "../../hex";
+import { Client } from "../client";
+import { ClientTransactionResponse, OutputsValidator } from "../clientTypes";
+import { JsonRpcPayload, JsonRpcTransformers } from "./advanced";
 
 /**
  * Applies a transformation function to a value if the transformer is provided.
@@ -33,8 +34,7 @@ async function transform(
  * Provides methods for sending transactions and building JSON-RPC payloads.
  */
 
-export abstract class ClientJsonRpc implements Pick<Client, "sendTransaction"> {
-
+export abstract class ClientJsonRpc extends Client {
   /**
    * Creates an instance of ClientJsonRpc.
    *
@@ -46,12 +46,7 @@ export abstract class ClientJsonRpc implements Pick<Client, "sendTransaction"> {
     private readonly url: string,
     private readonly timeout = 30000,
   ) {
-    CkbRpcMethods.map((method) =>
-      Object.defineProperty(this, method.method, {
-        value: this.buildSender(method),
-        enumerable: true,
-      }),
-    );
+    super();
   }
 
   /**
@@ -65,6 +60,36 @@ export abstract class ClientJsonRpc implements Pick<Client, "sendTransaction"> {
   }
 
   /**
+   * Send a transaction to node.
+   *
+   * @param transaction - The transaction to send.
+   * @param validator - "passthrough": Disable validation. "well_known_scripts_only": Only accept well known scripts in the transaction.
+   * @returns Transaction hash.
+   */
+
+  sendTransaction = this.buildSender(
+    "send_transaction",
+    [JsonRpcTransformers.toTransaction],
+    hexFrom,
+  ) as (
+    transaction: TransactionLike,
+    validator?: OutputsValidator | undefined,
+  ) => Promise<Hex>;
+
+  /**
+   * Get a transaction from node.
+   *
+   * @param txHash - The hash of the transaction.
+   * @returns The transaction with status.
+   */
+
+  getTransaction = this.buildSender(
+    "get_transaction",
+    [hexFrom],
+    JsonRpcTransformers.fromTransactionResponse,
+  ) as (txHash: HexLike) => Promise<ClientTransactionResponse>;
+
+  /**
    * Builds a sender function for a JSON-RPC method.
    *
    * @param rpcMethod - The JSON-RPC method.
@@ -73,7 +98,11 @@ export abstract class ClientJsonRpc implements Pick<Client, "sendTransaction"> {
    * @returns A function that sends a JSON-RPC request with the given method and transformed parameters.
    */
 
-  buildSender({ rpcMethod, inTransformers, outTransformer }: JsonRpcMethod) {
+  buildSender(
+    rpcMethod: string,
+    inTransformers: (((_: any) => unknown) | undefined)[],
+    outTransformer?: (_: any) => unknown,
+  ) {
     return async (...req: unknown[]) => {
       const payload = ClientJsonRpc.buildPayload(
         rpcMethod,
@@ -120,7 +149,7 @@ export abstract class ClientJsonRpc implements Pick<Client, "sendTransaction"> {
     }
     return res.result;
   }
-  
+
   /**
    * Builds a JSON-RPC payload for the given method and parameters.
    *

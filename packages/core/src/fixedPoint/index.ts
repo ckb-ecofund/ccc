@@ -76,5 +76,5 @@ export const Zero = 0n;
  * Represents the fixed point value of one as a FixedPoint (bigint).
  * Equivalent to 1 in fixed-point representation with default decimals (8).
  */
- 
+
 export const One = fixedPointFrom("1");

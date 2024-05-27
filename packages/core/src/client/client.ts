@@ -1,6 +1,7 @@
-import { ScriptLike, TransactionLike } from "../ckb";
-import { Hex } from "../hex";
-import { OutputsValidator } from "./clientTypes";
+import { Cell, OutPointLike, Script, TransactionLike } from "../ckb";
+import { Hex, HexLike } from "../hex";
+import { numFrom } from "../num";
+import { ClientTransactionResponse, OutputsValidator } from "./clientTypes";
 
 export enum KnownScript {
   Secp256k1Blake160,
@@ -10,14 +11,36 @@ export enum KnownScript {
   OmniLock,
 }
 
-export interface Client {
-  getUrl(): string;
+export abstract class Client {
+  abstract getUrl(): string;
 
-  getAddressPrefix(): Promise<string>;
-  getKnownScript(script: KnownScript): Promise<Omit<ScriptLike, "args">>;
+  abstract getAddressPrefix(): Promise<string>;
+  abstract getKnownScript(
+    script: KnownScript,
+  ): Promise<Pick<Script, "codeHash" | "hashType">>;
 
-  sendTransaction(
+  abstract sendTransaction(
     transaction: TransactionLike,
     validator?: OutputsValidator,
   ): Promise<Hex>;
+  abstract getTransaction(
+    txHash: HexLike,
+  ): Promise<ClientTransactionResponse | null>;
+
+  async getCell(outPoint: OutPointLike): Promise<Cell | null> {
+    const transaction = await this.getTransaction(outPoint.txHash);
+    if (!transaction) {
+      return null;
+    }
+
+    const index = Number(numFrom(outPoint.index));
+    if (index >= transaction.transaction.outputs.length) {
+      return null;
+    }
+
+    return Cell.from({
+      cellOutput: transaction.transaction.outputs[index],
+      outputData: transaction.transaction.outputsData[index] ?? "0x",
+    });
+  }
 }
