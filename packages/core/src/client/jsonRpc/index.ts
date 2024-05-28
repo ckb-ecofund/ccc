@@ -69,7 +69,7 @@ export abstract class ClientJsonRpc extends Client {
 
   sendTransaction = this.buildSender(
     "send_transaction",
-    [JsonRpcTransformers.toTransaction],
+    [JsonRpcTransformers.transactionFrom],
     hexFrom,
   ) as (
     transaction: TransactionLike,
@@ -86,7 +86,7 @@ export abstract class ClientJsonRpc extends Client {
   getTransaction = this.buildSender(
     "get_transaction",
     [hexFrom],
-    JsonRpcTransformers.fromTransactionResponse,
+    JsonRpcTransformers.transactionResponseTo,
   ) as (txHash: HexLike) => Promise<ClientTransactionResponse>;
 
   /**

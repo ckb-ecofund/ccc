@@ -1,6 +1,7 @@
 "use client";
 
 import { ccc } from "@ckb-ccc/connector-react";
+import { cccA } from "@ckb-ccc/connector-react/advanced";
 import React, { useEffect, useState } from "react";
 import { common } from "@ckb-lumos/common-scripts";
 import { TransactionSkeleton } from "@ckb-lumos/helpers";
