@@ -1,19 +1,26 @@
-import { Script, ScriptLike, Transaction, TransactionLike } from "../ckb";
+import {
+  Script,
+  ScriptLike,
+  Transaction,
+  TransactionLike,
+  WitnessArgs,
+} from "../ckb";
 import { Client } from "../client";
 import { Hasher } from "../hasher";
-import { Hex } from "../hex";
+import { Hex, hexFrom } from "../hex";
 
 /**
  * Computes the signing hash information for a given transaction and script.
  *
  * @param txLike - The transaction to sign, represented as a TransactionLike object.
  * @param scriptLike - The script associated with the transaction, represented as a ScriptLike object.
+ * @param client - The client for complete extra infos in the transaction.
  * @returns A promise that resolves to an object containing the signing message and the witness position,
  *          or undefined if no matching input is found.
  *
  * @example
  * ```typescript
- * const signHashInfo = await getSignHashInfo(transactionLike, scriptLike);
+ * const signHashInfo = await getSignHashInfo(transactionLike, scriptLike, client);
  * if (signHashInfo) {
  *   console.log(signHashInfo.message); // Outputs the signing message
  *   console.log(signHashInfo.position); // Outputs the witness position
@@ -63,4 +70,53 @@ export async function getSignHashInfo(
     message: hasher.digest(),
     position,
   };
+}
+
+/**
+ * Prepare dummy witness for sighash all method
+ *
+ * @param txLike - The transaction to prepare, represented as a TransactionLike object.
+ * @param scriptLike - The script associated with the transaction, represented as a ScriptLike object.
+ * @param client - The client for complete extra infos in the transaction.
+ * @returns A promise that resolves to the prepared transaction
+ *
+ * @example
+ * ```typescript
+ * const tx = await prepareSighashAllWitness(transactionLike, scriptLike, client);
+ * ```
+ */
+export async function prepareSighashAllWitness(
+  txLike: TransactionLike,
+  scriptLike: ScriptLike,
+  lockLen: number,
+  client: Client,
+): Promise<Transaction> {
+  const tx = Transaction.from(txLike);
+  const script = Script.from(scriptLike);
+
+  let position = -1;
+
+  for (let i = 0; i < tx.inputs.length; i += 1) {
+    const input = await tx.inputs[i].completeExtraInfos(client);
+
+    if (!input.cellOutput) {
+      throw Error("Unable to resolve inputs info");
+    }
+
+    if (script.eq(input.cellOutput.lock)) {
+      position = i;
+      break;
+    }
+  }
+  if (position === -1) {
+    return tx;
+  }
+
+  const witness = tx.witnesses[position]
+    ? WitnessArgs.fromBytes(tx.witnesses[position])
+    : WitnessArgs.from({});
+  witness.lock = hexFrom(Array.from(new Array(lockLen), () => 0));
+  tx.witnesses[position] = hexFrom(witness.toBytes());
+
+  return tx;
 }

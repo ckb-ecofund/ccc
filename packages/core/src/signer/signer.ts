@@ -91,7 +91,19 @@ export abstract class Signer {
    * @returns A promise that resolves to the signed Transaction object.
    */
   async signTransaction(tx: TransactionLike): Promise<Transaction> {
-    return this.signOnlyTransaction(tx);
+    const preparedTx = await this.prepareTransaction(tx);
+    return this.signOnlyTransaction(preparedTx);
+  }
+
+  /**
+   * prepare a transaction before signing. This method is not implemented and should be overridden by subclasses.
+   *
+   * @param _ - The transaction to prepare, represented as a TransactionLike object.
+   * @returns A promise that resolves to the prepared Transaction object.
+   * @throws Will throw an error if not implemented.
+   */
+  prepareTransaction(_: TransactionLike): Promise<Transaction> {
+    throw Error("Signer.prepareTransaction not implemented");
   }
 
   /**

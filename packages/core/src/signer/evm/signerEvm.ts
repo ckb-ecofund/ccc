@@ -4,7 +4,7 @@ import { Transaction, TransactionLike, WitnessArgs } from "../../ckb";
 import { KnownScript } from "../../client";
 import { hexFrom } from "../../hex";
 import { numToBytes } from "../../num";
-import { getSignHashInfo } from "../helpers";
+import { getSignHashInfo, prepareSighashAllWitness } from "../helpers";
 import { Signer } from "../signer";
 
 /**
@@ -42,6 +42,17 @@ export abstract class SignerEvm extends Signer {
         this.client,
       ),
     ];
+  }
+
+  /**
+   * prepare a transaction before signing. This method is not implemented and should be overridden by subclasses.
+   *
+   * @param txLike - The transaction to prepare, represented as a TransactionLike object.
+   * @returns A promise that resolves to the prepared Transaction object.
+   */
+  async prepareTransaction(txLike: TransactionLike): Promise<Transaction> {
+    const { script } = await this.getRecommendedAddressObj();
+    return prepareSighashAllWitness(txLike, script, 85, this.client);
   }
 
   /**
