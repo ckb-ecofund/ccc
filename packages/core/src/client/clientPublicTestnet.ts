@@ -4,8 +4,8 @@ import { TESTNET_SCRIPTS } from "./clientPublicTestnet.advanced";
 import { ClientJsonRpc } from "./jsonRpc";
 
 export class ClientPublicTestnet extends ClientJsonRpc {
-  constructor(timeout?: number) {
-    super("https://testnet.ckbapp.dev/", timeout);
+  constructor(url = "https://testnet.ckbapp.dev/", timeout?: number) {
+    super(url, timeout);
   }
 
   async getAddressPrefix(): Promise<string> {

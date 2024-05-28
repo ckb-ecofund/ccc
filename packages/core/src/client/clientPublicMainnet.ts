@@ -4,8 +4,8 @@ import { MAINNET_SCRIPTS } from "./clientPublicMainnet.advanced";
 import { ClientJsonRpc } from "./jsonRpc";
 
 export class ClientPublicMainnet extends ClientJsonRpc {
-  constructor(timeout?: number) {
-    super("https://mainnet.ckbapp.dev/", timeout);
+  constructor(url = "https://mainnet.ckbapp.dev/", timeout?: number) {
+    super(url, timeout);
   }
 
   async getAddressPrefix(): Promise<string> {
