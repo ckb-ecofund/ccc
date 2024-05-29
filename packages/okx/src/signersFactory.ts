@@ -4,7 +4,7 @@ import { BitcoinSigner } from "./signer";
 
 export function getOKXBitcoinSigner(
   client: ccc.Client,
-): ccc.Signer | undefined {
+): BitcoinSigner | undefined {
   const windowRef = window as { okxwallet?: { bitcoin: BitcoinProvider } };
 
   if (typeof windowRef.okxwallet === "undefined") {
