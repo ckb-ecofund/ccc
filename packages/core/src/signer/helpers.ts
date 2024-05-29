@@ -47,7 +47,7 @@ export async function getSignHashInfo(
       }
 
       if (!script.eq(input.cellOutput.lock)) {
-        return;
+        continue;
       }
 
       if (position === -1) {
