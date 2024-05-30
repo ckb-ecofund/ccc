@@ -11,11 +11,12 @@ import {
   generateWalletsScene,
 } from "../scenes";
 import { ConnectorStatus } from "../status";
+import { WalletWithSigners } from "../types";
 
 @customElement("ccc-connector")
 export class WebComponentConnector extends LitElement {
   @state()
-  private wallets: ccc.Wallet[] = [];
+  private wallets: WalletWithSigners[] = [];
 
   private resetListeners: (() => void)[] = [];
 
@@ -75,8 +76,21 @@ export class WebComponentConnector extends LitElement {
   reset() {
     this.wallets = [];
 
-    this.dispatchEvent(new StatusChangedEvent(ConnectorStatus.SelectingSigner));
-    this.dispatchEvent(new SignerChangedEvent(undefined, undefined));
+    (async () => {
+      if (!this.signer) {
+        return;
+      }
+
+      const newSigner = await this.signer.signer.replaceClient(this.client);
+      if (newSigner) {
+        this.onSignerSelected(this.wallet, {
+          ...this.signer,
+          signer: newSigner,
+        });
+      } else {
+        this.onReset();
+      }
+    })();
 
     const resetListeners = this.resetListeners;
     this.resetListeners = [];
@@ -107,7 +121,13 @@ export class WebComponentConnector extends LitElement {
 
   render() {
     const [title, body] = (() => {
-      if (!this.wallet) {
+      const wallet = ccc.apply(
+        (wallet: ccc.Wallet) =>
+          this.wallets.find((w) => w.name === wallet.name),
+        this.wallet,
+      );
+
+      if (!wallet) {
         return generateWalletsScene(
           this.wallets,
           this.onWalletSelected,
@@ -115,10 +135,10 @@ export class WebComponentConnector extends LitElement {
         );
       }
       if (!this.signer) {
-        return generateSignersScene(this.wallet, this.onSignerSelected);
+        return generateSignersScene(wallet, this.onSignerSelected);
       }
       return generateConnectingScene(
-        this.wallet,
+        wallet,
         this.signer,
         this.onSignerSelected,
       );
@@ -157,20 +177,33 @@ export class WebComponentConnector extends LitElement {
   }
 
   private onClose = () => {
-    this.dispatchEvent(new SignerChangedEvent());
+    if (this.status === ConnectorStatus.SelectingSigner) {
+      this.onReset();
+    }
     this.dispatchEvent(new CloseEvent());
+  };
+
+  private onReset = () => {
+    this.dispatchEvent(new StatusChangedEvent(ConnectorStatus.SelectingSigner));
+    this.dispatchEvent(new SignerChangedEvent());
   };
 
   private onWalletSelected = (wallet: ccc.Wallet) => {
     this.dispatchEvent(new SignerChangedEvent(wallet, this.signer));
   };
 
-  private onSignerSelected = (wallet: ccc.Wallet, signer: ccc.SignerInfo) => {
-    this.dispatchEvent(new StatusChangedEvent(ConnectorStatus.Connecting));
-    this.dispatchEvent(new SignerChangedEvent(wallet, signer));
-
+  private onSignerSelected = (
+    wallet: ccc.Wallet | undefined,
+    signer: ccc.SignerInfo,
+  ) => {
     (async () => {
-      await signer.signer.connect();
+      this.dispatchEvent(new SignerChangedEvent(wallet, signer));
+
+      if (!(await signer.signer.isConnected())) {
+        this.dispatchEvent(new StatusChangedEvent(ConnectorStatus.Connecting));
+        await signer.signer.connect();
+      }
+
       this.dispatchEvent(new StatusChangedEvent(ConnectorStatus.Idle));
       this.dispatchEvent(new CloseEvent());
     })();

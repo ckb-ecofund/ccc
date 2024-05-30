@@ -1,11 +1,12 @@
 import { ccc } from "@ckb-ccc/ccc";
 import { html } from "lit";
 import { repeat } from "lit/directives/repeat.js";
+import { WalletWithSigners } from "../types";
 
 export function generateWalletsScene(
-  wallets: ccc.Wallet[],
+  wallets: WalletWithSigners[],
   onWalletSelected: (wallet: ccc.Wallet) => unknown,
-  onSignerSelected: (wallet: ccc.Wallet, signer: ccc.SignerInfo) => unknown,
+  onSignerSelected: (wallet: ccc.Wallet | undefined, signer: ccc.SignerInfo) => unknown,
 ) {
   return [
     "Connect Wallet",

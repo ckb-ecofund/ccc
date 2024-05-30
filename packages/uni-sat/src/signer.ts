@@ -9,6 +9,10 @@ export class Signer extends ccc.SignerBtc {
     super(client);
   }
 
+  async replaceClient(client: ccc.Client): Promise<Signer> {
+    return new Signer(client, this.provider);
+  }
+
   async getBtcAccount() {
     return (await this.provider.getAccounts())[0];
   }
@@ -19,6 +23,10 @@ export class Signer extends ccc.SignerBtc {
 
   async connect(): Promise<void> {
     await this.provider.requestAccounts();
+  }
+
+  async isConnected(): Promise<boolean> {
+    return (await this.provider.getAccounts()).length !== 0;
   }
 
   async signMessage(message: string | ccc.BytesLike): Promise<string> {

@@ -9,6 +9,10 @@ export class Signer extends ccc.SignerEvm {
     super(client);
   }
 
+  async replaceClient(client: ccc.Client): Promise<Signer> {
+    return new Signer(client, this.detail);
+  }
+
   async getEvmAccount() {
     return (await this.detail.provider.request({ method: "eth_accounts" }))[0];
   }
@@ -16,6 +20,10 @@ export class Signer extends ccc.SignerEvm {
   async connect(): Promise<void> {
     await this.detail.provider.request({ method: "eth_requestAccounts" });
   }
+
+  async isConnected(): Promise<boolean> {
+    return (await this.detail.provider.request({ method: "eth_accounts" })).length !== 0;
+  };
 
   async signMessage(message: string | ccc.BytesLike): Promise<ccc.Hex> {
     const challenge =

@@ -6,7 +6,7 @@ import { SignerEvm } from "./signerEvm";
  * A class extending SignerEvm that provides read-only access to an EVM address.
  * This class does not support signing operations.
  */
-export abstract class SignerEvmAddressReadonly extends SignerEvm {
+export class SignerEvmAddressReadonly extends SignerEvm {
   private readonly address: Hex;
 
   /**
@@ -22,6 +22,15 @@ export abstract class SignerEvmAddressReadonly extends SignerEvm {
   }
 
   /**
+   * Construct a new signer with the client replaced.
+   *
+   * @returns A promise that resolves the new Signer.
+   */
+  async replaceClient(client: Client): Promise<SignerEvmAddressReadonly> {
+    return new SignerEvmAddressReadonly(client, this.address);
+  }
+
+  /**
    * Connects to the client. This implementation does nothing as the class is read-only.
    *
    * @returns A promise that resolves when the connection is complete.
@@ -33,6 +42,15 @@ export abstract class SignerEvmAddressReadonly extends SignerEvm {
    */
 
   async connect(): Promise<void> {}
+
+  /**
+   * Check if the signer is connected.
+   *
+   * @returns A promise that resolves the connection status.
+   */
+  async isConnected(): Promise<boolean> {
+    return true;
+  };
 
   /**
    * Gets the EVM account associated with the signer.

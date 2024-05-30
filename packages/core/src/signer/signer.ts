@@ -9,14 +9,32 @@ import { Hex } from "../hex";
  * This class provides methods to connect, get addresses, and sign transactions.
  */
 export abstract class Signer {
-  constructor(public readonly client: Client) {}
+  constructor(protected client_: Client) {}
+
+  get client(): Client {
+    return this.client_;
+  }
 
   /**
-   * Connects to the client.
+   * Construct a new signer with the client replaced.
+   *
+   * @returns A promise that resolves the new Signer.
+   */
+  abstract replaceClient(client: Client): Promise<Signer>;
+
+  /**
+   * Connects to the signer.
    *
    * @returns A promise that resolves when the connection is complete.
    */
   abstract connect(): Promise<void>;
+
+  /**
+   * Check if the signer is connected.
+   *
+   * @returns A promise that resolves the connection status.
+   */
+  abstract isConnected(): Promise<boolean>;
 
   /**
    * Gets the internal address associated with the signer.
@@ -142,5 +160,4 @@ export class SignerInfo {
 export type Wallet = {
   name: string;
   icon: string;
-  signers: SignerInfo[];
 };

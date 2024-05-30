@@ -9,4 +9,8 @@ export class BitcoinSigner extends UniSat.Signer {
   ) {
     super(client, provider);
   }
+
+  async replaceClient(client: ccc.Client): Promise<BitcoinSigner> {
+    return new BitcoinSigner(client, this.provider);
+  }
 }
