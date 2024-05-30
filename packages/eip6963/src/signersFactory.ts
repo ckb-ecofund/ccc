@@ -3,14 +3,21 @@ import { AnnounceProviderEvent as EIP6963AnnounceProviderEvent } from "./eip6963
 import { Signer as EIP6963Signer } from "./signer";
 
 export class SignerFactory {
+  private readonly existedUuids: string[] = [];
+
   constructor(private readonly client: ccc.Client) {}
 
   subscribeSigners(callback: (newSigner: EIP6963Signer) => unknown) {
     const onNewProvider = (event: Event) => {
-      const signer = new EIP6963Signer(
-        this.client,
-        (event as unknown as EIP6963AnnounceProviderEvent).detail,
-      );
+      const { detail } = event as unknown as EIP6963AnnounceProviderEvent;
+      const { uuid } = detail.info;
+
+      if (this.existedUuids.indexOf(uuid) !== -1) {
+        return;
+      }
+
+      this.existedUuids.push(uuid);
+      const signer = new EIP6963Signer(this.client, detail);
       callback(signer);
     };
 

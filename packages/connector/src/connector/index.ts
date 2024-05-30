@@ -1,5 +1,5 @@
 import { ccc } from "@ckb-ccc/ccc";
-import { LitElement, css, html } from "lit";
+import { LitElement, PropertyValues, css, html } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { CLOSE_SVG } from "../assets/close.svg";
 import { OKX_SVG } from "../assets/okx.svg";
@@ -16,11 +16,14 @@ import { ConnectorStatus } from "../status";
 export class WebComponentConnector extends LitElement {
   @state()
   private wallets: ccc.Wallet[] = [];
-  private existedEip6963: string[] = [];
+
+  private resetListeners: (() => void)[] = [];
 
   @property()
   public isOpen: boolean = false;
 
+  @property()
+  public client: ccc.Client = new ccc.ClientPublicTestnet();
   @property()
   public wallet?: ccc.Wallet;
   @property()
@@ -30,14 +33,23 @@ export class WebComponentConnector extends LitElement {
 
   connectedCallback(): void {
     super.connectedCallback();
+    this.refreshSigners();
+  }
 
-    const client = new ccc.ClientPublicTestnet();
-    const uniSatSigner = ccc.UniSat.getUniSatSigner(client);
+  willUpdate(changedProperties: PropertyValues<this>): void {
+    if (changedProperties.get("client")) {
+      this.reset();
+      this.refreshSigners();
+    }
+  }
+
+  refreshSigners() {
+    const uniSatSigner = ccc.UniSat.getUniSatSigner(this.client);
     if (uniSatSigner) {
       this.addSigner("UniSat", UNI_SAT_SVG, ccc.SignerType.BTC, uniSatSigner);
     }
 
-    const okxBitcoinSigner = ccc.Okx.getOKXBitcoinSigner(client);
+    const okxBitcoinSigner = ccc.Okx.getOKXBitcoinSigner(this.client);
     if (okxBitcoinSigner) {
       this.addSigner(
         "OKX Wallet",
@@ -47,19 +59,28 @@ export class WebComponentConnector extends LitElement {
       );
     }
 
-    const eip6963Manager = new ccc.Eip6963.SignerFactory(client);
-    eip6963Manager.subscribeSigners((signer) => {
-      if (this.existedEip6963.indexOf(signer.detail.info.uuid) !== -1) {
-        return;
-      }
-      this.existedEip6963.push(signer.detail.info.uuid);
-      this.addSigner(
-        `${signer.detail.info.name}`,
-        signer.detail.info.icon,
-        ccc.SignerType.EVM,
-        signer,
-      );
-    });
+    const eip6963Manager = new ccc.Eip6963.SignerFactory(this.client);
+    this.resetListeners.push(
+      eip6963Manager.subscribeSigners((signer) => {
+        this.addSigner(
+          `${signer.detail.info.name}`,
+          signer.detail.info.icon,
+          ccc.SignerType.EVM,
+          signer,
+        );
+      }),
+    );
+  }
+
+  reset() {
+    this.wallets = [];
+
+    this.dispatchEvent(new StatusChangedEvent(ConnectorStatus.SelectingSigner));
+    this.dispatchEvent(new SignerChangedEvent(undefined, undefined));
+
+    const resetListeners = this.resetListeners;
+    this.resetListeners = [];
+    resetListeners.forEach((listener) => listener());
   }
 
   addSigner(

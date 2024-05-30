@@ -171,11 +171,12 @@ function Transfer() {
 }
 
 export default function Home() {
-  const { wallet, open, disconnect } = ccc.useCcc();
+  const { wallet, open, disconnect, setClient } = ccc.useCcc();
   const signer = ccc.useSigner();
 
   const [internalAddress, setInternalAddress] = useState("");
   const [address, setAddress] = useState("");
+  const [isTestnet, setIsTestnet] = useState(true);
 
   useEffect(() => {
     if (!signer) {
@@ -189,6 +190,12 @@ export default function Home() {
       setAddress(await signer.getRecommendedAddress());
     })();
   }, [signer]);
+
+  useEffect(() => {
+    setClient(
+      isTestnet ? new ccc.ClientPublicTestnet() : new ccc.ClientPublicMainnet(),
+    );
+  }, [isTestnet, setClient]);
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-white p-24">
@@ -207,6 +214,14 @@ export default function Home() {
       ) : (
         <Button onClick={open}>Connect Wallet</Button>
       )}
+      <Button
+        className="mt-4"
+        onClick={() => {
+          setIsTestnet(!isTestnet);
+        }}
+      >
+        Switch to the {isTestnet ? "mainnet" : "testnet"}
+      </Button>
     </main>
   );
 }
