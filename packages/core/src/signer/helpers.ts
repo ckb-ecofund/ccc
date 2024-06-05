@@ -112,9 +112,11 @@ export async function prepareSighashAllWitness(
     return tx;
   }
 
-  const witness = tx.witnesses[position]
-    ? WitnessArgs.fromBytes(tx.witnesses[position])
-    : WitnessArgs.from({});
+  const rawWitness = tx.witnesses[position];
+  const witness =
+    (rawWitness ?? "0x") !== "0x"
+      ? WitnessArgs.fromBytes(rawWitness)
+      : WitnessArgs.from({});
   witness.lock = hexFrom(Array.from(new Array(lockLen), () => 0));
   tx.witnesses[position] = hexFrom(witness.toBytes());
 

@@ -49,7 +49,7 @@ export class SignerBtcPublicKeyReadonly extends SignerBtc {
    */
   async isConnected(): Promise<boolean> {
     return true;
-  };
+  }
 
   /**
    * Gets the Bitcoin account associated with the signer.

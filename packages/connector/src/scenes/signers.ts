@@ -13,7 +13,10 @@ export function signerTypeToIcon(type: ccc.SignerType): string {
 
 export function generateSignersScene(
   wallet: WalletWithSigners,
-  onSignerSelected: (wallet: ccc.Wallet | undefined, signer: ccc.SignerInfo) => unknown,
+  onSignerSelected: (
+    wallet: ccc.Wallet | undefined,
+    signer: ccc.SignerInfo,
+  ) => unknown,
 ) {
   return [
     "Select a Chain",

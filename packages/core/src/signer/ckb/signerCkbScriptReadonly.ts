@@ -45,7 +45,7 @@ export class SignerCkbScriptReadonly extends Signer {
    */
   async isConnected(): Promise<boolean> {
     return true;
-  };
+  }
 
   /**
    * Gets the internal address for the script.

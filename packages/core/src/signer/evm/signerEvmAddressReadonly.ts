@@ -50,7 +50,7 @@ export class SignerEvmAddressReadonly extends SignerEvm {
    */
   async isConnected(): Promise<boolean> {
     return true;
-  };
+  }
 
   /**
    * Gets the EVM account associated with the signer.

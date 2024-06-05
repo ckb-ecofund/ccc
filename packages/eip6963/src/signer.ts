@@ -22,8 +22,11 @@ export class Signer extends ccc.SignerEvm {
   }
 
   async isConnected(): Promise<boolean> {
-    return (await this.detail.provider.request({ method: "eth_accounts" })).length !== 0;
-  };
+    return (
+      (await this.detail.provider.request({ method: "eth_accounts" }))
+        .length !== 0
+    );
+  }
 
   async signMessage(message: string | ccc.BytesLike): Promise<ccc.Hex> {
     const challenge =

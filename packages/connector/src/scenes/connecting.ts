@@ -5,7 +5,10 @@ import { RETRY_SVG } from "../assets/retry.svg";
 export function generateConnectingScene(
   wallet: ccc.Wallet,
   signer: ccc.SignerInfo,
-  onSignerSelected: (wallet: ccc.Wallet | undefined, signer: ccc.SignerInfo) => unknown,
+  onSignerSelected: (
+    wallet: ccc.Wallet | undefined,
+    signer: ccc.SignerInfo,
+  ) => unknown,
 ) {
   return [
     wallet.name,
