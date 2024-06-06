@@ -1,6 +1,6 @@
 import { Address } from "../../address";
-import { bytesConcat, bytesFrom } from "../../bytes";
-import { Transaction, TransactionLike, WitnessArgs } from "../../ckb";
+import { BytesLike, bytesConcat, bytesFrom } from "../../bytes";
+import { Script, Transaction, TransactionLike, WitnessArgs } from "../../ckb";
 import { KnownScript } from "../../client";
 import { hexFrom } from "../../hex";
 import { numToBytes } from "../../num";
@@ -36,12 +36,25 @@ export abstract class SignerEvm extends Signer {
   async getAddressObjs(): Promise<Address[]> {
     const account = await this.getEvmAccount();
     return [
-      await Address.fromKnownScript(
-        KnownScript.OmniLock,
-        hexFrom([0x12, ...bytesFrom(account), 0x00]),
-        this.client,
-      ),
+      await this._getOmniLockEvmAddressObj(account),
+      await this._getOmniLockOldEvmAddressObj(account),
     ];
+  }
+
+  async _getOmniLockEvmAddressObj(account: string): Promise<Address> {
+    return Address.fromKnownScript(
+      KnownScript.OmniLock,
+      hexFrom([0x12, ...bytesFrom(account), 0x00]),
+      this.client,
+    );
+  }
+
+  async _getOmniLockOldEvmAddressObj(account: string): Promise<Address> {
+    return Address.fromKnownScript(
+      KnownScript.OmniLock,
+      hexFrom([0x1, ...bytesFrom(account), 0x00]),
+      this.client,
+    );
   }
 
   /**
@@ -51,8 +64,15 @@ export abstract class SignerEvm extends Signer {
    * @returns A promise that resolves to the prepared Transaction object.
    */
   async prepareTransaction(txLike: TransactionLike): Promise<Transaction> {
-    const { script } = await this.getRecommendedAddressObj();
-    return prepareSighashAllWitness(txLike, script, 85, this.client);
+    const addresses = await this.getAddressObjs();
+
+    return addresses.reduce(
+      (txPromise, { script }) =>
+        txPromise.then((tx) =>
+          prepareSighashAllWitness(tx, script, 85, this.client),
+        ),
+      Promise.resolve(Transaction.from(txLike)),
+    );
   }
 
   /**
@@ -62,16 +82,39 @@ export abstract class SignerEvm extends Signer {
    * @returns A promise that resolves to a signed Transaction object.
    */
   async signOnlyTransaction(txLike: TransactionLike): Promise<Transaction> {
-    const tx = Transaction.from(txLike);
+    let tx = Transaction.from(txLike);
 
-    const { script } = await this.getRecommendedAddressObj();
+    const account = await this.getEvmAccount();
+    const { script: evmScript } = await this._getOmniLockEvmAddressObj(account);
+    const { script: oldEvmScript } =
+      await this._getOmniLockOldEvmAddressObj(account);
+
+    tx = await this._signOmniLockScriptForTransaction(
+      tx,
+      evmScript,
+      (hash) => `CKB transaction: ${hash}`,
+    );
+    tx = await this._signOmniLockScriptForTransaction(
+      tx,
+      oldEvmScript,
+      (hash) => bytesFrom(hash),
+    );
+
+    return tx;
+  }
+
+  async _signOmniLockScriptForTransaction(
+    tx: Transaction,
+    script: Script,
+    messageTransformer: (hash: string) => BytesLike,
+  ): Promise<Transaction> {
     const info = await getSignHashInfo(tx, script, this.client);
     if (!info) {
       return tx;
     }
 
     const signature = bytesFrom(
-      await this.signMessage(`CKB transaction: ${info.message}`),
+      await this.signMessage(messageTransformer(info.message)),
     );
     if (signature[signature.length - 1] >= 27) {
       signature[signature.length - 1] -= 27;

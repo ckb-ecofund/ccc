@@ -1,7 +1,6 @@
 "use client";
 
 import { ccc } from "@ckb-ccc/connector-react";
-import { cccA } from "@ckb-ccc/connector-react/advanced";
 import React, { useEffect, useState } from "react";
 import { common } from "@ckb-lumos/common-scripts";
 import { TransactionSkeleton } from "@ckb-lumos/helpers";
@@ -118,9 +117,10 @@ function Transfer() {
             if (!signer) {
               return;
             }
-            // Verify address
+            // Verify destination address
             await ccc.Address.fromString(transferTo, signer.client);
 
+            const fromAddresses = await signer.getAddresses();
             // === Composing transaction with Lumos ===
             const indexer = new Indexer(signer.client.getUrl());
             let txSkeleton = new TransactionSkeleton({
@@ -128,7 +128,7 @@ function Transfer() {
             });
             txSkeleton = await common.transfer(
               txSkeleton,
-              [await signer.getRecommendedAddress()],
+              fromAddresses,
               transferTo,
               ccc.fixedPointFrom(amount),
               undefined,
@@ -137,7 +137,7 @@ function Transfer() {
             );
             txSkeleton = await common.payFeeByFeeRate(
               txSkeleton,
-              [await signer.getRecommendedAddress()],
+              fromAddresses,
               BigInt(1500),
               undefined,
               { config: predefined.AGGRON4 },
