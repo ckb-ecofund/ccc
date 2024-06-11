@@ -28,6 +28,10 @@ export type FixedPointLike = bigint | string | number;
 
 export function fixedPointToString(val: FixedPointLike, decimals = 8): string {
   const str = fixedPointFrom(val).toString();
+  if (decimals === 0) {
+    return str;
+  }
+
   const l = str.length <= decimals ? "0" : str.slice(0, -decimals);
   const r = str.slice(-decimals).padStart(decimals, "0").replace(/0*$/, "");
   if (r === "") {
@@ -57,7 +61,9 @@ export function fixedPointFrom(val: FixedPointLike, decimals = 8): FixedPoint {
     return val;
   }
 
-  const [l, r] = val.toString().split(".");
+  const [l, r] = (
+    typeof val === "number" ? val.toFixed(decimals) : val.toString()
+  ).split(".");
   const lVal = BigInt(l.padEnd(l.length + decimals, "0"));
   if (r === undefined) {
     return lVal;

@@ -2,5 +2,6 @@ lerna-debug.log
 .nx/
 
 **/node_modules/
+coverage
 
 packages/*/dist*
