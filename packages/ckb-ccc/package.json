@@ -10,9 +10,10 @@
     "type": "git",
     "url": "git://github.com/ckb-ecofund/ccc.git"
   },
-  "main": "dist/index.js",
+  "main": "dist.commonjs/index.js",
+  "module": "dist/index.js",
   "scripts": {
-    "build": "rimraf ./dist && tsc",
+    "build": "rimraf ./dist && rimraf ./dist.commonjs && tsc && tsc --project tsconfig.commonjs.json",
     "lint": "eslint",
     "format": "prettier --write . && eslint --fix"
   },
