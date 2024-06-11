@@ -1,6 +1,6 @@
 {
   "name": "ckb-ccc",
-  "version": "0.0.4-alpha.13",
+  "version": "0.0.4",
   "description": "Common Chains Connector",
   "author": "Hanssen0 <hanssen0@hanssen0.com>",
   "license": "MIT",
