@@ -6,10 +6,7 @@ import { WalletWithSigners } from "../types";
 export function generateWalletsScene(
   wallets: WalletWithSigners[],
   onWalletSelected: (wallet: ccc.Wallet) => unknown,
-  onSignerSelected: (
-    wallet: ccc.Wallet | undefined,
-    signer: ccc.SignerInfo,
-  ) => unknown,
+  onSignerSelected: (wallet: ccc.Wallet, signer: ccc.SignerInfo) => unknown,
 ) {
   return [
     "Connect Wallet",
