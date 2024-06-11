@@ -10,7 +10,6 @@ const CCC_CONTEXT = createContext<
       client: ccc.Client;
       wallet?: ccc.Wallet;
       signerInfo?: ccc.SignerInfo;
-      status: ccc.ConnectorStatus;
     }
   | undefined
 >(undefined);
@@ -28,10 +27,6 @@ export function Provider({
   const client = useMemo(
     () => ref?.client ?? new ccc.ClientPublicTestnet(),
     [ref?.client],
-  );
-  const status = useMemo(
-    () => ref?.status ?? ccc.ConnectorStatus.SelectingSigner,
-    [ref?.status],
   );
   const open = useCallback(() => ref?.setIsOpen(true), [ref, ref?.setIsOpen]);
   const disconnect = useMemo(
@@ -51,19 +46,8 @@ export function Provider({
         setClient,
 
         client,
-        ...([
-          ccc.ConnectorStatus.SelectingSigner,
-          ccc.ConnectorStatus.Connecting,
-        ].includes(status)
-          ? {
-              wallet: undefined,
-              signerInfo: undefined,
-            }
-          : {
-              wallet: ref?.wallet,
-              signerInfo: ref?.signer,
-            }),
-        status,
+        wallet: ref?.wallet,
+        signerInfo: ref?.signer,
       }}
     >
       <Connector
