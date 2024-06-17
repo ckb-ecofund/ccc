@@ -1,14 +1,41 @@
 {
-  "name": "joyid",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "name": "@ckb-ccc/joyid",
+  "version": "0.0.4-alpha.13",
+  "description": "Connector's support for JoyID",
+  "author": "Francis <francislee920217@gmail.com>",
+  "license": "MIT",
+  "private": false,
+  "homepage": "https://github.com/ckb-ecofund/ccc",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/ckb-ecofund/ccc.git"
   },
-  "author": "",
-  "license": "ISC",
+  "main": "dist/index.js",
+  "exports": {
+    ".": "./dist/index.js",
+    "./advanced": "./dist/advanced.js"
+  },
+  "scripts": {
+    "build": "rimraf ./dist && tsc",
+    "lint": "eslint",
+    "format": "prettier --write . && eslint --fix"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.1.1",
+    "eslint": "^9.1.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.3",
+    "prettier": "^3.2.5",
+    "prettier-plugin-organize-imports": "^3.2.4",
+    "rimraf": "^5.0.5",
+    "typescript": "^5.4.5",
+    "typescript-eslint": "^7.7.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
-    "@ckb-ccc/core": "workspace:*"
+    "@ckb-ccc/core": "workspace:*",
+    "@joyid/bitcoin": "^0.1.2"
   }
 }
