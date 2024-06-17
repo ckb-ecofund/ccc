@@ -11,6 +11,7 @@ import {
   generateWalletsScene,
 } from "../scenes";
 import { WalletWithSigners } from "../types";
+import { recommendedWallets, WalletInfo } from "../assets/recommandedWallet";
 
 @customElement("ccc-connector")
 export class WebComponentConnector extends LitElement {
@@ -55,13 +56,6 @@ export class WebComponentConnector extends LitElement {
   public signer?: ccc.SignerInfo;
   private canConnect = false;
 
-  private detectDevice() {
-    const userAgent = navigator.userAgent.toLowerCase();
-    const isMobile = /iphone|ipod|android|blackberry|mini|windows\sce|palm/i.test(userAgent);
-    const deviceType = isMobile ? "mobile" : "desktop";
-    return deviceType
-  }
-
   private prepareSigner() {
     (async () => {
       if (!this.selectedSigner) {
@@ -74,22 +68,6 @@ export class WebComponentConnector extends LitElement {
         if (!this.canConnect) {
           this.disconnect();
           return;
-        }
-        try {
-          await this.selectedSigner.signer.connect();
-        } catch {
-          if(this.wallet?.name === 'OKX Wallet') {
-            window.open("https://www.okx.com/zh-hans/download");
-          } else if (this.wallet?.name === 'UniSat') {
-            window.open("https://unisat.io/");
-          } else {
-            let device = this.detectDevice();
-            if(device === 'mobile') {
-              window.open("https://metamask.io/download/");
-            } else {
-              window.open("https://chromewebstore.google.com/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn?utm_source=ext_sidebar");
-            }
-          }
         }
       }
 
@@ -242,26 +220,76 @@ export class WebComponentConnector extends LitElement {
   }
 
   render() {
-    const [title, body] = (() => {
-      if (!this.selectedWallet) {
-        return generateWalletsScene(
-          this.wallets,
-          this.signerSelectedHandler,
-          this.signerSelectedHandler,
-        );
-      }
-      if (!this.selectedSigner) {
-        return generateSignersScene(
-          this.selectedWallet,
-          this.signerSelectedHandler,
-        );
-      }
-      return generateConnectingScene(
-        this.selectedWallet,
-        this.selectedSigner,
-        this.signerSelectedHandler,
+    let title, body;
+
+if (this.wallets.length === 0) {
+      title = "Recommended Wallets";
+      body = recommendedWallets.map(
+        (wallet: WalletInfo) => html`
+          <div>
+            <img class="wallet-icon" src=${wallet.icon} alt=${wallet.name} />
+            <span class="mb-2">${wallet.name}</span>
+            <button
+              class="btn-primary mb-1"
+              @click=${() => {
+                window.open(wallet.downloadLink, "_blank");
+              }}
+            >
+              Download ${wallet.name}
+            </button>
+          </div>
+        `,
       );
-    })();
+    } else {
+      const missingWallets = recommendedWallets.filter(
+        (recommendedWallet) =>
+          !this.wallets.some((wallet) => wallet.name === recommendedWallet.name),
+      );
+
+      const additionalButtons = missingWallets.map(
+        (wallet: WalletInfo) => html`
+          <div>
+            <img class="wallet-icon" src=${wallet.icon} alt=${wallet.name} />
+            <span class="mb-2">${wallet.name}</span>
+            <button
+              class="btn-primary mb-1"
+              @click=${() => {
+                window.open(wallet.downloadLink, "_blank");
+              }}
+            >
+              Download ${wallet.name}
+            </button>
+          </div>
+        `,
+      );
+
+      [title, body] = (() => {
+        if (!this.selectedWallet) {
+          return [
+            "Connect wallet",
+            html`
+              ${generateWalletsScene(
+                this.wallets,
+                this.signerSelectedHandler,
+                this.signerSelectedHandler,
+              )}
+              ${additionalButtons}
+            `,
+          ];
+        }
+        if (!this.selectedSigner) {
+          return generateSignersScene(
+            this.selectedWallet,
+            this.signerSelectedHandler,
+          );
+        }
+        return generateConnectingScene(
+          this.selectedWallet,
+          this.selectedSigner,
+          this.signerSelectedHandler,
+        );
+      })();
+    }
 
     return html`<style>
         :host {
