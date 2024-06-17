@@ -54,6 +54,14 @@ export class WebComponentConnector extends LitElement {
   @state()
   public signer?: ccc.SignerInfo;
   private canConnect = false;
+
+  private detectDevice() {
+    const userAgent = navigator.userAgent.toLowerCase();
+    const isMobile = /iphone|ipod|android|blackberry|mini|windows\sce|palm/i.test(userAgent);
+    const deviceType = isMobile ? "mobile" : "desktop";
+    return deviceType
+  }
+
   private prepareSigner() {
     (async () => {
       if (!this.selectedSigner) {
@@ -67,7 +75,22 @@ export class WebComponentConnector extends LitElement {
           this.disconnect();
           return;
         }
-        await this.selectedSigner.signer.connect();
+        try {
+          await this.selectedSigner.signer.connect();
+        } catch {
+          if(this.wallet?.name === 'OKX Wallet') {
+            window.open("https://www.okx.com/zh-hans/download");
+          } else if (this.wallet?.name === 'UniSat') {
+            window.open("https://unisat.io/");
+          } else {
+            let device = this.detectDevice();
+            if(device === 'mobile') {
+              window.open("https://metamask.io/download/");
+            } else {
+              window.open("https://chromewebstore.google.com/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn?utm_source=ext_sidebar");
+            }
+          }
+        }
       }
 
       this.saveConnection();
