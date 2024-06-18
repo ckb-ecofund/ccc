@@ -9,9 +9,6 @@ export function generateWalletsScene(
   onWalletSelected: (wallet: ccc.Wallet) => unknown,
   onSignerSelected: (wallet: ccc.Wallet, signer: ccc.SignerInfo) => unknown,
 ) {
-
-  console.log("check missing wallets", wallets);
-
   const missingWallets = recommendedWallets.filter(
     (recommendedWallet) =>
       !wallets.some((wallet) => wallet.name === recommendedWallet.name),
@@ -55,5 +52,5 @@ export function generateWalletsScene(
       )}
       ${additionalButtons}
     `,
-  ];
+    ];
 }
