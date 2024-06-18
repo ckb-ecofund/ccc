@@ -22,7 +22,7 @@ export function generateWalletsScene(
             window.open(wallet.downloadLink, "_blank");
           }}
         >
-           <img class="wallet-icon" src=${wallet.icon} alt=${wallet.name} />
+           <img src=${wallet.icon} alt=${wallet.name} />
           ${wallet.name}
         </button>
     `,
