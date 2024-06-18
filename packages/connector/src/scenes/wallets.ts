@@ -23,7 +23,7 @@ export function generateWalletsScene(
           }}
         >
            <img class="wallet-icon" src=${wallet.icon} alt=${wallet.name} />
-          <span class="mb-2">${wallet.name}</span>
+          ${wallet.name}
         </button>
     `,
   );
