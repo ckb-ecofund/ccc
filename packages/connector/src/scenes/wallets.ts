@@ -19,18 +19,15 @@ export function generateWalletsScene(
 
   const additionalButtons = missingWallets.map(
     (wallet: WalletInfo) => html`
-      <div>
-        <img class="wallet-icon" src=${wallet.icon} alt=${wallet.name} />
-        <span class="mb-2">${wallet.name}</span>
         <button
           class="btn-primary mb-1"
           @click=${() => {
             window.open(wallet.downloadLink, "_blank");
           }}
         >
-          Download ${wallet.name}
+           <img class="wallet-icon" src=${wallet.icon} alt=${wallet.name} />
+          <span class="mb-2">${wallet.name}</span>
         </button>
-      </div>
     `,
   );
   
