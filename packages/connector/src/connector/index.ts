@@ -69,6 +69,7 @@ export class WebComponentConnector extends LitElement {
           this.disconnect();
           return;
         }
+        await this.selectedSigner.signer.connect();
       }
 
       this.saveConnection();
