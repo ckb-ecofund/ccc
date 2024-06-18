@@ -54,7 +54,6 @@ export class WebComponentConnector extends LitElement {
   @state()
   public signer?: ccc.SignerInfo;
   private canConnect = false;
-
   private prepareSigner() {
     (async () => {
       if (!this.selectedSigner) {
@@ -77,7 +76,6 @@ export class WebComponentConnector extends LitElement {
       this.closedHandler();
     })();
   }
-
 
   public disconnect() {
     this.walletName = undefined;
@@ -221,7 +219,7 @@ export class WebComponentConnector extends LitElement {
   }
 
   render() {
-     const [title, body] = (() => {
+    const [title, body] = (() => {
       if (!this.selectedWallet) {
         return generateWalletsScene(
           this.wallets,
