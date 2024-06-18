@@ -68,7 +68,7 @@ export class WebComponentConnector extends LitElement {
           this.disconnect();
           return;
         }
-        await this.selectedSigner.signer.connect
+        await this.selectedSigner.signer.connect();
       }
 
       this.saveConnection();
@@ -77,6 +77,7 @@ export class WebComponentConnector extends LitElement {
       this.closedHandler();
     })();
   }
+
 
   public disconnect() {
     this.walletName = undefined;
