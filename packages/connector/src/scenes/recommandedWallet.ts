@@ -13,7 +13,7 @@ export const recommendedWallets: WalletInfo[] = [
   {
     name: "MetaMask",
     icon: METAMASK_SVG,
-    downloadLink: "https://metamask.app.link/dapp/yourwebsite",
+    downloadLink: `https://metamask.app.link/dapp/${window.location.href}`,
   },
   {
     name: "OKX Wallet",
