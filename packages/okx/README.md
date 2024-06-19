@@ -10,7 +10,7 @@
 
 <p align="center">
   <a href="https://www.npmjs.com/package/@ckb-ccc/okx"><img
-    alt="NPM Version" src="https://img.shields.io/npm/v/%40ckb-ccc%2okx"
+    alt="NPM Version" src="https://img.shields.io/npm/v/%40ckb-ccc%2Fokx"
   /></a>
   <img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/m/ckb-ecofund/ccc" />
   <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/ckb-ecofund/ccc/master" />
