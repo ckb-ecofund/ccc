@@ -1,6 +1,7 @@
 node_modules/
 
 tsconfig.json
+tsconfig.*.json
 eslint.config.mjs
 .prettierrc
 .prettierignore
