@@ -5,3 +5,5 @@ lerna-debug.log
 coverage
 
 packages/*/dist*
+
+*.DS_Store
