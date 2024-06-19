@@ -1,14 +1,33 @@
 import { ccc } from "@ckb-ccc/ccc";
 import { html } from "lit";
 import { repeat } from "lit/directives/repeat.js";
-import { WalletWithSigners } from "../types";
-import { recommendedWallets, WalletInfo } from "./recommandedWallet";
+import { WalletInfo, WalletWithSigners } from "../types";
+import { METAMASK_SVG } from "../assets/metamask.svg";
+import { OKX_SVG } from "../assets/okx.svg";
+import { UNI_SAT_SVG } from "../assets/uni-sat.svg";
 
 export function generateWalletsScene(
   wallets: WalletWithSigners[],
   onWalletSelected: (wallet: ccc.Wallet) => unknown,
   onSignerSelected: (wallet: ccc.Wallet, signer: ccc.SignerInfo) => unknown,
 ) {
+
+  const recommendedWallets = [{
+    name: "MetaMask",
+    icon: METAMASK_SVG,
+    downloadLink: `https://metamask.app.link/dapp/${window.location.href}`,
+  },
+  {
+    name: "OKX Wallet",
+    icon: OKX_SVG,
+    downloadLink: "https://www.okx.com/zh-hans/download",
+  },
+  {
+    name: "UniSat",
+    icon: UNI_SAT_SVG,
+    downloadLink: "https://unisat.io/",
+  }]
+
   const missingWallets = recommendedWallets.filter(
     (recommendedWallet) =>
       !wallets.some((wallet) => wallet.name === recommendedWallet.name),
@@ -22,7 +41,7 @@ export function generateWalletsScene(
             window.open(wallet.downloadLink, "_blank");
           }}
         >
-           <img src=${wallet.icon} alt=${wallet.name} />
+          <img src=${wallet.icon} alt=${wallet.name} />
           ${wallet.name}
         </button>
     `,
