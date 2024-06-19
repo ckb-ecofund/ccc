@@ -1,3 +1,9 @@
+<p align="center">
+  <a href="https://ckbccc-demo.vercel.app/">
+    <img alt="Logo" src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/logo.svg" width="20%" />
+  </a>
+</p>
+
 <h1 align="center" style="font-size: 48px;">
   CCC Connector
 </h1>
