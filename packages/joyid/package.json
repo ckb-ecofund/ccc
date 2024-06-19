@@ -36,6 +36,7 @@
   },
   "dependencies": {
     "@ckb-ccc/core": "workspace:*",
-    "@joyid/bitcoin": "^0.1.2"
+    "@joyid/bitcoin": "^0.1.2",
+    "@joyid/ckb": "^0.0.11"
   }
 }

@@ -1,5 +1,5 @@
 import { ccc } from '@ckb-ccc/core';
-import { Provider } from './joyid-btc.advanced';
+import { Provider } from './joyid.btc.advanced';
 import { getPublicKey as getJoyIDPublicKey, initConfig, requestAccounts, getAccounts, signMessage } from '@joyid/bitcoin';
 
 export class BitcoinSigner extends ccc.SignerBtc {
