@@ -1,7 +1,9 @@
-import { ccc, Client, ScriptLike } from "@ckb-ccc/core";
-import { initConfig } from "@joyid/ckb";
+import { ccc, Client, ScriptLike, SignerCkbScriptReadonly, TransactionLike } from "@ckb-ccc/core";
+import { initConfig, signRawTransaction } from "@joyid/ckb";
 import { connect as joyidConnect } from "@joyid/ckb";
-
+import { helpers } from '@ckb-lumos/lumos';
+import { bytes, number } from '@ckb-lumos/codec';
+import { blockchain } from '@ckb-lumos/base';
 
 /**
  * A class extending SignerCkbScriptReadonly that provides additional functionalities.
@@ -31,22 +33,15 @@ export class Signer extends ccc.SignerCkbScriptReadonly {
    * @param client - The new client instance.
    * @returns A promise that resolves to a new Signer instance.
    */
-  async replaceClient(client: Client): Promise<Signer> {
+  async replaceClient(client: Client): Promise<SignerCkbScriptReadonly> {
     const script = (this as any).script as ScriptLike;
-    return new Signer(client, script);
+    return new SignerCkbScriptReadonly(client, script);
   }
-
-  // Add any additional methods or override existing methods here
-  // For example, if you want to add a signTransaction method, you can define it like this:
-
-  /**
-   * Sign a transaction.
-   *
-   * @param transaction - The transaction to be signed.
-   * @returns A promise that resolves to the signed transaction.
-   */
-  async signTransaction(transaction: any): Promise<any> {
-    // Implement your signing logic here
-    throw new Error("Signing operation is not supported in read-only mode.");
+  
+  async sendTransactionWithAddress(tx: helpers.TransactionSkeletonType, address: string): Promise<ccc.Hex> {
+    const txSkeleton = helpers.createTransactionFromSkeleton(tx);
+    //@ts-ignore
+    const signedTx = await signRawTransaction(tx, address);
+    return this.client.sendTransaction(signedTx);
   }
 }
