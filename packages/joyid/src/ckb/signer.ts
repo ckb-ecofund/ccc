@@ -1,30 +1,49 @@
-import { ccc, Client, ScriptLike, SignerCkbScriptReadonly, TransactionLike } from "@ckb-ccc/core";
+import { Address, ccc, Client, ScriptLike, SignerCkbScriptReadonly, TransactionLike } from "@ckb-ccc/core";
 import { initConfig, signRawTransaction } from "@joyid/ckb";
 import { connect as joyidConnect } from "@joyid/ckb";
-import { helpers } from '@ckb-lumos/lumos';
-import { bytes, number } from '@ckb-lumos/codec';
-import { blockchain } from '@ckb-lumos/base';
 
 /**
  * A class extending SignerCkbScriptReadonly that provides additional functionalities.
  */
-export class Signer extends ccc.SignerCkbScriptReadonly {
+export class Signer extends ccc.Signer {
   
+  private address: string;
+
   /**
    * Creates an instance of Signer.
    *
    * @param client - The client instance used for communication.
    * @param script - The script associated with the signer.
    */
-  constructor(client: Client, script: ScriptLike) {
-    super(client, script);
+  
+  constructor(client: Client) {
+    super(client);
+    this.address = ""
   }
 
-  async connect():Promise<void> {
+  private async initJoyidConfig(): Promise<void> {
+    const prefix = await this.client.getAddressPrefix();
     initConfig({
-      network: process.env.NODE_ENV === 'development' ? 'testnet': 'mainnet'
-    })
-    await joyidConnect();
+      network: prefix === 'ckt' ? 'testnet' : 'mainnet'
+    });
+  }
+
+  async connect(): Promise<void> {
+    await this.initJoyidConfig(); 
+    const addressInfo = await joyidConnect();
+    this.address = addressInfo.address;
+  }
+
+  async isConnected(): Promise<boolean> {
+    return !!this.address;
+  }
+
+  async getInternalAddress(): Promise<string> {
+    return this.address;
+  }
+
+  async getAddressObjs(): Promise<ccc.Address[]> {
+    return [await Address.fromString(this.address, this.client)];
   }
 
   /**
@@ -33,15 +52,24 @@ export class Signer extends ccc.SignerCkbScriptReadonly {
    * @param client - The new client instance.
    * @returns A promise that resolves to a new Signer instance.
    */
-  async replaceClient(client: Client): Promise<SignerCkbScriptReadonly> {
-    const script = (this as any).script as ScriptLike;
-    return new SignerCkbScriptReadonly(client, script);
-  }
   
-  async sendTransactionWithAddress(tx: helpers.TransactionSkeletonType, address: string): Promise<ccc.Hex> {
-    const txSkeleton = helpers.createTransactionFromSkeleton(tx);
+  async replaceClient(client: Client): Promise<Signer> {
+    let replacedSigner = new Signer(client);
+    await replacedSigner.connect();
+    return replacedSigner;
+  }
+
+  // async sendTransactionWithAddress(tx: helpers.TransactionSkeletonType, address: string): Promise<ccc.Hex> {
+  //   const txSkeleton = helpers.createTransactionFromSkeleton(tx);
+  //   //@ts-ignore
+  //   const signedTx = await signRawTransaction(tx, address);
+  //   return this.client.sendTransaction(signedTx);
+  // }
+
+  async sendTransaction(tx: ccc.TransactionLike): Promise<ccc.Hex> {
+    const fromTx = ccc.Transaction.from(tx);
     //@ts-ignore
-    const signedTx = await signRawTransaction(tx, address);
+    const signedTx = await signRawTransaction(fromTx, this.address);
     return this.client.sendTransaction(signedTx);
   }
 }

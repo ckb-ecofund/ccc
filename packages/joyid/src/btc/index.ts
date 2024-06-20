@@ -1,1 +1,3 @@
-export * as joyidBtc from './barrel';
+export * from './signer';
+export * from './signerFactory';
+export * from './joyid.btc.advanced';

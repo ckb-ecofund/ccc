@@ -142,6 +142,7 @@ export abstract class Signer {
 export enum SignerType {
   EVM = "EVM",
   BTC = "BTC",
+  CKB = "CKB",
 }
 
 /**

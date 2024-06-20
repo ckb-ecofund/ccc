@@ -12,6 +12,7 @@ import {
 } from "../scenes";
 import { ConnectorStatus } from "../status";
 import { WalletWithSigners } from "../types";
+import { JOYID_SVG } from "../assets/joyid.svg";
 
 @customElement("ccc-connector")
 export class WebComponentConnector extends LitElement {
@@ -71,6 +72,22 @@ export class WebComponentConnector extends LitElement {
         );
       }),
     );
+
+    const joyidBtcSigner = ccc.joyidSigner.getJoyIDBitcoinSigner(this.client);
+    this.addSigner(
+      "JoyID",
+      JOYID_SVG,
+      ccc.SignerType.BTC,
+      joyidBtcSigner!!
+    )
+
+    const joyidCkbSigner =ccc.joyidSigner.getJoyidCkbSigner(this.client);
+    this.addSigner(
+      "JoyID",
+      JOYID_SVG,
+      ccc.SignerType.CKB,
+      joyidCkbSigner!!
+    )
   }
 
   reset() {
