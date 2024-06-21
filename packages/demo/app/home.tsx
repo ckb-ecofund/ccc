@@ -2,14 +2,13 @@
 
 import { ccc } from "@ckb-ccc/connector-react";
 import React, { useEffect, useState } from "react";
-import { common } from "@ckb-lumos/common-scripts";
-import { TransactionSkeleton } from "@ckb-lumos/helpers";
-import { Indexer } from "@ckb-lumos/ckb-indexer";
-import { getConfig, predefined } from "@ckb-lumos/config-manager";
+import { Indexer } from "@ckb-lumos/lumos";
 import { config, helpers } from "@ckb-lumos/lumos";
-import { registerCustomLockScriptInfos } from "@ckb-lumos/common-scripts/lib/common";
+import { commons } from '@ckb-lumos/lumos';
 import { createJoyIDScriptInfo } from "./joyid";
 import { CCCTransferCKB } from "./transfer-ckb";
+import { registerCustomLockScriptInfos } from "@ckb-lumos/lumos/common-scripts/common";
+import { TransactionSkeleton } from "@ckb-lumos/lumos/helpers";
 
 function WalletIcon({
   wallet,
@@ -132,8 +131,8 @@ function Transfer() {
             let txSkeleton = new TransactionSkeleton({
               cellProvider: indexer,
             });
-
-            txSkeleton = await common.transfer(
+            
+            txSkeleton = await commons.common.transfer(
               txSkeleton,
               fromAddresses,
               transferTo,
@@ -142,7 +141,7 @@ function Transfer() {
               undefined,
               { config: config.TESTNET },
             );
-            txSkeleton = await common.payFeeByFeeRate(
+            txSkeleton = await commons.common.payFeeByFeeRate(
               txSkeleton,
               fromAddresses,
               BigInt(1500),
