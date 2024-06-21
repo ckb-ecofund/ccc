@@ -121,6 +121,8 @@ function Transfer() {
             if (!signer) {
               return;
             }
+            config.initializeConfig(config.TESTNET);
+            registerCustomLockScriptInfos([createJoyIDScriptInfo(true)]);
             // Verify destination address
             await ccc.Address.fromString(transferTo, signer.client);
 
