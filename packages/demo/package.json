@@ -15,7 +15,8 @@
     "format": "prettier --write ."
   },
   "dependencies": {
-    "@ckb-lumos/lumos": "^0.22.2",
+    "@ckb-lumos/joyid": "^0.23.0",
+    "@ckb-lumos/lumos": "^0.23.0",
     "@lit/react": "^1.0.5",
     "@nervina-labs/joyid-sdk": "^0.3.0",
     "next": "14.2.2",

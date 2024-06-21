@@ -8,6 +8,7 @@ import { connect as joyidConnect } from "@joyid/ckb";
 export class Signer extends ccc.Signer {
   
   private address: string;
+  private authData: any;
 
   /**
    * Creates an instance of Signer.
@@ -18,7 +19,8 @@ export class Signer extends ccc.Signer {
   
   constructor(client: Client) {
     super(client);
-    this.address = ""
+    this.address = "";
+    this.authData = {}
   }
 
   private async initJoyidConfig(): Promise<void> {
@@ -32,6 +34,7 @@ export class Signer extends ccc.Signer {
     await this.initJoyidConfig(); 
     const addressInfo = await joyidConnect();
     this.address = addressInfo.address;
+    this.authData = addressInfo 
   }
 
   async isConnected(): Promise<boolean> {

@@ -232,9 +232,12 @@ importers:
 
   packages/demo:
     dependencies:
+      '@ckb-lumos/joyid':
+        specifier: ^0.23.0
+        version: 0.23.0(@joyid/ckb@0.0.6)
       '@ckb-lumos/lumos':
-        specifier: ^0.22.2
-        version: 0.22.2
+        specifier: ^0.23.0
+        version: 0.23.0
       '@lit/react':
         specifier: ^1.0.5
         version: 1.0.5(@types/react@18.3.3)
@@ -487,6 +490,20 @@ packages:
       lodash.isequal: 4.5.0
     dev: false
 
+  /@ckb-lumos/base@0.23.0:
+    resolution: {integrity: sha512-8aLFsUyWIK0rT7GQlYFuXyiG5lQ2bLRK2GvUsxv5G7I3nJ1UyxjwvVOdtlsR/cwhzOam3ujwqASqBIayBL6GLA==}
+    engines: {node: '>=12.0.0'}
+    dependencies:
+      '@ckb-lumos/bi': 0.23.0
+      '@ckb-lumos/codec': 0.23.0
+      '@ckb-lumos/toolkit': 0.23.0
+      '@types/blake2b': 2.1.3
+      '@types/lodash.isequal': 4.5.8
+      blake2b: 2.1.4
+      js-xxhash: 1.0.4
+      lodash.isequal: 4.5.0
+    dev: false
+
   /@ckb-lumos/bi@0.22.2:
     resolution: {integrity: sha512-F+dLC/tE+xdtNuGgJxlDqbgX/f8azg1tvIFTR5mu7Vhz08nkFgnA+Z+yC0t/I3fDwwH4p/SlGP/yducrsfVTqw==}
     engines: {node: '>=12.0.0'}
@@ -494,15 +511,22 @@ packages:
       jsbi: 4.3.0
     dev: false
 
-  /@ckb-lumos/ckb-indexer@0.22.2:
-    resolution: {integrity: sha512-y4v2yNa3IYURcUc+lkFs/4/nV4W0QQeCORtv1IlkgbES0718XB4IMGWvQtSGKAC94A9B4kSHREcyn0d+9lMzew==}
+  /@ckb-lumos/bi@0.23.0:
+    resolution: {integrity: sha512-KAy+lyVpL+Al4XD+c9tHrA9DSpHkMusyXtTS81aNZi5MyL6F9jrVmFcqLorhfyfl8Fsv2sEjMe5Neo2Y+w/RJQ==}
     engines: {node: '>=12.0.0'}
     dependencies:
-      '@ckb-lumos/base': 0.22.2
-      '@ckb-lumos/bi': 0.22.2
-      '@ckb-lumos/codec': 0.22.2
-      '@ckb-lumos/rpc': 0.22.2
-      '@ckb-lumos/toolkit': 0.22.2
+      jsbi: 4.3.0
+    dev: false
+
+  /@ckb-lumos/ckb-indexer@0.23.0:
+    resolution: {integrity: sha512-yLODLJzvtz4M6W6OJR4iRbBTUGrKReV2dhVePPjbH/HRkRY6f6J6cEM9+qM2I3QABmaCXeAM3hWvnWU9hjalQQ==}
+    engines: {node: '>=12.0.0'}
+    dependencies:
+      '@ckb-lumos/base': 0.23.0
+      '@ckb-lumos/bi': 0.23.0
+      '@ckb-lumos/codec': 0.23.0
+      '@ckb-lumos/rpc': 0.23.0
+      '@ckb-lumos/toolkit': 0.23.0
       cross-fetch: 3.1.8
       events: 3.3.0
     transitivePeerDependencies:
@@ -516,17 +540,24 @@ packages:
       '@ckb-lumos/bi': 0.22.2
     dev: false
 
-  /@ckb-lumos/common-scripts@0.22.2:
-    resolution: {integrity: sha512-eSXutpQXqAVh0MorCG8bg+xcMqxhpiJCXgdgfpQAA0q6BkdSGmu4Zn3InFRdeHZam8ap02dadVK7ZOi4ZaUKCg==}
+  /@ckb-lumos/codec@0.23.0:
+    resolution: {integrity: sha512-FwYooXnsFDjlHHnlFnCTB1UbBzV72I0VjkRpeauFk5nQ4+/75xl28ywK3J14M+0aHTnYU9msXUTRDAGqC0CaNQ==}
     engines: {node: '>=12.0.0'}
     dependencies:
-      '@ckb-lumos/base': 0.22.2
-      '@ckb-lumos/bi': 0.22.2
-      '@ckb-lumos/codec': 0.22.2
-      '@ckb-lumos/config-manager': 0.22.2
-      '@ckb-lumos/helpers': 0.22.2
-      '@ckb-lumos/rpc': 0.22.2
-      '@ckb-lumos/toolkit': 0.22.2
+      '@ckb-lumos/bi': 0.23.0
+    dev: false
+
+  /@ckb-lumos/common-scripts@0.23.0:
+    resolution: {integrity: sha512-Dwic0Al94afdGNu+TGAMmZiU5OVF/zvXbzhCvNmkFS25t8BxPdFjGEc0MlWBI4ZSEoGRrC0O+BOxjzfl5VxSYg==}
+    engines: {node: '>=12.0.0'}
+    dependencies:
+      '@ckb-lumos/base': 0.23.0
+      '@ckb-lumos/bi': 0.23.0
+      '@ckb-lumos/codec': 0.23.0
+      '@ckb-lumos/config-manager': 0.23.0
+      '@ckb-lumos/helpers': 0.23.0
+      '@ckb-lumos/rpc': 0.23.0
+      '@ckb-lumos/toolkit': 0.23.0
       bech32: 2.0.0
       bs58: 5.0.0
       immutable: 4.3.6
@@ -548,12 +579,26 @@ packages:
       - encoding
     dev: false
 
-  /@ckb-lumos/hd@0.22.2:
-    resolution: {integrity: sha512-bCcW+yoeBNniKijEIjZZZC2/a9ZEhvVco4L+aOHqwRon3jgXLN6izvzBgzm/m9hWUx47PpzPXjq3fRIn+kONxg==}
+  /@ckb-lumos/config-manager@0.23.0:
+    resolution: {integrity: sha512-MvNyzGIJTmIpEf5WJB3TkE4icZyZ2HZhFIfJB2SXDRAC84E02jxENPelCnqRbM1rlFHnxjh/5a/oCi5LcXefag==}
     engines: {node: '>=12.0.0'}
     dependencies:
-      '@ckb-lumos/base': 0.22.2
-      '@ckb-lumos/bi': 0.22.2
+      '@ckb-lumos/base': 0.23.0
+      '@ckb-lumos/bi': 0.23.0
+      '@ckb-lumos/codec': 0.23.0
+      '@ckb-lumos/rpc': 0.23.0
+      '@types/deep-freeze-strict': 1.1.2
+      deep-freeze-strict: 1.1.1
+    transitivePeerDependencies:
+      - encoding
+    dev: false
+
+  /@ckb-lumos/hd@0.23.0:
+    resolution: {integrity: sha512-z7EsR/GeX54hq4ukqwW3nrqLCsYrTWIFAjZLR1Ao8xycqQp0IBjCWZLLjRrZY6krbUQpVOoiKo3NBLpPW36LXg==}
+    engines: {node: '>=12.0.0'}
+    dependencies:
+      '@ckb-lumos/base': 0.23.0
+      '@ckb-lumos/bi': 0.23.0
       bn.js: 5.2.1
       elliptic: 6.5.4
       scrypt-js: 3.0.1
@@ -576,35 +621,66 @@ packages:
       - encoding
     dev: false
 
-  /@ckb-lumos/light-client@0.22.2:
-    resolution: {integrity: sha512-G9cDOeTC81+cVdGnVOEJ767jPDFV+ao/hsc8ANNVCxsWTlj1EQvEzxGB3vi3S9Jh0lri3t3XxRQia8No5HJ4EQ==}
+  /@ckb-lumos/helpers@0.23.0:
+    resolution: {integrity: sha512-yfD28vSn1BBk8BA+/ivL7pF3rMsx4OPQ+UUJjsQiR1zGdkNR3zhJOecgICeddJGYDTBBDVgwHcuyoekLxQzmGg==}
     engines: {node: '>=12.0.0'}
     dependencies:
-      '@ckb-lumos/base': 0.22.2
-      '@ckb-lumos/ckb-indexer': 0.22.2
-      '@ckb-lumos/rpc': 0.22.2
+      '@ckb-lumos/base': 0.23.0
+      '@ckb-lumos/bi': 0.23.0
+      '@ckb-lumos/codec': 0.23.0
+      '@ckb-lumos/config-manager': 0.23.0
+      '@ckb-lumos/toolkit': 0.23.0
+      bech32: 2.0.0
+      immutable: 4.3.6
+    transitivePeerDependencies:
+      - encoding
+    dev: false
+
+  /@ckb-lumos/joyid@0.23.0(@joyid/ckb@0.0.6):
+    resolution: {integrity: sha512-bgwvurAC7EOTLPzMy0dcgyWo/XeppPHJQUCNeY67Mb+EQKqgzsZcKBY8PzE+wDQmM1qJ1Unz2UqPT3mIEDNFrQ==}
+    engines: {node: '>=12.0.0'}
+    peerDependencies:
+      '@joyid/ckb': 0.0.6
+    dependencies:
+      '@ckb-lumos/base': 0.23.0
+      '@ckb-lumos/codec': 0.23.0
+      '@ckb-lumos/common-scripts': 0.23.0
+      '@ckb-lumos/config-manager': 0.23.0
+      '@ckb-lumos/helpers': 0.23.0
+      '@joyid/ckb': 0.0.6
+    transitivePeerDependencies:
+      - encoding
+    dev: false
+
+  /@ckb-lumos/light-client@0.23.0:
+    resolution: {integrity: sha512-O+dbfubDjl0iODiQ8Q+RVJLfuXYNCN6c0am8xEv4vvazLwfw1y/vn6fG/pFu9Mc1GahZ58y9o6fkUgs8ujH3Mg==}
+    engines: {node: '>=12.0.0'}
+    dependencies:
+      '@ckb-lumos/base': 0.23.0
+      '@ckb-lumos/ckb-indexer': 0.23.0
+      '@ckb-lumos/rpc': 0.23.0
       cross-fetch: 3.1.8
       events: 3.3.0
     transitivePeerDependencies:
       - encoding
     dev: false
 
-  /@ckb-lumos/lumos@0.22.2:
-    resolution: {integrity: sha512-oobNnRx2m2crr6rgz4Mz066ggRLiAgZPwcZJCxiQLxIR3e9ik9f37hxJOEhZ/1kZmNMxZIKectVckaMn8MHROg==}
+  /@ckb-lumos/lumos@0.23.0:
+    resolution: {integrity: sha512-ocsmzgTgevVwyQeQkUZrg4PLJCfX48D5MEBNYTMoGh5b1g0f1iEBHcAgw4WBGOKgMJQmGRmWB5P6tPDZ3OZBwQ==}
     engines: {node: '>=12.0.0'}
     dependencies:
-      '@ckb-lumos/base': 0.22.2
-      '@ckb-lumos/bi': 0.22.2
-      '@ckb-lumos/ckb-indexer': 0.22.2
-      '@ckb-lumos/codec': 0.22.2
-      '@ckb-lumos/common-scripts': 0.22.2
-      '@ckb-lumos/config-manager': 0.22.2
-      '@ckb-lumos/hd': 0.22.2
-      '@ckb-lumos/helpers': 0.22.2
-      '@ckb-lumos/light-client': 0.22.2
-      '@ckb-lumos/rpc': 0.22.2
-      '@ckb-lumos/toolkit': 0.22.2
-      '@ckb-lumos/transaction-manager': 0.22.2
+      '@ckb-lumos/base': 0.23.0
+      '@ckb-lumos/bi': 0.23.0
+      '@ckb-lumos/ckb-indexer': 0.23.0
+      '@ckb-lumos/codec': 0.23.0
+      '@ckb-lumos/common-scripts': 0.23.0
+      '@ckb-lumos/config-manager': 0.23.0
+      '@ckb-lumos/hd': 0.23.0
+      '@ckb-lumos/helpers': 0.23.0
+      '@ckb-lumos/light-client': 0.23.0
+      '@ckb-lumos/rpc': 0.23.0
+      '@ckb-lumos/toolkit': 0.23.0
+      '@ckb-lumos/transaction-manager': 0.23.0
     transitivePeerDependencies:
       - encoding
     dev: false
@@ -621,6 +697,18 @@ packages:
       - encoding
     dev: false
 
+  /@ckb-lumos/rpc@0.23.0:
+    resolution: {integrity: sha512-NEY1Wb2cNMYdHwcZYtd8XZ3CP6WGPd25hcsudoDAFlAt9vjHsPlNiwSS7tcZCZfg1XiJy3taViVgG8pFemgpbA==}
+    engines: {node: '>=12.0.0'}
+    dependencies:
+      '@ckb-lumos/base': 0.23.0
+      '@ckb-lumos/bi': 0.23.0
+      abort-controller: 3.0.0
+      cross-fetch: 3.1.8
+    transitivePeerDependencies:
+      - encoding
+    dev: false
+
   /@ckb-lumos/toolkit@0.22.2:
     resolution: {integrity: sha512-HmKz2dGQeaW2XDqkvjJfLv50VQWGKbthg2RDfIxGsZyjveluRROTyuHP1akypy4pqF8TApGLsXci2MaHCRau+w==}
     engines: {node: '>=12.0.0'}
@@ -628,15 +716,22 @@ packages:
       '@ckb-lumos/bi': 0.22.2
     dev: false
 
-  /@ckb-lumos/transaction-manager@0.22.2:
-    resolution: {integrity: sha512-RV/nLGAi5to6ROHh58uwiQB9wJBFmABlmU3GvUf2Baz0SIlniBx0EBtS3SzyD95w4zot1Fc8sVwLN8wCvt8ADA==}
+  /@ckb-lumos/toolkit@0.23.0:
+    resolution: {integrity: sha512-7LTsUFfoNCBWJLgh+V/QFnemjGw+y4mmLeQvubwYuJqIPIhIpwKUuKRzkvVG8snA8xVQSfjSSQOs5m3mKp66Kg==}
     engines: {node: '>=12.0.0'}
     dependencies:
-      '@ckb-lumos/base': 0.22.2
-      '@ckb-lumos/ckb-indexer': 0.22.2
-      '@ckb-lumos/codec': 0.22.2
-      '@ckb-lumos/rpc': 0.22.2
-      '@ckb-lumos/toolkit': 0.22.2
+      '@ckb-lumos/bi': 0.23.0
+    dev: false
+
+  /@ckb-lumos/transaction-manager@0.23.0:
+    resolution: {integrity: sha512-sfwt2g8JlYxr5jRx5r/UZNffTpkwn3sh4dD2THzKmX0S1CsSgww2D1ZD7yruWwSu05ZLKlDPFVKyJ50tNc3LuQ==}
+    engines: {node: '>=12.0.0'}
+    dependencies:
+      '@ckb-lumos/base': 0.23.0
+      '@ckb-lumos/ckb-indexer': 0.23.0
+      '@ckb-lumos/codec': 0.23.0
+      '@ckb-lumos/rpc': 0.23.0
+      '@ckb-lumos/toolkit': 0.23.0
       immutable: 4.3.6
     transitivePeerDependencies:
       - encoding
@@ -1134,6 +1229,10 @@ packages:
       - encoding
       - typescript
       - zod
+    dev: false
+
+  /@joyid/ckb@0.0.6:
+    resolution: {integrity: sha512-V7SfcWJ3hWrbxibHkRYxd7rXViLLJYSxuDg2/KQikEQMPYHW/FtFLO8EWNOa8a/rMBjJ7EhYKcUxiGAAq8ecRQ==}
     dev: false
 
   /@joyid/common@0.0.3(typescript@5.4.5):
