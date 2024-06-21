@@ -4,7 +4,7 @@ import { ccc } from "@ckb-ccc/connector-react";
 import React, { useEffect, useState } from "react";
 import { Indexer } from "@ckb-lumos/lumos";
 import { config, helpers } from "@ckb-lumos/lumos";
-import { commons } from '@ckb-lumos/lumos';
+import { commons } from "@ckb-lumos/lumos";
 import { registerCustomLockScriptInfos } from "@ckb-lumos/lumos/common-scripts/common";
 import { TransactionSkeleton } from "@ckb-lumos/lumos/helpers";
 import { createJoyIDScriptInfo, getDefaultConfig } from "@ckb-lumos/joyid";
@@ -121,10 +121,12 @@ function Transfer() {
               return;
             }
             //@ts-ignore
-            if(signer.authData) {
+            if (signer.authData) {
               config.initializeConfig(config.TESTNET);
-              //@ts-ignore
-              registerCustomLockScriptInfos([createJoyIDScriptInfo(signer.authData, getDefaultConfig(false))]);
+              registerCustomLockScriptInfos([
+                //@ts-ignore
+                createJoyIDScriptInfo(signer.authData, getDefaultConfig(false)),
+              ]);
             }
             // Verify destination address
             await ccc.Address.fromString(transferTo, signer.client);
@@ -135,7 +137,7 @@ function Transfer() {
             let txSkeleton = new TransactionSkeleton({
               cellProvider: indexer,
             });
-            
+
             txSkeleton = await commons.common.transfer(
               txSkeleton,
               fromAddresses,
@@ -153,26 +155,29 @@ function Transfer() {
               { config: config.TESTNET },
             );
             // // ====== format transaction
-            
+
             let tx;
             //@ts-ignore
-            if(signer.authData) {
-              tx = helpers.createTransactionFromSkeleton(txSkeleton)
-            } else {
-              tx = ccc.Transaction.fromLumosSkeleton(txSkeleton);
-              // CCC transactions are easy to be edited
-              const dataBytes = (() => {
-                try {
-                  return ccc.bytesFrom(data);
-                } catch (e) {}
+            // if (signer.authData) {
+            //   tx = helpers.createTransactionFromSkeleton(txSkeleton);
+            // } else {
+            //   tx = ccc.Transaction.fromLumosSkeleton(txSkeleton);
+            //   // CCC transactions are easy to be edited
+            //   const dataBytes = (() => {
+            //     try {
+            //       return ccc.bytesFrom(data);
+            //     } catch (e) {}
 
-                return ccc.bytesFrom(data, "utf8");
-              })();
-              if (tx.outputs[0].capacity < ccc.fixedPointFrom(dataBytes.length)) {
-                throw new Error("Insufficient capacity to store data");
-              }
-              tx.outputsData[0] = ccc.hexFrom(dataBytes);
-            }
+            //     return ccc.bytesFrom(data, "utf8");
+            //   })();
+            //   if (
+            //     tx.outputs[0].capacity < ccc.fixedPointFrom(dataBytes.length)
+            //   ) {
+            //     throw new Error("Insufficient capacity to store data");
+            //   }
+            //   tx.outputsData[0] = ccc.hexFrom(dataBytes);
+            // }
+            tx = ccc.Transaction.fromLumosSkeleton(txSkeleton);
             // Sign and send the transaction
             setHash(await signer.sendTransaction(tx));
           }}
@@ -191,7 +196,6 @@ export default function Home() {
   const [internalAddress, setInternalAddress] = useState("");
   const [address, setAddress] = useState("");
   const [isTestnet, setIsTestnet] = useState(true);
-
 
   useEffect(() => {
     if (!signer) {

@@ -1,1 +1,1 @@
-export * as joyidSigner from './barrel';
+export * as joyIdSigner from "./barrel";

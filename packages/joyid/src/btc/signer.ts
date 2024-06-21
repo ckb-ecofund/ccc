@@ -1,21 +1,27 @@
-import { ccc } from '@ckb-ccc/core';
-import { Provider } from './joyid.btc.advanced';
-import { getPublicKey as getJoyIDPublicKey, initConfig, requestAccounts, getAccounts, signMessage as signBtcMessage } from '@joyid/bitcoin';
+import { ccc } from "@ckb-ccc/core";
+import {
+  getAccounts,
+  getPublicKey as getJoyIDPublicKey,
+  initConfig,
+  requestAccounts,
+  signMessage as signBtcMessage,
+} from "@joyid/bitcoin";
 
 export class BitcoinSigner extends ccc.SignerBtc {
-  constructor(
-    client: ccc.Client,
-  ) {
+  constructor(client: ccc.Client) {
     super(client);
   }
 
   async initJoyidConfig() {
     initConfig({
-      joyidAppURL: await this.client.getAddressPrefix() === "ckt" ? "https://testnet.joyid.dev" : "https://app.joy.id",
-      requestAddressType: 'p2tr',
+      joyidAppURL:
+        (await this.client.getAddressPrefix()) === "ckt"
+          ? "https://testnet.joyid.dev"
+          : "https://app.joy.id",
+      requestAddressType: "p2tr",
     });
   }
-  
+
   async getBtcAccount(): Promise<string> {
     await this.initJoyidConfig();
     const accounts = await getAccounts();
@@ -23,7 +29,7 @@ export class BitcoinSigner extends ccc.SignerBtc {
   }
 
   async getBtcPublicKey(): Promise<ccc.HexLike> {
-        await this.initJoyidConfig();
+    await this.initJoyidConfig();
 
     const publicKey = await getJoyIDPublicKey();
     return publicKey!!;
@@ -46,6 +52,6 @@ export class BitcoinSigner extends ccc.SignerBtc {
 
   async signMessage(_: string | ccc.BytesLike): Promise<string> {
     const message = await signBtcMessage(_ as string);
-    return message
+    return message;
   }
 }

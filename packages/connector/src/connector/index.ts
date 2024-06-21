@@ -2,6 +2,7 @@ import { ccc } from "@ckb-ccc/ccc";
 import { LitElement, PropertyValues, css, html } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { CLOSE_SVG } from "../assets/close.svg";
+import { JOYID_SVG } from "../assets/joyid.svg";
 import { OKX_SVG } from "../assets/okx.svg";
 import { UNI_SAT_SVG } from "../assets/uni-sat.svg";
 import { CloseEvent, SignerChangedEvent, StatusChangedEvent } from "../events";
@@ -12,7 +13,6 @@ import {
 } from "../scenes";
 import { ConnectorStatus } from "../status";
 import { WalletWithSigners } from "../types";
-import { JOYID_SVG } from "../assets/joyid.svg";
 
 @customElement("ccc-connector")
 export class WebComponentConnector extends LitElement {
@@ -73,21 +73,11 @@ export class WebComponentConnector extends LitElement {
       }),
     );
 
-    const joyidBtcSigner = ccc.joyidSigner.getJoyIDBitcoinSigner(this.client);
-    this.addSigner(
-      "JoyID",
-      JOYID_SVG,
-      ccc.SignerType.BTC,
-      joyidBtcSigner!!
-    )
+    const joyIdBtcSigner = ccc.joyIdSigner.getJoyIdBitcoinSigner(this.client);
+    this.addSigner("JoyID", JOYID_SVG, ccc.SignerType.BTC, joyIdBtcSigner!!);
 
-    const joyidCkbSigner =ccc.joyidSigner.getJoyidCkbSigner(this.client);
-    this.addSigner(
-      "JoyID",
-      JOYID_SVG,
-      ccc.SignerType.CKB,
-      joyidCkbSigner!!
-    )
+    const joyIdCkbSigner = ccc.joyIdSigner.getJoyIdCkbSigner(this.client);
+    this.addSigner("JoyID", JOYID_SVG, ccc.SignerType.CKB, joyIdCkbSigner!!);
   }
 
   reset() {
