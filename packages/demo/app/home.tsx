@@ -126,31 +126,29 @@ function Transfer() {
 
             const fromAddresses = await signer.getAddresses();
             // === Composing transaction with Lumos ===
-            // const indexer = new Indexer(signer.client.getUrl());
-            // let txSkeleton = new TransactionSkeleton({
-            //   cellProvider: indexer,
-            // });
+            const indexer = new Indexer(signer.client.getUrl());
+            let txSkeleton = new TransactionSkeleton({
+              cellProvider: indexer,
+            });
 
-            // txSkeleton = await common.transfer(
-            //   txSkeleton,
-            //   fromAddresses,
-            //   transferTo,
-            //   ccc.fixedPointFrom(amount),
-            //   undefined,
-            //   undefined,
-            //   { config: config.TESTNET },
-            // );
-            // console.log('is here no error', JSON.stringify(txSkeleton));
-            // txSkeleton = await common.payFeeByFeeRate(
-            //   txSkeleton,
-            //   fromAddresses,
-            //   BigInt(1500),
-            //   undefined,
-            //   { config: config.TESTNET },
-            // );
+            txSkeleton = await common.transfer(
+              txSkeleton,
+              fromAddresses,
+              transferTo,
+              ccc.fixedPointFrom(amount),
+              undefined,
+              undefined,
+              { config: config.TESTNET },
+            );
+            txSkeleton = await common.payFeeByFeeRate(
+              txSkeleton,
+              fromAddresses,
+              BigInt(1500),
+              undefined,
+              { config: config.TESTNET },
+            );
             // // ======
-            // console.log('is here no error too')
-            const txSkeleton = await CCCTransferCKB(fromAddresses[0], transferTo, ccc.fixedPointFrom(amount).toString(), fromAddresses[0].slice(0,3) === 'ckt');
+            // const txSkeleton = await CCCTransferCKB(fromAddresses[0], transferTo, ccc.fixedPointFrom(amount).toString(), fromAddresses[0].slice(0,3) === 'ckt');
             const tx = ccc.Transaction.fromLumosSkeleton(txSkeleton);
             // CCC transactions are easy to be edited
             const dataBytes = (() => {
@@ -166,7 +164,6 @@ function Transfer() {
             tx.outputsData[0] = ccc.hexFrom(dataBytes);
             console.log(tx);
             // Sign and send the transaction
-            //@ts-ignore
             setHash(await signer.sendTransaction(tx));
           }}
         >
