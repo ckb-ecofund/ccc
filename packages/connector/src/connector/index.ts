@@ -74,10 +74,10 @@ export class WebComponentConnector extends LitElement {
     );
 
     const joyIdBtcSigner = ccc.joyIdSigner.getJoyIdBitcoinSigner(this.client);
-    this.addSigner("JoyID", JOYID_SVG, ccc.SignerType.BTC, joyIdBtcSigner!!);
+    this.addSigner("JoyID", JOYID_SVG, ccc.SignerType.BTC, joyIdBtcSigner);
 
     const joyIdCkbSigner = ccc.joyIdSigner.getJoyIdCkbSigner(this.client);
-    this.addSigner("JoyID", JOYID_SVG, ccc.SignerType.CKB, joyIdCkbSigner!!);
+    this.addSigner("JoyID", JOYID_SVG, ccc.SignerType.CKB, joyIdCkbSigner);
   }
 
   reset() {

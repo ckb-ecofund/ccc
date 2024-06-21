@@ -3,6 +3,6 @@ import { BitcoinSigner } from "./signer";
 
 export function getJoyIdBitcoinSigner(
   client: ccc.Client,
-): BitcoinSigner | undefined {
+): BitcoinSigner {
   return new BitcoinSigner(client);
 }
