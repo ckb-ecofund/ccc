@@ -5,7 +5,11 @@ import React, { useEffect, useState } from "react";
 import { common } from "@ckb-lumos/common-scripts";
 import { TransactionSkeleton } from "@ckb-lumos/helpers";
 import { Indexer } from "@ckb-lumos/ckb-indexer";
-import { predefined } from "@ckb-lumos/config-manager";
+import { getConfig, predefined } from "@ckb-lumos/config-manager";
+import { config, helpers } from "@ckb-lumos/lumos";
+import { registerCustomLockScriptInfos } from "@ckb-lumos/common-scripts/lib/common";
+import { createJoyIDScriptInfo } from "./joyid";
+import { CCCTransferCKB } from "./transfer-ckb";
 
 function WalletIcon({
   wallet,
@@ -122,30 +126,32 @@ function Transfer() {
 
             const fromAddresses = await signer.getAddresses();
             // === Composing transaction with Lumos ===
-            const indexer = new Indexer(signer.client.getUrl());
-            let txSkeleton = new TransactionSkeleton({
-              cellProvider: indexer,
-            });
-            txSkeleton = await common.transfer(
-              txSkeleton,
-              fromAddresses,
-              transferTo,
-              ccc.fixedPointFrom(amount),
-              undefined,
-              undefined,
-              { config: predefined.AGGRON4 },
-            );
-            txSkeleton = await common.payFeeByFeeRate(
-              txSkeleton,
-              fromAddresses,
-              BigInt(1500),
-              undefined,
-              { config: predefined.AGGRON4 },
-            );
-            // ======
+            // const indexer = new Indexer(signer.client.getUrl());
+            // let txSkeleton = new TransactionSkeleton({
+            //   cellProvider: indexer,
+            // });
 
+            // txSkeleton = await common.transfer(
+            //   txSkeleton,
+            //   fromAddresses,
+            //   transferTo,
+            //   ccc.fixedPointFrom(amount),
+            //   undefined,
+            //   undefined,
+            //   { config: config.TESTNET },
+            // );
+            // console.log('is here no error', JSON.stringify(txSkeleton));
+            // txSkeleton = await common.payFeeByFeeRate(
+            //   txSkeleton,
+            //   fromAddresses,
+            //   BigInt(1500),
+            //   undefined,
+            //   { config: config.TESTNET },
+            // );
+            // // ======
+            // console.log('is here no error too')
+            const txSkeleton = await CCCTransferCKB(fromAddresses[0], transferTo, ccc.fixedPointFrom(amount).toString(), fromAddresses[0].slice(0,3) === 'ckt');
             const tx = ccc.Transaction.fromLumosSkeleton(txSkeleton);
-
             // CCC transactions are easy to be edited
             const dataBytes = (() => {
               try {
@@ -158,8 +164,9 @@ function Transfer() {
               throw new Error("Insufficient capacity to store data");
             }
             tx.outputsData[0] = ccc.hexFrom(dataBytes);
-
+            console.log(tx);
             // Sign and send the transaction
+            //@ts-ignore
             setHash(await signer.sendTransaction(tx));
           }}
         >
@@ -177,6 +184,11 @@ export default function Home() {
   const [internalAddress, setInternalAddress] = useState("");
   const [address, setAddress] = useState("");
   const [isTestnet, setIsTestnet] = useState(true);
+
+  useEffect(() => {
+    config.initializeConfig(isTestnet ? config.TESTNET: config.MAINNET);
+    registerCustomLockScriptInfos([createJoyIDScriptInfo(isTestnet)]);
+  },[isTestnet])
 
   useEffect(() => {
     if (!signer) {

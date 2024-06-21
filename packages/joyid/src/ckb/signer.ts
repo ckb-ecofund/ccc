@@ -1,5 +1,5 @@
 import { Address, ccc, Client, ScriptLike, SignerCkbScriptReadonly, TransactionLike } from "@ckb-ccc/core";
-import { initConfig, signRawTransaction } from "@joyid/ckb";
+import { CKBTransaction, initConfig, signRawTransaction } from "@joyid/ckb";
 import { connect as joyidConnect } from "@joyid/ckb";
 
 /**
@@ -24,7 +24,7 @@ export class Signer extends ccc.Signer {
   private async initJoyidConfig(): Promise<void> {
     const prefix = await this.client.getAddressPrefix();
     initConfig({
-      network: prefix === 'ckt' ? 'testnet' : 'mainnet'
+      joyidAppURL: prefix === 'ckt' ? 'https://testnet.joyid.dev' : "https://app.joy.id/",
     });
   }
 
@@ -59,17 +59,9 @@ export class Signer extends ccc.Signer {
     return replacedSigner;
   }
 
-  // async sendTransactionWithAddress(tx: helpers.TransactionSkeletonType, address: string): Promise<ccc.Hex> {
-  //   const txSkeleton = helpers.createTransactionFromSkeleton(tx);
-  //   //@ts-ignore
-  //   const signedTx = await signRawTransaction(tx, address);
-  //   return this.client.sendTransaction(signedTx);
-  // }
-
   async sendTransaction(tx: ccc.TransactionLike): Promise<ccc.Hex> {
-    const fromTx = ccc.Transaction.from(tx);
     //@ts-ignore
-    const signedTx = await signRawTransaction(fromTx, this.address);
+    const signedTx = await signRawTransaction(tx, this.address);
     return this.client.sendTransaction(signedTx);
   }
 }
