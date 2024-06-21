@@ -1,4 +1,5 @@
-import { Address, ccc, Client } from "@ckb-ccc/core";
+import { Address, bytesFrom, ccc, Client, numToBytes, numToHex } from "@ckb-ccc/core";
+import { Transaction as LumosTransaction } from '@ckb-lumos/base';
 import {
   initConfig,
   connect as joyIdConnect,
@@ -65,9 +66,18 @@ export class Signer extends ccc.Signer {
     return replacedSigner;
   }
 
-  async sendTransaction(tx: ccc.TransactionLike): Promise<ccc.Hex> {
-    //@ts-ignore
+  async signOnlyTransaction(_: ccc.TransactionLike): Promise<ccc.Transaction> {
+    const tx = JSON.parse(JSON.stringify(_, (key, value) => {
+      if (typeof value === 'bigint') {
+        return numToHex(value)
+      }
+      return value
+    }))
     const signedTx = await signRawTransaction(tx, this.address);
-    return this.client.sendTransaction(signedTx);
+    return ccc.Transaction.from(signedTx);
+  }
+
+  async sendTransaction(tx: ccc.TransactionLike): Promise<ccc.Hex> {
+    return this.client.sendTransaction(await this.signOnlyTransaction(tx));
   }
 }

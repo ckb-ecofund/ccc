@@ -1,6 +1,6 @@
 "use client";
 
-import { ccc } from "@ckb-ccc/connector-react";
+import { ccc, hexFrom, numToHex } from "@ckb-ccc/connector-react";
 import React, { useEffect, useState } from "react";
 import { Indexer } from "@ckb-lumos/lumos";
 import { config, helpers } from "@ckb-lumos/lumos";
@@ -9,6 +9,7 @@ import { registerCustomLockScriptInfos } from "@ckb-lumos/lumos/common-scripts/c
 import { TransactionSkeleton } from "@ckb-lumos/lumos/helpers";
 import { createJoyIDScriptInfo, getDefaultConfig } from "@ckb-lumos/joyid";
 import { connect } from "http2";
+import { replace } from "lodash";
 
 function WalletIcon({
   wallet,
@@ -150,35 +151,35 @@ function Transfer() {
             txSkeleton = await commons.common.payFeeByFeeRate(
               txSkeleton,
               fromAddresses,
-              BigInt(1500),
+              BigInt(3666),
               undefined,
               { config: config.TESTNET },
             );
             // // ====== format transaction
 
-            let tx;
+            const tx = ccc.Transaction.fromLumosSkeleton(txSkeleton);
             //@ts-ignore
-            // if (signer.authData) {
-            //   tx = helpers.createTransactionFromSkeleton(txSkeleton);
-            // } else {
-            //   tx = ccc.Transaction.fromLumosSkeleton(txSkeleton);
-            //   // CCC transactions are easy to be edited
-            //   const dataBytes = (() => {
-            //     try {
-            //       return ccc.bytesFrom(data);
-            //     } catch (e) {}
+            // CCC transactions are easy to be edited
+            const dataBytes = (() => {
+              try {
+                return ccc.bytesFrom(data);
+              } catch (e) {}
 
-            //     return ccc.bytesFrom(data, "utf8");
-            //   })();
-            //   if (
-            //     tx.outputs[0].capacity < ccc.fixedPointFrom(dataBytes.length)
-            //   ) {
-            //     throw new Error("Insufficient capacity to store data");
-            //   }
-            //   tx.outputsData[0] = ccc.hexFrom(dataBytes);
-            // }
-            tx = ccc.Transaction.fromLumosSkeleton(txSkeleton);
+              return ccc.bytesFrom(data, "utf8");
+            })();
+            if (
+              tx.outputs[0].capacity < ccc.fixedPointFrom(dataBytes.length)
+            ) {
+              throw new Error("Insufficient capacity to store data");
+            }
+            tx.outputsData[0] = ccc.hexFrom(dataBytes);
             // Sign and send the transaction
+            // console.log(JSON.stringify(tx, (key, value) => {
+            //   if (typeof value === 'bigint') {
+            //     return hexFrom(value.toString())
+            //   }
+            //   return value
+            // }));
             setHash(await signer.sendTransaction(tx));
           }}
         >

@@ -8,6 +8,7 @@ import { apply } from "../utils";
 import * as mol from "./molecule.advanced";
 import { Script, ScriptLike } from "./script";
 import { DEP_TYPE_TO_NUM, NUM_TO_DEP_TYPE } from "./transaction.advanced";
+import { Transaction as LumosTransaction } from '@ckb-lumos/base';
 
 export type DepTypeLike = string | number | bigint;
 export type DepType = "depGroup" | "code";
