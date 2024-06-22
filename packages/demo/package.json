@@ -22,6 +22,7 @@
   },
   "devDependencies": {
     "@ckb-ccc/connector-react": "workspace:*",
+    "@ckb-ccc/lumos-patches": "workspace:*",
     "@ckb-lumos/ckb-indexer": "^0.22.2",
     "@ckb-lumos/common-scripts": "^0.22.2",
     "@ckb-lumos/config-manager": "^0.22.2",

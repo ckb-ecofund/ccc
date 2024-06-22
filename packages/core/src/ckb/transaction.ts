@@ -3,7 +3,14 @@ import { Bytes, BytesLike, bytesFrom } from "../bytes";
 import { Client } from "../client";
 import { Hasher, ckbHash } from "../hasher";
 import { Hex, HexLike, hexFrom } from "../hex";
-import { Num, NumLike, numFrom, numFromBytes, numToBytes } from "../num";
+import {
+  Num,
+  NumLike,
+  numFrom,
+  numFromBytes,
+  numToBytes,
+  numToHex,
+} from "../num";
 import { apply } from "../utils";
 import * as mol from "./molecule.advanced";
 import { Script, ScriptLike } from "./script";
@@ -751,6 +758,15 @@ export class Transaction {
     });
   }
 
+  stringify(): string {
+    return JSON.stringify(this, (_, value) => {
+      if (typeof value === "bigint") {
+        return numToHex(value);
+      }
+      return value;
+    });
+  }
+
   /**
    * Converts the raw transaction data to bytes.
    *
@@ -806,5 +822,168 @@ export class Transaction {
     const raw = bytesFrom(hexFrom(witness));
     hasher.update(numToBytes(raw.length, 8));
     hasher.update(raw);
+  }
+
+  /**
+   * Computes the signing hash information for a given script.
+   *
+   * @param scriptLike - The script associated with the transaction, represented as a ScriptLike object.
+   * @param client - The client for complete extra infos in the transaction.
+   * @returns A promise that resolves to an object containing the signing message and the witness position,
+   *          or undefined if no matching input is found.
+   *
+   * @example
+   * ```typescript
+   * const signHashInfo = await tx.getSignHashInfo(scriptLike, client);
+   * if (signHashInfo) {
+   *   console.log(signHashInfo.message); // Outputs the signing message
+   *   console.log(signHashInfo.position); // Outputs the witness position
+   * }
+   * ```
+   */
+  async getSignHashInfo(
+    scriptLike: ScriptLike,
+    client: Client,
+  ): Promise<{ message: Hex; position: number } | undefined> {
+    const script = Script.from(scriptLike);
+    let position = -1;
+    const hasher = new Hasher();
+    hasher.update(this.hash());
+
+    for (let i = 0; i < this.witnesses.length; i += 1) {
+      if (this.inputs[i]) {
+        const input = await this.inputs[i].completeExtraInfos(client);
+
+        if (!input.cellOutput) {
+          throw Error("Unable to resolve inputs info");
+        }
+
+        if (!script.eq(input.cellOutput.lock)) {
+          continue;
+        }
+
+        if (position === -1) {
+          position = i;
+        }
+      }
+
+      if (position === -1) {
+        return undefined;
+      }
+
+      Transaction.hashWitnessToHasher(this.witnesses[i], hasher);
+    }
+
+    if (position === -1) {
+      return undefined;
+    }
+
+    return {
+      message: hasher.digest(),
+      position,
+    };
+  }
+
+  /**
+   * Find the first occurrence of a input with the specified lock
+   *
+   * @param scriptLike - The script associated with the transaction, represented as a ScriptLike object.
+   * @param client - The client for complete extra infos in the transaction.
+   * @returns A promise that resolves to the prepared transaction
+   *
+   * @example
+   * ```typescript
+   * const index = await tx.findInputIndexByLock(scriptLike, client);
+   * ```
+   */
+  async findInputIndexByLock(
+    scriptLike: ScriptLike,
+    client: Client,
+  ): Promise<number | undefined> {
+    const script = Script.from(scriptLike);
+
+    for (let i = 0; i < this.inputs.length; i += 1) {
+      const input = await this.inputs[i].completeExtraInfos(client);
+
+      if (!input.cellOutput) {
+        throw Error("Unable to resolve inputs info");
+      }
+
+      if (script.eq(input.cellOutput.lock)) {
+        return i;
+      }
+    }
+  }
+
+  /**
+   * Get witness at index as WitnessArgs
+   *
+   * @param index - The index of the witness.
+   * @returns The witness parsed as WitnessArgs.
+   *
+   * @example
+   * ```typescript
+   * const witnessArgs = await tx.getWitnessArgsAt(0);
+   * ```
+   */
+  getWitnessArgsAt(index: number): WitnessArgs | undefined {
+    const rawWitness = this.witnesses[index];
+    return (rawWitness ?? "0x") !== "0x"
+      ? WitnessArgs.fromBytes(rawWitness)
+      : undefined;
+  }
+
+  /**
+   * Set witness at index by WitnessArgs
+   *
+   * @param index - The index of the witness.
+   * @param witness - The WitnessArgs to set.
+   * @returns The transaction itself.
+   *
+   * @example
+   * ```typescript
+   * await tx.setWitnessArgsAt(0, witnessArgs);
+   * ```
+   */
+  setWitnessArgsAt(index: number, witness: WitnessArgs): Transaction {
+    if (this.witnesses.length < index) {
+      this.witnesses.push(
+        ...Array.from(
+          new Array(index - this.witnesses.length),
+          (): Hex => "0x",
+        ),
+      );
+    }
+
+    this.witnesses[index] = hexFrom(witness.toBytes());
+    return this;
+  }
+
+  /**
+   * Prepare dummy witness for sighash all method
+   *
+   * @param scriptLike - The script associated with the transaction, represented as a ScriptLike object.
+   * @param lockLen - The length of dummy lock bytes.
+   * @param client - The client for complete extra infos in the transaction.
+   * @returns A promise that resolves to the prepared transaction
+   *
+   * @example
+   * ```typescript
+   * await tx.prepareSighashAllWitness(scriptLike, 85, client);
+   * ```
+   */
+  async prepareSighashAllWitness(
+    scriptLike: ScriptLike,
+    lockLen: number,
+    client: Client,
+  ): Promise<Transaction> {
+    const position = await this.findInputIndexByLock(scriptLike, client);
+    if (position === undefined) {
+      return this;
+    }
+
+    const witness = this.getWitnessArgsAt(position) ?? WitnessArgs.from({});
+    witness.lock = hexFrom(Array.from(new Array(lockLen), () => 0));
+    return this.setWitnessArgsAt(position, witness);
   }
 }

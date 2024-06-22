@@ -53,6 +53,7 @@
     "@ckb-ccc/core": "workspace:*",
     "@ckb-ccc/eip6963": "workspace:*",
     "@ckb-ccc/okx": "workspace:*",
-    "@ckb-ccc/uni-sat": "workspace:*"
+    "@ckb-ccc/uni-sat": "workspace:*",
+    "@ckb-ccc/joy-id": "workspace:*"
   }
 }

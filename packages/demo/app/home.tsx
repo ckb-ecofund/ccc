@@ -6,6 +6,8 @@ import { common } from "@ckb-lumos/common-scripts";
 import { TransactionSkeleton } from "@ckb-lumos/helpers";
 import { Indexer } from "@ckb-lumos/ckb-indexer";
 import { predefined } from "@ckb-lumos/config-manager";
+import { registerCustomLockScriptInfos } from "@ckb-lumos/common-scripts/lib/common";
+import { generateDefaultScriptInfos } from "@ckb-ccc/lumos-patches";
 
 function WalletIcon({
   wallet,
@@ -122,6 +124,7 @@ function Transfer() {
 
             const fromAddresses = await signer.getAddresses();
             // === Composing transaction with Lumos ===
+            registerCustomLockScriptInfos(generateDefaultScriptInfos());
             const indexer = new Indexer(signer.client.getUrl());
             let txSkeleton = new TransactionSkeleton({
               cellProvider: indexer,
@@ -138,7 +141,7 @@ function Transfer() {
             txSkeleton = await common.payFeeByFeeRate(
               txSkeleton,
               fromAddresses,
-              BigInt(1500),
+              BigInt(3600),
               undefined,
               { config: predefined.AGGRON4 },
             );

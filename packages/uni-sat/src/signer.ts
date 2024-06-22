@@ -1,5 +1,5 @@
 import { ccc } from "@ckb-ccc/core";
-import { Provider } from "./uni-sat.advanced";
+import { Provider } from "./advancedBarrel";
 
 export class Signer extends ccc.SignerBtc {
   constructor(

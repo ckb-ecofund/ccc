@@ -1,6 +1,6 @@
 import { ccc } from "@ckb-ccc/core";
 import { UniSat } from "@ckb-ccc/uni-sat";
-import { BitcoinProvider } from "./advanced";
+import { BitcoinProvider } from "./advancedBarrel";
 
 export class BitcoinSigner extends UniSat.Signer {
   constructor(

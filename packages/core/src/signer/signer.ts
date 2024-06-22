@@ -30,6 +30,13 @@ export abstract class Signer {
   abstract connect(): Promise<void>;
 
   /**
+   * Disconnects to the signer.
+   *
+   * @returns A promise that resolves when disconnected.
+   */
+  async disconnect(): Promise<void> {}
+
+  /**
    * Check if the signer is connected.
    *
    * @returns A promise that resolves the connection status.
@@ -142,6 +149,7 @@ export abstract class Signer {
 export enum SignerType {
   EVM = "EVM",
   BTC = "BTC",
+  CKB = "CKB",
 }
 
 /**
@@ -149,6 +157,7 @@ export enum SignerType {
  */
 export class SignerInfo {
   constructor(
+    public name: string,
     public type: SignerType,
     public signer: Signer,
   ) {}

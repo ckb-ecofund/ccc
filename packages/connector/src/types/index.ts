@@ -9,4 +9,3 @@ export interface WalletInfo {
   icon: string;
   downloadLink: string;
 }
-

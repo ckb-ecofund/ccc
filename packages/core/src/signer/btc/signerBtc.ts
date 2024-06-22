@@ -6,7 +6,6 @@ import { Transaction, TransactionLike, WitnessArgs } from "../../ckb";
 import { KnownScript } from "../../client";
 import { HexLike, hexFrom } from "../../hex";
 import { numToBytes } from "../../num";
-import { getSignHashInfo, prepareSighashAllWitness } from "../helpers";
 import { Signer } from "../signer";
 
 /**
@@ -64,7 +63,11 @@ export abstract class SignerBtc extends Signer {
    */
   async prepareTransaction(txLike: TransactionLike): Promise<Transaction> {
     const { script } = await this.getRecommendedAddressObj();
-    return prepareSighashAllWitness(txLike, script, 85, this.client);
+    return Transaction.from(txLike).prepareSighashAllWitness(
+      script,
+      85,
+      this.client,
+    );
   }
 
   /**
@@ -76,7 +79,7 @@ export abstract class SignerBtc extends Signer {
   async signOnlyTransaction(txLike: TransactionLike): Promise<Transaction> {
     const tx = Transaction.from(txLike);
     const { script } = await this.getRecommendedAddressObj();
-    const info = await getSignHashInfo(tx, script, this.client);
+    const info = await tx.getSignHashInfo(script, this.client);
     if (!info) {
       return tx;
     }

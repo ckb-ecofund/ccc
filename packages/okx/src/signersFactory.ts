@@ -1,5 +1,5 @@
 import { ccc } from "@ckb-ccc/core";
-import { BitcoinProvider } from "./advanced";
+import { BitcoinProvider } from "./advancedBarrel";
 import { BitcoinSigner } from "./signer";
 
 export function getOKXBitcoinSigner(

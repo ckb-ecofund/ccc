@@ -2,6 +2,7 @@ import { ccc } from "@ckb-ccc/ccc";
 import { LitElement, PropertyValues, css, html } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { CLOSE_SVG } from "../assets/close.svg";
+import { JOY_ID_SVG } from "../assets/joy-id.svg";
 import { OKX_SVG } from "../assets/okx.svg";
 import { UNI_SAT_SVG } from "../assets/uni-sat.svg";
 import { WillUpdateEvent } from "../events";
@@ -11,6 +12,13 @@ import {
   generateWalletsScene,
 } from "../scenes";
 import { WalletWithSigners } from "../types";
+
+enum Scene {
+  SelectingWallets = "SelectingWallets",
+  SelectingSigners = "SelectingSigners",
+  Connecting = "Connecting",
+  Connected = "Connected",
+}
 
 @customElement("ccc-connector")
 export class WebComponentConnector extends LitElement {
@@ -32,68 +40,49 @@ export class WebComponentConnector extends LitElement {
   }
 
   @state()
-  private walletName?: string;
-  @state()
-  private signerType?: ccc.SignerType;
+  private scene: Scene = Scene.SelectingWallets;
   @state()
   private selectedWallet?: WalletWithSigners;
-  private updateWallet() {
-    this.selectedWallet = this.wallets.find(
-      (wallet) => this.walletName === wallet.name,
-    );
-  }
   @state()
   private selectedSigner?: ccc.SignerInfo;
-  private updateSigner() {
-    this.selectedSigner = this.selectedWallet?.signers.find(
-      ({ type }) => type === this.signerType,
-    );
-  }
+
   @state()
-  public wallet?: WalletWithSigners;
+  private walletName?: string;
+  @state()
+  private signerName?: string;
+  @state()
+  public wallet?: ccc.Wallet;
   @state()
   public signer?: ccc.SignerInfo;
-  private canConnect = false;
   private prepareSigner() {
     (async () => {
-      if (!this.selectedSigner) {
-        this.wallet = undefined;
-        this.signer = undefined;
+      if (this.signer && (await this.signer.signer.isConnected())) {
+        this.scene = Scene.Connected;
         return;
       }
 
-      if (!(await this.selectedSigner.signer.isConnected())) {
-        if (!this.canConnect) {
-          this.disconnect();
-          return;
-        }
-        await this.selectedSigner.signer.connect();
-      }
-
-      this.saveConnection();
-      this.wallet = this.selectedWallet;
-      this.signer = this.selectedSigner;
-      this.closedHandler();
+      this.wallet = undefined;
+      this.signer = undefined;
+      this.scene = Scene.SelectingWallets;
     })();
   }
 
   public disconnect() {
+    this.signer?.signer?.disconnect();
     this.walletName = undefined;
-    this.wallet = undefined;
-    this.signerType = undefined;
-    this.signer = undefined;
+    this.signerName = undefined;
     this.saveConnection();
   }
 
   private loadConnection() {
     const {
-      signerType,
+      signerName,
       walletName,
-    }: { signerType?: ccc.SignerType; walletName?: string } = JSON.parse(
+    }: { signerName?: string; walletName?: string } = JSON.parse(
       window.localStorage.getItem("ccc-connection-info") ?? "{}",
     );
 
-    this.signerType = signerType;
+    this.signerName = signerName;
     this.walletName = walletName;
   }
 
@@ -101,7 +90,7 @@ export class WebComponentConnector extends LitElement {
     window.localStorage.setItem(
       "ccc-connection-info",
       JSON.stringify({
-        signerType: this.signerType,
+        signerName: this.signerName,
         walletName: this.walletName,
       }),
     );
@@ -121,15 +110,18 @@ export class WebComponentConnector extends LitElement {
       changedProperties.has("walletName") ||
       changedProperties.has("wallets")
     ) {
-      this.updateWallet();
+      this.wallet = this.wallets.find(({ name }) => name === this.walletName);
     }
     if (
-      changedProperties.has("signerType") ||
-      changedProperties.has("selectedWallet")
+      changedProperties.has("signerName") ||
+      changedProperties.has("wallet")
     ) {
-      this.updateSigner();
+      const wallet = this.wallets.find(({ name }) => name === this.walletName);
+      this.signer = wallet?.signers.find(
+        ({ name }) => name === this.signerName,
+      );
     }
-    if (changedProperties.has("selectedSigner")) {
+    if (changedProperties.has("signer")) {
       this.prepareSigner();
     }
 
@@ -140,35 +132,39 @@ export class WebComponentConnector extends LitElement {
     this.wallets = [];
 
     (async () => {
-      if (!this.selectedSigner) {
+      if (!this.signer) {
         return;
       }
 
-      const newSigner = await this.selectedSigner.signer.replaceClient(
-        this.client,
-      );
-      if (newSigner) {
-        this.selectedSigner = {
-          ...this.selectedSigner,
-          signer: newSigner,
-        };
-      } else {
-        this.disconnect();
-      }
+      this.signer = {
+        ...this.signer,
+        signer: await this.signer.signer.replaceClient(this.client),
+      };
     })();
 
     this.resetListeners.forEach((listener) => listener());
     this.resetListeners = [];
 
+    ccc.JoyId.getJoyIdSigners(this.client).forEach(({ signer, type, name }) => {
+      this.addSigner("JoyID", name, JOY_ID_SVG, type, signer);
+    });
+
     const uniSatSigner = ccc.UniSat.getUniSatSigner(this.client);
     if (uniSatSigner) {
-      this.addSigner("UniSat", UNI_SAT_SVG, ccc.SignerType.BTC, uniSatSigner);
+      this.addSigner(
+        "UniSat",
+        "BTC",
+        UNI_SAT_SVG,
+        ccc.SignerType.BTC,
+        uniSatSigner,
+      );
     }
 
     const okxBitcoinSigner = ccc.Okx.getOKXBitcoinSigner(this.client);
     if (okxBitcoinSigner) {
       this.addSigner(
         "OKX Wallet",
+        "BTC",
         OKX_SVG,
         ccc.SignerType.BTC,
         okxBitcoinSigner,
@@ -180,6 +176,7 @@ export class WebComponentConnector extends LitElement {
       eip6963Manager.subscribeSigners((signer) => {
         this.addSigner(
           `${signer.detail.info.name}`,
+          "EVM",
           signer.detail.info.icon,
           ccc.SignerType.EVM,
           signer,
@@ -189,29 +186,30 @@ export class WebComponentConnector extends LitElement {
   }
 
   private addSigner(
-    name: string,
+    walletName: string,
+    signerName: string,
     icon: string,
     type: ccc.SignerType,
     signer: ccc.Signer,
   ) {
     let updated = false;
     const wallets = this.wallets.map((wallet) => {
-      if (wallet.name !== name) {
+      if (wallet.name !== walletName) {
         return wallet;
       }
 
       updated = true;
       return {
         ...wallet,
-        signers: [...wallet.signers, { type, signer }],
+        signers: [...wallet.signers, { type, name: signerName, signer }],
       };
     });
 
     if (!updated) {
       wallets.push({
-        name,
+        name: walletName,
         icon,
-        signers: [{ type, signer }],
+        signers: [{ type, name: signerName, signer }],
       });
     }
 
@@ -220,14 +218,17 @@ export class WebComponentConnector extends LitElement {
 
   render() {
     const [title, body] = (() => {
-      if (!this.selectedWallet) {
+      if (this.scene === Scene.SelectingWallets || !this.selectedWallet) {
         return generateWalletsScene(
           this.wallets,
-          this.signerSelectedHandler,
+          (wallet) => {
+            this.selectedWallet = wallet;
+            this.scene = Scene.SelectingSigners;
+          },
           this.signerSelectedHandler,
         );
       }
-      if (!this.selectedSigner) {
+      if (this.scene === Scene.SelectingSigners || !this.selectedSigner) {
         return generateSignersScene(
           this.selectedWallet,
           this.signerSelectedHandler,
@@ -248,7 +249,6 @@ export class WebComponentConnector extends LitElement {
           --btn-primary: #f8f8f8;
           --btn-primary-hover: #efeeee;
           --btn-secondary: #ddd;
-          --btn-icon: #e9e4de;
           color: #1e1e1e;
           --tip-color: #666;
         }
@@ -273,19 +273,38 @@ export class WebComponentConnector extends LitElement {
   }
 
   private closedHandler = () => {
-    if (this.signer === undefined) {
-      this.disconnect();
+    if (
+      [
+        Scene.SelectingSigners,
+        Scene.SelectingWallets,
+        Scene.Connecting,
+      ].includes(this.scene)
+    ) {
+      this.scene = Scene.SelectingWallets;
+      this.selectedSigner = undefined;
+      this.selectedWallet = undefined;
     }
     this.isOpen = false;
   };
 
   private signerSelectedHandler = (
-    wallet?: ccc.Wallet,
-    signer?: ccc.SignerInfo,
+    wallet: WalletWithSigners,
+    signer: ccc.SignerInfo,
   ) => {
-    this.walletName = wallet?.name;
-    this.signerType = signer?.type;
-    this.canConnect = true;
+    this.scene = Scene.Connecting;
+    this.selectedWallet = wallet;
+    this.selectedSigner = signer;
+    (async () => {
+      await signer.signer.connect();
+      if (!(await signer.signer.isConnected())) {
+        return;
+      }
+      this.scene = Scene.Connected;
+      this.walletName = wallet.name;
+      this.signerName = signer.name;
+      this.saveConnection();
+      this.closedHandler();
+    })();
   };
 
   static styles = css`
@@ -385,8 +404,6 @@ export class WebComponentConnector extends LitElement {
       width: 2rem;
       height: 2rem;
       margin-right: 1rem;
-      border-radius: 0.4rem;
-      background: var(--btn-icon);
     }
 
     .btn-primary:hover {
@@ -412,8 +429,6 @@ export class WebComponentConnector extends LitElement {
       width: 4rem;
       height: 4rem;
       margin-bottom: 0.5rem;
-      border-radius: 0.8rem;
-      background: var(--btn-icon);
     }
 
     .connecting-wallet-icon {

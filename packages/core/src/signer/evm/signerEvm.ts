@@ -4,7 +4,6 @@ import { Script, Transaction, TransactionLike, WitnessArgs } from "../../ckb";
 import { KnownScript } from "../../client";
 import { hexFrom } from "../../hex";
 import { numToBytes } from "../../num";
-import { getSignHashInfo, prepareSighashAllWitness } from "../helpers";
 import { Signer } from "../signer";
 
 /**
@@ -69,7 +68,7 @@ export abstract class SignerEvm extends Signer {
     return addresses.reduce(
       (txPromise, { script }) =>
         txPromise.then((tx) =>
-          prepareSighashAllWitness(tx, script, 85, this.client),
+          tx.prepareSighashAllWitness(script, 85, this.client),
         ),
       Promise.resolve(Transaction.from(txLike)),
     );
@@ -108,7 +107,7 @@ export abstract class SignerEvm extends Signer {
     script: Script,
     messageTransformer: (hash: string) => BytesLike,
   ): Promise<Transaction> {
-    const info = await getSignHashInfo(tx, script, this.client);
+    const info = await tx.getSignHashInfo(script, this.client);
     if (!info) {
       return tx;
     }

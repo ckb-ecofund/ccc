@@ -1,20 +1,21 @@
 import { ccc } from "@ckb-ccc/ccc";
 import { html } from "lit";
 import { repeat } from "lit/directives/repeat.js";
-import { BTC_SVG, ETH_SVG } from "../assets/chains";
+import { BTC_SVG, CKB_SVG, ETH_SVG } from "../assets/chains";
 import { WalletWithSigners } from "../types";
 
 export function signerTypeToIcon(type: ccc.SignerType): string {
   return {
     [ccc.SignerType.BTC]: BTC_SVG,
     [ccc.SignerType.EVM]: ETH_SVG,
+    [ccc.SignerType.CKB]: CKB_SVG,
   }[type];
 }
 
 export function generateSignersScene(
   wallet: WalletWithSigners,
   onSignerSelected: (
-    wallet: ccc.Wallet | undefined,
+    wallet: WalletWithSigners,
     signer: ccc.SignerInfo,
   ) => unknown,
 ) {
@@ -35,7 +36,7 @@ export function generateSignersScene(
             }}
           >
             <img src=${signerTypeToIcon(signer.type)} alt=${signer.type} />
-            ${signer.type}
+            ${signer.name}
           </button>
         `,
       )}

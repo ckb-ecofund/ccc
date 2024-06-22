@@ -1,12 +1,13 @@
 import { ccc } from "@ckb-ccc/ccc";
 import { html } from "lit";
 import { RETRY_SVG } from "../assets/retry.svg";
+import { WalletWithSigners } from "../types";
 
 export function generateConnectingScene(
-  wallet: ccc.Wallet,
+  wallet: WalletWithSigners,
   signer: ccc.SignerInfo,
   onSignerSelected: (
-    wallet: ccc.Wallet | undefined,
+    wallet: WalletWithSigners,
     signer: ccc.SignerInfo,
   ) => unknown,
 ) {

@@ -1,6 +1,6 @@
 import { ccc } from "@ckb-ccc/core";
+import { Provider } from "./advancedBarrel";
 import { Signer } from "./signer";
-import { Provider } from "./uni-sat.advanced";
 
 export function getUniSatSigner(client: ccc.Client): Signer | undefined {
   const windowRef = window as { unisat?: Provider };
