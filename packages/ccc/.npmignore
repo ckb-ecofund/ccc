@@ -7,4 +7,5 @@ eslint.config.mjs
 .prettierignore
 
 tsconfig.tsbuildinfo
+tsconfig.*.tsbuildinfo
 .github/
