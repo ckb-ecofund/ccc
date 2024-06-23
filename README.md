@@ -52,6 +52,23 @@ CCC exports everything on the `ccc` object:
 import { ccc } from "@ckb-ccc/<package-name>";
 ```
 
+## Lumos Patches
+
+For developers who use Lumos to compose CKB transactions, CCC provides patches to:
+
+* Support the JoyID Wallet.
+
+See [lumos-patches](https://www.npmjs.com/package/@ckb-ccc/lumos-patches): ```npm install @ckb-ccc/lumos-patches```
+
+You can apply patches by:
+
+```typescript
+import { generateDefaultScriptInfos } from "@ckb-ccc/lumos-patches";
+
+// Before using Lumos. You don't need @ckb-lumos/joyid anymore.
+registerCustomLockScriptInfos(generateDefaultScriptInfos());
+```
+
 ## Links
 
 * [Lumos](https://github.com/ckb-js/lumos) and its [Docs](https://lumos-website.vercel.app/): Lumos provides utils to help compose CKB transactions.
