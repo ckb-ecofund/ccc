@@ -279,20 +279,26 @@ export class CellOutput {
 }
 
 export type CellLike = {
+  outPoint: OutPointLike;
   cellOutput: CellOutputLike;
   outputData: HexLike;
+  blockNumber: NumLike;
 };
 export class Cell {
   /**
    * Creates an instance of Cell.
    *
+   * @param outPoint - The output point of the cell.
    * @param cellOutput - The cell output of the cell.
    * @param outputData - The output data of the cell.
+   * @param blockNumber - The block number of the cell.
    */
 
   constructor(
+    public outPoint: OutPoint,
     public cellOutput: CellOutput,
     public outputData: Hex,
+    public blockNumber: Num,
   ) {}
 
   /**
@@ -307,7 +313,12 @@ export class Cell {
       return cell;
     }
 
-    return new Cell(CellOutput.from(cell.cellOutput), hexFrom(cell.outputData));
+    return new Cell(
+      OutPoint.from(cell.outPoint),
+      CellOutput.from(cell.cellOutput),
+      hexFrom(cell.outputData),
+      numFrom(cell.blockNumber),
+    );
   }
 }
 
@@ -316,6 +327,7 @@ export type CellInputLike = {
   since: NumLike;
   cellOutput?: CellOutputLike;
   outputData?: HexLike;
+  blockNumber?: NumLike;
 };
 export class CellInput {
   /**
@@ -325,6 +337,7 @@ export class CellInput {
    * @param since - The since value of the cell input.
    * @param cellOutput - The optional cell output associated with the cell input.
    * @param outputData - The optional output data associated with the cell input.
+   * @param blockNumber - The optional block number associated with the cell input.
    */
 
   constructor(
@@ -332,6 +345,7 @@ export class CellInput {
     public since: Num,
     public cellOutput?: CellOutput,
     public outputData?: Hex,
+    public blockNumber?: Num,
   ) {}
 
   /**
@@ -359,6 +373,7 @@ export class CellInput {
       numFrom(cellInput.since),
       apply(CellOutput.from, cellInput.cellOutput),
       apply(hexFrom, cellInput.outputData),
+      apply(numFrom, cellInput.blockNumber),
     );
   }
 
@@ -376,7 +391,7 @@ export class CellInput {
    */
 
   async completeExtraInfos(client: Client): Promise<CellInput> {
-    if (this.cellOutput && this.outputData) {
+    if (this.cellOutput && this.outputData && this.blockNumber) {
       return this;
     }
 
@@ -384,6 +399,7 @@ export class CellInput {
     if (cell) {
       this.cellOutput = cell.cellOutput;
       this.outputData = cell.outputData;
+      this.blockNumber = cell.blockNumber;
     }
     return this;
   }

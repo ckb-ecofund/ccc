@@ -1,4 +1,5 @@
 import { ccc } from "@ckb-ccc/core";
+import { Aggregator } from "@joyid/ckb";
 import {
   DappRequestType,
   authWithPopup,
@@ -27,6 +28,7 @@ export class CkbSigner extends ccc.Signer {
   constructor(
     client: ccc.Client,
     private readonly _uri?: string,
+    private readonly _aggregatorUri?: string,
     private readonly connectionsRepo: ConnectionsRepo = new ConnectionsRepoLocalStorage(),
   ) {
     super(client);
@@ -44,6 +46,16 @@ export class CkbSigner extends ccc.Signer {
     return (await this.client.getAddressPrefix()) === "ckb"
       ? "https://app.joy.id"
       : "https://testnet.joyid.dev";
+  }
+
+  private async getAggregatorUri(): Promise<string> {
+    if (this._aggregatorUri) {
+      return this._aggregatorUri;
+    }
+
+    return (await this.client.getAddressPrefix()) === "ckb"
+      ? "https://cota.nervina.dev/mainnet-aggregator"
+      : "https://cota.nervina.dev/aggregator";
   }
 
   async connect(): Promise<void> {
@@ -78,13 +90,15 @@ export class CkbSigner extends ccc.Signer {
     return (await this.assertConnection()).address;
   }
 
+  async getAddressObj(): Promise<ccc.Address> {
+    return await ccc.Address.fromString(
+      await this.getInternalAddress(),
+      this.client,
+    );
+  }
+
   async getAddressObjs(): Promise<ccc.Address[]> {
-    return [
-      await ccc.Address.fromString(
-        await this.getInternalAddress(),
-        this.client,
-      ),
-    ];
+    return [await this.getAddressObj()];
   }
 
   async prepareTransaction(
@@ -92,7 +106,7 @@ export class CkbSigner extends ccc.Signer {
   ): Promise<ccc.Transaction> {
     const tx = ccc.Transaction.from(txLike);
     const position = await tx.findInputIndexByLock(
-      (await this.getAddressObjs())[0].script,
+      (await this.getAddressObj()).script,
       this.client,
     );
     if (position === undefined) {
@@ -101,7 +115,47 @@ export class CkbSigner extends ccc.Signer {
 
     const witness = tx.getWitnessArgsAt(position) ?? ccc.WitnessArgs.from({});
     witness.lock = "0x";
+    await this.prepareTransactionForSubKey(tx, witness);
     return tx.setWitnessArgsAt(position, witness);
+  }
+
+  private async prepareTransactionForSubKey(
+    tx: ccc.Transaction,
+    witness: ccc.WitnessArgs,
+  ) {
+    if (this.connection?.keyType !== "sub_key") {
+      return [];
+    }
+
+    const pubkeyHash = ccc.ckbHash(this.connection.publicKey).substring(0, 42);
+    const lock = (await this.getAddressObj()).script;
+    const aggregator = new Aggregator(await this.getAggregatorUri());
+    const { unlock_entry: unlockEntry } =
+      await aggregator.generateSubkeyUnlockSmt({
+        alg_index: 1,
+        pubkey_hash: pubkeyHash,
+        lock_script: ccc.hexFrom(lock.toBytes()),
+      });
+    witness.outputType = ccc.hexFrom(unlockEntry);
+
+    const cotaDeps: ccc.CellDep[] = [];
+    for await (const cell of this.client.findCellsByLockAndType(lock, {
+      ...(await this.client.getKnownScript(ccc.KnownScript.COTA)),
+      args: "0x",
+    })) {
+      cotaDeps.push(
+        ccc.CellDep.from({
+          depType: "code",
+          outPoint: cell.outPoint,
+        }),
+      );
+    }
+
+    if (cotaDeps.length === 0) {
+      throw new Error("No COTA cells for sub key wallet");
+    }
+
+    tx.cellDeps.unshift(...cotaDeps);
   }
 
   async signOnlyTransaction(
@@ -111,13 +165,16 @@ export class CkbSigner extends ccc.Signer {
     if (!popup) {
       return createBlockDialog(async () => this.signOnlyTransaction(txLike));
     }
+    const tx = ccc.Transaction.from(txLike);
+    const { script } = await this.getAddressObj();
 
     popup.location.href = buildJoyIDURL(
       {
         joyidAppURL: await this.getUri(),
-        tx: JSON.parse(ccc.Transaction.from(txLike).stringify()),
+        tx: JSON.parse(tx.stringify()),
         signerAddress: (await this.assertConnection()).address,
         redirectURL: location.href,
+        witnessIndex: await tx.findInputIndexByLock(script, this.client),
       },
       "popup",
       "/sign-ckb-raw-tx",

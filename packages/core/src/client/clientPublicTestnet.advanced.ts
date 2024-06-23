@@ -25,6 +25,11 @@ export const TESTNET_SCRIPTS: Record<
       "0xd23761b364210735c19c60561d213fb3beae2fd6172743719eff6920e020baac",
     hashType: "type",
   },
+  [KnownScript.COTA]: {
+    codeHash:
+      "0x89cd8003a0eaf8e65e0c31525b7d1d5c1becefd2ea75bb4cff87810ae37764d8",
+    hashType: "type",
+  },
   [KnownScript.OmniLock]: {
     codeHash:
       "0xf329effd1c475a2978453c8600e1eaf0bc2087ee093c3ee64cc96ec6847752cb",

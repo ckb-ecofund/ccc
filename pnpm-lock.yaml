@@ -360,6 +360,9 @@ importers:
       '@ckb-ccc/core':
         specifier: workspace:*
         version: link:../core
+      '@joyid/ckb':
+        specifier: ^0.0.11
+        version: 0.0.11(encoding@0.1.13)(typescript@5.4.5)
       '@joyid/common':
         specifier: ^0.0.3
         version: 0.0.3(typescript@5.4.5)

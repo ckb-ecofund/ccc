@@ -1,8 +1,14 @@
 import fetch from "cross-fetch";
 import { TransactionLike } from "../../ckb";
 import { Hex, HexLike, hexFrom } from "../../hex";
+import { NumLike, numToHex } from "../../num";
 import { Client } from "../client";
-import { ClientTransactionResponse, OutputsValidator } from "../clientTypes";
+import {
+  ClientFindCellsResponse,
+  ClientIndexerSearchKeyLike,
+  ClientTransactionResponse,
+  OutputsValidator,
+} from "../clientTypes";
 import { JsonRpcPayload, JsonRpcTransformers } from "./advanced";
 
 /**
@@ -90,6 +96,28 @@ export abstract class ClientJsonRpc extends Client {
   ) as (txHash: HexLike) => Promise<ClientTransactionResponse>;
 
   /**
+   * find cells from node.
+   *
+   * @param txHash - The hash of the transaction.
+   * @returns The found cells.
+   */
+
+  findCellsPaged = this.buildSender(
+    "get_cells",
+    [
+      JsonRpcTransformers.indexerSearchKeyFrom,
+      (order) => order ?? "asc",
+      (limit) => numToHex(limit ?? 10),
+    ],
+    JsonRpcTransformers.findCellsResponseTo,
+  ) as (
+    key: ClientIndexerSearchKeyLike,
+    order?: "asc" | "desc",
+    limit?: NumLike,
+    after?: string,
+  ) => Promise<ClientFindCellsResponse>;
+
+  /**
    * Builds a sender function for a JSON-RPC method.
    *
    * @param rpcMethod - The JSON-RPC method.
@@ -106,7 +134,15 @@ export abstract class ClientJsonRpc extends Client {
     return async (...req: unknown[]) => {
       const payload = ClientJsonRpc.buildPayload(
         rpcMethod,
-        await Promise.all(req.map((v, i) => transform(v, inTransformers[i]))),
+        await Promise.all(
+          req
+            .concat(
+              Array.from(
+                new Array(Math.max(inTransformers.length - req.length, 0)),
+              ),
+            )
+            .map((v, i) => transform(v, inTransformers[i])),
+        ),
       );
 
       return transform(await this.send(payload), outTransformer);

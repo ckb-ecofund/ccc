@@ -25,6 +25,11 @@ export const MAINNET_SCRIPTS: Record<
       "0xd00c84f0ec8fd441c38bc3f87a371f547190f2fcff88e642bc5bf54b9e318323",
     hashType: "type",
   },
+  [KnownScript.COTA]: {
+    codeHash:
+      "0x1122a4fb54697cf2e6e3a96c9d80fd398a936559b90954c6e88eb7ba0cf652df",
+    hashType: "type",
+  },
   [KnownScript.OmniLock]: {
     codeHash:
       "0x9b819793a64463aed77c615d6cb226eea5487ccfc0783043a587254cda2b6f26",

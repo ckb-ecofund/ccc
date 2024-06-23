@@ -1,4 +1,5 @@
 import {
+  Cell,
   CellDep,
   CellDepLike,
   CellInput,
@@ -18,15 +19,23 @@ import {
   depTypeFrom,
   hashTypeFrom,
 } from "../../ckb";
-import { numToHex } from "../../num";
+import { Hex } from "../../hex";
+import { NumLike, numFrom, numToHex } from "../../num";
 import { apply } from "../../utils";
-import { ClientTransactionResponse, TransactionStatus } from "../clientTypes";
+import {
+  ClientFindCellsResponse,
+  ClientIndexerSearchKey,
+  ClientIndexerSearchKeyLike,
+  ClientTransactionResponse,
+  TransactionStatus,
+} from "../clientTypes";
 import {
   JsonRpcCellDep,
   JsonRpcCellInput,
   JsonRpcCellOutput,
   JsonRpcDepType,
   JsonRpcHashType,
+  JsonRpcIndexerSearchKey,
   JsonRpcOutPoint,
   JsonRpcScript,
   JsonRpcTransaction,
@@ -147,15 +156,75 @@ export class JsonRpcTransformers {
     });
   }
   static transactionResponseTo({
-    tx_status: { status },
+    tx_status: { status, block_number },
     transaction,
   }: {
-    tx_status: { status: TransactionStatus };
+    tx_status: { status: TransactionStatus; block_number: Hex };
     transaction: JsonRpcTransaction;
   }): ClientTransactionResponse {
     return {
       transaction: JsonRpcTransformers.transactionTo(transaction),
       status,
+      blockNumber: numFrom(block_number),
+    };
+  }
+  static rangeFrom([a, b]: [NumLike, NumLike]): [Hex, Hex] {
+    return [numToHex(a), numToHex(b)];
+  }
+  static indexerSearchKeyFrom(
+    keyLike: ClientIndexerSearchKeyLike,
+  ): JsonRpcIndexerSearchKey {
+    const key = ClientIndexerSearchKey.from(keyLike);
+    return {
+      script: JsonRpcTransformers.scriptFrom(key.script),
+      script_type: key.scriptType,
+      script_search_mode: key.scriptSearchMode,
+      filter: apply(
+        (filter: NonNullable<ClientIndexerSearchKey["filter"]>) => ({
+          script: apply(JsonRpcTransformers.scriptFrom, filter.script),
+          script_len_range: apply(
+            JsonRpcTransformers.rangeFrom,
+            filter.scriptLenRange,
+          ),
+          output_data: filter.outputData,
+          output_data_filter_mode: filter.outputDataSearchMode,
+          output_data_len_range: apply(
+            JsonRpcTransformers.rangeFrom,
+            filter.outputDataLenRange,
+          ),
+          output_capacity_range: apply(
+            JsonRpcTransformers.rangeFrom,
+            filter.outputCapacityRange,
+          ),
+          block_range: apply(JsonRpcTransformers.rangeFrom, filter.blockRange),
+        }),
+        key.filter,
+      ),
+      with_data: key.withData,
+    };
+  }
+  static findCellsResponseTo({
+    last_cursor,
+    objects,
+  }: {
+    last_cursor: string;
+    objects: {
+      block_number: Hex;
+      out_point: JsonRpcOutPoint;
+      output: JsonRpcCellOutput;
+      output_data: Hex;
+    }[];
+  }): ClientFindCellsResponse {
+    return {
+      lastCursor: last_cursor,
+      cells: objects.map((cell) =>
+        Cell.from({
+          blockNumber: cell.block_number,
+          outPoint: JsonRpcTransformers.outPointTo(cell.out_point),
+          cellOutput: JsonRpcTransformers.cellOutputTo(cell.output),
+          outputData: cell.output_data,
+        }),
+      ),
     };
   }
 }

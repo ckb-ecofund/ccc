@@ -46,3 +46,19 @@ export type JsonRpcTransaction = {
   outputs_data: Hex[];
   witnesses: Hex[];
 };
+
+export type JsonRpcIndexerSearchKey = {
+  script: JsonRpcScript;
+  script_type: "lock" | "type";
+  script_search_mode?: "prefix" | "exact" | "partial";
+  filter?: {
+    script?: JsonRpcScript;
+    script_len_range?: [Hex, Hex];
+    output_data?: Hex;
+    output_data_filter_mode?: "prefix" | "exact" | "partial";
+    output_data_len_range?: [Hex, Hex];
+    output_capacity_range?: [Hex, Hex];
+    block_range?: [Hex, Hex];
+  };
+  with_data?: boolean;
+};
