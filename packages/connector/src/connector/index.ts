@@ -3,6 +3,7 @@ import { LitElement, PropertyValues, css, html } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { CLOSE_SVG } from "../assets/close.svg";
 import { JOY_ID_SVG } from "../assets/joy-id.svg";
+import { LEFT_SVG } from "../assets/left.svg";
 import { OKX_SVG } from "../assets/okx.svg";
 import { UNI_SAT_SVG } from "../assets/uni-sat.svg";
 import { WillUpdateEvent } from "../events";
@@ -241,6 +242,10 @@ export class WebComponentConnector extends LitElement {
       );
     })();
 
+    const canBack = [Scene.SelectingSigners, Scene.Connecting].includes(
+      this.scene,
+    );
+
     return html`<style>
         :host {
           ${this.isOpen ? "" : "display: none;"}
@@ -263,9 +268,23 @@ export class WebComponentConnector extends LitElement {
       >
         <div class="main">
           <div class="header text-bold fs-big">
-            <div class="back"></div>
+            <img
+              class="back ${canBack ? "active" : ""}"
+              src=${LEFT_SVG}
+              @click=${() => {
+                if (this.scene === Scene.Connecting) {
+                  this.scene = Scene.SelectingSigners;
+                } else if (this.scene === Scene.SelectingSigners) {
+                  this.scene = Scene.SelectingWallets;
+                }
+              }}
+            />
             ${title}
-            <img class="close" src=${CLOSE_SVG} @click=${this.closedHandler} />
+            <img
+              class="close active"
+              src=${CLOSE_SVG}
+              @click=${this.closedHandler}
+            />
           </div>
           <div class="body">${body}</div>
         </div>
@@ -378,6 +397,12 @@ export class WebComponentConnector extends LitElement {
     .back {
       width: 0.8rem;
       height: 0.8rem;
+      opacity: 0;
+    }
+
+    .close.active,
+    .back.active {
+      opacity: 1;
       cursor: pointer;
     }
 
