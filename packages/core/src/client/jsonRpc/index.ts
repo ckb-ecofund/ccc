@@ -1,7 +1,7 @@
 import fetch from "cross-fetch";
 import { TransactionLike } from "../../ckb";
 import { Hex, HexLike, hexFrom } from "../../hex";
-import { NumLike, numToHex } from "../../num";
+import { Num, NumLike, numFrom, numToHex } from "../../num";
 import { Client } from "../client";
 import {
   ClientFindCellsResponse,
@@ -98,7 +98,10 @@ export abstract class ClientJsonRpc extends Client {
   /**
    * find cells from node.
    *
-   * @param txHash - The hash of the transaction.
+   * @param key - The search key of cells.
+   * @param order - The order of cells.
+   * @param limit - The max return size of cells.
+   * @param after - Pagination parameter.
    * @returns The found cells.
    */
 
@@ -116,6 +119,19 @@ export abstract class ClientJsonRpc extends Client {
     limit?: NumLike,
     after?: string,
   ) => Promise<ClientFindCellsResponse>;
+
+  /**
+   * get cells capacity from node.
+   *
+   * @param key - The search key of cells.
+   * @returns The sum of cells capacity.
+   */
+
+  getCellsCapacity = this.buildSender(
+    "get_cells_capacity",
+    [JsonRpcTransformers.indexerSearchKeyFrom],
+    ({ capacity }) => numFrom(capacity),
+  ) as (key: ClientIndexerSearchKeyLike) => Promise<Num>;
 
   /**
    * Builds a sender function for a JSON-RPC method.

@@ -5,8 +5,9 @@ import {
   ScriptLike,
   TransactionLike,
 } from "../ckb";
+import { Zero } from "../fixedPoint";
 import { Hex, HexLike } from "../hex";
-import { NumLike, numFrom } from "../num";
+import { Num, NumLike, numFrom } from "../num";
 import {
   ClientFindCellsResponse,
   ClientIndexerSearchKeyLike,
@@ -103,5 +104,27 @@ export abstract class Client {
       },
       withData,
     });
+  }
+
+  abstract getCellsCapacity(key: ClientIndexerSearchKeyLike): Promise<Num>;
+
+  async getBalanceSingle(lock: ScriptLike): Promise<Num> {
+    return this.getCellsCapacity({
+      script: lock,
+      scriptType: "lock",
+      scriptSearchMode: "exact",
+      filter: {
+        scriptLenRange: [0, 1],
+        outputDataLenRange: [0, 1],
+      },
+    });
+  }
+
+  async getBalance(locks: ScriptLike[]): Promise<Num> {
+    return locks.reduce(
+      (res: Promise<Num>, lock) =>
+        this.getBalanceSingle(lock).then((a) => res.then((b) => a + b)),
+      Promise.resolve(Zero),
+    );
   }
 }

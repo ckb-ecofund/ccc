@@ -3,6 +3,7 @@ import { BytesLike } from "../bytes";
 import { Transaction, TransactionLike } from "../ckb";
 import { Client } from "../client";
 import { Hex } from "../hex";
+import { Num } from "../num";
 
 /**
  * An abstract class representing a generic signer.
@@ -85,6 +86,17 @@ export abstract class Signer {
   async getAddresses(): Promise<string[]> {
     return this.getAddressObjs().then((addresses) =>
       addresses.map((address) => address.toString()),
+    );
+  }
+
+  /**
+   * Gets balance of all addresses
+   *
+   * @returns A promise that resolves to the balance
+   */
+  async getBalance(): Promise<Num> {
+    return this.client.getBalance(
+      (await this.getAddressObjs()).map(({ script }) => script),
     );
   }
 

@@ -179,6 +179,7 @@ export default function Home() {
 
   const [internalAddress, setInternalAddress] = useState("");
   const [address, setAddress] = useState("");
+  const [balance, setBalance] = useState(ccc.Zero);
   const [isTestnet, setIsTestnet] = useState(true);
 
   useEffect(() => {
@@ -191,6 +192,7 @@ export default function Home() {
     (async () => {
       setInternalAddress(await signer.getInternalAddress());
       setAddress(await signer.getRecommendedAddress());
+      setBalance(await signer.getBalance());
     })();
   }, [signer]);
 
@@ -208,6 +210,7 @@ export default function Home() {
           <p className="mb-1">Connected to {wallet.name}</p>
           <p className="mb-1">{internalAddress}</p>
           <p className="mb-1 text-balance break-all text-center">{address}</p>
+          <p className="mb-1">{ccc.fixedPointToString(balance)} CKB</p>
           <Sign />
           <Transfer />
           <Button className="mt-4" onClick={disconnect}>
