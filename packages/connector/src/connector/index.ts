@@ -1,6 +1,7 @@
 import { ccc } from "@ckb-ccc/ccc";
 import { LitElement, PropertyValues, css, html } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
+import { Ref, createRef, ref } from "lit/directives/ref.js";
 import { CLOSE_SVG } from "../assets/close.svg";
 import { JOY_ID_SVG } from "../assets/joy-id.svg";
 import { LEFT_SVG } from "../assets/left.svg";
@@ -217,6 +218,10 @@ export class WebComponentConnector extends LitElement {
     this.wallets = wallets;
   }
 
+  mainRef: Ref<HTMLDivElement> = createRef();
+  headerRef: Ref<HTMLDivElement> = createRef();
+  bodyRef: Ref<HTMLDivElement> = createRef();
+
   render() {
     const [title, body] = (() => {
       if (this.scene === Scene.SelectingWallets || !this.selectedWallet) {
@@ -266,8 +271,8 @@ export class WebComponentConnector extends LitElement {
           }
         }}
       >
-        <div class="main">
-          <div class="header text-bold fs-big">
+        <div class="main" ${ref(this.mainRef)}>
+          <div class="header text-bold fs-big" ${ref(this.headerRef)}>
             <img
               class="back ${canBack ? "active" : ""}"
               src=${LEFT_SVG}
@@ -286,9 +291,19 @@ export class WebComponentConnector extends LitElement {
               @click=${this.closedHandler}
             />
           </div>
-          <div class="body">${body}</div>
+          <div class="body" ${ref(this.bodyRef)}>${body}</div>
         </div>
       </div>`;
+  }
+
+  updated() {
+    if (!this.mainRef.value) {
+      return;
+    }
+    this.mainRef.value.style.height = `${
+      (this.bodyRef.value?.clientHeight ?? 0) +
+      (this.headerRef.value?.clientHeight ?? 0)
+    }px`;
   }
 
   private closedHandler = () => {
@@ -383,6 +398,8 @@ export class WebComponentConnector extends LitElement {
       transform: translate(-50%, -50%);
       background: var(--background);
       border-radius: 1.2rem;
+      overflow: hidden;
+      transition: height 0.15s ease-out;
     }
 
     .header {
@@ -398,6 +415,7 @@ export class WebComponentConnector extends LitElement {
       width: 0.8rem;
       height: 0.8rem;
       opacity: 0;
+      transition: opacity 0.15s ease-in-out;
     }
 
     .close.active,
@@ -422,13 +440,14 @@ export class WebComponentConnector extends LitElement {
       padding: 0.75rem 1rem;
       background: var(--btn-primary);
       border-radius: 0.4rem;
-      transition: background 0.3s ease-in-out;
+      transition: background 0.15s ease-in-out;
     }
 
     .btn-primary img {
       width: 2rem;
       height: 2rem;
       margin-right: 1rem;
+      border-radius: 0.4rem;
     }
 
     .btn-primary:hover {
@@ -441,7 +460,7 @@ export class WebComponentConnector extends LitElement {
       padding: 0.25rem 1rem;
       background: var(--btn-secondary);
       border-radius: 9999px;
-      transition: background 0.3s ease-in-out;
+      transition: background 0.15s ease-in-out;
     }
 
     .btn-secondary img {
@@ -454,6 +473,7 @@ export class WebComponentConnector extends LitElement {
       width: 4rem;
       height: 4rem;
       margin-bottom: 0.5rem;
+      border-radius: 0.8rem;
     }
 
     .connecting-wallet-icon {
