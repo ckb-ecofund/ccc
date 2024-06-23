@@ -27,11 +27,11 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
-     inkscape:zoom="0.72572935"
-     inkscape:cx="269.38417"
-     inkscape:cy="233.55814"
-     inkscape:window-width="1414"
-     inkscape:window-height="835"
+     inkscape:zoom="0.18143234"
+     inkscape:cx="118.50148"
+     inkscape:cy="680.69453"
+     inkscape:window-width="1510"
+     inkscape:window-height="799"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
@@ -84,11 +84,13 @@
        cy="80"
        r="60.335545" />
     <circle
-       style="opacity:1;fill:none;fill-opacity:1;stroke:#4c4c4c;stroke-width:6.7414;stroke-linecap:butt;stroke-linejoin:round;stroke-dasharray:0.957279, 6.7414;stroke-dashoffset:0;stroke-opacity:1"
+       style="opacity:1;fill:none;fill-opacity:1;stroke:#4c4c4c;stroke-width:6.74103;stroke-linecap:butt;stroke-linejoin:round;stroke-dasharray:1.34820604,23.15206828;stroke-dashoffset:0;stroke-opacity:1"
        id="path3"
-       cx="80.000031"
+       cx="-80"
        cy="80"
-       r="39.209801" />
+       inkscape:label="path3"
+       transform="rotate(-90)"
+       r="39.209988" />
     <path
        id="ellipse2"
        style="opacity:1;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:3;stroke-linecap:butt;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
