@@ -1,6 +1,6 @@
 {
   "name": "@ckb-ccc/ccc",
-  "version": "0.0.4",
+  "version": "0.0.5-alpha.0",
   "description": "Common Chains Connector",
   "author": "Hanssen0 <hanssen0@hanssen0.com>",
   "license": "MIT",
@@ -52,8 +52,8 @@
   "dependencies": {
     "@ckb-ccc/core": "workspace:*",
     "@ckb-ccc/eip6963": "workspace:*",
+    "@ckb-ccc/joy-id": "workspace:*",
     "@ckb-ccc/okx": "workspace:*",
-    "@ckb-ccc/uni-sat": "workspace:*",
-    "@ckb-ccc/joy-id": "workspace:*"
+    "@ckb-ccc/uni-sat": "workspace:*"
   }
 }
