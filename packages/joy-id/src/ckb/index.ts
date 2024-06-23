@@ -1,13 +1,7 @@
 import { ccc } from "@ckb-ccc/core";
 import { Aggregator } from "@joyid/ckb";
-import {
-  DappRequestType,
-  authWithPopup,
-  buildJoyIDURL,
-  createBlockDialog,
-  openPopup,
-  runPopup,
-} from "@joyid/common";
+import { DappRequestType, buildJoyIDURL } from "@joyid/common";
+import { createPopup } from "../common";
 import {
   Connection,
   ConnectionsRepo,
@@ -29,7 +23,7 @@ export class CkbSigner extends ccc.Signer {
     client: ccc.Client,
     private readonly name: string,
     private readonly icon: string,
-    private readonly _uri?: string,
+    private readonly _appUri?: string,
     private readonly _aggregatorUri?: string,
     private readonly connectionsRepo: ConnectionsRepo = new ConnectionsRepoLocalStorage(),
   ) {
@@ -41,20 +35,23 @@ export class CkbSigner extends ccc.Signer {
       client,
       this.name,
       this.icon,
-      this._uri,
+      this._appUri,
       this._aggregatorUri,
       this.connectionsRepo,
     );
   }
 
-  private async getUri(): Promise<string> {
-    if (this._uri) {
-      return this._uri;
-    }
-
-    return (await this.client.getAddressPrefix()) === "ckb"
-      ? "https://app.joy.id"
-      : "https://testnet.joyid.dev";
+  private async getConfig() {
+    return {
+      redirectURL: location.href,
+      joyidAppURL:
+        this._appUri ??
+        ((await this.client.getAddressPrefix()) === "ckb"
+          ? "https://app.joy.id"
+          : "https://testnet.joyid.dev"),
+      name: this.name,
+      logo: this.icon,
+    };
   }
 
   private async getAggregatorUri(): Promise<string> {
@@ -68,12 +65,11 @@ export class CkbSigner extends ccc.Signer {
   }
 
   async connect(): Promise<void> {
-    const uri = await this.getUri();
-    const res = await authWithPopup({
-      joyidAppURL: uri,
-      name: this.name,
-      logo: this.icon,
-      redirectURL: location.href,
+    const config = await this.getConfig();
+
+    const res = await createPopup(buildJoyIDURL(config, "popup", "/auth"), {
+      ...config,
+      type: DappRequestType.Auth,
     });
 
     this.connection = {
@@ -172,32 +168,26 @@ export class CkbSigner extends ccc.Signer {
   async signOnlyTransaction(
     txLike: ccc.TransactionLike,
   ): Promise<ccc.Transaction> {
-    const popup = openPopup("");
-    if (!popup) {
-      return createBlockDialog(async () => this.signOnlyTransaction(txLike));
-    }
     const tx = ccc.Transaction.from(txLike);
     const { script } = await this.getAddressObj();
 
-    popup.location.href = buildJoyIDURL(
+    const config = await this.getConfig();
+    const res = await createPopup(
+      buildJoyIDURL(
+        {
+          ...config,
+          tx: JSON.parse(tx.stringify()),
+          signerAddress: (await this.assertConnection()).address,
+          witnessIndex: await tx.findInputIndexByLock(script, this.client),
+        },
+        "popup",
+        "/sign-ckb-raw-tx",
+      ),
       {
-        joyidAppURL: await this.getUri(),
-        name: this.name,
-        logo: this.icon,
-        tx: JSON.parse(tx.stringify()),
-        signerAddress: (await this.assertConnection()).address,
-        redirectURL: location.href,
-        witnessIndex: await tx.findInputIndexByLock(script, this.client),
+        ...config,
+        type: DappRequestType.SignCkbRawTx,
       },
-      "popup",
-      "/sign-ckb-raw-tx",
     );
-
-    const res = await runPopup({
-      timeoutInSeconds: 3600,
-      popup,
-      type: DappRequestType.SignCkbRawTx,
-    });
 
     return ccc.Transaction.from(res.tx);
   }
@@ -205,7 +195,7 @@ export class CkbSigner extends ccc.Signer {
   private async saveConnection() {
     return this.connectionsRepo.set(
       {
-        uri: await this.getUri(),
+        uri: (await this.getConfig()).joyidAppURL,
         addressType: "ckb",
       },
       this.connection,
@@ -214,7 +204,7 @@ export class CkbSigner extends ccc.Signer {
 
   private async restoreConnection() {
     this.connection = await this.connectionsRepo.get({
-      uri: await this.getUri(),
+      uri: (await this.getConfig()).joyidAppURL,
       addressType: "ckb",
     });
   }

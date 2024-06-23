@@ -1,5 +1,6 @@
 import { ccc } from "@ckb-ccc/core";
-import { authWithPopup, signMessageWithPopup } from "@joyid/common";
+import { DappRequestType, buildJoyIDURL } from "@joyid/common";
+import { createPopup } from "../common";
 import {
   Connection,
   ConnectionsRepo,
@@ -22,7 +23,7 @@ export class BitcoinSigner extends ccc.SignerBtc {
     private readonly name: string,
     private readonly icon: string,
     private readonly addressType: "auto" | "p2wpkh" | "p2tr" = "auto",
-    private readonly uri = "https://app.joy.id",
+    private readonly appUri = "https://app.joy.id",
     private readonly connectionsRepo: ConnectionsRepo = new ConnectionsRepoLocalStorage(),
   ) {
     super(client);
@@ -34,9 +35,19 @@ export class BitcoinSigner extends ccc.SignerBtc {
       this.name,
       this.icon,
       this.addressType,
-      this.uri,
+      this.appUri,
       this.connectionsRepo,
     );
+  }
+
+  private getConfig() {
+    return {
+      redirectURL: location.href,
+      joyidAppURL: this.appUri,
+      requestNetwork: `btc-${this.addressType}`,
+      name: this.name,
+      logo: this.icon,
+    };
   }
 
   async getBtcAccount(): Promise<string> {
@@ -50,12 +61,10 @@ export class BitcoinSigner extends ccc.SignerBtc {
   }
 
   async connect(): Promise<void> {
-    const res = await authWithPopup({
-      joyidAppURL: this.uri,
-      name: this.name,
-      logo: this.icon,
-      redirectURL: location.href,
-      requestNetwork: `btc-${this.addressType}`,
+    const config = this.getConfig();
+    const res = await createPopup(buildJoyIDURL(config, "popup", "/auth"), {
+      ...config,
+      type: DappRequestType.Auth,
     });
 
     const { address, pubkey } = (() => {
@@ -72,11 +81,11 @@ export class BitcoinSigner extends ccc.SignerBtc {
     };
     await Promise.all([
       this.connectionsRepo.set(
-        { uri: this.uri, addressType: `btc-${res.btcAddressType}` },
+        { uri: this.appUri, addressType: `btc-${res.btcAddressType}` },
         this.connection,
       ),
       this.connectionsRepo.set(
-        { uri: this.uri, addressType: "btc-auto" },
+        { uri: this.appUri, addressType: "btc-auto" },
         this.connection,
       ),
     ]);
@@ -88,7 +97,7 @@ export class BitcoinSigner extends ccc.SignerBtc {
     }
 
     this.connection = await this.connectionsRepo.get({
-      uri: this.uri,
+      uri: this.appUri,
       addressType: `btc-${this.addressType}`,
     });
     return this.connection !== undefined;
@@ -100,16 +109,20 @@ export class BitcoinSigner extends ccc.SignerBtc {
     const challenge =
       typeof message === "string" ? message : ccc.hexFrom(message).slice(2);
 
-    const { signature } = await signMessageWithPopup({
-      joyidAppURL: this.uri,
-      name: this.name,
-      logo: this.icon,
-      requestNetwork: `btc-${this.addressType}`,
-      challenge,
-      address,
-      signMessageType: "ecdsa",
-      redirectURL: location.href,
-    });
+    const config = this.getConfig();
+    const { signature } = await createPopup(
+      buildJoyIDURL(
+        {
+          ...config,
+          challenge,
+          address,
+          signMessageType: "ecdsa",
+        },
+        "popup",
+        "/sign-message",
+      ),
+      { ...config, type: DappRequestType.SignMessage },
+    );
     return signature;
   }
 }
