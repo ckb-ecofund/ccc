@@ -303,6 +303,9 @@ export class WebComponentConnector extends LitElement {
           this.signerSelectedHandler,
         );
       }
+      if (this.scene === Scene.Connected || this.wallet) {
+
+      }
       return generateConnectingScene(
         this.selectedWallet,
         this.selectedSigner,
@@ -312,7 +315,7 @@ export class WebComponentConnector extends LitElement {
 
     const canBack = [Scene.SelectingSigners, Scene.Connecting].includes(
       this.scene,
-    );
+    ) && this.scene !== Scene.Connected;
 
     return html`<style>
         :host {
