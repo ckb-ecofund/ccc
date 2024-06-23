@@ -19,6 +19,8 @@ export class BitcoinSigner extends ccc.SignerBtc {
 
   constructor(
     client: ccc.Client,
+    private readonly name: string,
+    private readonly icon: string,
     private readonly addressType: "auto" | "p2wpkh" | "p2tr" = "auto",
     private readonly uri = "https://app.joy.id",
     private readonly connectionsRepo: ConnectionsRepo = new ConnectionsRepoLocalStorage(),
@@ -27,7 +29,14 @@ export class BitcoinSigner extends ccc.SignerBtc {
   }
 
   async replaceClient(client: ccc.Client): Promise<BitcoinSigner> {
-    return new BitcoinSigner(client, this.addressType, this.uri);
+    return new BitcoinSigner(
+      client,
+      this.name,
+      this.icon,
+      this.addressType,
+      this.uri,
+      this.connectionsRepo,
+    );
   }
 
   async getBtcAccount(): Promise<string> {
@@ -43,6 +52,8 @@ export class BitcoinSigner extends ccc.SignerBtc {
   async connect(): Promise<void> {
     const res = await authWithPopup({
       joyidAppURL: this.uri,
+      name: this.name,
+      logo: this.icon,
       redirectURL: location.href,
       requestNetwork: `btc-${this.addressType}`,
     });
@@ -91,6 +102,8 @@ export class BitcoinSigner extends ccc.SignerBtc {
 
     const { signature } = await signMessageWithPopup({
       joyidAppURL: this.uri,
+      name: this.name,
+      logo: this.icon,
       requestNetwork: `btc-${this.addressType}`,
       challenge,
       address,

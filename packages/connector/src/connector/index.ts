@@ -36,6 +36,11 @@ export class WebComponentConnector extends LitElement {
   }
 
   @property()
+  public name?: string;
+  @property()
+  public icon?: string;
+
+  @property()
   public client: ccc.Client = new ccc.ClientPublicTestnet();
   public setClient(client: ccc.Client) {
     this.client = client;
@@ -146,10 +151,18 @@ export class WebComponentConnector extends LitElement {
 
     this.resetListeners.forEach((listener) => listener());
     this.resetListeners = [];
+    const name =
+      this.name ??
+      (document.querySelector("head title") as HTMLTitleElement).text;
+    const icon =
+      this.icon ??
+      (document.querySelector('link[rel="icon"]') as HTMLLinkElement).href;
 
-    ccc.JoyId.getJoyIdSigners(this.client).forEach(({ signer, type, name }) => {
-      this.addSigner("JoyID", name, JOY_ID_SVG, type, signer);
-    });
+    ccc.JoyId.getJoyIdSigners(this.client, name, icon).forEach(
+      ({ signer, type, name }) => {
+        this.addSigner("JoyID", name, JOY_ID_SVG, type, signer);
+      },
+    );
 
     const uniSatSigner = ccc.UniSat.getUniSatSigner(this.client);
     if (uniSatSigner) {

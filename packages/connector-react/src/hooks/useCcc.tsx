@@ -17,9 +17,13 @@ const CCC_CONTEXT = createContext<
 export function Provider({
   children,
   connectorProps,
+  name,
+  icon,
 }: {
   children: React.ReactNode;
   connectorProps?: React.HTMLAttributes<{}>;
+  name?: string;
+  icon?: string;
 }) {
   const [ref, setRef] = useState<WebComponentConnector | null>(null);
   const [_, setFlag] = useState(0);
@@ -51,6 +55,8 @@ export function Provider({
       }}
     >
       <Connector
+        name={name}
+        icon={icon}
         ref={setRef}
         onWillUpdate={() => setFlag((f) => f + 1)}
         {...{

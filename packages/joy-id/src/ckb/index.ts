@@ -27,6 +27,8 @@ export class CkbSigner extends ccc.Signer {
 
   constructor(
     client: ccc.Client,
+    private readonly name: string,
+    private readonly icon: string,
     private readonly _uri?: string,
     private readonly _aggregatorUri?: string,
     private readonly connectionsRepo: ConnectionsRepo = new ConnectionsRepoLocalStorage(),
@@ -35,7 +37,14 @@ export class CkbSigner extends ccc.Signer {
   }
 
   async replaceClient(client: ccc.Client): Promise<CkbSigner> {
-    return new CkbSigner(client, this._uri);
+    return new CkbSigner(
+      client,
+      this.name,
+      this.icon,
+      this._uri,
+      this._aggregatorUri,
+      this.connectionsRepo,
+    );
   }
 
   private async getUri(): Promise<string> {
@@ -62,6 +71,8 @@ export class CkbSigner extends ccc.Signer {
     const uri = await this.getUri();
     const res = await authWithPopup({
       joyidAppURL: uri,
+      name: this.name,
+      logo: this.icon,
       redirectURL: location.href,
     });
 
@@ -171,6 +182,8 @@ export class CkbSigner extends ccc.Signer {
     popup.location.href = buildJoyIDURL(
       {
         joyidAppURL: await this.getUri(),
+        name: this.name,
+        logo: this.icon,
         tx: JSON.parse(tx.stringify()),
         signerAddress: (await this.assertConnection()).address,
         redirectURL: location.href,
