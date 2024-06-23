@@ -19,11 +19,16 @@ export function Provider({
   connectorProps,
   name,
   icon,
+  signerFilter,
 }: {
   children: React.ReactNode;
   connectorProps?: React.HTMLAttributes<{}>;
   name?: string;
   icon?: string;
+  signerFilter?: (
+    signerInfo: ccc.SignerInfo,
+    wallet: ccc.Wallet,
+  ) => Promise<boolean>;
 }) {
   const [ref, setRef] = useState<WebComponentConnector | null>(null);
   const [_, setFlag] = useState(0);
@@ -57,6 +62,7 @@ export function Provider({
       <Connector
         name={name}
         icon={icon}
+        signerFilter={signerFilter}
         ref={setRef}
         onWillUpdate={() => setFlag((f) => f + 1)}
         {...{

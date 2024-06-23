@@ -5,6 +5,7 @@ import { Ref, createRef, ref } from "lit/directives/ref.js";
 import { CLOSE_SVG } from "../assets/close.svg";
 import { JOY_ID_SVG } from "../assets/joy-id.svg";
 import { LEFT_SVG } from "../assets/left.svg";
+import { METAMASK_SVG } from "../assets/metamask.svg";
 import { OKX_SVG } from "../assets/okx.svg";
 import { UNI_SAT_SVG } from "../assets/uni-sat.svg";
 import { WillUpdateEvent } from "../events";
@@ -13,6 +14,7 @@ import {
   generateSignersScene,
   generateWalletsScene,
 } from "../scenes";
+import { SignerOpenLink } from "../signerOpenLink";
 import { WalletWithSigners } from "../types";
 
 enum Scene {
@@ -26,6 +28,11 @@ enum Scene {
 export class WebComponentConnector extends LitElement {
   @state()
   private wallets: WalletWithSigners[] = [];
+  @property()
+  public signerFilter?: (
+    signerInfo: ccc.SignerInfo,
+    wallet: ccc.Wallet,
+  ) => Promise<boolean>;
 
   private resetListeners: (() => void)[] = [];
 
@@ -110,7 +117,10 @@ export class WebComponentConnector extends LitElement {
   }
 
   willUpdate(changedProperties: PropertyValues): void {
-    if (changedProperties.has("client")) {
+    if (
+      changedProperties.has("client") ||
+      changedProperties.has("signerFilter")
+    ) {
       this.reloadSigners();
     }
     if (
@@ -198,15 +208,51 @@ export class WebComponentConnector extends LitElement {
         );
       }),
     );
+
+    // === Dummy signers ===
+    this.addSigner(
+      "MetaMask",
+      "BTC",
+      METAMASK_SVG,
+      ccc.SignerType.EVM,
+      new SignerOpenLink(
+        this.client,
+        `https://metamask.app.link/dapp/${window.location.href}`,
+      ),
+    );
+    [ccc.SignerType.EVM, ccc.SignerType.BTC].forEach((type) => {
+      this.addSigner(
+        "OKX Wallet",
+        type,
+        OKX_SVG,
+        type,
+        new SignerOpenLink(this.client, "https://www.okx.com/zh-hans/download"),
+      );
+    });
+    this.addSigner(
+      "UniSat",
+      ccc.SignerType.BTC,
+      UNI_SAT_SVG,
+      ccc.SignerType.BTC,
+      new SignerOpenLink(this.client, "https://unisat.io/"),
+    );
+    // ===
   }
 
-  private addSigner(
+  private async addSigner(
     walletName: string,
     signerName: string,
     icon: string,
     type: ccc.SignerType,
     signer: ccc.Signer,
   ) {
+    const signerInfo = { type, name: signerName, signer };
+    if (
+      this.signerFilter &&
+      !(await this.signerFilter(signerInfo, { name: walletName, icon }))
+    ) {
+      return;
+    }
     let updated = false;
     const wallets = this.wallets.map((wallet) => {
       if (wallet.name !== walletName) {
@@ -214,9 +260,13 @@ export class WebComponentConnector extends LitElement {
       }
 
       updated = true;
+      const allSigners = [...wallet.signers, signerInfo];
+      const signers = allSigners.filter(
+        ({ signer }) => !(signer instanceof SignerOpenLink),
+      );
       return {
         ...wallet,
-        signers: [...wallet.signers, { type, name: signerName, signer }],
+        signers: signers.length !== 0 ? signers : [signerInfo],
       };
     });
 
@@ -224,7 +274,7 @@ export class WebComponentConnector extends LitElement {
       wallets.push({
         name: walletName,
         icon,
-        signers: [{ type, name: signerName, signer }],
+        signers: [signerInfo],
       });
     }
 
@@ -291,7 +341,11 @@ export class WebComponentConnector extends LitElement {
               src=${LEFT_SVG}
               @click=${() => {
                 if (this.scene === Scene.Connecting) {
-                  this.scene = Scene.SelectingSigners;
+                  if ((this.selectedWallet?.signers.length ?? 0) <= 1) {
+                    this.scene = Scene.SelectingWallets;
+                  } else {
+                    this.scene = Scene.SelectingSigners;
+                  }
                 } else if (this.scene === Scene.SelectingSigners) {
                   this.scene = Scene.SelectingWallets;
                 }
