@@ -208,7 +208,9 @@ export default function Home() {
         <>
           <WalletIcon wallet={wallet} className="mb-1" />
           <p className="mb-1">Connected to {wallet.name}</p>
-          <p className="mb-1">{internalAddress}</p>
+          <p className="mb-1 text-balance break-all text-center">
+            {internalAddress}
+          </p>
           <p className="mb-1 text-balance break-all text-center">{address}</p>
           <p className="mb-1">{ccc.fixedPointToString(balance)} CKB</p>
           <Sign />
