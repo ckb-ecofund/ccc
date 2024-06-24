@@ -105,6 +105,7 @@ export class WebComponentConnector extends LitElement {
     this.walletName = undefined;
     this.signerName = undefined;
     this.saveConnection();
+    this.closedHandler();
   }
 
   private loadConnection() {
@@ -158,6 +159,9 @@ export class WebComponentConnector extends LitElement {
         if (signer && (await signer.signer.isConnected())) {
           this.wallet = wallet;
           this.signer = signer;
+        } else {
+          this.wallet = undefined;
+          this.signer = undefined;
         }
       })();
     }
