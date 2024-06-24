@@ -455,13 +455,14 @@ export class WebComponentConnector extends LitElement {
       if (!(await signer.signer.isConnected())) {
         return;
       }
-      this.recommendAddress = await signer.signer.getRecommendedAddress();
-      this.balance = await signer.signer.getBalance();
       this.scene = Scene.Connected;
       this.walletName = wallet.name;
       this.signerName = signer.name;
       this.saveConnection();
       this.closedHandler();
+      this.internalAddress = await signer.signer.getInternalAddress();
+      this.recommendAddress = await signer.signer.getRecommendedAddress();
+      this.balance = await signer.signer.getBalance();
     })();
   };
 
