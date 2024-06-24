@@ -27,7 +27,7 @@ export function generateSignersScene(
       <span class="mb-2">${wallet.name}</span>
       ${repeat(
         wallet.signers,
-        (signer) => signer.type,
+        (signer) => signer.name,
         (signer) => html`
           <button
             class="btn-primary mb-1"
@@ -35,7 +35,10 @@ export function generateSignersScene(
               onSignerSelected(wallet, signer);
             }}
           >
-            <img src=${signerTypeToIcon(signer.type)} alt=${signer.type} />
+            <img
+              src=${signerTypeToIcon(signer.signer.type)}
+              alt=${signer.signer.type}
+            />
             ${signer.name}
           </button>
         `,

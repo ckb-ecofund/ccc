@@ -6,7 +6,7 @@ import { Transaction, TransactionLike, WitnessArgs } from "../../ckb";
 import { KnownScript } from "../../client";
 import { HexLike, hexFrom } from "../../hex";
 import { numToBytes } from "../../num";
-import { Signer, SignerSignType } from "../signer";
+import { Signer, SignerSignType, SignerType } from "../signer";
 
 /**
  * An abstract class extending the Signer class for Bitcoin-like signing operations.
@@ -14,6 +14,10 @@ import { Signer, SignerSignType } from "../signer";
  * as well as signing transactions.
  */
 export abstract class SignerBtc extends Signer {
+  get type(): SignerType {
+    return SignerType.BTC;
+  }
+
   get signType(): SignerSignType {
     return SignerSignType.BtcEcdsa;
   }

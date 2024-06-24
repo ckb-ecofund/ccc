@@ -20,6 +20,7 @@ export function Provider({
   name,
   icon,
   signerFilter,
+  client: clientArg,
 }: {
   children: React.ReactNode;
   connectorProps?: React.HTMLAttributes<{}>;
@@ -29,6 +30,7 @@ export function Provider({
     signerInfo: ccc.SignerInfo,
     wallet: ccc.Wallet,
   ) => Promise<boolean>;
+  client?: ccc.Client;
 }) {
   const [ref, setRef] = useState<WebComponentConnector | null>(null);
   const [_, setFlag] = useState(0);
@@ -71,6 +73,7 @@ export function Provider({
             ...connectorProps?.style,
             zIndex: connectorProps?.style?.zIndex ?? 999,
           },
+          ...(clientArg ? { client: clientArg } : {}),
         }}
       />
       {children}

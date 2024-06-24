@@ -49,7 +49,7 @@ export abstract class ClientJsonRpc extends Client {
    */
 
   constructor(
-    private readonly url: string,
+    private readonly url_: string,
     private readonly timeout = 30000,
   ) {
     super();
@@ -61,8 +61,8 @@ export abstract class ClientJsonRpc extends Client {
    * @returns The URL of the JSON-RPC server.
    */
 
-  getUrl() {
-    return this.url;
+  get url() {
+    return this.url_;
   }
 
   /**

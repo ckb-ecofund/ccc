@@ -15,7 +15,7 @@ import {
   generateWalletsScene,
 } from "../scenes";
 import { generateConnectedScene } from "../scenes/connected";
-import { generateSwitchingScene } from "../scenes/switching";
+import { generateNetworksScene } from "../scenes/networks";
 import { SignerOpenLink } from "../signerOpenLink";
 import { WalletWithSigners } from "../types";
 
@@ -24,7 +24,7 @@ enum Scene {
   SelectingSigners = "SelectingSigners",
   Connecting = "Connecting",
   Connected = "Connected",
-  Switching = "Switching",
+  SwitchingNetworks = "SwitchingNetworks",
 }
 
 @customElement("ccc-connector")
@@ -77,31 +77,27 @@ export class WebComponentConnector extends LitElement {
   @state()
   private internalAddress?: string;
   @state()
-  private balance?: string;
+  private balance?: ccc.Num;
 
   private async updateSignerInfo() {
-    if (this.signer) {
-      this.recommendAddress = await this.signer.signer.getRecommendedAddress();
-      this.balance = ccc.fixedPointToString(
-        await this.signer.signer.getBalance(),
-      );
-      this.internalAddress = await this.signer.signer.getInternalAddress();
-      this.requestUpdate();
+    if (!this.signer) {
+      return;
     }
+    this.recommendAddress = await this.signer.signer.getRecommendedAddress();
+    this.balance = await this.signer.signer.getBalance();
+    this.internalAddress = await this.signer.signer.getInternalAddress();
   }
 
-  private prepareSigner() {
-    (async () => {
-      if (this.signer && (await this.signer.signer.isConnected())) {
-        this.scene = Scene.Connected;
-        await this.updateSignerInfo();
-        return;
-      }
+  private async prepareSigner() {
+    if (this.signer && (await this.signer.signer.isConnected())) {
+      await this.updateSignerInfo();
+      this.scene = Scene.Connected;
+      return;
+    }
 
-      this.wallet = undefined;
-      this.signer = undefined;
-      this.scene = Scene.SelectingWallets;
-    })();
+    this.wallet = undefined;
+    this.signer = undefined;
+    this.scene = Scene.SelectingWallets;
   }
 
   public disconnect() {
@@ -192,31 +188,19 @@ export class WebComponentConnector extends LitElement {
       (document.querySelector('link[rel="icon"]') as HTMLLinkElement).href;
 
     ccc.JoyId.getJoyIdSigners(this.client, name, icon).forEach(
-      ({ signer, type, name }) => {
-        this.addSigner("JoyID", name, JOY_ID_SVG, type, signer);
+      ({ signer, name }) => {
+        this.addSigner("JoyID", name, JOY_ID_SVG, signer);
       },
     );
 
     const uniSatSigner = ccc.UniSat.getUniSatSigner(this.client);
     if (uniSatSigner) {
-      this.addSigner(
-        "UniSat",
-        "BTC",
-        UNI_SAT_SVG,
-        ccc.SignerType.BTC,
-        uniSatSigner,
-      );
+      this.addSigner("UniSat", "BTC", UNI_SAT_SVG, uniSatSigner);
     }
 
     const okxBitcoinSigner = ccc.Okx.getOKXBitcoinSigner(this.client);
     if (okxBitcoinSigner) {
-      this.addSigner(
-        "OKX Wallet",
-        "BTC",
-        OKX_SVG,
-        ccc.SignerType.BTC,
-        okxBitcoinSigner,
-      );
+      this.addSigner("OKX Wallet", "BTC", OKX_SVG, okxBitcoinSigner);
     }
 
     const eip6963Manager = new ccc.Eip6963.SignerFactory(this.client);
@@ -226,7 +210,6 @@ export class WebComponentConnector extends LitElement {
           `${signer.detail.info.name}`,
           "EVM",
           signer.detail.info.icon,
-          ccc.SignerType.EVM,
           signer,
         );
       }),
@@ -235,12 +218,12 @@ export class WebComponentConnector extends LitElement {
     // === Dummy signers ===
     this.addSigner(
       "MetaMask",
-      "BTC",
+      "EVM",
       METAMASK_SVG,
-      ccc.SignerType.EVM,
       new SignerOpenLink(
         this.client,
         `https://metamask.app.link/dapp/${window.location.href}`,
+        ccc.SignerType.EVM,
       ),
     );
     [ccc.SignerType.EVM, ccc.SignerType.BTC].forEach((type) => {
@@ -248,16 +231,18 @@ export class WebComponentConnector extends LitElement {
         "OKX Wallet",
         type,
         OKX_SVG,
-        type,
-        new SignerOpenLink(this.client, "https://www.okx.com/zh-hans/download"),
+        new SignerOpenLink(
+          this.client,
+          "https://www.okx.com/zh-hans/download",
+          type,
+        ),
       );
     });
     this.addSigner(
       "UniSat",
       ccc.SignerType.BTC,
       UNI_SAT_SVG,
-      ccc.SignerType.BTC,
-      new SignerOpenLink(this.client, "https://unisat.io/"),
+      new SignerOpenLink(this.client, "https://unisat.io/", ccc.SignerType.BTC),
     );
     // ===
   }
@@ -266,10 +251,9 @@ export class WebComponentConnector extends LitElement {
     walletName: string,
     signerName: string,
     icon: string,
-    type: ccc.SignerType,
     signer: ccc.Signer,
   ) {
-    const signerInfo = { type, name: signerName, signer };
+    const signerInfo = { name: signerName, signer };
     if (
       this.signerFilter &&
       !(await this.signerFilter(signerInfo, { name: walletName, icon }))
@@ -310,9 +294,6 @@ export class WebComponentConnector extends LitElement {
 
   render() {
     const [title, body] = (() => {
-      if (this.scene === Scene.Switching && this.recommendAddress) {
-        return generateSwitchingScene(this.recommendAddress, () => {});
-      }
       if (this.scene === Scene.Connected && this.wallet && this.signer) {
         return generateConnectedScene(
           this.wallet,
@@ -322,9 +303,15 @@ export class WebComponentConnector extends LitElement {
           this.balance,
           this.disconnect.bind(this),
           () => {
-            this.scene = Scene.Switching;
+            this.scene = Scene.SwitchingNetworks;
           },
         );
+      }
+      if (this.scene === Scene.SwitchingNetworks) {
+        return generateNetworksScene(this.client, (client) => {
+          this.setClient(client);
+          this.closedHandler();
+        });
       }
       if (this.scene === Scene.SelectingWallets || !this.selectedWallet) {
         return generateWalletsScene(
@@ -349,9 +336,11 @@ export class WebComponentConnector extends LitElement {
       );
     })();
 
-    const canBack =
-      [Scene.SelectingSigners, Scene.Connecting, Scene.Switching].includes(this.scene) &&
-      this.scene !== Scene.Connected;
+    const canBack = [
+      Scene.SelectingSigners,
+      Scene.Connecting,
+      Scene.SwitchingNetworks,
+    ].includes(this.scene);
 
     return html`<style>
         :host {
@@ -361,6 +350,7 @@ export class WebComponentConnector extends LitElement {
           --btn-primary: #f8f8f8;
           --btn-primary-hover: #efeeee;
           --btn-secondary: #ddd;
+          --btn-secondary-hover: #ccc;
           color: #1e1e1e;
           --tip-color: #666;
         }
@@ -374,7 +364,12 @@ export class WebComponentConnector extends LitElement {
         }}
       >
         <div class="main" ${ref(this.mainRef)}>
-          <div class="header text-bold text-lg" ${ref(this.headerRef)}>
+          <div
+            class="header text-bold fs-lg ${title == null
+              ? ""
+              : "header-divider"}"
+            ${ref(this.headerRef)}
+          >
             <img
               class="back ${canBack ? "active" : ""}"
               src=${LEFT_SVG}
@@ -387,7 +382,7 @@ export class WebComponentConnector extends LitElement {
                   }
                 } else if (this.scene === Scene.SelectingSigners) {
                   this.scene = Scene.SelectingWallets;
-                } else if (this.scene === Scene.Switching) {
+                } else if (this.scene === Scene.SwitchingNetworks) {
                   this.scene = Scene.Connected;
                 }
               }}
@@ -425,7 +420,7 @@ export class WebComponentConnector extends LitElement {
       this.scene = Scene.SelectingWallets;
       this.selectedSigner = undefined;
       this.selectedWallet = undefined;
-    } else if ([Scene.Switching].includes(this.scene)) {
+    } else if ([Scene.SwitchingNetworks].includes(this.scene)) {
       this.scene = Scene.Connected;
     }
 
@@ -445,7 +440,7 @@ export class WebComponentConnector extends LitElement {
         return;
       }
       this.recommendAddress = await signer.signer.getRecommendedAddress();
-      this.balance = ccc.fixedPointToString(await signer.signer.getBalance());
+      this.balance = await signer.signer.getBalance();
       this.scene = Scene.Connected;
       this.walletName = wallet.name;
       this.signerName = signer.name;
@@ -473,10 +468,6 @@ export class WebComponentConnector extends LitElement {
       outline: inherit;
     }
 
-    .block {
-      display: block;
-    }
-
     .text-bold {
       font-weight: bold;
     }
@@ -485,20 +476,16 @@ export class WebComponentConnector extends LitElement {
       color: var(--tip-color);
     }
 
-    .font-black {
-      color: #000;
-    }
-
-    .text-sm {
+    .fs-sm {
       font-size: 0.8rem;
     }
-    .text-md {
+    .fs-md {
       font-size: 1rem;
     }
-    .text-lg {
+    .fs-lg {
       font-size: 1.2rem;
     }
-    .text-xl {
+    .fs-xl {
       font-size: 1.5rem;
     }
 
@@ -513,6 +500,18 @@ export class WebComponentConnector extends LitElement {
     }
     .mt-2 {
       margin-top: 1rem;
+    }
+    .ml-1 {
+      margin-left: 0.7rem;
+    }
+    .ml-2 {
+      margin-left: 1em;
+    }
+    .mr-1 {
+      margin-right: 0.7rem;
+    }
+    .mr-2 {
+      margin-right: 1rem;
     }
 
     .background {
@@ -536,8 +535,13 @@ export class WebComponentConnector extends LitElement {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 1rem 1.3rem;
+      padding: 1rem 1.3rem 0.5rem;
+    }
+
+    .header-divider {
+      padding-bottom: 1rem;
       border-bottom: 1px solid var(--divider);
+      margin-bottom: 1rem;
     }
 
     .close,
@@ -555,7 +559,7 @@ export class WebComponentConnector extends LitElement {
     }
 
     .body {
-      padding: 1.4rem 1.3rem;
+      padding: 0 1.3rem 1.4rem;
       min-width: 20rem;
       display: flex;
       flex-direction: column;
@@ -572,16 +576,20 @@ export class WebComponentConnector extends LitElement {
       border-radius: 0.4rem;
       transition: background 0.15s ease-in-out;
     }
-
     .btn-primary img {
       width: 2rem;
       height: 2rem;
       margin-right: 1rem;
       border-radius: 0.4rem;
     }
-
     .btn-primary:hover {
       background: var(--btn-primary-hover);
+    }
+    .btn-primary:disabled {
+      cursor: not-allowed;
+    }
+    .btn-primary:disabled:hover {
+      background: var(--btn-primary);
     }
 
     .btn-secondary {
@@ -592,11 +600,19 @@ export class WebComponentConnector extends LitElement {
       border-radius: 9999px;
       transition: background 0.15s ease-in-out;
     }
-
     .btn-secondary img {
       width: 0.8rem;
       height: 0.8rem;
       margin-right: 0.5rem;
+    }
+    .btn-secondary:hover {
+      background: var(--btn-secondary-hover);
+    }
+    .btn-secondary:disabled {
+      cursor: not-allowed;
+    }
+    .btn-secondary:disabled:hover {
+      background: var(--btn-secondary);
     }
 
     .wallet-icon {
@@ -612,8 +628,11 @@ export class WebComponentConnector extends LitElement {
       border-radius: 1rem;
     }
 
-    .connected-icon-container {
+    .position-relative {
       position: relative;
+    }
+    .position-absolute {
+      position: absolute;
     }
 
     .connected-type-icon {
@@ -622,10 +641,6 @@ export class WebComponentConnector extends LitElement {
       height: 1.5rem;
       right: -0.5rem;
       bottom: -0.5rem;
-    }
-
-    .font-gray {
-      color: #999999;
     }
 
     .text-center {
@@ -649,13 +664,6 @@ export class WebComponentConnector extends LitElement {
       align-items: center;
     }
 
-    .ml-2_3 {
-      margin-left: 0.625rem;
-    }
-    .mr-2_3 {
-      margin-right: 0.625rem;
-    }
-
     .switch-btn-container {
       width: 100%;
       padding: 1rem;
@@ -663,20 +671,8 @@ export class WebComponentConnector extends LitElement {
 
     .switch-line {
       flex: 1;
-      height: 0.0625rem;
-      background-color: #ddd;
-    }
-
-    .switch-content {
-      display: flex;
-      align-items: center;
-      margin: 0 1.25rem;
-    }
-
-    .switching-connected {
-      font-size: 0.875rem;
-      color: #000;
-      margin-right: 1rem;
+      height: 1px;
+      background-color: var(--divider);
     }
 
     .switching-status-dot {
@@ -684,12 +680,6 @@ export class WebComponentConnector extends LitElement {
       height: 0.5rem;
       background: #0f0;
       border-radius: 50%;
-    }
-
-    .switching-close-button {
-      cursor: pointer;
-      width: 1rem;
-      height: 1rem;
     }
 
     .copy-btn {
@@ -703,7 +693,7 @@ export class WebComponentConnector extends LitElement {
     }
 
     .sm-chain-logo {
-      width: 1.125rem
+      width: 1.125rem;
     }
   `;
 }

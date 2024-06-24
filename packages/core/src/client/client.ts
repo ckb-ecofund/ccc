@@ -25,9 +25,9 @@ export enum KnownScript {
 }
 
 export abstract class Client {
-  abstract getUrl(): string;
+  abstract get url(): string;
+  abstract get addressPrefix(): string;
 
-  abstract getAddressPrefix(): Promise<string>;
   abstract getKnownScript(
     script: KnownScript,
   ): Promise<Pick<Script, "codeHash" | "hashType">>;

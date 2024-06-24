@@ -4,13 +4,17 @@ import { Script, Transaction, TransactionLike, WitnessArgs } from "../../ckb";
 import { KnownScript } from "../../client";
 import { hexFrom } from "../../hex";
 import { numToBytes } from "../../num";
-import { Signer, SignerSignType } from "../signer";
+import { Signer, SignerSignType, SignerType } from "../signer";
 
 /**
  * An abstract class extending Signer for Ethereum Virtual Machine (EVM) based signing operations.
  * This class provides methods to get EVM account, internal address, and signing transactions.
  */
 export abstract class SignerEvm extends Signer {
+  get type(): SignerType {
+    return SignerType.EVM;
+  }
+
   get signType(): SignerSignType {
     return SignerSignType.EvmPersonal;
   }

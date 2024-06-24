@@ -9,6 +9,10 @@ import {
 } from "../connectionsStorage";
 
 export class CkbSigner extends ccc.Signer {
+  get type(): ccc.SignerType {
+    return ccc.SignerType.CKB;
+  }
+
   get signType(): ccc.SignerSignType {
     return ccc.SignerSignType.JoyId;
   }
@@ -45,31 +49,30 @@ export class CkbSigner extends ccc.Signer {
     );
   }
 
-  private async getConfig() {
+  private getConfig() {
     return {
       redirectURL: location.href,
       joyidAppURL:
-        this._appUri ??
-        ((await this.client.getAddressPrefix()) === "ckb"
+        this._appUri ?? this.client.addressPrefix === "ckb"
           ? "https://app.joy.id"
-          : "https://testnet.joyid.dev"),
+          : "https://testnet.joyid.dev",
       name: this.name,
       logo: this.icon,
     };
   }
 
-  private async getAggregatorUri(): Promise<string> {
+  private getAggregatorUri(): string {
     if (this._aggregatorUri) {
       return this._aggregatorUri;
     }
 
-    return (await this.client.getAddressPrefix()) === "ckb"
+    return this.client.addressPrefix === "ckb"
       ? "https://cota.nervina.dev/mainnet-aggregator"
       : "https://cota.nervina.dev/aggregator";
   }
 
   async connect(): Promise<void> {
-    const config = await this.getConfig();
+    const config = this.getConfig();
 
     const res = await createPopup(buildJoyIDURL(config, "popup", "/auth"), {
       ...config,
@@ -183,7 +186,7 @@ export class CkbSigner extends ccc.Signer {
     const tx = ccc.Transaction.from(txLike);
     const { script } = await this.getAddressObj();
 
-    const config = await this.getConfig();
+    const config = this.getConfig();
     const res = await createPopup(
       buildJoyIDURL(
         {
@@ -210,7 +213,7 @@ export class CkbSigner extends ccc.Signer {
     const challenge =
       typeof message === "string" ? message : ccc.hexFrom(message).slice(2);
 
-    const config = await this.getConfig();
+    const config = this.getConfig();
     const res = await createPopup(
       buildJoyIDURL(
         {
@@ -234,7 +237,7 @@ export class CkbSigner extends ccc.Signer {
   private async saveConnection() {
     return this.connectionsRepo.set(
       {
-        uri: (await this.getConfig()).joyidAppURL,
+        uri: this.getConfig().joyidAppURL,
         addressType: "ckb",
       },
       this.connection,
@@ -243,7 +246,7 @@ export class CkbSigner extends ccc.Signer {
 
   private async restoreConnection() {
     this.connection = await this.connectionsRepo.get({
-      uri: (await this.getConfig()).joyidAppURL,
+      uri: this.getConfig().joyidAppURL,
       addressType: "ckb",
     });
   }

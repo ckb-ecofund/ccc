@@ -1,13 +1,17 @@
 import { Address } from "../../address";
 import { Script, ScriptLike } from "../../ckb";
 import { Client } from "../../client";
-import { Signer, SignerSignType } from "../signer";
+import { Signer, SignerSignType, SignerType } from "../signer";
 
 /**
  * A class extending Signer that provides read-only access to a CKB script.
  * This class does not support signing operations.
  */
 export class SignerCkbScriptReadonly extends Signer {
+  get type(): SignerType {
+    return SignerType.CKB;
+  }
+
   get signType(): SignerSignType {
     return SignerSignType.Unknown;
   }
@@ -77,6 +81,6 @@ export class SignerCkbScriptReadonly extends Signer {
    */
 
   async getAddressObjs(): Promise<Address[]> {
-    return [await Address.fromScript(this.script, this.client)];
+    return [Address.fromScript(this.script, this.client)];
   }
 }
