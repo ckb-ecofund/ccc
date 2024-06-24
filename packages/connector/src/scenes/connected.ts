@@ -49,14 +49,14 @@ export function generateConnectedScene(
       
       <div class="mb-2 mt-2 text-center">
         <div class="flex">
-          <span class="block text-bold fs-semi-big font-montserrat font-black"> ${formatString(internalAddress)}</span>
+          <span class="block text-bold fs-semi-big font-black">${formatString(internalAddress)}</span>
           <img class="hover" src=${COPY_SVG} alt="copy" @click=${async () => {
             internalAddress && (await copyAddress(internalAddress));
           }}/>
         </div>
-        <span class="block text-bold fs-md font-montserrat font-black">${balance} CKB</span>
+        <span class="block text-bold fs-md font-black">${balance} CKB</span>
         <div class="flex justify-center">
-          <span class="block text-bold font-gray fs-md font-montserrat font-black">CKB ${formatString(recommendedAddress)}</span>
+          <span class="block text-bold font-gray fs-md font-black">${formatString(recommendedAddress)}</span>
           <img class="hover" src=${COPY_SM_SVG} alt="copy" @click=${async () => {
             recommendedAddress && (await copyAddress(recommendedAddress));
           }}/>
@@ -65,7 +65,7 @@ export function generateConnectedScene(
       </div>
 
       <button
-        class="btn-primary mb-1 font-montserrat font-black"
+        class="btn-primary mb-1 font-black"
         @click=${disconnect}
       >
         <img

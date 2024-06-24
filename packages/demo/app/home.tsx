@@ -236,8 +236,8 @@ export default function Home() {
           <p className="mb-1">{ccc.fixedPointToString(balance)} CKB</p>
           <Sign />
           <Transfer />
-          <Button className="mt-4" onClick={disconnect}>
-            Disconnect
+          <Button className="mt-4" onClick={open}>
+            {internalAddress.slice(0, 7)}...{internalAddress.slice(-5)}
           </Button>
         </>
       ) : (

@@ -442,11 +442,11 @@ export class WebComponentConnector extends LitElement {
       if (!(await signer.signer.isConnected())) {
         return;
       }
+      this.recommendAddress = await signer.signer.getRecommendedAddress();
+      this.balance = ccc.fixedPointToString(await signer.signer.getBalance());
       this.scene = Scene.Connected;
       this.walletName = wallet.name;
       this.signerName = signer.name;
-      this.recommendAddress = await signer.signer.getRecommendedAddress();
-      this.balance = (await signer.signer.getBalance()).toString();
       this.saveConnection();
       this.closedHandler();
     })();
@@ -620,10 +620,6 @@ export class WebComponentConnector extends LitElement {
       height: 1.5rem;
       right: 0;
       bottom: 0;
-    }
-
-    .font-montserrat {
-      font-family: Montserrat;
     }
 
     .font-gray {

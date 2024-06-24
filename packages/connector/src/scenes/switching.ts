@@ -11,7 +11,7 @@ export function generateSwitchingScene(
     "Switch Network",
     html`
       <button
-        class="btn-primary flex justify-between mb-1 font-gray font-montserrat ${isMainnet
+        class="btn-primary flex justify-between mb-1 font-gray ${isMainnet
           ? "switching-active"
           : ""}"
         @click=${() => handleSwapClick()}
@@ -28,7 +28,7 @@ export function generateSwitchingScene(
         </div>
       </button>
       <button
-        class="btn-primary flex justify-between  mb-1 font-gray font-montserrat ${!isMainnet
+        class="btn-primary flex justify-between  mb-1 font-gray ${!isMainnet
           ? "switching-active"
           : ""}"
         @click=${() => handleSwapClick()}
