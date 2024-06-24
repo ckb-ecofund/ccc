@@ -241,7 +241,11 @@ export class WebComponentConnector extends LitElement {
         OKX_SVG,
         new SignerOpenLink(
           this.client,
-          "https://www.okx.com/zh-hans/download",
+          "https://www.okx.com/download?deeplink=" +
+            encodeURIComponent(
+              "okx://wallet/dapp/url?dappUrl=" +
+                encodeURIComponent(window.location.href),
+            ),
           type,
         ),
       );
@@ -250,7 +254,11 @@ export class WebComponentConnector extends LitElement {
       "UniSat",
       ccc.SignerType.BTC,
       UNI_SAT_SVG,
-      new SignerOpenLink(this.client, "https://unisat.io/", ccc.SignerType.BTC),
+      new SignerOpenLink(
+        this.client,
+        "https://unisat.io/download",
+        ccc.SignerType.BTC,
+      ),
     );
     // ===
   }
