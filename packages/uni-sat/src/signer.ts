@@ -29,7 +29,7 @@ export class Signer extends ccc.SignerBtc {
     return (await this.provider.getAccounts()).length !== 0;
   }
 
-  async signMessage(message: string | ccc.BytesLike): Promise<string> {
+  async signMessageRaw(message: string | ccc.BytesLike): Promise<string> {
     const challenge =
       typeof message === "string" ? message : ccc.hexFrom(message).slice(2);
 

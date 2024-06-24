@@ -103,7 +103,7 @@ export class BitcoinSigner extends ccc.SignerBtc {
     return this.connection !== undefined;
   }
 
-  async signMessage(message: string | ccc.BytesLike): Promise<string> {
+  async signMessageRaw(message: string | ccc.BytesLike): Promise<string> {
     const { address } = this.assertConnection();
 
     const challenge =

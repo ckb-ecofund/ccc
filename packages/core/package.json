@@ -57,11 +57,14 @@
   },
   "dependencies": {
     "@ckb-lumos/helpers": "^0.22.2",
+    "@joyid/ckb": "^0.0.11",
     "@noble/hashes": "^1.4.0",
+    "@unisat/wallet-utils": "^1.0.0",
     "abort-controller": "^3.0.0",
     "bech32": "^2.0.0",
     "blake2b": "^2.1.4",
     "buffer": "^6.0.3",
-    "cross-fetch": "^4.0.0"
+    "cross-fetch": "^4.0.0",
+    "ethers": "^6.13.1"
   }
 }

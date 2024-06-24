@@ -6,7 +6,7 @@ import { Transaction, TransactionLike, WitnessArgs } from "../../ckb";
 import { KnownScript } from "../../client";
 import { HexLike, hexFrom } from "../../hex";
 import { numToBytes } from "../../num";
-import { Signer } from "../signer";
+import { Signer, SignerSignType } from "../signer";
 
 /**
  * An abstract class extending the Signer class for Bitcoin-like signing operations.
@@ -14,6 +14,10 @@ import { Signer } from "../signer";
  * as well as signing transactions.
  */
 export abstract class SignerBtc extends Signer {
+  get signType(): SignerSignType {
+    return SignerSignType.BtcEcdsa;
+  }
+
   /**
    * Gets the Bitcoin account associated with the signer.
    *
@@ -35,6 +39,15 @@ export abstract class SignerBtc extends Signer {
    */
   async getInternalAddress(): Promise<string> {
     return this.getBtcAccount();
+  }
+
+  /**
+   * Gets the identity, which is the Bitcoin public key in this case.
+   *
+   * @returns A promise that resolves to a string representing the identity
+   */
+  async getIdentity(): Promise<string> {
+    return hexFrom(await this.getBtcPublicKey()).slice(2);
   }
 
   /**
@@ -85,7 +98,7 @@ export abstract class SignerBtc extends Signer {
     }
 
     const signature = bytesFrom(
-      await this.signMessage(
+      await this.signMessageRaw(
         `CKB (Bitcoin Layer) transaction: ${info.message}`,
       ),
       "base64",

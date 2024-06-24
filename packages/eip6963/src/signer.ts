@@ -28,7 +28,7 @@ export class Signer extends ccc.SignerEvm {
     );
   }
 
-  async signMessage(message: string | ccc.BytesLike): Promise<ccc.Hex> {
+  async signMessageRaw(message: string | ccc.BytesLike): Promise<ccc.Hex> {
     const challenge =
       typeof message === "string" ? ccc.bytesFrom(message, "utf8") : message;
     const address = await this.getEvmAccount();

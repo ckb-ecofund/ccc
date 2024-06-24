@@ -1,13 +1,17 @@
 import { Address } from "../../address";
 import { Script, ScriptLike } from "../../ckb";
 import { Client } from "../../client";
-import { Signer } from "../signer";
+import { Signer, SignerSignType } from "../signer";
 
 /**
  * A class extending Signer that provides read-only access to a CKB script.
  * This class does not support signing operations.
  */
 export class SignerCkbScriptReadonly extends Signer {
+  get signType(): SignerSignType {
+    return SignerSignType.Unknown;
+  }
+
   private readonly script: Script;
 
   /**

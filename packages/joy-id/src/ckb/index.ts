@@ -9,6 +9,10 @@ import {
 } from "../connectionsStorage";
 
 export class CkbSigner extends ccc.Signer {
+  get signType(): ccc.SignerSignType {
+    return ccc.SignerSignType.JoyId;
+  }
+
   private connection?: Connection;
 
   private async assertConnection(): Promise<Connection> {
@@ -95,6 +99,14 @@ export class CkbSigner extends ccc.Signer {
 
   async getInternalAddress(): Promise<string> {
     return (await this.assertConnection()).address;
+  }
+
+  async getIdentity(): Promise<string> {
+    const connection = await this.assertConnection();
+    return JSON.stringify({
+      keyType: connection.keyType,
+      publicKey: connection.publicKey.slice(2),
+    });
   }
 
   async getAddressObj(): Promise<ccc.Address> {
@@ -190,6 +202,33 @@ export class CkbSigner extends ccc.Signer {
     );
 
     return ccc.Transaction.from(res.tx);
+  }
+
+  async signMessageRaw(message: string | ccc.BytesLike): Promise<string> {
+    const { address } = await this.assertConnection();
+
+    const challenge =
+      typeof message === "string" ? message : ccc.hexFrom(message).slice(2);
+
+    const config = await this.getConfig();
+    const res = await createPopup(
+      buildJoyIDURL(
+        {
+          ...config,
+          challenge,
+          isData: typeof message !== "string",
+          address,
+        },
+        "popup",
+        "/sign-message",
+      ),
+      { ...config, type: DappRequestType.SignMessage },
+    );
+    return JSON.stringify({
+      signature: res.signature,
+      alg: res.alg,
+      message: res.message,
+    });
   }
 
   private async saveConnection() {

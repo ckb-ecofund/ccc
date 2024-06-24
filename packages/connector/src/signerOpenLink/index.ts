@@ -1,6 +1,10 @@
 import { ccc } from "@ckb-ccc/ccc";
 
 export class SignerOpenLink extends ccc.Signer {
+  get signType(): ccc.SignerSignType {
+    return ccc.SignerSignType.Unknown;
+  }
+
   constructor(
     client: ccc.Client,
     private readonly link: string,

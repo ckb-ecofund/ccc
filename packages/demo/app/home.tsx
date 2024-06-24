@@ -39,6 +39,7 @@ function Sign() {
   const signer = ccc.useSigner();
   const [messageToSign, setMessageToSign] = useState<string>("");
   const [signature, setSignature] = useState<string>("");
+  const [isValid, setIsValid] = useState<boolean | undefined>(undefined);
 
   return (
     <>
@@ -48,27 +49,47 @@ function Sign() {
           <p className="mb-1 w-full whitespace-normal text-balance break-all text-center">
             {signature}
           </p>
+          {isValid !== undefined ? (
+            <p className="mb-1">{isValid ? "Valid" : "Invalid"}</p>
+          ) : null}
         </>
       ) : null}
-      <div className="mb-1 flex items-center">
+      <div className="mb-1 flex flex-col items-center">
         <input
-          className="rounded-full border border-black px-4 py-2"
+          className="mb-1 rounded-full border border-black px-2 py-2"
           type="text"
           value={messageToSign}
           onInput={(e) => setMessageToSign(e.currentTarget.value)}
           placeholder="Enter message to sign"
         />
-        <Button
-          className="ml-2"
-          onClick={async () => {
-            if (!signer) {
-              return;
-            }
-            setSignature(await signer.signMessage(messageToSign));
-          }}
-        >
-          Sign
-        </Button>
+        <div className="flex">
+          <Button
+            onClick={async () => {
+              if (!signer) {
+                return;
+              }
+              setSignature(
+                JSON.stringify(await signer.signMessage(messageToSign)),
+              );
+              setIsValid(undefined);
+            }}
+          >
+            Sign
+          </Button>
+          <Button
+            className="ml-2"
+            onClick={async () => {
+              setIsValid(
+                await ccc.Signer.verifyMessage(
+                  messageToSign,
+                  JSON.parse(signature),
+                ),
+              );
+            }}
+          >
+            Verify
+          </Button>
+        </div>
       </div>
     </>
   );

@@ -76,7 +76,7 @@ export class EvmSigner extends ccc.SignerEvm {
     return this.connection !== undefined;
   }
 
-  async signMessage(message: string | ccc.BytesLike): Promise<ccc.Hex> {
+  async signMessageRaw(message: string | ccc.BytesLike): Promise<ccc.Hex> {
     const { address } = this.assertConnection();
 
     const challenge =
