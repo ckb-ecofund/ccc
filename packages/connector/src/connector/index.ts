@@ -16,12 +16,15 @@ import {
 } from "../scenes";
 import { SignerOpenLink } from "../signerOpenLink";
 import { WalletWithSigners } from "../types";
+import { generateConnectedScene } from "../scenes/connected";
+import { generateSwitchingScene } from "../scenes/switching";
 
 enum Scene {
   SelectingWallets = "SelectingWallets",
   SelectingSigners = "SelectingSigners",
   Connecting = "Connecting",
   Connected = "Connected",
+  Switching = "Switching"
 }
 
 @customElement("ccc-connector")
@@ -68,10 +71,29 @@ export class WebComponentConnector extends LitElement {
   public wallet?: ccc.Wallet;
   @state()
   public signer?: ccc.SignerInfo;
+
+  @state()
+  public recommendAddress?: string;
+  @state()
+  public internalAddress?: string;
+  @state()
+  private balance?: string;
+
+  private async updateSignerInfo() {
+    if (this.signer) {
+      this.recommendAddress = await this.signer.signer.getRecommendedAddress();
+      this.balance = ccc.fixedPointToString((await this.signer.signer.getBalance()));
+      this.internalAddress = await this.signer.signer.getInternalAddress();
+      this.requestUpdate(); 
+    }
+  }
+
+
   private prepareSigner() {
     (async () => {
       if (this.signer && (await this.signer.signer.isConnected())) {
         this.scene = Scene.Connected;
+        await this.updateSignerInfo();
         return;
       }
 
@@ -287,6 +309,25 @@ export class WebComponentConnector extends LitElement {
 
   render() {
     const [title, body] = (() => {
+      if(this.scene === Scene.Switching && this.recommendAddress) {
+        return generateSwitchingScene(
+          this.recommendAddress,
+          () => {}
+        )
+      }
+      if (this.scene === Scene.Connected && this.wallet && this.signer) {
+        return generateConnectedScene(
+          this.wallet,
+          this.signer,
+          this.recommendAddress,
+          this.internalAddress,
+          this.balance,
+          this.disconnect.bind(this),
+          () => {
+            this.scene = Scene.Switching;
+          }
+        )
+      }
       if (this.scene === Scene.SelectingWallets || !this.selectedWallet) {
         return generateWalletsScene(
           this.wallets,
@@ -302,9 +343,6 @@ export class WebComponentConnector extends LitElement {
           this.selectedWallet,
           this.signerSelectedHandler,
         );
-      }
-      if (this.scene === Scene.Connected || this.wallet) {
-
       }
       return generateConnectingScene(
         this.selectedWallet,
@@ -387,7 +425,10 @@ export class WebComponentConnector extends LitElement {
       this.scene = Scene.SelectingWallets;
       this.selectedSigner = undefined;
       this.selectedWallet = undefined;
+    } else if ([Scene.Switching].includes(this.scene)) {
+      this.scene = Scene.Connected;
     }
+
     this.isOpen = false;
   };
 
@@ -406,6 +447,8 @@ export class WebComponentConnector extends LitElement {
       this.scene = Scene.Connected;
       this.walletName = wallet.name;
       this.signerName = signer.name;
+      this.recommendAddress = await signer.signer.getRecommendedAddress();
+      this.balance = (await signer.signer.getBalance()).toString();
       this.saveConnection();
       this.closedHandler();
     })();
@@ -430,6 +473,10 @@ export class WebComponentConnector extends LitElement {
       outline: inherit;
     }
 
+    .block {
+      display: block;
+    }
+
     .text-bold {
       font-weight: bold;
     }
@@ -438,8 +485,21 @@ export class WebComponentConnector extends LitElement {
       color: var(--tip-color);
     }
 
+    .font-black {
+      color: #000
+    }
+
+    .fs-semi-big {
+      font-size: 1.5rem;
+    }
     .fs-big {
       font-size: 1.2rem;
+    }
+    .fs-mid {
+      font-size: 1rem;
+    }
+    .fs-sm {
+      font-size: 0.8rem
     }
 
     .mb-1 {
@@ -550,6 +610,129 @@ export class WebComponentConnector extends LitElement {
       width: 5rem;
       height: 5rem;
       border-radius: 1rem;
+    }
+
+    .connected-icon-container {
+      position: relative;
+    }
+
+    .connected-type-icon {
+      position: absolute;
+      width: 1.5rem;
+      height: 1.5rem;
+      right:0;
+      bottom:0;
+    }
+
+    .font-montserrat {
+      font-family: Montserrat
+    }
+
+    .font-gray {
+      color: #999999
+    }
+
+    .text-center {
+      text-align: center
+    }
+
+    .hover {
+      cursor: pointer;
+    }
+    
+    .flex {
+      display: flex;
+    }
+    .justify-center {
+      justify-content: space-between;
+    }
+    .align-center {
+      align-items: center;
+    }
+
+    .switch-btn-container {
+      display: flex;
+      width: 100%;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem; 
+    }
+
+    .switch-line {
+      flex: 1;
+      height: 0.0625rem;
+      background-color: #ddd;
+    }
+
+    .switch-content {
+      display: flex;
+      align-items: center;
+      margin: 0 1.25rem;
+    }
+
+    .switch-content img {
+      margin-right: 0.625rem; 
+    }
+
+    .switch-content span {
+      color: #333;
+      margin-right: 0.625rem; 
+    }
+
+    .switch-content .arrows {
+      display: flex;
+      align-items: center;
+    }
+
+    .switch-content .arrows img {
+      margin-left: 0.3125rem; 
+    }
+    
+    .switching-btn-primary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: background 0.3s;
+    }
+    
+    .switching-btn-primary img {
+      width: 2rem;
+      height: 2rem;
+      margin-right: 1rem;
+    }
+    
+    .switching-btn-primary span {
+      flex: 1;
+      text-align: left;
+    }
+    
+    .switching-connected {
+      font-size: 0.875rem;
+      color: #000;
+      margin-right: 1rem;
+    }
+    
+    .switching-status-dot {
+      width: 0.5rem;
+      height: 0.5rem;
+      background: #0f0;
+      border-radius: 50%;
+    }
+    
+    .switching-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 1rem 0;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #fff;
+    }
+    
+    .switching-close-button {
+      cursor: pointer;
+      width: 1rem;
+      height: 1rem;
     }
   `;
 }
