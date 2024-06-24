@@ -2,7 +2,7 @@
 "use client";
 
 import { ccc } from "@ckb-ccc/connector-react";
-import React, { useEffect, useState } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import { common } from "@ckb-lumos/common-scripts";
 import { TransactionSkeleton } from "@ckb-lumos/helpers";
 import { Indexer } from "@ckb-lumos/ckb-indexer";
@@ -204,7 +204,7 @@ export default function Home() {
   const [balance, setBalance] = useState(ccc.Zero);
   const [isTestnet] = useState(true);
   const [tab, setTab] = useState("Sign");
-  const tabs = [
+  const tabs: [string, ReactNode][] = [
     ["Sign", <Sign key="Sign" />],
     ["Transfer", <Transfer key="Transfer" />],
   ];
@@ -245,7 +245,7 @@ export default function Home() {
           <div className="mb-2 mt-2 flex">
             {tabs.map(([name]) => (
               <button
-                key="name"
+                key={name}
                 className={`flex items-center border-b border-black px-5 py-2 text-lg ${tab === name ? "border-b-4" : ""}`}
                 onClick={() => setTab(name)}
               >

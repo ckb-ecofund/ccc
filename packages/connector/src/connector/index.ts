@@ -144,18 +144,22 @@ export class WebComponentConnector extends LitElement {
     }
     if (
       changedProperties.has("walletName") ||
-      changedProperties.has("wallets")
-    ) {
-      this.wallet = this.wallets.find(({ name }) => name === this.walletName);
-    }
-    if (
+      changedProperties.has("wallets") ||
       changedProperties.has("signerName") ||
       changedProperties.has("wallet")
     ) {
-      const wallet = this.wallets.find(({ name }) => name === this.walletName);
-      this.signer = wallet?.signers.find(
-        ({ name }) => name === this.signerName,
-      );
+      (async () => {
+        const wallet = this.wallets.find(
+          ({ name }) => name === this.walletName,
+        );
+        const signer = wallet?.signers.find(
+          ({ name }) => name === this.signerName,
+        );
+        if (signer && (await signer.signer.isConnected())) {
+          this.wallet = wallet;
+          this.signer = signer;
+        }
+      })();
     }
     if (changedProperties.has("signer")) {
       this.prepareSigner();
