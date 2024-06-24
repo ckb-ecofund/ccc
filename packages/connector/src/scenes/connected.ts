@@ -1,11 +1,11 @@
 import { ccc } from "@ckb-ccc/ccc";
 import { html } from "lit";
 import { CKB_SM_SVG } from "../assets/chains/ckb.sm.svg";
-import { COPY_SM_SVG } from "../assets/copy.sm.svg";
 import { COPY_SVG } from "../assets/copy.svg";
 import { DISCONNECT_SVG } from "../assets/diconnect.svg";
 import { SWAP_SVG } from "../assets/swap.svg";
 import { signerTypeToIcon } from "./signers";
+import { CKB_SVG } from "../assets/chains";
 
 export function formatString(
   str: string | undefined,
@@ -35,7 +35,7 @@ export function generateConnectedScene(
     html`
       <div class="connected-icon-container">
         <img
-          class="connecting-wallet-icon mb-1"
+          class="connecting-wallet-icon"
           src=${wallet.icon}
           alt=${wallet.name}
         />
@@ -48,16 +48,16 @@ export function generateConnectedScene(
       </div>
       
       <div class="mb-2 mt-2 text-center">
-        <div class="flex">
-          <span class="block text-bold fs-semi-big font-black">${formatString(internalAddress)}</span>
-          <img class="hover" src=${COPY_SVG} alt="copy" @click=${async () => {
+        <div class="flex align-center">
+          <span class="block text-bold text-xl font-black">${formatString(internalAddress)}</span>
+          <img class="cursor-pointer copy-btn" src=${COPY_SVG} alt="copy" @click=${async () => {
             internalAddress && (await copyAddress(internalAddress));
           }}/>
         </div>
         <span class="block text-bold fs-md font-black">${balance} CKB</span>
-        <div class="flex justify-center">
+        <div class="flex justify-center align-center">
           <span class="block text-bold font-gray fs-md font-black">${formatString(recommendedAddress)}</span>
-          <img class="hover" src=${COPY_SM_SVG} alt="copy" @click=${async () => {
+          <img class="cursor-pointer copy-btn-sm" src=${COPY_SVG} alt="copy" @click=${async () => {
             recommendedAddress && (await copyAddress(recommendedAddress));
           }}/>
         </div>
@@ -75,12 +75,12 @@ export function generateConnectedScene(
         Disconnect
       </button>
 
-      <div class="switch-btn-container">
+      <div class="switch-btn-container align-center flex justify-center">
         <div class="switch-line"></div>
-        <div class="switch-content hover" @click=${handleSwitchClick}>
-          <img src=${CKB_SM_SVG} alt="Nervos Network">
-          <span class="fs-sm">Nervos Network</span>
-          <div class="arrows">
+        <div class="switch-content align-center cursor-pointer" @click=${handleSwitchClick}>
+          <img class="mr-2_3 sm-chain-logo" src=${CKB_SVG} alt="Nervos Network">
+          <span class="text-sm ml-2_3 mr-2_3">Nervos Network</span>
+          <div class="flex align-center ml-2_3">
             <img src=${SWAP_SVG} alt="Nervos Network">
           </div>
         </div>

@@ -73,9 +73,9 @@ export class WebComponentConnector extends LitElement {
   public signer?: ccc.SignerInfo;
 
   @state()
-  public recommendAddress?: string;
+  private recommendAddress?: string;
   @state()
-  public internalAddress?: string;
+  private internalAddress?: string;
   @state()
   private balance?: string;
 
@@ -350,7 +350,7 @@ export class WebComponentConnector extends LitElement {
     })();
 
     const canBack =
-      [Scene.SelectingSigners, Scene.Connecting].includes(this.scene) &&
+      [Scene.SelectingSigners, Scene.Connecting, Scene.Switching].includes(this.scene) &&
       this.scene !== Scene.Connected;
 
     return html`<style>
@@ -374,7 +374,7 @@ export class WebComponentConnector extends LitElement {
         }}
       >
         <div class="main" ${ref(this.mainRef)}>
-          <div class="header text-bold fs-big" ${ref(this.headerRef)}>
+          <div class="header text-bold text-lg" ${ref(this.headerRef)}>
             <img
               class="back ${canBack ? "active" : ""}"
               src=${LEFT_SVG}
@@ -387,6 +387,8 @@ export class WebComponentConnector extends LitElement {
                   }
                 } else if (this.scene === Scene.SelectingSigners) {
                   this.scene = Scene.SelectingWallets;
+                } else if (this.scene === Scene.Switching) {
+                  this.scene = Scene.Connected;
                 }
               }}
             />
@@ -487,17 +489,17 @@ export class WebComponentConnector extends LitElement {
       color: #000;
     }
 
-    .fs-semi-big {
-      font-size: 1.5rem;
+    .text-sm {
+      font-size: 0.8rem;
     }
-    .fs-big {
-      font-size: 1.2rem;
-    }
-    .fs-mid {
+    .text-md {
       font-size: 1rem;
     }
-    .fs-sm {
-      font-size: 0.8rem;
+    .text-lg {
+      font-size: 1.2rem;
+    }
+    .text-xl {
+      font-size: 1.5rem;
     }
 
     .mb-1 {
@@ -618,8 +620,8 @@ export class WebComponentConnector extends LitElement {
       position: absolute;
       width: 1.5rem;
       height: 1.5rem;
-      right: 0;
-      bottom: 0;
+      right: -0.5rem;
+      bottom: -0.5rem;
     }
 
     .font-gray {
@@ -630,7 +632,7 @@ export class WebComponentConnector extends LitElement {
       text-align: center;
     }
 
-    .hover {
+    .cursor-pointer {
       cursor: pointer;
     }
 
@@ -647,11 +649,15 @@ export class WebComponentConnector extends LitElement {
       align-items: center;
     }
 
+    .ml-2_3 {
+      margin-left: 0.625rem;
+    }
+    .mr-2_3 {
+      margin-right: 0.625rem;
+    }
+
     .switch-btn-container {
-      display: flex;
       width: 100%;
-      align-items: center;
-      justify-content: center;
       padding: 1rem;
     }
 
@@ -667,42 +673,6 @@ export class WebComponentConnector extends LitElement {
       margin: 0 1.25rem;
     }
 
-    .switch-content img {
-      margin-right: 0.625rem;
-    }
-
-    .switch-content span {
-      color: #333;
-      margin-right: 0.625rem;
-    }
-
-    .switch-content .arrows {
-      display: flex;
-      align-items: center;
-    }
-
-    .switch-content .arrows img {
-      margin-left: 0.3125rem;
-    }
-
-    .switching-btn-primary {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      transition: background 0.3s;
-    }
-
-    .switching-btn-primary img {
-      width: 2rem;
-      height: 2rem;
-      margin-right: 1rem;
-    }
-
-    .switching-btn-primary span {
-      flex: 1;
-      text-align: left;
-    }
-
     .switching-connected {
       font-size: 0.875rem;
       color: #000;
@@ -716,20 +686,24 @@ export class WebComponentConnector extends LitElement {
       border-radius: 50%;
     }
 
-    .switching-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1rem 1rem 0;
-      font-size: 1.5rem;
-      font-weight: bold;
-      color: #fff;
-    }
-
     .switching-close-button {
       cursor: pointer;
       width: 1rem;
       height: 1rem;
+    }
+
+    .copy-btn {
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+
+    .copy-btn-sm {
+      width: 1rem;
+      height: 1rem;
+    }
+
+    .sm-chain-logo {
+      width: 1.125rem
     }
   `;
 }
