@@ -234,13 +234,11 @@ export default function Home() {
           </p>
           <p className="mb-1 text-balance break-all text-center">{address}</p>
           <p className="mb-1">{ccc.fixedPointToString(balance)} CKB</p>
-          <Button onClick={open}>Connect Wallet</Button>
           <Sign />
           <Transfer />
           <Button className="mt-4" onClick={disconnect}>
             Disconnect
           </Button>
-
         </>
       ) : (
         <Button onClick={open}>Connect Wallet</Button>

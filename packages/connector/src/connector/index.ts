@@ -14,17 +14,17 @@ import {
   generateSignersScene,
   generateWalletsScene,
 } from "../scenes";
-import { SignerOpenLink } from "../signerOpenLink";
-import { WalletWithSigners } from "../types";
 import { generateConnectedScene } from "../scenes/connected";
 import { generateSwitchingScene } from "../scenes/switching";
+import { SignerOpenLink } from "../signerOpenLink";
+import { WalletWithSigners } from "../types";
 
 enum Scene {
   SelectingWallets = "SelectingWallets",
   SelectingSigners = "SelectingSigners",
   Connecting = "Connecting",
   Connected = "Connected",
-  Switching = "Switching"
+  Switching = "Switching",
 }
 
 @customElement("ccc-connector")
@@ -82,12 +82,13 @@ export class WebComponentConnector extends LitElement {
   private async updateSignerInfo() {
     if (this.signer) {
       this.recommendAddress = await this.signer.signer.getRecommendedAddress();
-      this.balance = ccc.fixedPointToString((await this.signer.signer.getBalance()));
+      this.balance = ccc.fixedPointToString(
+        await this.signer.signer.getBalance(),
+      );
       this.internalAddress = await this.signer.signer.getInternalAddress();
-      this.requestUpdate(); 
+      this.requestUpdate();
     }
   }
-
 
   private prepareSigner() {
     (async () => {
@@ -309,11 +310,8 @@ export class WebComponentConnector extends LitElement {
 
   render() {
     const [title, body] = (() => {
-      if(this.scene === Scene.Switching && this.recommendAddress) {
-        return generateSwitchingScene(
-          this.recommendAddress,
-          () => {}
-        )
+      if (this.scene === Scene.Switching && this.recommendAddress) {
+        return generateSwitchingScene(this.recommendAddress, () => {});
       }
       if (this.scene === Scene.Connected && this.wallet && this.signer) {
         return generateConnectedScene(
@@ -325,8 +323,8 @@ export class WebComponentConnector extends LitElement {
           this.disconnect.bind(this),
           () => {
             this.scene = Scene.Switching;
-          }
-        )
+          },
+        );
       }
       if (this.scene === Scene.SelectingWallets || !this.selectedWallet) {
         return generateWalletsScene(
@@ -351,9 +349,9 @@ export class WebComponentConnector extends LitElement {
       );
     })();
 
-    const canBack = [Scene.SelectingSigners, Scene.Connecting].includes(
-      this.scene,
-    ) && this.scene !== Scene.Connected;
+    const canBack =
+      [Scene.SelectingSigners, Scene.Connecting].includes(this.scene) &&
+      this.scene !== Scene.Connected;
 
     return html`<style>
         :host {
@@ -486,7 +484,7 @@ export class WebComponentConnector extends LitElement {
     }
 
     .font-black {
-      color: #000
+      color: #000;
     }
 
     .fs-semi-big {
@@ -499,7 +497,7 @@ export class WebComponentConnector extends LitElement {
       font-size: 1rem;
     }
     .fs-sm {
-      font-size: 0.8rem
+      font-size: 0.8rem;
     }
 
     .mb-1 {
@@ -620,30 +618,33 @@ export class WebComponentConnector extends LitElement {
       position: absolute;
       width: 1.5rem;
       height: 1.5rem;
-      right:0;
-      bottom:0;
+      right: 0;
+      bottom: 0;
     }
 
     .font-montserrat {
-      font-family: Montserrat
+      font-family: Montserrat;
     }
 
     .font-gray {
-      color: #999999
+      color: #999999;
     }
 
     .text-center {
-      text-align: center
+      text-align: center;
     }
 
     .hover {
       cursor: pointer;
     }
-    
+
     .flex {
       display: flex;
     }
     .justify-center {
+      justify-content: center;
+    }
+    .justify-between {
       justify-content: space-between;
     }
     .align-center {
@@ -655,7 +656,7 @@ export class WebComponentConnector extends LitElement {
       width: 100%;
       align-items: center;
       justify-content: center;
-      padding: 1rem; 
+      padding: 1rem;
     }
 
     .switch-line {
@@ -671,12 +672,12 @@ export class WebComponentConnector extends LitElement {
     }
 
     .switch-content img {
-      margin-right: 0.625rem; 
+      margin-right: 0.625rem;
     }
 
     .switch-content span {
       color: #333;
-      margin-right: 0.625rem; 
+      margin-right: 0.625rem;
     }
 
     .switch-content .arrows {
@@ -685,40 +686,40 @@ export class WebComponentConnector extends LitElement {
     }
 
     .switch-content .arrows img {
-      margin-left: 0.3125rem; 
+      margin-left: 0.3125rem;
     }
-    
+
     .switching-btn-primary {
       display: flex;
       align-items: center;
       justify-content: space-between;
       transition: background 0.3s;
     }
-    
+
     .switching-btn-primary img {
       width: 2rem;
       height: 2rem;
       margin-right: 1rem;
     }
-    
+
     .switching-btn-primary span {
       flex: 1;
       text-align: left;
     }
-    
+
     .switching-connected {
       font-size: 0.875rem;
       color: #000;
       margin-right: 1rem;
     }
-    
+
     .switching-status-dot {
       width: 0.5rem;
       height: 0.5rem;
       background: #0f0;
       border-radius: 50%;
     }
-    
+
     .switching-header {
       display: flex;
       justify-content: space-between;
@@ -728,7 +729,7 @@ export class WebComponentConnector extends LitElement {
       font-weight: bold;
       color: #fff;
     }
-    
+
     .switching-close-button {
       cursor: pointer;
       width: 1rem;

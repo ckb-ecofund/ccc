@@ -1,12 +1,16 @@
 import { ccc } from "@ckb-ccc/ccc";
 import { html } from "lit";
-import { signerTypeToIcon } from "./signers";
-import { DISCONNECT_SVG } from "../assets/diconnect.svg";
 import { CKB_SM_SVG } from "../assets/chains/ckb.sm.svg";
+import { COPY_SM_SVG } from "../assets/copy.sm.svg";
+import { COPY_SVG } from "../assets/copy.svg";
+import { DISCONNECT_SVG } from "../assets/diconnect.svg";
 import { SWAP_SVG } from "../assets/swap.svg";
+import { signerTypeToIcon } from "./signers";
 
-export function formatString(str: string | undefined, maxLen: number = 15): string | undefined {
-  
+export function formatString(
+  str: string | undefined,
+  maxLen: number = 15,
+): string | undefined {
   if (str && str.length > maxLen) {
     return `${str.slice(0, 8)}......${str.slice(-4)}`;
   }
@@ -17,11 +21,14 @@ export function generateConnectedScene(
   wallet: ccc.Wallet,
   signer: ccc.SignerInfo,
   recommendedAddress: string | undefined,
-  internalAddress: string |undefined,
+  internalAddress: string | undefined,
   balance: string | undefined,
   disconnect: () => void,
-  handleSwitchClick: () => void
+  handleSwitchClick: () => void,
 ) {
+  async function copyAddress(address: string) {
+    await window.navigator.clipboard.writeText(address);
+  }
 
   return [
     wallet.name,
@@ -41,9 +48,20 @@ export function generateConnectedScene(
       </div>
       
       <div class="mb-2 mt-2 text-center">
-        <span class="block text-bold fs-semi-big font-montserrat font-black"> ${formatString(internalAddress)}</span>
+        <div class="flex">
+          <span class="block text-bold fs-semi-big font-montserrat font-black"> ${formatString(internalAddress)}</span>
+          <img class="hover" src=${COPY_SVG} alt="copy" @click=${async () => {
+            internalAddress && (await copyAddress(internalAddress));
+          }}/>
+        </div>
         <span class="block text-bold fs-md font-montserrat font-black">${balance} CKB</span>
-        <span class="block text-bold font-gray fs-md font-montserrat font-black">CKB ${formatString(recommendedAddress)}</span>
+        <div class="flex justify-center">
+          <span class="block text-bold font-gray fs-md font-montserrat font-black">CKB ${formatString(recommendedAddress)}</span>
+          <img class="hover" src=${COPY_SM_SVG} alt="copy" @click=${async () => {
+            recommendedAddress && (await copyAddress(recommendedAddress));
+          }}/>
+        </div>
+        
       </div>
 
       <button
