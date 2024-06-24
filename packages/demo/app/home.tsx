@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { ccc } from "@ckb-ccc/connector-react";
@@ -56,11 +57,11 @@ function Sign() {
       ) : null}
       <div className="mb-1 flex flex-col items-center">
         <input
-          className="mb-1 rounded-full border border-black px-2 py-2"
+          className="mb-1 rounded-full border border-black px-4 py-2"
           type="text"
           value={messageToSign}
           onInput={(e) => setMessageToSign(e.currentTarget.value)}
-          placeholder="Enter message to sign"
+          placeholder="Message to sign and verify"
         />
         <div className="flex">
           <Button
@@ -111,31 +112,31 @@ function Transfer() {
       ) : (
         <></>
       )}
-      <div className="mb-1 flex items-center">
+      <div className="mb-1 flex flex-col items-center">
         <div className="flex flex-col">
           <input
             className="rounded-full border border-black px-4 py-2"
             type="text"
             value={transferTo}
             onInput={(e) => setTransferTo(e.currentTarget.value)}
-            placeholder="Enter address to transfer to"
+            placeholder="Address to transfer to"
           />
           <input
             className="mt-1 rounded-full border border-black px-4 py-2"
             type="text"
             value={amount}
             onInput={(e) => setAmount(e.currentTarget.value)}
-            placeholder="Enter amount to transfer"
+            placeholder="Amount to transfer"
           />
           <textarea
             className="mt-1 rounded-3xl border border-black px-4 py-2"
             value={data}
             onInput={(e) => setData(e.currentTarget.value)}
-            placeholder="Enter data in the cell. Hex string will be parsed."
+            placeholder="Data in the cell. Hex string will be parsed."
           />
         </div>
         <Button
-          className="ml-2"
+          className="mt-1"
           onClick={async () => {
             if (!signer) {
               return;
@@ -146,7 +147,7 @@ function Transfer() {
             const fromAddresses = await signer.getAddresses();
             // === Composing transaction with Lumos ===
             registerCustomLockScriptInfos(generateDefaultScriptInfos());
-            const indexer = new Indexer(signer.client.getUrl());
+            const indexer = new Indexer(signer.client.url);
             let txSkeleton = new TransactionSkeleton({
               cellProvider: indexer,
             });
@@ -195,13 +196,18 @@ function Transfer() {
 }
 
 export default function Home() {
-  const { wallet, open, disconnect, setClient } = ccc.useCcc();
+  const { wallet, open, setClient } = ccc.useCcc();
   const signer = ccc.useSigner();
 
   const [internalAddress, setInternalAddress] = useState("");
   const [address, setAddress] = useState("");
   const [balance, setBalance] = useState(ccc.Zero);
-  const [isTestnet, setIsTestnet] = useState(true);
+  const [isTestnet] = useState(true);
+  const [tab, setTab] = useState("Sign");
+  const tabs = [
+    ["Sign", <Sign key="Sign" />],
+    ["Transfer", <Transfer key="Transfer" />],
+  ];
 
   useEffect(() => {
     if (!signer) {
@@ -228,29 +234,37 @@ export default function Home() {
       {wallet ? (
         <>
           <WalletIcon wallet={wallet} className="mb-1" />
-          <p className="mb-1">Connected to {wallet.name}</p>
-          <p className="mb-1 text-balance break-all text-center">
+          <p className="mt-1 text-balance break-all text-center">
             {internalAddress}
           </p>
-          <p className="mb-1 text-balance break-all text-center">{address}</p>
-          <p className="mb-1">{ccc.fixedPointToString(balance)} CKB</p>
-          <Sign />
-          <Transfer />
-          <Button className="mt-4" onClick={disconnect}>
-            Disconnect
+          <p className="mt-1 text-balance break-all text-center">{address}</p>
+          <p className="mt-1">{ccc.fixedPointToString(balance)} CKB</p>
+          <Button className="mt-2" onClick={open}>
+            {internalAddress.slice(0, 7)}...{internalAddress.slice(-5)}
           </Button>
+          <div className="mb-2 mt-2 flex">
+            {tabs.map(([name]) => (
+              <button
+                key="name"
+                className={`flex items-center border-b border-black px-5 py-2 text-lg ${tab === name ? "border-b-4" : ""}`}
+                onClick={() => setTab(name)}
+              >
+                {name}
+              </button>
+            ))}
+          </div>
+          {tabs.find(([name]) => name === tab)?.[1]}
         </>
       ) : (
-        <Button onClick={open}>Connect Wallet</Button>
+        <>
+          <img
+            src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/logo.svg"
+            alt="CCC Logo"
+            className="mb-8 h-32 w-32"
+          />
+          <Button onClick={open}>Connect Wallet</Button>
+        </>
       )}
-      <Button
-        className="mt-4"
-        onClick={() => {
-          setIsTestnet(!isTestnet);
-        }}
-      >
-        Switch to the {isTestnet ? "mainnet" : "testnet"}
-      </Button>
     </main>
   );
 }

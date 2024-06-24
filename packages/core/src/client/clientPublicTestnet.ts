@@ -8,7 +8,7 @@ export class ClientPublicTestnet extends ClientJsonRpc {
     super(url, timeout);
   }
 
-  async getAddressPrefix(): Promise<string> {
+  get addressPrefix(): string {
     return "ckt";
   }
 

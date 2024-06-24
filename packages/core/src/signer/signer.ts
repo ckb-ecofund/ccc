@@ -15,6 +15,15 @@ export enum SignerSignType {
   JoyId = "JoyId",
 }
 
+/**
+ * An enumeration of signer display types in wallet.
+ */
+export enum SignerType {
+  EVM = "EVM",
+  BTC = "BTC",
+  CKB = "CKB",
+}
+
 export class Signature {
   constructor(
     public signature: string,
@@ -30,6 +39,7 @@ export class Signature {
 export abstract class Signer {
   constructor(protected client_: Client) {}
 
+  abstract get type(): SignerType;
   abstract get signType(): SignerSignType;
 
   get client(): Client {
@@ -266,21 +276,11 @@ export abstract class Signer {
 }
 
 /**
- * An enumeration of signer display types in wallet.
- */
-export enum SignerType {
-  EVM = "EVM",
-  BTC = "BTC",
-  CKB = "CKB",
-}
-
-/**
  * A class representing information about a signer, including its type and the signer instance.
  */
 export class SignerInfo {
   constructor(
     public name: string,
-    public type: SignerType,
     public signer: Signer,
   ) {}
 }

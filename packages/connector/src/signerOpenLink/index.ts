@@ -8,12 +8,13 @@ export class SignerOpenLink extends ccc.Signer {
   constructor(
     client: ccc.Client,
     private readonly link: string,
+    public readonly type: ccc.SignerType,
   ) {
     super(client);
   }
 
   async replaceClient(client: ccc.Client): Promise<SignerOpenLink> {
-    return new SignerOpenLink(client, this.link);
+    return new SignerOpenLink(client, this.link, this.type);
   }
 
   async isConnected(): Promise<boolean> {

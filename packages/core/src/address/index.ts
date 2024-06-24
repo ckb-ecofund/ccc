@@ -66,7 +66,7 @@ export class Address {
     if (!client) {
       throw new Error(`Unknown address prefix ${prefix}`);
     }
-    const expectedPrefix = await client.getAddressPrefix();
+    const expectedPrefix = client.addressPrefix;
     if (expectedPrefix !== prefix) {
       throw new Error(
         `Unknown address prefix ${prefix}, expected ${expectedPrefix}`,
@@ -86,11 +86,8 @@ export class Address {
    * @returns A promise that resolves to an Address instance.
    */
 
-  static async fromScript(
-    script: ScriptLike,
-    client: Client,
-  ): Promise<Address> {
-    return Address.from({ script, prefix: await client.getAddressPrefix() });
+  static fromScript(script: ScriptLike, client: Client): Address {
+    return Address.from({ script, prefix: client.addressPrefix });
   }
 
   static async fromKnownScript(
@@ -103,7 +100,7 @@ export class Address {
         ...(await client.getKnownScript(script)),
         args,
       },
-      prefix: await client.getAddressPrefix(),
+      prefix: client.addressPrefix,
     });
   }
 
