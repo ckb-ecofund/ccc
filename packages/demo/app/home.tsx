@@ -277,7 +277,7 @@ export default function Home() {
         </>
       )}
       <Link
-        className="mt-2 h-6 w-6"
+        className="mt-10 h-6 w-6"
         href="https://github.com/ckb-ecofund/ccc"
         target="_blank"
       >
