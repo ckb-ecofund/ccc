@@ -26,3 +26,7 @@ export function apply<T, R>(
 
   return transformer(value);
 }
+
+export function isWebview(userAgent: string): boolean {
+  return /webview|wv|ip((?!.*Safari)|(?=.*like Safari))/i.test(userAgent);
+}

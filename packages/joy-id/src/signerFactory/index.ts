@@ -9,7 +9,7 @@ export function getJoyIdSigners(
   name: string,
   icon: string,
 ): ccc.SignerInfo[] {
-  if (isStandaloneBrowser()) {
+  if (isStandaloneBrowser() || ccc.isWebview(window.navigator.userAgent)) {
     return [];
   }
 
