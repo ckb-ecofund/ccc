@@ -56,14 +56,20 @@ export async function createPopup<T extends DappRequestType>(
     }
     let popupEventListener: (e: MessageEvent) => void;
     let timeoutId: undefined | ReturnType<typeof setTimeout>;
+    let isClosed = false;
     // Check each second if the popup is closed triggering a PopupCancelledError
     const popupTimer = setInterval(() => {
-      if (config.popup?.closed) {
-        clearInterval(popupTimer);
-        clearTimeout(timeoutId);
-        window.removeEventListener("message", popupEventListener, false);
-        reject(new PopupCancelledError(config.popup));
+      if (!config.popup?.closed) {
+        return;
       }
+      clearTimeout(timeoutId);
+      if (!isClosed) {
+        isClosed = true;
+        return;
+      }
+      clearInterval(popupTimer);
+      window.removeEventListener("message", popupEventListener, false);
+      reject(new PopupCancelledError(config.popup));
     }, 1000);
 
     timeoutId = setTimeout(
