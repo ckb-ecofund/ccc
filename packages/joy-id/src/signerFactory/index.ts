@@ -1,4 +1,5 @@
 import { ccc } from "@ckb-ccc/core";
+import { isStandaloneBrowser } from "@joyid/common";
 import { BitcoinSigner } from "../btc";
 import { CkbSigner } from "../ckb";
 import { EvmSigner } from "../evm";
@@ -8,6 +9,10 @@ export function getJoyIdSigners(
   name: string,
   icon: string,
 ): ccc.SignerInfo[] {
+  if (isStandaloneBrowser()) {
+    return [];
+  }
+
   return [
     {
       name: "CKB",
