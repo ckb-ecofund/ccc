@@ -1,12 +1,12 @@
-import { Address } from "../address";
-import { BytesLike } from "../bytes";
-import { Transaction, TransactionLike } from "../ckb";
-import { Client } from "../client";
-import { Hex } from "../hex";
-import { Num } from "../num";
-import { verifyMessageBtcEcdsa } from "./btc";
-import { verifyMessageJoyId } from "./ckb/verifyJoyId";
-import { verifyMessageEvmPersonal } from "./evm/verify";
+import { Address } from "../../address";
+import { BytesLike } from "../../bytes";
+import { Transaction, TransactionLike } from "../../ckb";
+import { Client } from "../../client";
+import { Hex } from "../../hex";
+import { Num } from "../../num";
+import { verifyMessageBtcEcdsa } from "../btc";
+import { verifyMessageJoyId } from "../ckb/verifyJoyId";
+import { verifyMessageEvmPersonal } from "../evm/verify";
 
 export enum SignerSignType {
   Unknown = "Unknown",

@@ -6,6 +6,7 @@ import { WalletWithSigners } from "../types";
 export function generateConnectingScene(
   wallet: WalletWithSigners,
   signer: ccc.SignerInfo,
+  error: string | undefined,
   onSignerSelected: (
     wallet: WalletWithSigners,
     signer: ccc.SignerInfo,
@@ -19,8 +20,14 @@ export function generateConnectingScene(
         src=${wallet.icon}
         alt=${wallet.name}
       />
-      <span class="text-bold">Opening ${wallet.name}...</span>
-      <span class="text-tip">Confirm connection in the wallet</span>
+      <span class="text-bold"
+        >${error
+          ? `Failed to open ${wallet.name}`
+          : `Opening ${wallet.name}...`}</span
+      >
+      <span class="text-tip text-center"
+        >${error ?? "Confirm connection in the wallet"}</span
+      >
       <button
         class="btn-secondary mt-2 mb-2"
         @click=${() => onSignerSelected(wallet, signer)}

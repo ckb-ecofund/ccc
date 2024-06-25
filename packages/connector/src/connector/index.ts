@@ -16,7 +16,6 @@ import {
 } from "../scenes";
 import { generateConnectedScene } from "../scenes/connected";
 import { generateNetworksScene } from "../scenes/networks";
-import { SignerOpenLink } from "../signerOpenLink";
 import { WalletWithSigners } from "../types";
 
 enum Scene {
@@ -62,6 +61,8 @@ export class WebComponentConnector extends LitElement {
   private selectedWallet?: WalletWithSigners;
   @state()
   private selectedSigner?: ccc.SignerInfo;
+  @state()
+  private connectingError?: string;
 
   @state()
   private walletName?: string;
@@ -229,10 +230,10 @@ export class WebComponentConnector extends LitElement {
       "MetaMask",
       "EVM",
       METAMASK_SVG,
-      new SignerOpenLink(
+      new ccc.SignerOpenLink(
         this.client,
-        `https://metamask.app.link/dapp/${window.location.href}`,
         ccc.SignerType.EVM,
+        `https://metamask.app.link/dapp/${window.location.href}`,
       ),
     );
     [ccc.SignerType.EVM, ccc.SignerType.BTC].forEach((type) => {
@@ -240,14 +241,14 @@ export class WebComponentConnector extends LitElement {
         "OKX Wallet",
         type,
         OKX_SVG,
-        new SignerOpenLink(
+        new ccc.SignerOpenLink(
           this.client,
+          type,
           "https://www.okx.com/download?deeplink=" +
             encodeURIComponent(
               "okx://wallet/dapp/url?dappUrl=" +
                 encodeURIComponent(window.location.href),
             ),
-          type,
         ),
       );
     });
@@ -255,10 +256,10 @@ export class WebComponentConnector extends LitElement {
       "UniSat",
       ccc.SignerType.BTC,
       UNI_SAT_SVG,
-      new SignerOpenLink(
+      new ccc.SignerOpenLink(
         this.client,
-        "https://unisat.io/download",
         ccc.SignerType.BTC,
+        "https://unisat.io/download",
       ),
     );
     // ===
@@ -286,7 +287,7 @@ export class WebComponentConnector extends LitElement {
       updated = true;
       const allSigners = [...wallet.signers, signerInfo];
       const signers = allSigners.filter(
-        ({ signer }) => !(signer instanceof SignerOpenLink),
+        ({ signer }) => !(signer instanceof ccc.SignerDummy),
       );
       return {
         ...wallet,
@@ -349,6 +350,7 @@ export class WebComponentConnector extends LitElement {
       return generateConnectingScene(
         this.selectedWallet,
         this.selectedSigner,
+        this.connectingError,
         this.signerSelectedHandler,
       );
     })();
@@ -449,11 +451,26 @@ export class WebComponentConnector extends LitElement {
     signerInfo: ccc.SignerInfo,
   ) => {
     this.scene = Scene.Connecting;
+    this.connectingError = undefined;
     this.selectedWallet = wallet;
     this.selectedSigner = signerInfo;
     (async () => {
       const { signer } = signerInfo;
-      await signer.connect();
+      try {
+        await signer.connect();
+      } catch (error) {
+        if (typeof error === "object") {
+          const message = (error as { message: unknown })?.message;
+          if (typeof message === "string") {
+            this.connectingError = message;
+          } else {
+            this.connectingError = JSON.stringify(message);
+          }
+          return;
+        }
+
+        this.connectingError = JSON.stringify(error);
+      }
       if (!(await signer.isConnected())) {
         return;
       }

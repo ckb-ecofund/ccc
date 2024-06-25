@@ -10,7 +10,16 @@ export function getJoyIdSigners(
   icon: string,
 ): ccc.SignerInfo[] {
   if (isStandaloneBrowser() || ccc.isWebview(window.navigator.userAgent)) {
-    return [];
+    return [ccc.SignerType.CKB, ccc.SignerType.EVM, ccc.SignerType.BTC].map(
+      (type) => ({
+        name: type,
+        signer: new ccc.SignerAlwaysError(
+          client,
+          type,
+          "JoyID can only be used with standard browsers",
+        ),
+      }),
+    );
   }
 
   return [
