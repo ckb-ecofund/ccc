@@ -145,6 +145,7 @@ export class WebComponentConnector extends LitElement {
       this.reloadSigners();
     }
     if (
+      (changedProperties.has("scene") && this.scene === Scene.Connected) ||
       changedProperties.has("wallets") ||
       changedProperties.has("walletName") ||
       changedProperties.has("signerName")
