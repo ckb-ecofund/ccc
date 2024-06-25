@@ -207,6 +207,17 @@ function Transfer() {
 }
 
 export default function Home() {
+  const [error, setError] = useState<string | undefined>(undefined);
+  useEffect(() => {
+    const handler = (event: PromiseRejectionEvent) => {
+      const { name, message, stack, cause } = event.reason as Error;
+      setError(JSON.stringify({ name, message, stack, cause }));
+    };
+
+    window.addEventListener("unhandledrejection", handler);
+    return () => window.removeEventListener("unhandledrejection", handler);
+  }, []);
+
   const { wallet, open, setClient } = ccc.useCcc();
   const signer = ccc.useSigner();
 
@@ -276,6 +287,11 @@ export default function Home() {
           <Button onClick={open}>Connect Wallet</Button>
         </>
       )}
+      {error !== undefined ? (
+        <p className="mt-4 text-balance break-all text-center font-bold text-red-400">
+          {error}
+        </p>
+      ) : null}
       <Link
         className="mt-10 h-6 w-6"
         href="https://github.com/ckb-ecofund/ccc"
