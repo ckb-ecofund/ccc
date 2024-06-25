@@ -80,12 +80,13 @@ export class WebComponentConnector extends LitElement {
   private balance?: ccc.Num;
 
   private async updateSignerInfo() {
-    if (!this.signer) {
+    const signer = this.signer?.signer;
+    if (!signer) {
       return;
     }
-    this.recommendAddress = await this.signer.signer.getRecommendedAddress();
-    this.balance = await this.signer.signer.getBalance();
-    this.internalAddress = await this.signer.signer.getInternalAddress();
+    this.recommendAddress = await signer.getRecommendedAddress();
+    this.internalAddress = await signer.getInternalAddress();
+    this.balance = await signer.getBalance();
   }
 
   private async prepareSigner() {
@@ -144,10 +145,9 @@ export class WebComponentConnector extends LitElement {
       this.reloadSigners();
     }
     if (
-      changedProperties.has("walletName") ||
       changedProperties.has("wallets") ||
-      changedProperties.has("signerName") ||
-      changedProperties.has("wallet")
+      changedProperties.has("walletName") ||
+      changedProperties.has("signerName")
     ) {
       (async () => {
         const wallet = this.wallets.find(
@@ -445,24 +445,25 @@ export class WebComponentConnector extends LitElement {
 
   private signerSelectedHandler = (
     wallet: WalletWithSigners,
-    signer: ccc.SignerInfo,
+    signerInfo: ccc.SignerInfo,
   ) => {
     this.scene = Scene.Connecting;
     this.selectedWallet = wallet;
-    this.selectedSigner = signer;
+    this.selectedSigner = signerInfo;
     (async () => {
-      await signer.signer.connect();
-      if (!(await signer.signer.isConnected())) {
+      const { signer } = signerInfo;
+      await signer.connect();
+      if (!(await signer.isConnected())) {
         return;
       }
       this.scene = Scene.Connected;
       this.walletName = wallet.name;
-      this.signerName = signer.name;
+      this.signerName = signerInfo.name;
       this.saveConnection();
       this.closedHandler();
-      this.internalAddress = await signer.signer.getInternalAddress();
-      this.recommendAddress = await signer.signer.getRecommendedAddress();
-      this.balance = await signer.signer.getBalance();
+      this.internalAddress = await signer.getInternalAddress();
+      this.recommendAddress = await signer.getRecommendedAddress();
+      this.balance = await signer.getBalance();
     })();
   };
 
