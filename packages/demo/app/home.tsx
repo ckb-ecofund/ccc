@@ -9,6 +9,8 @@ import { Indexer } from "@ckb-lumos/ckb-indexer";
 import { predefined } from "@ckb-lumos/config-manager";
 import { registerCustomLockScriptInfos } from "@ckb-lumos/common-scripts/lib/common";
 import { generateDefaultScriptInfos } from "@ckb-ccc/lumos-patches";
+import Link from "next/link";
+import Image from "next/image";
 
 function WalletIcon({
   wallet,
@@ -165,7 +167,7 @@ function Transfer() {
               fromAddresses,
               BigInt(3600),
               undefined,
-              { config: predefined.AGGRON4 },
+              { config: signer.client instanceof ccc.ClientPublicMainnet ? predefined.LINA : predefined.AGGRON4 },
             );
             // ======
 
@@ -265,6 +267,9 @@ export default function Home() {
           <Button onClick={open}>Connect Wallet</Button>
         </>
       )}
+      <Link className="mt-2" href="https://github.com/ckb-ecofund/ccc" target="_blank">
+        <Image alt="github" src="/github.png" width={24} height={24} />
+      </Link>
     </main>
   );
 }
