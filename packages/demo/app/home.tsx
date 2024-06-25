@@ -10,7 +10,6 @@ import { predefined } from "@ckb-lumos/config-manager";
 import { registerCustomLockScriptInfos } from "@ckb-lumos/common-scripts/lib/common";
 import { generateDefaultScriptInfos } from "@ckb-ccc/lumos-patches";
 import Link from "next/link";
-import GithubIcon from "./assets/github.svg";
 
 function WalletIcon({
   wallet,
