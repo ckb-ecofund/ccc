@@ -33,13 +33,17 @@ export function Provider({
   client?: ccc.Client;
 }) {
   const [ref, setRef] = useState<WebComponentConnector | null>(null);
+  const [isOpen, setIsOpen] = useState(false);
   const [_, setFlag] = useState(0);
 
   const client = useMemo(
     () => ref?.client ?? new ccc.ClientPublicTestnet(),
     [ref?.client],
   );
-  const open = useCallback(() => ref?.setIsOpen(true), [ref, ref?.setIsOpen]);
+  const open = useCallback(() => {
+    setIsOpen(true);
+    ref?.requestUpdate();
+  }, [setIsOpen, ref, ref?.requestUpdate]);
   const disconnect = useMemo(
     () => ref?.disconnect.bind(ref) ?? (() => {}),
     [ref, ref?.disconnect],
@@ -67,11 +71,23 @@ export function Provider({
         signerFilter={signerFilter}
         ref={setRef}
         onWillUpdate={() => setFlag((f) => f + 1)}
+        onClosed={() => setIsOpen(false)}
         {...{
           ...connectorProps,
           style: {
             ...connectorProps?.style,
             zIndex: connectorProps?.style?.zIndex ?? 999,
+            ...(isOpen ? {} : { display: "none" }),
+            ...({
+              "--background": "#fff",
+              "--divider": "#eee",
+              "--btn-primary": "#f8f8f8",
+              "--btn-primary-hover": "#efeeee",
+              "--btn-secondary": "#ddd",
+              "--btn-secondary-hover": "#ccc",
+              color: "#1e1e1e",
+              "--tip-color": "#666",
+            } as React.CSSProperties),
           },
           ...(clientArg ? { client: clientArg } : {}),
         }}

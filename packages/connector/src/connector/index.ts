@@ -8,7 +8,7 @@ import { LEFT_SVG } from "../assets/left.svg";
 import { METAMASK_SVG } from "../assets/metamask.svg";
 import { OKX_SVG } from "../assets/okx.svg";
 import { UNI_SAT_SVG } from "../assets/uni-sat.svg";
-import { WillUpdateEvent } from "../events";
+import { ClosedEvent, WillUpdateEvent } from "../events";
 import {
   generateConnectingScene,
   generateSignersScene,
@@ -37,12 +37,6 @@ export class WebComponentConnector extends LitElement {
   ) => Promise<boolean>;
 
   private resetListeners: (() => void)[] = [];
-
-  @state()
-  public isOpen: boolean = false;
-  public setIsOpen(isOpen: boolean) {
-    this.isOpen = isOpen;
-  }
 
   @property()
   public name?: string;
@@ -361,61 +355,48 @@ export class WebComponentConnector extends LitElement {
       Scene.SwitchingNetworks,
     ].includes(this.scene);
 
-    return html`<style>
-        :host {
-          ${this.isOpen ? "" : "display: none;"}
-          --background: #fff;
-          --divider: #eee;
-          --btn-primary: #f8f8f8;
-          --btn-primary-hover: #efeeee;
-          --btn-secondary: #ddd;
-          --btn-secondary-hover: #ccc;
-          color: #1e1e1e;
-          --tip-color: #666;
+    return html` <div
+      class="background"
+      @click=${(event: Event) => {
+        if (event.target === event.currentTarget) {
+          this.closedHandler();
         }
-      </style>
-      <div
-        class="background"
-        @click=${(event: Event) => {
-          if (event.target === event.currentTarget) {
-            this.closedHandler();
-          }
-        }}
-      >
-        <div class="main" ${ref(this.mainRef)}>
-          <div
-            class="header text-bold fs-lg ${title == null
-              ? ""
-              : "header-divider"}"
-            ${ref(this.headerRef)}
-          >
-            <img
-              class="back ${canBack ? "active" : ""}"
-              src=${LEFT_SVG}
-              @click=${() => {
-                if (this.scene === Scene.Connecting) {
-                  if ((this.selectedWallet?.signers.length ?? 0) <= 1) {
-                    this.scene = Scene.SelectingWallets;
-                  } else {
-                    this.scene = Scene.SelectingSigners;
-                  }
-                } else if (this.scene === Scene.SelectingSigners) {
+      }}
+    >
+      <div class="main" ${ref(this.mainRef)}>
+        <div
+          class="header text-bold fs-lg ${title == null
+            ? ""
+            : "header-divider"}"
+          ${ref(this.headerRef)}
+        >
+          <img
+            class="back ${canBack ? "active" : ""}"
+            src=${LEFT_SVG}
+            @click=${() => {
+              if (this.scene === Scene.Connecting) {
+                if ((this.selectedWallet?.signers.length ?? 0) <= 1) {
                   this.scene = Scene.SelectingWallets;
-                } else if (this.scene === Scene.SwitchingNetworks) {
-                  this.scene = Scene.Connected;
+                } else {
+                  this.scene = Scene.SelectingSigners;
                 }
-              }}
-            />
-            ${title}
-            <img
-              class="close active"
-              src=${CLOSE_SVG}
-              @click=${this.closedHandler}
-            />
-          </div>
-          <div class="body" ${ref(this.bodyRef)}>${body}</div>
+              } else if (this.scene === Scene.SelectingSigners) {
+                this.scene = Scene.SelectingWallets;
+              } else if (this.scene === Scene.SwitchingNetworks) {
+                this.scene = Scene.Connected;
+              }
+            }}
+          />
+          ${title}
+          <img
+            class="close active"
+            src=${CLOSE_SVG}
+            @click=${this.closedHandler}
+          />
         </div>
-      </div>`;
+        <div class="body" ${ref(this.bodyRef)}>${body}</div>
+      </div>
+    </div>`;
   }
 
   updated() {
@@ -443,7 +424,7 @@ export class WebComponentConnector extends LitElement {
       this.scene = Scene.Connected;
     }
 
-    this.isOpen = false;
+    this.dispatchEvent(new ClosedEvent());
   };
 
   private signerSelectedHandler = (

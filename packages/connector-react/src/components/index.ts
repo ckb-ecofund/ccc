@@ -10,5 +10,6 @@ export const Connector = createComponent({
   react: React,
   events: {
     onWillUpdate: "willUpdate" as EventName<ccc.WillUpdateEvent>,
+    onClosed: "closed" as EventName<ccc.ClosedEvent>,
   },
 });

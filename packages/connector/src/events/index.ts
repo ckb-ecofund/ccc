@@ -3,3 +3,9 @@ export class WillUpdateEvent extends Event {
     super("willUpdate", { composed: true });
   }
 }
+
+export class ClosedEvent extends Event {
+  constructor() {
+    super("closed", { composed: true });
+  }
+}
