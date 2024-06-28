@@ -31,15 +31,6 @@ export class SignerCkbScriptReadonly extends Signer {
   }
 
   /**
-   * Construct a new signer with the client replaced.
-   *
-   * @returns A promise that resolves the new Signer.
-   */
-  async replaceClient(client: Client): Promise<SignerCkbScriptReadonly> {
-    return new SignerCkbScriptReadonly(client, this.script);
-  }
-
-  /**
    * Connects to the client. This implementation does nothing as the class is read-only.
    *
    * @returns A promise that resolves when the connection is complete.

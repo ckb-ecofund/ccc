@@ -11,10 +11,6 @@ export class SignerAlwaysError extends SignerDummy {
     super(client, type);
   }
 
-  async replaceClient(client: Client): Promise<SignerAlwaysError> {
-    return new SignerAlwaysError(client, this.type, this.message);
-  }
-
   async connect(): Promise<void> {
     throw new Error(this.message);
   }

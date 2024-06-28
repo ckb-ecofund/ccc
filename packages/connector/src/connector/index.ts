@@ -172,13 +172,15 @@ export class WebComponentConnector extends LitElement {
     this.wallets = [];
 
     (async () => {
-      if (!this.signer) {
+      const signer = this.signer;
+      if (!signer) {
         return;
       }
 
+      await signer.signer.replaceClient(this.client);
+
       this.signer = {
-        ...this.signer,
-        signer: await this.signer.signer.replaceClient(this.client),
+        ...signer,
       };
     })();
 

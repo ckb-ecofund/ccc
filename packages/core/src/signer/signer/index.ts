@@ -75,11 +75,11 @@ export abstract class Signer {
   }
 
   /**
-   * Construct a new signer with the client replaced.
-   *
-   * @returns A promise that resolves the new Signer.
+   * Replace the current client.
    */
-  abstract replaceClient(client: Client): Promise<Signer>;
+  async replaceClient(client: Client): Promise<void> {
+    this.client_ = client;
+  }
 
   /**
    * Connects to the signer.

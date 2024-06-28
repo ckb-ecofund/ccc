@@ -8,6 +8,7 @@ import {
 import { Zero } from "../fixedPoint";
 import { Hex, HexLike } from "../hex";
 import { Num, NumLike, numFrom } from "../num";
+import { reduceAsync } from "../utils";
 import {
   ClientFindCellsResponse,
   ClientIndexerSearchKeyLike,
@@ -121,10 +122,10 @@ export abstract class Client {
   }
 
   async getBalance(locks: ScriptLike[]): Promise<Num> {
-    return locks.reduce(
-      (res: Promise<Num>, lock) =>
-        this.getBalanceSingle(lock).then((a) => res.then((b) => a + b)),
-      Promise.resolve(Zero),
+    return reduceAsync(
+      locks,
+      async (acc, lock) => acc + (await this.getBalanceSingle(lock)),
+      Zero,
     );
   }
 }

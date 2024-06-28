@@ -961,7 +961,7 @@ export class Transaction {
    * await tx.setWitnessArgsAt(0, witnessArgs);
    * ```
    */
-  setWitnessArgsAt(index: number, witness: WitnessArgs): Transaction {
+  setWitnessArgsAt(index: number, witness: WitnessArgs): void {
     if (this.witnesses.length < index) {
       this.witnesses.push(
         ...Array.from(
@@ -972,7 +972,6 @@ export class Transaction {
     }
 
     this.witnesses[index] = hexFrom(witness.toBytes());
-    return this;
   }
 
   /**
@@ -992,14 +991,14 @@ export class Transaction {
     scriptLike: ScriptLike,
     lockLen: number,
     client: Client,
-  ): Promise<Transaction> {
+  ): Promise<void> {
     const position = await this.findInputIndexByLock(scriptLike, client);
     if (position === undefined) {
-      return this;
+      return;
     }
 
     const witness = this.getWitnessArgsAt(position) ?? WitnessArgs.from({});
     witness.lock = hexFrom(Array.from(new Array(lockLen), () => 0));
-    return this.setWitnessArgsAt(position, witness);
+    this.setWitnessArgsAt(position, witness);
   }
 }

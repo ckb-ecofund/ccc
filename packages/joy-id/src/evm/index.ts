@@ -28,16 +28,6 @@ export class EvmSigner extends ccc.SignerEvm {
     super(client);
   }
 
-  async replaceClient(client: ccc.Client): Promise<EvmSigner> {
-    return new EvmSigner(
-      client,
-      this.name,
-      this.icon,
-      this.appUri,
-      this.connectionsRepo,
-    );
-  }
-
   private getConfig() {
     return {
       redirectURL: location.href,

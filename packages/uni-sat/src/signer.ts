@@ -9,10 +9,6 @@ export class Signer extends ccc.SignerBtc {
     super(client);
   }
 
-  async replaceClient(client: ccc.Client): Promise<Signer> {
-    return new Signer(client, this.provider);
-  }
-
   async getBtcAccount() {
     return (await this.provider.getAccounts())[0];
   }

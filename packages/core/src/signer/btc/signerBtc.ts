@@ -79,12 +79,10 @@ export abstract class SignerBtc extends Signer {
    * @returns A promise that resolves to the prepared Transaction object.
    */
   async prepareTransaction(txLike: TransactionLike): Promise<Transaction> {
+    const tx = Transaction.from(txLike);
     const { script } = await this.getRecommendedAddressObj();
-    return Transaction.from(txLike).prepareSighashAllWitness(
-      script,
-      85,
-      this.client,
-    );
+    await tx.prepareSighashAllWitness(script, 85, this.client);
+    return tx;
   }
 
   /**

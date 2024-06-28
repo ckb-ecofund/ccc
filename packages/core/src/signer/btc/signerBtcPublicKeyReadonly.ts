@@ -27,15 +27,6 @@ export class SignerBtcPublicKeyReadonly extends SignerBtc {
   }
 
   /**
-   * Construct a new signer with the client replaced.
-   *
-   * @returns A promise that resolves the new Signer.
-   */
-  async replaceClient(client: Client): Promise<SignerBtcPublicKeyReadonly> {
-    return new SignerBtcPublicKeyReadonly(client, this.account, this.publicKey);
-  }
-
-  /**
    * Connects to the client. This implementation does nothing as the class is read-only.
    *
    * @returns A promise that resolves when the connection is complete.

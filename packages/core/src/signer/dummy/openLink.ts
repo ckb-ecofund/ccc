@@ -11,10 +11,6 @@ export class SignerOpenLink extends SignerDummy {
     super(client, type);
   }
 
-  async replaceClient(client: Client): Promise<SignerOpenLink> {
-    return new SignerOpenLink(client, this.type, this.link);
-  }
-
   async connect(): Promise<void> {
     window.open(this.link, "_blank")?.focus();
   }

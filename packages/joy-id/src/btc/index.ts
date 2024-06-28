@@ -29,17 +29,6 @@ export class BitcoinSigner extends ccc.SignerBtc {
     super(client);
   }
 
-  async replaceClient(client: ccc.Client): Promise<BitcoinSigner> {
-    return new BitcoinSigner(
-      client,
-      this.name,
-      this.icon,
-      this.addressType,
-      this.appUri,
-      this.connectionsRepo,
-    );
-  }
-
   private getConfig() {
     return {
       redirectURL: location.href,

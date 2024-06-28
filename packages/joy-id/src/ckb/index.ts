@@ -38,17 +38,6 @@ export class CkbSigner extends ccc.Signer {
     super(client);
   }
 
-  async replaceClient(client: ccc.Client): Promise<CkbSigner> {
-    return new CkbSigner(
-      client,
-      this.name,
-      this.icon,
-      this._appUri,
-      this._aggregatorUri,
-      this.connectionsRepo,
-    );
-  }
-
   private getConfig() {
     return {
       redirectURL: location.href,
@@ -138,7 +127,9 @@ export class CkbSigner extends ccc.Signer {
     const witness = tx.getWitnessArgsAt(position) ?? ccc.WitnessArgs.from({});
     witness.lock = "0x";
     await this.prepareTransactionForSubKey(tx, witness);
-    return tx.setWitnessArgsAt(position, witness);
+    tx.setWitnessArgsAt(position, witness);
+
+    return tx;
   }
 
   private async prepareTransactionForSubKey(

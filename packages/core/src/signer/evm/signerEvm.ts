@@ -4,6 +4,7 @@ import { Script, Transaction, TransactionLike, WitnessArgs } from "../../ckb";
 import { KnownScript } from "../../client";
 import { hexFrom } from "../../hex";
 import { numToBytes } from "../../num";
+import { reduceAsync } from "../../utils";
 import { Signer, SignerSignType, SignerType } from "../signer";
 
 /**
@@ -71,14 +72,11 @@ export abstract class SignerEvm extends Signer {
    * @returns A promise that resolves to the prepared Transaction object.
    */
   async prepareTransaction(txLike: TransactionLike): Promise<Transaction> {
-    const addresses = await this.getAddressObjs();
-
-    return addresses.reduce(
-      (txPromise, { script }) =>
-        txPromise.then((tx) =>
-          tx.prepareSighashAllWitness(script, 85, this.client),
-        ),
-      Promise.resolve(Transaction.from(txLike)),
+    return reduceAsync(
+      await this.getAddressObjs(),
+      (tx: Transaction, { script }) =>
+        tx.prepareSighashAllWitness(script, 85, this.client),
+      Transaction.from(txLike),
     );
   }
 

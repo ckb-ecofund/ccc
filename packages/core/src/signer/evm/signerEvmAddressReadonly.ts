@@ -22,15 +22,6 @@ export class SignerEvmAddressReadonly extends SignerEvm {
   }
 
   /**
-   * Construct a new signer with the client replaced.
-   *
-   * @returns A promise that resolves the new Signer.
-   */
-  async replaceClient(client: Client): Promise<SignerEvmAddressReadonly> {
-    return new SignerEvmAddressReadonly(client, this.address);
-  }
-
-  /**
    * Connects to the client. This implementation does nothing as the class is read-only.
    *
    * @returns A promise that resolves when the connection is complete.

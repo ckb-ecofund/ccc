@@ -9,10 +9,6 @@ export class Signer extends ccc.SignerEvm {
     super(client);
   }
 
-  async replaceClient(client: ccc.Client): Promise<Signer> {
-    return new Signer(client, this.detail);
-  }
-
   async getEvmAccount() {
     return (await this.detail.provider.request({ method: "eth_accounts" }))[0];
   }
