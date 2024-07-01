@@ -16,6 +16,10 @@ import {
   openPopup,
 } from "@joyid/common";
 
+/**
+ * Interface representing the return type for various Dapp request types.
+ * @interface
+ */
 export interface PopupReturnType {
   [DappRequestType.Auth]: AuthResponseData;
   [DappRequestType.SignMessage]: SignMessageResponseData;
@@ -36,6 +40,15 @@ export interface PopupReturnType {
   [DappRequestType.EvmWeb2Login]: EvmWeb2LoginResponse;
 }
 
+/**
+ * Creates a popup window for JoyID Dapp requests.
+ * @param {string} url - The URL to open in the popup.
+ * @param {PopupConfigOptions<T> & { joyidAppURL: string }} config - The popup configuration options.
+ * @returns {Promise<PopupReturnType[T]>} A promise that resolves to the response data of the requested type.
+ * @throws {PopupNotSupportedError} If popups are not supported in the current browser.
+ * @throws {PopupCancelledError} If the popup is closed by the user.
+ * @throws {PopupTimeoutError} If the popup operation times out.
+ */
 export async function createPopup<T extends DappRequestType>(
   url: string,
   config: PopupConfigOptions<T> & { joyidAppURL: string },

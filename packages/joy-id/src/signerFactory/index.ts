@@ -4,6 +4,15 @@ import { BitcoinSigner } from "../btc";
 import { CkbSigner } from "../ckb";
 import { EvmSigner } from "../evm";
 
+/**
+ * Gets the JoyID signers based on the client, name, and icon.
+ * If the browser is standalone or a webview, returns SignerAlwaysError instances.
+ * Otherwise, returns instances of CkbSigner, BitcoinSigner, and EvmSigner.
+ * @param {ccc.Client} client - The client instance.
+ * @param {string} name - The name of the signer.
+ * @param {string} icon - The icon URL of the signer.
+ * @returns {ccc.SignerInfo[]} An array of signer information objects.
+ */
 export function getJoyIdSigners(
   client: ccc.Client,
   name: string,
