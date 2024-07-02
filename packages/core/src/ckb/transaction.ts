@@ -933,6 +933,38 @@ export class Transaction {
   }
 
   /**
+   * Find the last occurrence of a input with the specified lock
+   *
+   * @param scriptLike - The script associated with the transaction, represented as a ScriptLike object.
+   * @param client - The client for complete extra infos in the transaction.
+   * @returns A promise that resolves to the prepared transaction
+   *
+   * @example
+   * ```typescript
+   * const index = await tx.findLastInputIndexByLock(scriptLike, client);
+   * ```
+   */
+  async findLastInputIndexByLock(
+    scriptLike: ScriptLike,
+    client: Client,
+  ): Promise<number | undefined> {
+    const script = Script.from(scriptLike);
+
+    for (let i = this.inputs.length - 1; i >= 0; i -= 1) {
+      const input = this.inputs[i];
+      await input.completeExtraInfos(client);
+
+      if (!input.cellOutput) {
+        throw Error("Unable to resolve inputs info");
+      }
+
+      if (script.eq(input.cellOutput.lock)) {
+        return i;
+      }
+    }
+  }
+
+  /**
    * Get witness at index as WitnessArgs
    *
    * @param index - The index of the witness.
