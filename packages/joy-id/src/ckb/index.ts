@@ -179,7 +179,7 @@ export class CkbSigner extends ccc.Signer {
 
     const config = this.getConfig();
 
-    const witnessIndexes = await tx.inputs.map(async (input, i) => {
+    const witnessIndexes = await Promise.all(tx.inputs.map(async (input, i) => {
       await input.completeExtraInfos(this.client);
 
       if (!input.cellOutput) {
@@ -191,7 +191,7 @@ export class CkbSigner extends ccc.Signer {
       }
 
       return i;
-    });
+    }));
 
     const res = await createPopup(
       buildJoyIDURL(
