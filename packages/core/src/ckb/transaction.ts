@@ -384,24 +384,23 @@ export class CellInput {
    * @returns The completed instance.
    * @example
    * ```typescript
-   * if (!cellInput.cellOutput) {
-   *   await cellInput.completeExtraInfos();
-   * }
+   * await cellInput.completeExtraInfos();
    * ```
    */
 
-  async completeExtraInfos(client: Client): Promise<CellInput> {
+  async completeExtraInfos(client: Client): Promise<void> {
     if (this.cellOutput && this.outputData && this.blockNumber) {
-      return this;
+      return;
     }
 
     const cell = await client.getCell(this.previousOutput);
-    if (cell) {
-      this.cellOutput = cell.cellOutput;
-      this.outputData = cell.outputData;
-      this.blockNumber = cell.blockNumber;
+    if (!cell) {
+      return;
     }
-    return this;
+
+    this.cellOutput = cell.cellOutput;
+    this.outputData = cell.outputData;
+    this.blockNumber = cell.blockNumber;
   }
 
   /**
@@ -867,8 +866,9 @@ export class Transaction {
     hasher.update(this.hash());
 
     for (let i = 0; i < this.witnesses.length; i += 1) {
-      if (this.inputs[i]) {
-        const input = await this.inputs[i].completeExtraInfos(client);
+      const input = this.inputs[i];
+      if (input) {
+        await input.completeExtraInfos(client);
 
         if (!input.cellOutput) {
           throw Error("Unable to resolve inputs info");
@@ -919,7 +919,8 @@ export class Transaction {
     const script = Script.from(scriptLike);
 
     for (let i = 0; i < this.inputs.length; i += 1) {
-      const input = await this.inputs[i].completeExtraInfos(client);
+      const input = this.inputs[i];
+      await input.completeExtraInfos(client);
 
       if (!input.cellOutput) {
         throw Error("Unable to resolve inputs info");

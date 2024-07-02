@@ -178,13 +178,28 @@ export class CkbSigner extends ccc.Signer {
     const { script } = await this.getAddressObj();
 
     const config = this.getConfig();
+
+    const witnessIndexes = await tx.inputs.map(async (input, i) => {
+      await input.completeExtraInfos(this.client);
+
+      if (!input.cellOutput) {
+        throw Error("Unable to resolve inputs info");
+      }
+
+      if (!script.eq(input.cellOutput.lock)) {
+        return;
+      }
+
+      return i;
+    });
+
     const res = await createPopup(
       buildJoyIDURL(
         {
           ...config,
           tx: JSON.parse(tx.stringify()),
           signerAddress: (await this.assertConnection()).address,
-          witnessIndex: await tx.findInputIndexByLock(script, this.client),
+          witnessIndexes: witnessIndexes.filter((i) => i !== undefined),
         },
         "popup",
         "/sign-ckb-raw-tx",
