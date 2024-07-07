@@ -1,9 +1,9 @@
 import { ccc } from "@ckb-ccc/ccc";
 import { html } from "lit";
 import { CKB_SVG } from "../assets/chains";
-import { COPY_SVG } from "../assets/copy.svg";
 import { DISCONNECT_SVG } from "../assets/diconnect.svg";
 import { SWAP_SVG } from "../assets/swap.svg";
+import { CopyButton } from "../components/CopyButton";
 import { signerTypeToIcon } from "./signers";
 
 function copyAddress(address?: string) {
@@ -53,12 +53,12 @@ export function generateConnectedScene(
       
       <div class="flex align-center mt-2">
         <span class="text-bold fs-xl">${formatString(internalAddress)}</span>
-        <img class="cursor-pointer copy-btn" src=${COPY_SVG} alt="copy" @click=${() => copyAddress(internalAddress)}/>
+        ${CopyButton(internalAddress ?? "")}      
       </div>
       <div class="text-bold fs-md">${ccc.fixedPointToString(balance ?? ccc.Zero)} CKB</div>
       <div class="flex align-center">
         <span class="text-bold text-tip fs-md">${formatString(recommendedAddress, 13, 7)}</span>
-        <img class="cursor-pointer copy-btn-sm" src=${COPY_SVG} alt="copy" @click=${() => copyAddress(recommendedAddress)}/>
+        ${CopyButton(recommendedAddress ?? "")}  
       </div>
 
       <button
