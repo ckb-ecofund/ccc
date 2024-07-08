@@ -16,11 +16,29 @@ import { addCellDep } from "@ckb-lumos/common-scripts/lib/helper";
 import { Config, getConfig } from "@ckb-lumos/config-manager";
 import { getJoyIDCellDep, getJoyIDLockScript } from "@joyid/ckb";
 
+/**
+ * Generates a class for collecting JoyID-related cells.
+ * @param {string} codeHash - The code hash of the JoyID script.
+ * @returns {typeof JoyIDCellCollector} The JoyIDCellCollector class.
+ */
 export function generateCollectorClass(codeHash: string) {
+  /**
+   * Class representing a collector for JoyID-related cells.
+   * @class
+   */
   return class JoyIDCellCollector {
     readonly fromScript: Script;
     readonly cellCollector: CellCollector;
 
+    /**
+     * Creates an instance of JoyIDCellCollector.
+     * @param {FromInfo} fromInfo - The information about the address to collect cells from.
+     * @param {CellProvider} cellProvider - The provider to collect cells from.
+     * @param {Object} options - The options for the collector.
+     * @param {QueryOptions} [options.queryOptions={}] - The query options for collecting cells.
+     * @param {Config} [options.config=getConfig()] - The Lumos configuration.
+     * @throws {Error} If cellProvider is not provided or fromInfo is not a string.
+     */
     constructor(
       fromInfo: FromInfo,
       cellProvider: CellProvider,
@@ -52,6 +70,12 @@ export function generateCollectorClass(codeHash: string) {
       this.cellCollector = cellProvider.collector(queryOptions);
     }
 
+    /**
+     * Collects JoyID-related cells.
+     * @async
+     * @generator
+     * @yields {Cell} The collected cell.
+     */
     async *collect(): AsyncGenerator<Cell> {
       if (!bytes.equal(this.fromScript.codeHash, codeHash)) {
         return;
@@ -64,6 +88,12 @@ export function generateCollectorClass(codeHash: string) {
   };
 }
 
+/**
+ * Generates JoyID lock script information.
+ * @param {string} codeHash - The code hash of the JoyID script.
+ * @param {CellDep[]} cellDeps - The cell dependencies for the JoyID script.
+ * @returns {LockScriptInfo} The lock script information.
+ */
 export function generateJoyIDInfo(
   codeHash: string,
   cellDeps: CellDep[],
@@ -119,6 +149,10 @@ export function generateJoyIDInfo(
   };
 }
 
+/**
+ * Generates default script information for JoyID.
+ * @returns {LockScriptInfo[]} An array of lock script information.
+ */
 export function generateDefaultScriptInfos(): LockScriptInfo[] {
   return [
     generateJoyIDInfo(getJoyIDLockScript(false).codeHash, [
@@ -130,6 +164,12 @@ export function generateDefaultScriptInfos(): LockScriptInfo[] {
   ];
 }
 
+/**
+ * Asserts that a condition is true, throwing an error if it is not.
+ * @param {unknown} condition - The condition to assert.
+ * @param {string} [message="Assert failed"] - The error message to throw if the condition is false.
+ * @throws {Error} If the condition is false.
+ */
 function asserts(
   condition: unknown,
   message = "Assert failed",
