@@ -3,6 +3,7 @@ import { isStandaloneBrowser } from "@joyid/common";
 import { BitcoinSigner } from "../btc";
 import { CkbSigner } from "../ckb";
 import { EvmSigner } from "../evm";
+import { NostrSigner } from "../nostr";
 
 /**
  * Gets the JoyID signers based on the client, name, and icon.
@@ -39,6 +40,10 @@ export function getJoyIdSigners(
     {
       name: "BTC",
       signer: new BitcoinSigner(client, name, icon),
+    },
+    {
+      name: "Nostr",
+      signer: new NostrSigner(client, name, icon),
     },
     {
       name: "EVM",

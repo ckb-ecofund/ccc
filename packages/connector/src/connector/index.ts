@@ -98,7 +98,6 @@ export class WebComponentConnector extends LitElement {
   }
 
   public disconnect() {
-    this.signer?.signer?.disconnect();
     this.walletName = undefined;
     this.signerName = undefined;
     this.saveConnection();

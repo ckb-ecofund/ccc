@@ -115,6 +115,7 @@ export abstract class SignerNostr extends Signer {
     const signedEvent = bytesFrom(
       JSON.stringify(
         await this.signNostrEvent({
+          pubkey: (await this.getNostrPublicKey()).slice(2),
           tags: [[SignerNostr.CKB_SIG_HASH_ALL_TAG, info.message.slice(2)]],
           created_at: Math.floor(Date.now() / 1000),
           kind: SignerNostr.CKB_UNLOCK_EVENT_KIND,

@@ -119,15 +119,6 @@ export class CkbSigner extends ccc.Signer {
   }
 
   /**
-   * Disconnects the signer.
-   * @returns {Promise<void>} A promise that resolves when the disconnection is complete.
-   */
-  async disconnect(): Promise<void> {
-    this.connection = undefined;
-    await this.saveConnection();
-  }
-
-  /**
    * Checks if the signer is connected.
    * @returns {Promise<boolean>} A promise that resolves to true if connected, false otherwise.
    */

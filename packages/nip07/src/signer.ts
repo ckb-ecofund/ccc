@@ -46,11 +46,6 @@ export class Signer extends ccc.SignerNostr {
     await this.connectionsRepo.set({ publicKey: this.publicKey });
   }
 
-  async disconnect(): Promise<void> {
-    this.publicKey = undefined;
-    await this.connectionsRepo.set(undefined);
-  }
-
   async isConnected(): Promise<boolean> {
     this.publicKey = (await this.connectionsRepo.get())?.publicKey;
     return this.publicKey !== undefined;
