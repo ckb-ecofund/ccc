@@ -95,7 +95,10 @@ export class ConnectionsRepoLocalStorage implements ConnectionsRepo {
    * @param {Connection | undefined} connection - The connection to set.
    * @returns {Promise<void>}
    */
-  async set(selector: AccountSelector, connection: Connection | undefined): Promise<void> {
+  async set(
+    selector: AccountSelector,
+    connection: Connection | undefined,
+  ): Promise<void> {
     const connections = await this.readConnections();
 
     if (connection) {

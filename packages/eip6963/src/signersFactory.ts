@@ -20,7 +20,9 @@ export class SignerFactory {
    * @param {(newSigner: EIP6963Signer) => unknown} callback - The callback to trigger with the new signer.
    * @returns {() => void} A function to unsubscribe from the signer events.
    */
-  subscribeSigners(callback: (newSigner: EIP6963Signer) => unknown): () => void {
+  subscribeSigners(
+    callback: (newSigner: EIP6963Signer) => unknown,
+  ): () => void {
     const onNewProvider = (event: Event) => {
       const { detail } = event as unknown as EIP6963AnnounceProviderEvent;
       const { uuid } = detail.info;
@@ -37,6 +39,7 @@ export class SignerFactory {
     window.addEventListener("eip6963:announceProvider", onNewProvider);
     window.dispatchEvent(new Event("eip6963:requestProvider"));
 
-    return () => window.removeEventListener("eip6963:announceProvider", onNewProvider);
+    return () =>
+      window.removeEventListener("eip6963:announceProvider", onNewProvider);
   }
 }
