@@ -57,6 +57,7 @@ import { ccc } from "@ckb-ccc/<package-name>";
 For developers who use Lumos to compose CKB transactions, CCC provides patches to:
 
 * Support the JoyID Wallet.
+* Support the Nostr Wallet.
 
 See [lumos-patches](https://www.npmjs.com/package/@ckb-ccc/lumos-patches): ```npm install @ckb-ccc/lumos-patches```
 

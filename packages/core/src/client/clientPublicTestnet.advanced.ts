@@ -35,4 +35,9 @@ export const TESTNET_SCRIPTS: Record<
       "0xf329effd1c475a2978453c8600e1eaf0bc2087ee093c3ee64cc96ec6847752cb",
     hashType: "type",
   },
+  [KnownScript.NostrLock]: {
+    codeHash:
+      "0x6ae5ee0cb887b2df5a9a18137315b9bdc55be8d52637b2de0624092d5f0c91d5",
+    hashType: "type",
+  },
 };

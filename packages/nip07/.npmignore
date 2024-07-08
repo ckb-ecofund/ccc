@@ -1,0 +1,11 @@
+node_modules/
+
+tsconfig.json
+tsconfig.*.json
+eslint.config.mjs
+.prettierrc
+.prettierignore
+
+tsconfig.tsbuildinfo
+tsconfig.*.tsbuildinfo
+.github/

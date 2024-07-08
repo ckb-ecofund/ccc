@@ -35,6 +35,9 @@ importers:
       '@ckb-ccc/joy-id':
         specifier: workspace:*
         version: link:../joy-id
+      '@ckb-ccc/nip07':
+        specifier: workspace:*
+        version: link:../nip07
       '@ckb-ccc/okx':
         specifier: workspace:*
         version: link:../okx
@@ -192,6 +195,9 @@ importers:
       '@joyid/ckb':
         specifier: ^0.0.11
         version: 0.0.11(encoding@0.1.13)(typescript@5.4.5)
+      '@noble/curves':
+        specifier: ^1.4.2
+        version: 1.4.2
       '@noble/hashes':
         specifier: ^1.4.0
         version: 1.4.0
@@ -421,6 +427,40 @@ importers:
       '@joyid/ckb':
         specifier: ^0.0.11
         version: 0.0.11(encoding@0.1.13)(typescript@5.4.5)
+    devDependencies:
+      '@eslint/js':
+        specifier: ^9.1.1
+        version: 9.1.1
+      eslint:
+        specifier: ^9.1.0
+        version: 9.1.0
+      eslint-config-prettier:
+        specifier: ^9.1.0
+        version: 9.1.0(eslint@9.1.0)
+      eslint-plugin-prettier:
+        specifier: ^5.1.3
+        version: 5.1.3(eslint-config-prettier@9.1.0(eslint@9.1.0))(eslint@9.1.0)(prettier@3.2.5)
+      prettier:
+        specifier: ^3.2.5
+        version: 3.2.5
+      prettier-plugin-organize-imports:
+        specifier: ^3.2.4
+        version: 3.2.4(prettier@3.2.5)(typescript@5.4.5)
+      rimraf:
+        specifier: ^5.0.5
+        version: 5.0.5
+      typescript:
+        specifier: ^5.4.5
+        version: 5.4.5
+      typescript-eslint:
+        specifier: ^7.7.0
+        version: 7.7.0(eslint@9.1.0)(typescript@5.4.5)
+
+  packages/nip07:
+    dependencies:
+      '@ckb-ccc/core':
+        specifier: workspace:*
+        version: link:../core
     devDependencies:
       '@eslint/js':
         specifier: ^9.1.1
@@ -1019,6 +1059,9 @@ packages:
 
   '@noble/curves@1.2.0':
     resolution: {integrity: sha512-oYclrNgRaM9SsBUBVbb8M6DTV7ZHRTKugureoYEncY5c65HOmRzvSiTE3y5CYaPYJA/GVkrhXEoF0M3Ya9PMnw==}
+
+  '@noble/curves@1.4.2':
+    resolution: {integrity: sha512-TavHr8qycMChk8UwMld0ZDRvatedkzWfH8IiaeGCfymOP5i0hSCozz9vHOL0nkwk7HRMlFnAiKpS2jrUmSybcw==}
 
   '@noble/hashes@1.3.2':
     resolution: {integrity: sha512-MVC8EAQp7MvEcm30KWENFjgR+Mkmf+D189XJTkFIlwohU5hcBbn1ZkKq7KVTi2Hme3PMGF390DaL52beVrIihQ==}
@@ -5740,6 +5783,10 @@ snapshots:
   '@noble/curves@1.2.0':
     dependencies:
       '@noble/hashes': 1.3.2
+
+  '@noble/curves@1.4.2':
+    dependencies:
+      '@noble/hashes': 1.4.0
 
   '@noble/hashes@1.3.2': {}
 

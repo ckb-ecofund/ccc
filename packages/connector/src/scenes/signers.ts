@@ -2,6 +2,7 @@ import { ccc } from "@ckb-ccc/ccc";
 import { html } from "lit";
 import { repeat } from "lit/directives/repeat.js";
 import { BTC_SVG, CKB_SVG, ETH_SVG } from "../assets/chains";
+import { NOSTR_SVG } from "../assets/chains/nostr.svg";
 import { WalletWithSigners } from "../types";
 
 export function signerTypeToIcon(type: ccc.SignerType): string {
@@ -9,6 +10,7 @@ export function signerTypeToIcon(type: ccc.SignerType): string {
     [ccc.SignerType.BTC]: BTC_SVG,
     [ccc.SignerType.EVM]: ETH_SVG,
     [ccc.SignerType.CKB]: CKB_SVG,
+    [ccc.SignerType.Nostr]: NOSTR_SVG,
   }[type];
 }
 
