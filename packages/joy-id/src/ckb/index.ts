@@ -178,6 +178,11 @@ export class CkbSigner extends ccc.Signer {
     txLike: ccc.TransactionLike,
   ): Promise<ccc.Transaction> {
     const tx = ccc.Transaction.from(txLike);
+    tx.addCellDeps(
+      ...(await this.client.getCellDeps(
+        ...(await this.client.getKnownScript(ccc.KnownScript.JoyId)).cellDeps,
+      )),
+    );
     const position = await tx.findInputIndexByLock(
       (await this.getAddressObj()).script,
       this.client,
@@ -187,7 +192,7 @@ export class CkbSigner extends ccc.Signer {
     }
 
     const witness = tx.getWitnessArgsAt(position) ?? ccc.WitnessArgs.from({});
-    witness.lock = "0x";
+    witness.lock = ccc.hexFrom("00".repeat(1000));
     await this.prepareTransactionForSubKey(tx, witness);
     tx.setWitnessArgsAt(position, witness);
 

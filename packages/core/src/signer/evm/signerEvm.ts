@@ -72,11 +72,17 @@ export abstract class SignerEvm extends Signer {
    * @returns A promise that resolves to the prepared Transaction object.
    */
   async prepareTransaction(txLike: TransactionLike): Promise<Transaction> {
+    const tx = Transaction.from(txLike);
+    tx.addCellDeps(
+      ...(await this.client.getCellDeps(
+        ...(await this.client.getKnownScript(KnownScript.OmniLock)).cellDeps,
+      )),
+    );
     return reduceAsync(
       await this.getAddressObjs(),
       (tx: Transaction, { script }) =>
         tx.prepareSighashAllWitness(script, 85, this.client),
-      Transaction.from(txLike),
+      tx,
     );
   }
 

@@ -1,6 +1,7 @@
 import type { TransactionSkeletonType } from "@ckb-lumos/helpers";
 import { Bytes, BytesLike, bytesFrom } from "../bytes";
-import { Client } from "../client";
+import { Client, ClientIndexerSearchKeyFilterLike } from "../client";
+import { Zero, fixedPointFrom } from "../fixedPoint";
 import { Hasher, ckbHash } from "../hasher";
 import { Hex, HexLike, hexFrom } from "../hex";
 import {
@@ -11,7 +12,8 @@ import {
   numToBytes,
   numToHex,
 } from "../num";
-import { apply } from "../utils";
+import { Signer } from "../signer";
+import { apply, reduceAsync } from "../utils";
 import * as mol from "./molecule.advanced";
 import { Script, ScriptLike } from "./script";
 import { DEP_TYPE_TO_NUM, NUM_TO_DEP_TYPE } from "./transaction.advanced";
@@ -104,6 +106,20 @@ export class OutPoint {
   ) {}
 
   /**
+   * Clone an OutPoint.
+   *
+   * @returns A cloned OutPoint instance.
+   *
+   * @example
+   * ```typescript
+   * const outPoint1 = outPoint0.clone();
+   * ```
+   */
+  clone(): OutPoint {
+    return new OutPoint(this.txHash, this.index);
+  }
+
+  /**
    * Creates an OutPoint instance from an OutPointLike object.
    *
    * @param outPoint - An OutPointLike object or an instance of OutPoint.
@@ -114,7 +130,6 @@ export class OutPoint {
    * const outPoint = OutPoint.from({ txHash: "0x...", index: 0 });
    * ```
    */
-
   static from(outPoint: OutPointLike): OutPoint {
     if (outPoint instanceof OutPoint) {
       return outPoint;
@@ -142,11 +157,11 @@ export class OutPoint {
    *
    * @example
    * ```typescript
-   * const outPointBytes = outPoint.encode();
+   * const outPointBytes = outPoint.toBytes();
    * ```
    */
 
-  encode(): Bytes {
+  toBytes(): Bytes {
     return bytesFrom(mol.SerializeOutPoint(this._toMolData()));
   }
 
@@ -173,6 +188,22 @@ export class OutPoint {
       numFromBytes(view.getIndex().raw()),
     );
   }
+
+  /**
+   * Compares the current OutPoint instance with another OutPointLike object for equality.
+   *
+   * @param val - The OutPointLike object to compare with.
+   * @returns True if the out points are equal, otherwise false.
+   *
+   * @example
+   * ```typescript
+   * const isEqual = outPoint.eq(anotherOutPoint);
+   * ```
+   */
+  eq(val: OutPointLike): boolean {
+    const outPoint = OutPoint.from(val);
+    return this.txHash === outPoint.txHash && this.index === outPoint.index;
+  }
 }
 
 export type CellOutputLike = {
@@ -196,6 +227,20 @@ export class CellOutput {
   ) {}
 
   /**
+   * Clone a CellOutput.
+   *
+   * @returns A cloned CellOutput instance.
+   *
+   * @example
+   * ```typescript
+   * const cellOutput1 = cellOutput0.clone();
+   * ```
+   */
+  clone(): CellOutput {
+    return new CellOutput(this.capacity, this.lock.clone(), this.type?.clone());
+  }
+
+  /**
    * Creates a CellOutput instance from a CellOutputLike object.
    *
    * @param cellOutput - A CellOutputLike object or an instance of CellOutput.
@@ -210,7 +255,6 @@ export class CellOutput {
    * });
    * ```
    */
-
   static from(cellOutput: CellOutputLike): CellOutput {
     if (cellOutput instanceof CellOutput) {
       return cellOutput;
@@ -349,6 +393,26 @@ export class CellInput {
   ) {}
 
   /**
+   * Clone a CellInput.
+   *
+   * @returns A cloned CellInput instance.
+   *
+   * @example
+   * ```typescript
+   * const cellInput1 = cellInput0.clone();
+   * ```
+   */
+  clone(): CellInput {
+    return new CellInput(
+      this.previousOutput.clone(),
+      this.since,
+      this.cellOutput?.clone(),
+      this.outputData,
+      this.blockNumber,
+    );
+  }
+
+  /**
    * Creates a CellInput instance from a CellInputLike object.
    *
    * @param cellInput - A CellInputLike object or an instance of CellInput.
@@ -362,7 +426,6 @@ export class CellInput {
    * });
    * ```
    */
-
   static from(cellInput: CellInputLike): CellInput {
     if (cellInput instanceof CellInput) {
       return cellInput;
@@ -381,13 +444,12 @@ export class CellInput {
    * Complete extra infos in the input. Like the output of the out point.
    * The instance will be modified.
    *
-   * @returns The completed instance.
+   * @returns true if succeed.
    * @example
    * ```typescript
    * await cellInput.completeExtraInfos();
    * ```
    */
-
   async completeExtraInfos(client: Client): Promise<void> {
     if (this.cellOutput && this.outputData && this.blockNumber) {
       return;
@@ -474,6 +536,21 @@ export class CellDep {
   ) {}
 
   /**
+   * Clone a CellDep.
+   *
+   * @returns A cloned CellDep instance.
+   *
+   * @example
+   * ```typescript
+   * const cellDep1 = cellDep0.clone();
+   * ```
+   */
+
+  clone(): CellDep {
+    return new CellDep(this.outPoint.clone(), this.depType);
+  }
+
+  /**
    * Creates a CellDep instance from a CellDepLike object.
    *
    * @param cellDep - A CellDepLike object or an instance of CellDep.
@@ -546,6 +623,24 @@ export class CellDep {
     return new CellDep(
       OutPoint.fromBytes(view.getOutPoint()),
       depTypeFromBytes([view.getDepType()]),
+    );
+  }
+
+  /**
+   * Compares the current CellDep instance with another CellDepLike object for equality.
+   *
+   * @param val - The CellDepLike object to compare with.
+   * @returns True if the cell deps are equal, otherwise false.
+   *
+   * @example
+   * ```typescript
+   * const isEqual = cellDep.eq(anotherCellDep);
+   * ```
+   */
+  eq(val: CellDepLike): boolean {
+    const cellDep = CellDep.from(val);
+    return (
+      this.outPoint.eq(cellDep.outPoint) && this.depType === cellDep.depType
     );
   }
 }
@@ -695,9 +790,49 @@ export class Transaction {
    * const defaultTx = Transaction.default();
    * ```
    */
-
   static default(): Transaction {
     return new Transaction(0n, [], [], [], [], [], []);
+  }
+
+  /**
+   * Copy every properties from another transaction.
+   *
+   * @example
+   * ```typescript
+   * this.copy(Transaction.default());
+   * ```
+   */
+  copy(txLike: TransactionLike) {
+    const tx = Transaction.from(txLike);
+    this.version = tx.version;
+    this.cellDeps = tx.cellDeps;
+    this.headerDeps = tx.headerDeps;
+    this.inputs = tx.inputs;
+    this.outputs = tx.outputs;
+    this.outputsData = tx.outputsData;
+    this.witnesses = tx.witnesses;
+  }
+
+  /**
+   * Clone a Transaction.
+   *
+   * @returns A cloned instance
+   *
+   * @example
+   * ```typescript
+   * const tx1 = tx0.clone();
+   * ```
+   */
+  clone(): Transaction {
+    return new Transaction(
+      0n,
+      this.cellDeps.map((c) => c.clone()),
+      [...this.headerDeps],
+      this.inputs.map((i) => i.clone()),
+      this.outputs.map((o) => o.clone()),
+      [...this.outputsData],
+      [...this.witnesses],
+    );
   }
 
   /**
@@ -792,7 +927,6 @@ export class Transaction {
    * const rawTxBytes = transaction.rawToBytes();
    * ```
    */
-
   rawToBytes(): Bytes {
     return bytesFrom(
       mol.SerializeRawTransaction({
@@ -802,6 +936,32 @@ export class Transaction {
         inputs: this.inputs.map((i) => i._toMolData()),
         outputs: this.outputs.map((o) => o._toMolData()),
         outputsData: this.outputsData.map((header) => bytesFrom(header)),
+      }),
+    );
+  }
+
+  /**
+   * Converts the whole transaction data to bytes.
+   *
+   * @returns A Uint8Array containing the full transaction bytes.
+   *
+   * @example
+   * ```typescript
+   * const txBytes = transaction.toBytes();
+   * ```
+   */
+  toBytes(): Bytes {
+    return bytesFrom(
+      mol.SerializeTransaction({
+        raw: {
+          version: numToBytes(this.version, 4),
+          cellDeps: this.cellDeps.map((d) => d._toMolData()),
+          headerDeps: this.headerDeps.map((header) => bytesFrom(header)),
+          inputs: this.inputs.map((i) => i._toMolData()),
+          outputs: this.outputs.map((o) => o._toMolData()),
+          outputsData: this.outputsData.map((header) => bytesFrom(header)),
+        },
+        witnesses: this.witnesses.map((witness) => bytesFrom(witness)),
       }),
     );
   }
@@ -866,12 +1026,11 @@ export class Transaction {
     hasher.update(this.hash());
 
     for (let i = 0; i < this.witnesses.length; i += 1) {
-      const input = this.inputs[i];
+      const input = await this.inputs[i];
+      await input.completeExtraInfos(client);
       if (input) {
-        await input.completeExtraInfos(client);
-
         if (!input.cellOutput) {
-          throw Error("Unable to resolve inputs info");
+          throw new Error("Unable to complete input");
         }
 
         if (!script.eq(input.cellOutput.lock)) {
@@ -921,9 +1080,8 @@ export class Transaction {
     for (let i = 0; i < this.inputs.length; i += 1) {
       const input = this.inputs[i];
       await input.completeExtraInfos(client);
-
       if (!input.cellOutput) {
-        throw Error("Unable to resolve inputs info");
+        throw new Error("Unable to complete input");
       }
 
       if (script.eq(input.cellOutput.lock)) {
@@ -953,15 +1111,59 @@ export class Transaction {
     for (let i = this.inputs.length - 1; i >= 0; i -= 1) {
       const input = this.inputs[i];
       await input.completeExtraInfos(client);
-
       if (!input.cellOutput) {
-        throw Error("Unable to resolve inputs info");
+        throw new Error("Unable to complete input");
       }
 
       if (script.eq(input.cellOutput.lock)) {
         return i;
       }
     }
+  }
+
+  /**
+   * Add cell deps if they are not existed
+   *
+   * @param cellDepLikes - The cell deps to add
+   *
+   * @example
+   * ```typescript
+   * tx.addCellDeps(cellDep);
+   * ```
+   */
+  addCellDeps(...cellDepsLike: CellDepLike[]): void {
+    cellDepsLike.forEach((cellDepLike) => {
+      const cellDep = CellDep.from(cellDepLike);
+      if (this.cellDeps.some((c) => c.eq(cellDep))) {
+        return;
+      }
+
+      this.cellDeps.push(cellDep);
+    });
+  }
+
+  /**
+   * Set output data at index.
+   *
+   * @param index - The index of the output data.
+   * @param witness - The data to set.
+   *
+   * @example
+   * ```typescript
+   * await tx.setOutputData(0, "0x00");
+   * ```
+   */
+  setOutputDataAt(index: number, data: HexLike): void {
+    if (this.outputsData.length < index) {
+      this.outputsData.push(
+        ...Array.from(
+          new Array(index - this.outputsData.length),
+          (): Hex => "0x",
+        ),
+      );
+    }
+
+    this.outputsData[index] = hexFrom(data);
   }
 
   /**
@@ -987,7 +1189,6 @@ export class Transaction {
    *
    * @param index - The index of the witness.
    * @param witness - The WitnessArgs to set.
-   * @returns The transaction itself.
    *
    * @example
    * ```typescript
@@ -1033,5 +1234,210 @@ export class Transaction {
     const witness = this.getWitnessArgsAt(position) ?? WitnessArgs.from({});
     witness.lock = hexFrom(Array.from(new Array(lockLen), () => 0));
     this.setWitnessArgsAt(position, witness);
+  }
+
+  async getInputsCapacity(client: Client): Promise<Num> {
+    return reduceAsync(
+      this.inputs,
+      async (acc, input) => {
+        await input.completeExtraInfos(client);
+        if (!input.cellOutput) {
+          throw new Error("Unable to complete input");
+        }
+        return acc + input.cellOutput.capacity;
+      },
+      numFrom(0),
+    );
+  }
+
+  getOutputsCapacity(): Num {
+    return this.outputs.reduce(
+      (acc, { capacity }) => acc + capacity,
+      numFrom(0),
+    );
+  }
+
+  async completeInputs<T>(
+    from: Signer,
+    filter: ClientIndexerSearchKeyFilterLike,
+    accumulator: (
+      acc: T,
+      v: Cell,
+      i: number,
+      array: Cell[],
+    ) => Promise<T | undefined> | T | undefined,
+    init: T,
+  ): Promise<number> {
+    const scripts = (await from.getAddressObjs()).map(({ script }) => script);
+    const collectedCells = [];
+    let acc: T = init;
+
+    for (const script of scripts) {
+      for await (const cell of from.client.findCells({
+        script,
+        scriptType: "lock",
+        filter,
+        scriptSearchMode: "exact",
+        withData: true,
+      })) {
+        const i = collectedCells.push(cell);
+        const next: T | undefined = await Promise.resolve(
+          accumulator(acc, cell, i - 1, collectedCells),
+        );
+        if (next === undefined) {
+          this.inputs.push(
+            ...collectedCells.map(
+              ({ outPoint, outputData, cellOutput, blockNumber }) =>
+                CellInput.from({
+                  previousOutput: outPoint,
+                  since: 0,
+                  outputData,
+                  cellOutput,
+                  blockNumber,
+                }),
+            ),
+          );
+          return collectedCells.length;
+        }
+        acc = next;
+      }
+    }
+
+    throw new Error("Failed to find enough cells for input");
+  }
+
+  async completeInputsByCapacity(
+    from: Signer,
+    capacityTweak?: NumLike,
+    filter?: ClientIndexerSearchKeyFilterLike,
+  ): Promise<number> {
+    const exceptedCapacity =
+      this.getOutputsCapacity() + numFrom(capacityTweak ?? 0);
+    const inputsCapacity = await this.getInputsCapacity(from.client);
+    if (inputsCapacity >= exceptedCapacity) {
+      return 0;
+    }
+
+    return this.completeInputs(
+      from,
+      filter ?? {
+        scriptLenRange: [0, 1],
+        outputDataLenRange: [0, 1],
+      },
+      (acc, { cellOutput: { capacity } }) => {
+        const sum = acc + capacity;
+        return sum > exceptedCapacity ? undefined : sum;
+      },
+      inputsCapacity,
+    );
+  }
+
+  estimateFee(feeRate: NumLike): Num {
+    const txSize = this.toBytes().length + 4;
+    return (numFrom(txSize) * numFrom(feeRate) + numFrom(1000)) / numFrom(1000);
+  }
+
+  async completeFee(
+    from: Signer,
+    change: (tx: Transaction, capacity: Num) => Promise<NumLike> | NumLike,
+    feeRate: NumLike,
+    filter?: ClientIndexerSearchKeyFilterLike,
+  ): Promise<[number, boolean]> {
+    // Complete all inputs extra infos for cache
+    await this.getInputsCapacity(from.client);
+
+    let leastFee = this.estimateFee(feeRate);
+    let leastExtraCapacity = Zero;
+
+    while (true) {
+      const prepared = await from.prepareTransaction(this.clone());
+      const collected = await prepared.completeInputsByCapacity(
+        from,
+        leastFee + leastExtraCapacity,
+        filter,
+      );
+
+      const extraCapacity =
+        (await prepared.getInputsCapacity(from.client)) -
+        prepared.getOutputsCapacity();
+      // The extra capacity paid the fee without a change
+      if (extraCapacity === leastFee) {
+        this.copy(prepared);
+        return [collected, false];
+      }
+
+      let changed = prepared.clone();
+      const missing = numFrom(
+        await Promise.resolve(change(changed, extraCapacity - leastFee)),
+      );
+      // No enough extra capacity to create new cells for change
+      if (missing > Zero) {
+        leastExtraCapacity += missing;
+        continue;
+      }
+
+      if (
+        (await changed.getInputsCapacity(from.client)) -
+          changed.getOutputsCapacity() !==
+        leastFee
+      ) {
+        throw new Error(
+          "The change function doesn't use all available capacity",
+        );
+      }
+
+      // New change cells created, update the fee
+      await from.prepareTransaction(changed);
+      const changedFee = changed.estimateFee(feeRate);
+      if (leastFee > changedFee) {
+        throw new Error("The change function removed existed transaction data");
+      }
+      // The fee has been paid
+      if (leastFee === changedFee) {
+        this.copy(changed);
+        return [collected, true];
+      }
+
+      // The fee after changing is more than the original fee
+      leastFee = changedFee;
+    }
+  }
+
+  completeFeeToLock(
+    from: Signer,
+    change: ScriptLike,
+    feeRate: NumLike,
+    filter?: ClientIndexerSearchKeyFilterLike,
+  ): Promise<[number, boolean]> {
+    const script = Script.from(change);
+
+    return this.completeFee(
+      from,
+      (tx, capacity) => {
+        for (const i in tx.outputs) {
+          const output = tx.outputs[i];
+          if (
+            output.lock.eq(script) &&
+            output.type === undefined &&
+            (tx.outputsData[i] ?? "0x") === "0x"
+          ) {
+            output.capacity += capacity;
+            return 0;
+          }
+        }
+        const neededCapacity = fixedPointFrom(
+          bytesFrom(script.args).length + 41,
+        );
+        if (capacity < neededCapacity) {
+          return neededCapacity - capacity;
+        }
+        const i =
+          tx.outputs.push(CellOutput.from({ lock: script, capacity })) - 1;
+        tx.setOutputDataAt(i, "0x");
+        return 0;
+      },
+      feeRate,
+      filter,
+    );
   }
 }

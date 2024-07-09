@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { ccc } from "@ckb-ccc/connector-react";
+import { KnownScript, ccc } from "@ckb-ccc/connector-react";
 import React, { ReactNode, useEffect, useState } from "react";
 import { common } from "@ckb-lumos/common-scripts";
 import { TransactionSkeleton } from "@ckb-lumos/helpers";
@@ -206,6 +206,177 @@ function Transfer() {
   );
 }
 
+function IssueXUdtSul() {
+  const signer = ccc.useSigner();
+  const [amount, setAmount] = useState<string>("");
+  const [hashes, setHashes] = useState<string[]>([]);
+
+  return (
+    <>
+      {hashes.length !== 0 ? (
+        hashes.map((hash, i) => (
+          <p
+            className="mb-1 w-full whitespace-normal text-balance break-all text-center"
+            key={i}
+          >
+            {hash}
+          </p>
+        ))
+      ) : (
+        <></>
+      )}
+      <div className="mb-1 flex flex-col items-center">
+        <div className="flex flex-col">
+          You will need to sign three transactions.
+          <input
+            className="mt-1 rounded-full border border-black px-4 py-2"
+            type="text"
+            value={amount}
+            onInput={(e) => setAmount(e.currentTarget.value)}
+            placeholder="Amount to issue"
+          />
+        </div>
+        <Button
+          className="mt-1"
+          onClick={async () => {
+            if (!signer) {
+              return;
+            }
+            const { script } = await signer.getRecommendedAddressObj();
+            const scriptSize = 32 + 1 + ccc.bytesFrom(script.args).length;
+
+            const susTx = ccc.Transaction.from({
+              ...ccc.Transaction.default(),
+              outputs: [
+                // SUS
+                {
+                  capacity: ccc.fixedPointFrom(4 + scriptSize),
+                  lock: script,
+                },
+                // Capacity for creating owner cell
+                {
+                  capacity: ccc.fixedPointFrom(8 + 69) + ccc.numFrom(3000),
+                  lock: script,
+                },
+                // Capacity for minting token
+                {
+                  capacity:
+                    ccc.fixedPointFrom(8 + 8 + 65 + scriptSize) +
+                    ccc.numFrom(3000),
+                  lock: script,
+                },
+              ],
+              outputsData: ["0x", "0x", "0x"],
+            });
+            await susTx.completeInputsByCapacity(signer);
+            await susTx.completeFeeToLock(signer, script, 1000);
+            const sus = await signer.sendTransaction(susTx);
+
+            const singleUseLock = ccc.Script.from({
+              ...(await signer.client.getKnownScript(
+                ccc.KnownScript.SingleUseLock,
+              )),
+              args: ccc.OutPoint.from({
+                txHash: sus,
+                index: 0,
+              }).toBytes(),
+            });
+            const lockTx = ccc.Transaction.from({
+              ...ccc.Transaction.default(),
+              inputs: [
+                {
+                  previousOutput: {
+                    txHash: sus,
+                    index: 1,
+                  },
+                  since: 0,
+                  cellOutput: susTx.outputs[1],
+                },
+              ],
+              outputs: [
+                // Owner cell
+                {
+                  capacity: ccc.fixedPointFrom(8 + 69),
+                  lock: singleUseLock,
+                },
+              ],
+              outputsData: ["0x"],
+            });
+            const lock = await signer.sendTransaction(lockTx);
+
+            const mintTx = ccc.Transaction.from({
+              ...ccc.Transaction.default(),
+              inputs: [
+                // SUS
+                {
+                  previousOutput: {
+                    txHash: sus,
+                    index: 0,
+                  },
+                  since: 0,
+                  cellOutput: susTx.outputs[0],
+                },
+                // Owner cell
+                {
+                  previousOutput: {
+                    txHash: lock,
+                    index: 0,
+                  },
+                  since: 0,
+                  cellOutput: lockTx.outputs[0],
+                },
+                // Capacity for xUDT cell
+                {
+                  previousOutput: {
+                    txHash: sus,
+                    index: 2,
+                  },
+                  since: 0,
+                  cellOutput: susTx.outputs[2],
+                },
+              ],
+              outputs: [
+                // Issued xUDT
+                {
+                  capacity: ccc.fixedPointFrom(8 + 8 + 65 + scriptSize),
+                  lock: script,
+                  type: {
+                    ...(await signer.client.getKnownScript(
+                      ccc.KnownScript.XUdt,
+                    )),
+                    args: singleUseLock.hash(),
+                  },
+                },
+                // Change cell
+                {
+                  capacity:
+                    susTx.outputs[0].capacity + lockTx.outputs[0].capacity,
+                  lock: script,
+                },
+              ],
+              outputsData: [ccc.numLeToBytes(amount, 8), "0x"],
+            });
+            mintTx.addCellDeps(
+              ...(await signer.client.getCellDeps(
+                ...(
+                  await signer.client.getKnownScript(KnownScript.SingleUseLock)
+                ).cellDeps,
+                ...(await signer.client.getKnownScript(KnownScript.XUdt))
+                  .cellDeps,
+              )),
+            );
+            const mint = await signer.sendTransaction(mintTx);
+
+            setHashes([sus, lock, mint]);
+          }}
+        >
+          Issue
+        </Button>
+      </div>
+    </>
+  );
+}
+
 export default function Home() {
   const [error, setError] = useState<string | undefined>(undefined);
   useEffect(() => {
@@ -229,6 +400,7 @@ export default function Home() {
   const tabs: [string, ReactNode][] = [
     ["Sign", <Sign key="Sign" />],
     ["Transfer", <Transfer key="Transfer" />],
+    ["Issue xUDT (SUS)", <IssueXUdtSul key="Transfer" />],
   ];
 
   useEffect(() => {

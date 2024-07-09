@@ -1,5 +1,7 @@
 import {
   Cell,
+  CellDep,
+  CellDepLike,
   OutPointLike,
   Script,
   ScriptLike,
@@ -8,7 +10,7 @@ import {
 import { Zero } from "../fixedPoint";
 import { Hex, HexLike } from "../hex";
 import { Num, NumLike, numFrom } from "../num";
-import { reduceAsync } from "../utils";
+import { apply, reduceAsync } from "../utils";
 import {
   ClientFindCellsResponse,
   ClientIndexerSearchKeyLike,
@@ -20,10 +22,33 @@ export enum KnownScript {
   Secp256k1Blake160 = "Secp256k1Blake160",
   Secp256k1Multisig = "Secp256k1Multisig",
   AnyoneCanPay = "AnyoneCanPay",
+  TypeId = "TypeId",
+  XUdt = "XUdt",
   JoyId = "JoyId",
   COTA = "COTA",
   OmniLock = "OmniLock",
   NostrLock = "NostrLock",
+  SingleUseLock = "SingleUseLock",
+  OutputTypeProxyLock = "OutputTypeProxyLock",
+}
+
+export type CellDepInfoLike = {
+  cellDep: CellDepLike;
+  type?: ScriptLike;
+};
+
+export class CellDepInfo {
+  constructor(
+    public cellDep: CellDep,
+    public type?: Script,
+  ) {}
+
+  static from(cellDepInfoLike: CellDepInfoLike): CellDepInfo {
+    return new CellDepInfo(
+      CellDep.from(cellDepInfoLike.cellDep),
+      apply(Script.from, cellDepInfoLike.type),
+    );
+  }
 }
 
 export abstract class Client {
@@ -32,7 +57,9 @@ export abstract class Client {
 
   abstract getKnownScript(
     script: KnownScript,
-  ): Promise<Pick<Script, "codeHash" | "hashType">>;
+  ): Promise<
+    Pick<Script, "codeHash" | "hashType"> & { cellDeps: CellDepInfo[] }
+  >;
 
   abstract sendTransaction(
     transaction: TransactionLike,
@@ -57,7 +84,7 @@ export abstract class Client {
       outPoint,
       cellOutput: transaction.transaction.outputs[index],
       outputData: transaction.transaction.outputsData[index] ?? "0x",
-      blockNumber: transaction.blockNumber,
+      blockNumber: transaction.blockNumber ?? 0,
     });
   }
 
@@ -96,16 +123,76 @@ export abstract class Client {
     lock: ScriptLike,
     type: ScriptLike,
     withData = true,
+    order?: "asc" | "desc",
+    limit = 10,
   ): AsyncGenerator<Cell> {
-    return this.findCells({
-      script: lock,
-      scriptType: "lock",
-      scriptSearchMode: "exact",
-      filter: {
-        script: type,
+    return this.findCells(
+      {
+        script: lock,
+        scriptType: "lock",
+        scriptSearchMode: "exact",
+        filter: {
+          script: type,
+        },
+        withData,
       },
+      order,
+      limit,
+    );
+  }
+
+  findCellsByType(
+    type: ScriptLike,
+    withData = true,
+    order?: "asc" | "desc",
+    limit = 10,
+  ): AsyncGenerator<Cell> {
+    return this.findCells(
+      {
+        script: type,
+        scriptType: "type",
+        scriptSearchMode: "exact",
+        withData,
+      },
+      order,
+      limit,
+    );
+  }
+
+  async findSingletonCellByType(
+    type: ScriptLike,
+    withData = false,
+  ): Promise<Cell | undefined> {
+    for await (const cell of this.findCellsByType(
+      type,
       withData,
-    });
+      undefined,
+      1,
+    )) {
+      return cell;
+    }
+  }
+
+  async getCellDeps(
+    ...cellDepsInfoLike: CellDepInfoLike[]
+  ): Promise<CellDep[]> {
+    return Promise.all(
+      cellDepsInfoLike.map(async (infoLike) => {
+        const { cellDep, type } = CellDepInfo.from(infoLike);
+        if (type === undefined) {
+          return cellDep;
+        }
+        const found = await this.findSingletonCellByType(type);
+        if (!found) {
+          return cellDep;
+        }
+
+        return CellDep.from({
+          outPoint: found.outPoint,
+          depType: cellDep.depType,
+        });
+      }),
+    );
   }
 
   abstract getCellsCapacity(key: ClientIndexerSearchKeyLike): Promise<Num>;

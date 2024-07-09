@@ -159,13 +159,17 @@ export class JsonRpcTransformers {
     tx_status: { status, block_number },
     transaction,
   }: {
-    tx_status: { status: TransactionStatus; block_number: Hex };
-    transaction: JsonRpcTransaction;
-  }): ClientTransactionResponse {
+    tx_status: { status: TransactionStatus; block_number: Hex | null };
+    transaction: JsonRpcTransaction | null;
+  }): ClientTransactionResponse | null {
+    if (transaction == null) {
+      return null;
+    }
+
     return {
       transaction: JsonRpcTransformers.transactionTo(transaction),
       status,
-      blockNumber: numFrom(block_number),
+      blockNumber: numFrom(block_number ?? 0),
     };
   }
   static rangeFrom([a, b]: [NumLike, NumLike]): [Hex, Hex] {
@@ -212,7 +216,7 @@ export class JsonRpcTransformers {
       block_number: Hex;
       out_point: JsonRpcOutPoint;
       output: JsonRpcCellOutput;
-      output_data: Hex;
+      output_data?: Hex;
     }[];
   }): ClientFindCellsResponse {
     return {
@@ -222,7 +226,7 @@ export class JsonRpcTransformers {
           blockNumber: cell.block_number,
           outPoint: JsonRpcTransformers.outPointTo(cell.out_point),
           cellOutput: JsonRpcTransformers.cellOutputTo(cell.output),
-          outputData: cell.output_data,
+          outputData: cell.output_data ?? "0x",
         }),
       ),
     };

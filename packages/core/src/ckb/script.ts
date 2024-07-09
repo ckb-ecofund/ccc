@@ -1,4 +1,5 @@
 import { Bytes, BytesLike, bytesFrom } from "../bytes";
+import { ckbHash } from "../hasher";
 import { Hex, hexFrom } from "../hex";
 import * as mol from "./molecule.advanced";
 import {
@@ -101,6 +102,20 @@ export class Script {
   ) {}
 
   /**
+   * Clone a script.
+   *
+   * @returns A cloned Script instance.
+   *
+   * @example
+   * ```typescript
+   * const script1 = script0.clone();
+   * ```
+   */
+  clone(): Script {
+    return new Script(this.codeHash, this.hashType, this.args);
+  }
+
+  /**
    * Creates a Script instance from a ScriptLike object.
    *
    * @param script - A ScriptLike object or an instance of Script.
@@ -155,6 +170,20 @@ export class Script {
 
   toBytes(): Bytes {
     return bytesFrom(mol.SerializeScript(this._toMolData()));
+  }
+
+  /**
+   * Get hash of a script
+   *
+   * @returns Hash of this script
+   *
+   * @example
+   * ```typescript
+   * const hash = script.hash();
+   * ```
+   */
+  hash(): Hex {
+    return ckbHash(this.toBytes());
   }
 
   /**

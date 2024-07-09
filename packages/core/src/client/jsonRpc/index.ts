@@ -93,7 +93,7 @@ export abstract class ClientJsonRpc extends Client {
     "get_transaction",
     [hexFrom],
     JsonRpcTransformers.transactionResponseTo,
-  ) as (txHash: HexLike) => Promise<ClientTransactionResponse>;
+  ) as (txHash: HexLike) => Promise<ClientTransactionResponse | null>;
 
   /**
    * find cells from node.
