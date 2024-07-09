@@ -130,6 +130,8 @@ export class WebComponentConnector extends LitElement {
     super.connectedCallback();
     this.loadConnection();
     this.reloadSigners();
+    // Delay for extensions to load
+    setTimeout(() => this.reloadSigners(), 100);
   }
 
   willUpdate(changedProperties: PropertyValues): void {
