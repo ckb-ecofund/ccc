@@ -356,14 +356,13 @@ function IssueXUdtSul() {
               ],
               outputsData: [ccc.numLeToBytes(amount, 8), "0x"],
             });
-            mintTx.addCellDeps(
-              ...(await signer.client.getCellDeps(
-                ...(
-                  await signer.client.getKnownScript(KnownScript.SingleUseLock)
-                ).cellDeps,
-                ...(await signer.client.getKnownScript(KnownScript.XUdt))
-                  .cellDeps,
-              )),
+            await mintTx.addCellDepsKnownScript(
+              signer.client,
+              KnownScript.SingleUseLock,
+            );
+            await mintTx.addCellDepsKnownScript(
+              signer.client,
+              KnownScript.XUdt,
             );
             const mint = await signer.sendTransaction(mintTx);
 

@@ -178,11 +178,7 @@ export class CkbSigner extends ccc.Signer {
     txLike: ccc.TransactionLike,
   ): Promise<ccc.Transaction> {
     const tx = ccc.Transaction.from(txLike);
-    tx.addCellDeps(
-      ...(await this.client.getCellDeps(
-        ...(await this.client.getKnownScript(ccc.KnownScript.JoyId)).cellDeps,
-      )),
-    );
+    await tx.addCellDepsKnownScript(this.client, ccc.KnownScript.JoyId);
     const position = await tx.findInputIndexByLock(
       (await this.getAddressObj()).script,
       this.client,
@@ -202,9 +198,8 @@ export class CkbSigner extends ccc.Signer {
   /**
    * Prepares a transaction for a sub key.
    * @private
-   * @param {ccc.Transaction} tx - The transaction object.
-   * @param {ccc.WitnessArgs} witness - The witness arguments.
-   * @returns {Promise<void>}
+   * @param tx - The transaction object.
+   * @param witness - The witness arguments.
    * @throws Will throw an error if no COTA cells are found for the sub key wallet.
    */
   private async prepareTransactionForSubKey(
@@ -256,6 +251,28 @@ export class CkbSigner extends ccc.Signer {
   ): Promise<ccc.Transaction> {
     const tx = ccc.Transaction.from(txLike);
     const { script } = await this.getAddressObj();
+    const witnessIndexes = await ccc.reduceAsync(
+      tx.inputs,
+      async (acc, input, i) => {
+        await input.completeExtraInfos(this.client);
+        if (!input.cellOutput) {
+          throw new Error("Unable to complete input");
+        }
+
+        if (input.cellOutput.lock.eq(script)) {
+          acc.push(i);
+        }
+      },
+      [] as number[],
+    );
+
+    // Trim unnecessary fields to reduce tx size
+    await tx.prepareSighashAllWitness(script, 0, this.client);
+    tx.inputs.forEach((i) => {
+      i.cellOutput = undefined;
+      i.outputData = undefined;
+      i.blockNumber = undefined;
+    });
 
     const config = this.getConfig();
     const res = await createPopup(
@@ -264,11 +281,7 @@ export class CkbSigner extends ccc.Signer {
           ...config,
           tx: JSON.parse(tx.stringify()),
           signerAddress: (await this.assertConnection()).address,
-          witnessIndex: await tx.findInputIndexByLock(script, this.client),
-          witnessLastIndex: await tx.findLastInputIndexByLock(
-            script,
-            this.client,
-          ),
+          witnessIndexes,
         },
         "popup",
         "/sign-ckb-raw-tx",

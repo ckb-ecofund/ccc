@@ -1,6 +1,11 @@
 import type { TransactionSkeletonType } from "@ckb-lumos/helpers";
 import { Bytes, BytesLike, bytesFrom } from "../bytes";
-import { Client, ClientIndexerSearchKeyFilterLike } from "../client";
+import {
+  CellDepInfoLike,
+  Client,
+  ClientIndexerSearchKeyFilterLike,
+  KnownScript,
+} from "../client";
 import { Zero, fixedPointFrom } from "../fixedPoint";
 import { Hasher, ckbHash } from "../hasher";
 import { Hex, HexLike, hexFrom } from "../hex";
@@ -1131,8 +1136,8 @@ export class Transaction {
    * tx.addCellDeps(cellDep);
    * ```
    */
-  addCellDeps(...cellDepsLike: CellDepLike[]): void {
-    cellDepsLike.forEach((cellDepLike) => {
+  addCellDeps(...cellDepsLike: (CellDepLike | CellDepLike[])[]): void {
+    cellDepsLike.flat().forEach((cellDepLike) => {
       const cellDep = CellDep.from(cellDepLike);
       if (this.cellDeps.some((c) => c.eq(cellDep))) {
         return;
@@ -1140,6 +1145,45 @@ export class Transaction {
 
       this.cellDeps.push(cellDep);
     });
+  }
+
+  /**
+   * Add cell dep from infos if they are not existed
+   *
+   * @param client - A client for searching cell deps
+   * @param cellDepLikes - The cell dep infos to add
+   *
+   * @example
+   * ```typescript
+   * tx.addCellDepInfos(client, cellDepInfos);
+   * ```
+   */
+  async addCellDepInfos(
+    client: Client,
+    ...cellDepInfosLike: (CellDepInfoLike | CellDepInfoLike[])[]
+  ): Promise<void> {
+    this.addCellDeps(await client.getCellDeps(...cellDepInfosLike));
+  }
+
+  /**
+   * Add cell deps from known script
+   *
+   * @param client - The client for searching known script and cell deps
+   * @param script - The known script to add
+   *
+   * @example
+   * ```typescript
+   * tx.addCellDepsKnownScript(client, KnownScript.OmniLock);
+   * ```
+   */
+  async addCellDepsKnownScript(
+    client: Client,
+    script: KnownScript,
+  ): Promise<void> {
+    return this.addCellDepInfos(
+      client,
+      (await client.getKnownScript(script)).cellDeps,
+    );
   }
 
   /**

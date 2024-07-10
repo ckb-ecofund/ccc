@@ -94,11 +94,7 @@ export abstract class SignerNostr extends Signer {
   async prepareTransaction(txLike: TransactionLike): Promise<Transaction> {
     const tx = Transaction.from(txLike);
     const { script } = await this.getRecommendedAddressObj();
-    tx.addCellDeps(
-      ...(await this.client.getCellDeps(
-        ...(await this.client.getKnownScript(KnownScript.NostrLock)).cellDeps,
-      )),
-    );
+    await tx.addCellDepsKnownScript(this.client, KnownScript.NostrLock);
     await tx.prepareSighashAllWitness(script, 572, this.client);
     return tx;
   }

@@ -174,10 +174,10 @@ export abstract class Client {
   }
 
   async getCellDeps(
-    ...cellDepsInfoLike: CellDepInfoLike[]
+    ...cellDepsInfoLike: (CellDepInfoLike | CellDepInfoLike[])[]
   ): Promise<CellDep[]> {
     return Promise.all(
-      cellDepsInfoLike.map(async (infoLike) => {
+      cellDepsInfoLike.flat().map(async (infoLike) => {
         const { cellDep, type } = CellDepInfo.from(infoLike);
         if (type === undefined) {
           return cellDep;

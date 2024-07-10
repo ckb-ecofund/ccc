@@ -73,11 +73,7 @@ export abstract class SignerEvm extends Signer {
    */
   async prepareTransaction(txLike: TransactionLike): Promise<Transaction> {
     const tx = Transaction.from(txLike);
-    tx.addCellDeps(
-      ...(await this.client.getCellDeps(
-        ...(await this.client.getKnownScript(KnownScript.OmniLock)).cellDeps,
-      )),
-    );
+    await tx.addCellDepsKnownScript(this.client, KnownScript.OmniLock);
     return reduceAsync(
       await this.getAddressObjs(),
       (tx: Transaction, { script }) =>
