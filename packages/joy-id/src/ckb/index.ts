@@ -271,7 +271,6 @@ export class CkbSigner extends ccc.Signer {
     tx.inputs.forEach((i) => {
       i.cellOutput = undefined;
       i.outputData = undefined;
-      i.blockNumber = undefined;
     });
 
     const config = this.getConfig();

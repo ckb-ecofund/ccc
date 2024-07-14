@@ -2,21 +2,27 @@ import {
   Cell,
   CellDep,
   CellDepLike,
+  CellLike,
+  OutPoint,
   OutPointLike,
   Script,
   ScriptLike,
+  Transaction,
   TransactionLike,
 } from "../ckb";
 import { Zero } from "../fixedPoint";
-import { Hex, HexLike } from "../hex";
+import { Hex, HexLike, hexFrom } from "../hex";
 import { Num, NumLike, numFrom } from "../num";
 import { apply, reduceAsync } from "../utils";
+import { filterCell } from "./client.advanced";
 import {
   ClientFindCellsResponse,
+  ClientIndexerSearchKey,
   ClientIndexerSearchKeyLike,
   ClientTransactionResponse,
   OutputsValidator,
 } from "./clientTypes";
+import { ClientCollectableSearchKeyLike } from "./clientTypes.advanced";
 
 export enum KnownScript {
   Secp256k1Blake160 = "Secp256k1Blake160",
@@ -52,6 +58,11 @@ export class CellDepInfo {
 }
 
 export abstract class Client {
+  private readonly cachedTransactions: Transaction[] = [];
+  private readonly unusableOutPoints: OutPoint[] = [];
+  private readonly usableCells: Cell[] = [];
+  private readonly knownCells: Cell[] = [];
+
   abstract get url(): string;
   abstract get addressPrefix(): string;
 
@@ -61,16 +72,37 @@ export abstract class Client {
     Pick<Script, "codeHash" | "hashType"> & { cellDeps: CellDepInfo[] }
   >;
 
-  abstract sendTransaction(
+  async markUsable(cellLike: CellLike): Promise<void> {
+    const cell = Cell.from(cellLike).clone();
+    this.usableCells.push(cell);
+    this.knownCells.push(cell);
+
+    const index = this.unusableOutPoints.findIndex((o) => cell.outPoint.eq(o));
+    if (index !== -1) {
+      this.unusableOutPoints.splice(index, 1);
+    }
+  }
+
+  async markUnusable(outPointLike: OutPointLike): Promise<void> {
+    const outPoint = OutPoint.from(outPointLike);
+    this.unusableOutPoints.push(outPoint.clone());
+
+    const index = this.usableCells.findIndex((c) => c.outPoint.eq(outPoint));
+    if (index !== -1) {
+      this.usableCells.splice(index, 1);
+    }
+  }
+
+  abstract sendTransactionNoCache(
     transaction: TransactionLike,
     validator?: OutputsValidator,
   ): Promise<Hex>;
-  abstract getTransaction(
+  abstract getTransactionNoCache(
     txHash: HexLike,
   ): Promise<ClientTransactionResponse | null>;
 
-  async getCell(outPoint: OutPointLike): Promise<Cell | null> {
-    const transaction = await this.getTransaction(outPoint.txHash);
+  async getCellNoCache(outPoint: OutPointLike): Promise<Cell | null> {
+    const transaction = await this.getTransactionNoCache(outPoint.txHash);
     if (!transaction) {
       return null;
     }
@@ -84,16 +116,25 @@ export abstract class Client {
       outPoint,
       cellOutput: transaction.transaction.outputs[index],
       outputData: transaction.transaction.outputsData[index] ?? "0x",
-      blockNumber: transaction.blockNumber ?? 0,
     });
   }
 
-  abstract findCellsPaged(
+  abstract findCellsPagedNoCache(
     key: ClientIndexerSearchKeyLike,
     order?: "asc" | "desc",
     limit?: NumLike,
     after?: string,
   ): Promise<ClientFindCellsResponse>;
+  async findCellsPaged(
+    key: ClientIndexerSearchKeyLike,
+    order?: "asc" | "desc",
+    limit?: NumLike,
+    after?: string,
+  ): Promise<ClientFindCellsResponse> {
+    const res = await this.findCellsPagedNoCache(key, order, limit, after);
+    this.knownCells.push(...res.cells);
+    return res;
+  }
 
   async *findCells(
     key: ClientIndexerSearchKeyLike,
@@ -215,5 +256,90 @@ export abstract class Client {
       async (acc, lock) => acc + (await this.getBalanceSingle(lock)),
       Zero,
     );
+  }
+
+  async sendTransaction(
+    transaction: TransactionLike,
+    validator?: OutputsValidator,
+  ): Promise<Hex> {
+    const tx = Transaction.from(transaction);
+
+    const txHash = await this.sendTransactionNoCache(tx, validator);
+
+    this.cachedTransactions.push(tx.clone());
+    await Promise.all(
+      tx.inputs.map((i) => this.markUnusable(i.previousOutput)),
+    );
+    await Promise.all(
+      tx.outputs.map((o, i) =>
+        this.markUsable({
+          cellOutput: o,
+          outputData: tx.outputsData[i],
+          outPoint: {
+            txHash,
+            index: i,
+          },
+        }),
+      ),
+    );
+    return txHash;
+  }
+
+  async getTransaction(
+    txHashLike: HexLike,
+  ): Promise<ClientTransactionResponse | null> {
+    const txHash = hexFrom(txHashLike);
+    const res = await this.getTransactionNoCache(txHash);
+    if (res !== null) {
+      return res;
+    }
+
+    const tx = this.cachedTransactions.find((t) => t.hash() === txHash);
+    if (!tx) {
+      return null;
+    }
+
+    return {
+      transaction: tx,
+      status: "proposed",
+    };
+  }
+
+  async getCell(outPointLike: OutPointLike): Promise<Cell | null> {
+    const outPoint = OutPoint.from(outPointLike);
+    const cached = this.knownCells.find((cell) => cell.outPoint.eq(outPoint));
+
+    if (cached) {
+      return cached.clone();
+    }
+
+    const cell = await this.getCellNoCache(outPoint);
+    if (cell) {
+      this.knownCells.push(cell);
+    }
+    return cell;
+  }
+
+  /**
+   * Find cells by search key designed for collectable cells.
+   *
+   * @param key - The search key.
+   * @returns A async generator for yielding cells.
+   */
+  async *findCellsByCollectableSearchKey(
+    keyLike: ClientCollectableSearchKeyLike,
+  ): AsyncGenerator<Cell> {
+    const key = ClientIndexerSearchKey.from(keyLike);
+    for (const cell of this.usableCells) {
+      if (filterCell(key, cell)) {
+        yield cell;
+      }
+    }
+
+    for await (const cell of this.findCells(key)) {
+      if (!this.unusableOutPoints.some((o) => o.eq(cell.outPoint))) {
+        yield cell;
+      }
+    }
   }
 }

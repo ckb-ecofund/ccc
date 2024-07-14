@@ -1,11 +1,7 @@
 import type { TransactionSkeletonType } from "@ckb-lumos/helpers";
+import { ClientCollectableSearchKeyFilterLike } from "../advancedBarrel";
 import { Bytes, BytesLike, bytesFrom } from "../bytes";
-import {
-  CellDepInfoLike,
-  Client,
-  ClientIndexerSearchKeyFilterLike,
-  KnownScript,
-} from "../client";
+import { CellDepInfoLike, Client, KnownScript } from "../client";
 import { Zero, fixedPointFrom } from "../fixedPoint";
 import { Hasher, ckbHash } from "../hasher";
 import { Hex, HexLike, hexFrom } from "../hex";
@@ -231,6 +227,10 @@ export class CellOutput {
     public type?: Script,
   ) {}
 
+  get occupiedSize(): number {
+    return 8 + this.lock.occupiedSize + (this.type?.occupiedSize ?? 0);
+  }
+
   /**
    * Clone a CellOutput.
    *
@@ -331,7 +331,6 @@ export type CellLike = {
   outPoint: OutPointLike;
   cellOutput: CellOutputLike;
   outputData: HexLike;
-  blockNumber: NumLike;
 };
 export class Cell {
   /**
@@ -340,14 +339,12 @@ export class Cell {
    * @param outPoint - The output point of the cell.
    * @param cellOutput - The cell output of the cell.
    * @param outputData - The output data of the cell.
-   * @param blockNumber - The block number of the cell.
    */
 
   constructor(
     public outPoint: OutPoint,
     public cellOutput: CellOutput,
     public outputData: Hex,
-    public blockNumber: Num,
   ) {}
 
   /**
@@ -366,17 +363,33 @@ export class Cell {
       OutPoint.from(cell.outPoint),
       CellOutput.from(cell.cellOutput),
       hexFrom(cell.outputData),
-      numFrom(cell.blockNumber),
+    );
+  }
+
+  /**
+   * Clone a Cell
+   *
+   * @returns A cloned Cell instance.
+   *
+   * @example
+   * ```typescript
+   * const cell1 = cell0.clone();
+   * ```
+   */
+  clone(): Cell {
+    return new Cell(
+      this.outPoint.clone(),
+      this.cellOutput.clone(),
+      this.outputData,
     );
   }
 }
 
 export type CellInputLike = {
   previousOutput: OutPointLike;
-  since: NumLike;
+  since?: NumLike;
   cellOutput?: CellOutputLike;
   outputData?: HexLike;
-  blockNumber?: NumLike;
 };
 export class CellInput {
   /**
@@ -386,7 +399,6 @@ export class CellInput {
    * @param since - The since value of the cell input.
    * @param cellOutput - The optional cell output associated with the cell input.
    * @param outputData - The optional output data associated with the cell input.
-   * @param blockNumber - The optional block number associated with the cell input.
    */
 
   constructor(
@@ -394,7 +406,6 @@ export class CellInput {
     public since: Num,
     public cellOutput?: CellOutput,
     public outputData?: Hex,
-    public blockNumber?: Num,
   ) {}
 
   /**
@@ -413,7 +424,6 @@ export class CellInput {
       this.since,
       this.cellOutput?.clone(),
       this.outputData,
-      this.blockNumber,
     );
   }
 
@@ -438,10 +448,9 @@ export class CellInput {
 
     return new CellInput(
       OutPoint.from(cellInput.previousOutput),
-      numFrom(cellInput.since),
+      numFrom(cellInput.since ?? 0),
       apply(CellOutput.from, cellInput.cellOutput),
       apply(hexFrom, cellInput.outputData),
-      apply(numFrom, cellInput.blockNumber),
     );
   }
 
@@ -456,7 +465,7 @@ export class CellInput {
    * ```
    */
   async completeExtraInfos(client: Client): Promise<void> {
-    if (this.cellOutput && this.outputData && this.blockNumber) {
+    if (this.cellOutput && this.outputData) {
       return;
     }
 
@@ -467,7 +476,6 @@ export class CellInput {
 
     this.cellOutput = cell.cellOutput;
     this.outputData = cell.outputData;
-    this.blockNumber = cell.blockNumber;
   }
 
   /**
@@ -754,13 +762,14 @@ export class WitnessArgs {
 }
 
 export type TransactionLike = {
-  version: NumLike;
-  cellDeps: CellDepLike[];
-  headerDeps: HexLike[];
-  inputs: CellInputLike[];
-  outputs: CellOutputLike[];
-  outputsData: HexLike[];
-  witnesses: HexLike[];
+  version?: NumLike;
+  cellDeps?: CellDepLike[];
+  headerDeps?: HexLike[];
+  inputs?: CellInputLike[];
+  outputs?: (Omit<CellOutputLike, "capacity"> &
+    Partial<Pick<CellOutputLike, "capacity">>)[];
+  outputsData?: HexLike[];
+  witnesses?: HexLike[];
 };
 export class Transaction {
   /**
@@ -866,13 +875,22 @@ export class Transaction {
     }
 
     return new Transaction(
-      numFrom(tx.version),
-      tx.cellDeps.map((cellDep) => CellDep.from(cellDep)),
-      tx.headerDeps.map(hexFrom),
-      tx.inputs.map((input) => CellInput.from(input)),
-      tx.outputs.map((output) => CellOutput.from(output)),
-      tx.outputsData.map(hexFrom),
-      tx.witnesses.map(hexFrom),
+      numFrom(tx.version ?? 0),
+      tx.cellDeps?.map((cellDep) => CellDep.from(cellDep)) ?? [],
+      tx.headerDeps?.map(hexFrom) ?? [],
+      tx.inputs?.map((input) => CellInput.from(input)) ?? [],
+      tx.outputs?.map((output, i) => {
+        const o = CellOutput.from({
+          ...output,
+          capacity: output.capacity ?? 0,
+        });
+        o.capacity = fixedPointFrom(
+          o.occupiedSize + (apply(bytesFrom, tx.outputsData?.[i])?.length ?? 0),
+        );
+        return o;
+      }) ?? [],
+      tx.outputsData?.map(hexFrom) ?? [],
+      tx.witnesses?.map(hexFrom) ?? [],
     );
   }
 
@@ -1303,7 +1321,7 @@ export class Transaction {
 
   async completeInputs<T>(
     from: Signer,
-    filter: ClientIndexerSearchKeyFilterLike,
+    filter: ClientCollectableSearchKeyFilterLike,
     accumulator: (
       acc: T,
       v: Cell,
@@ -1317,28 +1335,33 @@ export class Transaction {
     let acc: T = init;
 
     for (const script of scripts) {
-      for await (const cell of from.client.findCells({
+      for await (const cell of from.client.findCellsByCollectableSearchKey({
         script,
         scriptType: "lock",
         filter,
         scriptSearchMode: "exact",
         withData: true,
       })) {
+        if (
+          this.inputs.some(({ previousOutput }) =>
+            previousOutput.eq(cell.outPoint),
+          )
+        ) {
+          continue;
+        }
         const i = collectedCells.push(cell);
         const next: T | undefined = await Promise.resolve(
           accumulator(acc, cell, i - 1, collectedCells),
         );
         if (next === undefined) {
           this.inputs.push(
-            ...collectedCells.map(
-              ({ outPoint, outputData, cellOutput, blockNumber }) =>
-                CellInput.from({
-                  previousOutput: outPoint,
-                  since: 0,
-                  outputData,
-                  cellOutput,
-                  blockNumber,
-                }),
+            ...collectedCells.map(({ outPoint, outputData, cellOutput }) =>
+              CellInput.from({
+                previousOutput: outPoint,
+                since: 0,
+                outputData,
+                cellOutput,
+              }),
             ),
           );
           return collectedCells.length;
@@ -1353,7 +1376,7 @@ export class Transaction {
   async completeInputsByCapacity(
     from: Signer,
     capacityTweak?: NumLike,
-    filter?: ClientIndexerSearchKeyFilterLike,
+    filter?: ClientCollectableSearchKeyFilterLike,
   ): Promise<number> {
     const exceptedCapacity =
       this.getOutputsCapacity() + numFrom(capacityTweak ?? 0);
@@ -1385,7 +1408,7 @@ export class Transaction {
     from: Signer,
     change: (tx: Transaction, capacity: Num) => Promise<NumLike> | NumLike,
     feeRate: NumLike,
-    filter?: ClientIndexerSearchKeyFilterLike,
+    filter?: ClientCollectableSearchKeyFilterLike,
   ): Promise<[number, boolean]> {
     // Complete all inputs extra infos for cache
     await this.getInputsCapacity(from.client);
@@ -1411,12 +1434,12 @@ export class Transaction {
       }
 
       let changed = prepared.clone();
-      const missing = numFrom(
+      const needed = numFrom(
         await Promise.resolve(change(changed, extraCapacity - leastFee)),
       );
       // No enough extra capacity to create new cells for change
-      if (missing > Zero) {
-        leastExtraCapacity += missing;
+      if (needed > Zero) {
+        leastExtraCapacity = needed;
         continue;
       }
 
@@ -1451,32 +1474,20 @@ export class Transaction {
     from: Signer,
     change: ScriptLike,
     feeRate: NumLike,
-    filter?: ClientIndexerSearchKeyFilterLike,
+    filter?: ClientCollectableSearchKeyFilterLike,
   ): Promise<[number, boolean]> {
     const script = Script.from(change);
 
     return this.completeFee(
       from,
       (tx, capacity) => {
-        for (const i in tx.outputs) {
-          const output = tx.outputs[i];
-          if (
-            output.lock.eq(script) &&
-            output.type === undefined &&
-            (tx.outputsData[i] ?? "0x") === "0x"
-          ) {
-            output.capacity += capacity;
-            return 0;
-          }
+        const changeCell = CellOutput.from({ capacity: 0, lock: script });
+        const occupiedCapacity = fixedPointFrom(changeCell.occupiedSize);
+        if (capacity < occupiedCapacity) {
+          return occupiedCapacity;
         }
-        const neededCapacity = fixedPointFrom(
-          bytesFrom(script.args).length + 41,
-        );
-        if (capacity < neededCapacity) {
-          return neededCapacity - capacity;
-        }
-        const i =
-          tx.outputs.push(CellOutput.from({ lock: script, capacity })) - 1;
+        changeCell.capacity = capacity;
+        const i = tx.outputs.push(changeCell) - 1;
         tx.setOutputDataAt(i, "0x");
         return 0;
       },

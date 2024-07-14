@@ -94,12 +94,15 @@ export class Script {
    * @param hashType - The hash type of the script.
    * @param args - The arguments for the script.
    */
-
   constructor(
     public codeHash: Hex,
     public hashType: HashType,
     public args: Hex,
   ) {}
+
+  get occupiedSize(): number {
+    return 33 + bytesFrom(this.args).length;
+  }
 
   /**
    * Clone a script.

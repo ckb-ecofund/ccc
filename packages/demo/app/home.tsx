@@ -243,102 +243,66 @@ function IssueXUdtSul() {
               return;
             }
             const { script } = await signer.getRecommendedAddressObj();
-            const scriptSize = 32 + 1 + ccc.bytesFrom(script.args).length;
 
             const susTx = ccc.Transaction.from({
-              ...ccc.Transaction.default(),
               outputs: [
-                // SUS
                 {
-                  capacity: ccc.fixedPointFrom(4 + scriptSize),
-                  lock: script,
-                },
-                // Capacity for creating owner cell
-                {
-                  capacity: ccc.fixedPointFrom(8 + 69) + ccc.numFrom(3000),
-                  lock: script,
-                },
-                // Capacity for minting token
-                {
-                  capacity:
-                    ccc.fixedPointFrom(8 + 8 + 65 + scriptSize) +
-                    ccc.numFrom(3000),
                   lock: script,
                 },
               ],
-              outputsData: ["0x", "0x", "0x"],
+              outputsData: ["0x"],
             });
             await susTx.completeInputsByCapacity(signer);
             await susTx.completeFeeToLock(signer, script, 1000);
-            const sus = await signer.sendTransaction(susTx);
+            console.log(susTx);
+            const susTxHash = await signer.sendTransaction(susTx);
+            console.log(susTxHash);
+            await signer.client.markUnusable({ txHash: susTxHash, index: 0 });
 
             const singleUseLock = ccc.Script.from({
               ...(await signer.client.getKnownScript(
                 ccc.KnownScript.SingleUseLock,
               )),
               args: ccc.OutPoint.from({
-                txHash: sus,
+                txHash: susTxHash,
                 index: 0,
               }).toBytes(),
             });
             const lockTx = ccc.Transaction.from({
-              ...ccc.Transaction.default(),
-              inputs: [
-                {
-                  previousOutput: {
-                    txHash: sus,
-                    index: 1,
-                  },
-                  since: 0,
-                  cellOutput: susTx.outputs[1],
-                },
-              ],
               outputs: [
                 // Owner cell
                 {
-                  capacity: ccc.fixedPointFrom(8 + 69),
                   lock: singleUseLock,
                 },
               ],
               outputsData: ["0x"],
             });
-            const lock = await signer.sendTransaction(lockTx);
+            await lockTx.completeInputsByCapacity(signer);
+            await lockTx.completeFeeToLock(signer, script, 1000);
+            console.log(lockTx);
+            const lockTxHash = await signer.sendTransaction(lockTx);
+            console.log(lockTxHash);
 
             const mintTx = ccc.Transaction.from({
-              ...ccc.Transaction.default(),
               inputs: [
                 // SUS
                 {
                   previousOutput: {
-                    txHash: sus,
+                    txHash: susTxHash,
                     index: 0,
                   },
-                  since: 0,
-                  cellOutput: susTx.outputs[0],
                 },
                 // Owner cell
                 {
                   previousOutput: {
-                    txHash: lock,
+                    txHash: lockTxHash,
                     index: 0,
                   },
-                  since: 0,
-                  cellOutput: lockTx.outputs[0],
-                },
-                // Capacity for xUDT cell
-                {
-                  previousOutput: {
-                    txHash: sus,
-                    index: 2,
-                  },
-                  since: 0,
-                  cellOutput: susTx.outputs[2],
                 },
               ],
               outputs: [
                 // Issued xUDT
                 {
-                  capacity: ccc.fixedPointFrom(8 + 8 + 65 + scriptSize),
                   lock: script,
                   type: {
                     ...(await signer.client.getKnownScript(
@@ -347,14 +311,8 @@ function IssueXUdtSul() {
                     args: singleUseLock.hash(),
                   },
                 },
-                // Change cell
-                {
-                  capacity:
-                    susTx.outputs[0].capacity + lockTx.outputs[0].capacity,
-                  lock: script,
-                },
               ],
-              outputsData: [ccc.numLeToBytes(amount, 8), "0x"],
+              outputsData: [ccc.numLeToBytes(amount, 8)],
             });
             await mintTx.addCellDepsKnownScript(
               signer.client,
@@ -364,9 +322,12 @@ function IssueXUdtSul() {
               signer.client,
               KnownScript.XUdt,
             );
-            const mint = await signer.sendTransaction(mintTx);
+            await mintTx.completeInputsByCapacity(signer);
+            await mintTx.completeFeeToLock(signer, script, 1000);
+            console.log(mintTx);
+            const mintTxHash = await signer.sendTransaction(mintTx);
 
-            setHashes([sus, lock, mint]);
+            setHashes([susTxHash, lockTxHash, mintTxHash]);
           }}
         >
           Issue

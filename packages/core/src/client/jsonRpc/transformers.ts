@@ -20,7 +20,7 @@ import {
   hashTypeFrom,
 } from "../../ckb";
 import { Hex } from "../../hex";
-import { NumLike, numFrom, numToHex } from "../../num";
+import { NumLike, numToHex } from "../../num";
 import { apply } from "../../utils";
 import {
   ClientFindCellsResponse,
@@ -92,7 +92,8 @@ export class JsonRpcTransformers {
       txHash: outPoint.tx_hash,
     });
   }
-  static cellInputFrom(cellInput: CellInputLike): JsonRpcCellInput {
+  static cellInputFrom(cellInputLike: CellInputLike): JsonRpcCellInput {
+    const cellInput = CellInput.from(cellInputLike);
     return {
       previous_output: JsonRpcTransformers.outPointFrom(
         cellInput.previousOutput,
@@ -156,10 +157,10 @@ export class JsonRpcTransformers {
     });
   }
   static transactionResponseTo({
-    tx_status: { status, block_number },
+    tx_status: { status },
     transaction,
   }: {
-    tx_status: { status: TransactionStatus; block_number: Hex | null };
+    tx_status: { status: TransactionStatus };
     transaction: JsonRpcTransaction | null;
   }): ClientTransactionResponse | null {
     if (transaction == null) {
@@ -169,7 +170,6 @@ export class JsonRpcTransformers {
     return {
       transaction: JsonRpcTransformers.transactionTo(transaction),
       status,
-      blockNumber: numFrom(block_number ?? 0),
     };
   }
   static rangeFrom([a, b]: [NumLike, NumLike]): [Hex, Hex] {
@@ -213,7 +213,6 @@ export class JsonRpcTransformers {
   }: {
     last_cursor: string;
     objects: {
-      block_number: Hex;
       out_point: JsonRpcOutPoint;
       output: JsonRpcCellOutput;
       output_data?: Hex;
@@ -223,7 +222,6 @@ export class JsonRpcTransformers {
       lastCursor: last_cursor,
       cells: objects.map((cell) =>
         Cell.from({
-          blockNumber: cell.block_number,
           outPoint: JsonRpcTransformers.outPointTo(cell.out_point),
           cellOutput: JsonRpcTransformers.cellOutputTo(cell.output),
           outputData: cell.output_data ?? "0x",

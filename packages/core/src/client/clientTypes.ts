@@ -1,7 +1,12 @@
-import { Cell, Script, ScriptLike, Transaction } from "../ckb";
-import { Hex, HexLike, hexFrom } from "../hex";
-import { Num, NumLike, numFrom } from "../num";
+import { Cell, Script, Transaction } from "../ckb";
+import { Hex, hexFrom } from "../hex";
+import { Num, NumLike } from "../num";
 import { apply } from "../utils";
+import {
+  ClientCollectableSearchKeyFilterLike,
+  ClientCollectableSearchKeyLike,
+  clientSearchKeyRangeFrom,
+} from "./clientTypes.advanced";
 
 export type OutputsValidator = "passthrough" | "well_known_scripts_only";
 
@@ -14,18 +19,12 @@ export type TransactionStatus =
 export type ClientTransactionResponse = {
   transaction: Transaction;
   status: TransactionStatus;
-  blockNumber: Num | null;
 };
 
-export type ClientIndexerSearchKeyFilterLike = {
-  script?: ScriptLike;
-  scriptLenRange?: [NumLike, NumLike];
-  outputData?: HexLike;
-  outputDataSearchMode?: "prefix" | "exact" | "partial";
-  outputDataLenRange?: [NumLike, NumLike];
-  outputCapacityRange?: [NumLike, NumLike];
-  blockRange?: [NumLike, NumLike];
-};
+export type ClientIndexerSearchKeyFilterLike =
+  ClientCollectableSearchKeyFilterLike & {
+    blockRange?: [NumLike, NumLike];
+  };
 export class ClientIndexerSearchKeyFilter {
   constructor(
     public script: Script | undefined,
@@ -42,32 +41,25 @@ export class ClientIndexerSearchKeyFilter {
   ): ClientIndexerSearchKeyFilter {
     return new ClientIndexerSearchKeyFilter(
       apply(Script.from, filterLike.script),
-      apply(rangeFrom, filterLike.scriptLenRange),
+      apply(clientSearchKeyRangeFrom, filterLike.scriptLenRange),
       apply(hexFrom, filterLike.outputData),
       filterLike.outputDataSearchMode,
-      apply(rangeFrom, filterLike.outputDataLenRange),
-      apply(rangeFrom, filterLike.outputCapacityRange),
-      apply(rangeFrom, filterLike.blockRange),
+      apply(clientSearchKeyRangeFrom, filterLike.outputDataLenRange),
+      apply(clientSearchKeyRangeFrom, filterLike.outputCapacityRange),
+      apply(clientSearchKeyRangeFrom, filterLike.blockRange),
     );
   }
 }
 
-export type ClientIndexerSearchKeyLike = {
-  script: ScriptLike;
-  scriptType: "lock" | "type";
-  scriptSearchMode?: "prefix" | "exact" | "partial";
+export type ClientIndexerSearchKeyLike = ClientCollectableSearchKeyLike & {
   filter?: ClientIndexerSearchKeyFilterLike;
-  withData?: boolean;
 };
 
-function rangeFrom([a, b]: [NumLike, NumLike]): [Num, Num] {
-  return [numFrom(a), numFrom(b)];
-}
 export class ClientIndexerSearchKey {
   constructor(
     public script: Script,
     public scriptType: "lock" | "type",
-    public scriptSearchMode: "prefix" | "exact" | "partial" | undefined,
+    public scriptSearchMode: "prefix" | "exact" | "partial",
     public filter: ClientIndexerSearchKeyFilter | undefined,
     public withData: boolean | undefined,
   ) {}
