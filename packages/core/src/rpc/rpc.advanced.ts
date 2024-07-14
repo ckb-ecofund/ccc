@@ -8,13 +8,12 @@ export type IOType = "input" | "output" | "both";
 export type Bytes32 = string;
 export type Hexadecimal = string;
 
-
 export interface JsonRpcRequest {
   id: number;
   jsonrpc: string;
   method: string;
   params?: any;
-};
+}
 
 export interface JsonRpcResponse<T> {
   jsonrpc: string;
@@ -25,7 +24,7 @@ export interface JsonRpcResponse<T> {
     message: string;
     data?: any;
   };
-};
+}
 
 export interface Tip {
   blockNumber: string;
@@ -84,12 +83,10 @@ export interface GetCellsSearchKey<WithData extends boolean = boolean>
   withData?: WithData;
 }
 
-
 export interface GetLiveCellsResult<WithData extends boolean = true> {
   lastCursor: string;
   objects: WithData extends true ? IndexerCell[] : IndexerCellWithoutData[];
 }
-
 
 export interface GetTransactionsSearchKey<Group extends boolean = boolean>
   extends SearchKey {

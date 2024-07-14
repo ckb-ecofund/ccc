@@ -1,9 +1,26 @@
-import { Hex } from '../hex';
-import { deepCamel, toGetCellsSearchKey, toGetTransactionsSearchKey } from './parseFormatter';
-import { GetCellsSearchKey, GetLiveCellsResult, GetTransactionsSearchKey, IndexerTransactionList, JsonRpcRequest, JsonRpcResponse, Order, Tip } from './rpc.advanced'
+import { Hex } from "../hex";
+import {
+  deepCamel,
+  toGetCellsSearchKey,
+  toGetTransactionsSearchKey,
+} from "./parseFormatter";
+import {
+  GetCellsSearchKey,
+  GetLiveCellsResult,
+  GetTransactionsSearchKey,
+  IndexerTransactionList,
+  JsonRpcRequest,
+  JsonRpcResponse,
+  Order,
+  Tip,
+} from "./rpc.advanced";
 
 class IndexerRequestError extends Error {
-  constructor(message: string, public code?: number, public data?: any) {
+  constructor(
+    message: string,
+    public code?: number,
+    public data?: any,
+  ) {
     super(message);
     this.name = "IndexerRequestError";
   }
@@ -12,7 +29,7 @@ class IndexerRequestError extends Error {
 const request = async <T>(
   ckbIndexerUrl: string,
   method: string,
-  params?: any
+  params?: any,
 ): Promise<T> => {
   const requestBody: JsonRpcRequest = {
     id: 0,
@@ -30,7 +47,9 @@ const request = async <T>(
   });
 
   if (!response.ok) {
-    throw new Error(`Indexer request failed with HTTP status code ${response.status}`);
+    throw new Error(
+      `Indexer request failed with HTTP status code ${response.status}`,
+    );
   }
 
   const responseData: JsonRpcResponse<T> = await response.json();
@@ -39,7 +58,7 @@ const request = async <T>(
     throw new IndexerRequestError(
       `Indexer request RPC failed with error: ${responseData.error.message}`,
       responseData.error.code,
-      responseData.error.data
+      responseData.error.data,
     );
   }
 
@@ -65,7 +84,7 @@ export class RPC {
     searchKey: GetCellsSearchKey<WithData>,
     order: Order,
     limit: Hex,
-    cursor?: string
+    cursor?: string,
   ): Promise<GetLiveCellsResult<WithData>> {
     const params = [toGetCellsSearchKey(searchKey), order, limit, cursor];
     return deepCamel(await request(this.uri, "get_cells", params));
@@ -75,7 +94,7 @@ export class RPC {
     searchKey: GetTransactionsSearchKey<Grouped>,
     order: Order,
     limit: Hex,
-    cursor?: string
+    cursor?: string,
   ): Promise<IndexerTransactionList<Grouped>> {
     const params = [
       toGetTransactionsSearchKey(searchKey),

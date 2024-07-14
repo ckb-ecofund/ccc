@@ -1,19 +1,27 @@
 import { ScriptLike } from "../ckb";
-import { GetCellsSearchKey, GetTransactionsSearchKey, SearchFilter, SearchKey } from "./rpc.advanced";
+import {
+  GetCellsSearchKey,
+  GetTransactionsSearchKey,
+  SearchFilter,
+  SearchKey,
+} from "./rpc.advanced";
 
 export function toCamel(s: string): string {
-  return s.replace(/([-_][a-z])/gi, match => match[1].toUpperCase());
+  return s.replace(/([-_][a-z])/gi, (match) => match[1].toUpperCase());
 }
 
 export function deepCamel(obj: any): any {
   if (Array.isArray(obj)) {
     return obj.map(deepCamel);
-  } else if (obj !== null && typeof obj === 'object') {
-    return Object.keys(obj).reduce((result, key) => {
-      const camelKey = toCamel(key);
-      result[camelKey] = deepCamel((obj as Record<string, unknown>)[key]);
-      return result;
-    }, {} as Record<string, unknown>);
+  } else if (obj !== null && typeof obj === "object") {
+    return Object.keys(obj).reduce(
+      (result, key) => {
+        const camelKey = toCamel(key);
+        result[camelKey] = deepCamel((obj as Record<string, unknown>)[key]);
+        return result;
+      },
+      {} as Record<string, unknown>,
+    );
   } else {
     return obj;
   }
@@ -52,7 +60,7 @@ const toGetCellsSearchKey = (data: GetCellsSearchKey): GetCellsSearchKey => {
 };
 
 const toGetTransactionsSearchKey = (
-  data: GetTransactionsSearchKey<boolean>
+  data: GetTransactionsSearchKey<boolean>,
 ): GetTransactionsSearchKey => {
   return {
     ...convert(data, toSearchKey),
@@ -61,9 +69,9 @@ const toGetTransactionsSearchKey = (
 };
 
 export {
-  toScript,
-  toSearchKey,
   toGetCellsSearchKey,
   toGetTransactionsSearchKey,
+  toScript,
   toSearchFilter,
+  toSearchKey,
 };
