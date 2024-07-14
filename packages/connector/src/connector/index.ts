@@ -2,6 +2,7 @@ import { ccc } from "@ckb-ccc/ccc";
 import { LitElement, PropertyValues, css, html } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { Ref, createRef, ref } from "lit/directives/ref.js";
+import { NOSTR_SVG } from "../assets/chains/nostr.svg";
 import { CLOSE_SVG } from "../assets/close.svg";
 import { JOY_ID_SVG } from "../assets/joy-id.svg";
 import { LEFT_SVG } from "../assets/left.svg";
@@ -97,7 +98,6 @@ export class WebComponentConnector extends LitElement {
   }
 
   public disconnect() {
-    this.signer?.signer?.disconnect();
     this.walletName = undefined;
     this.signerName = undefined;
     this.saveConnection();
@@ -130,6 +130,8 @@ export class WebComponentConnector extends LitElement {
     super.connectedCallback();
     this.loadConnection();
     this.reloadSigners();
+    // Delay for extensions to load
+    setTimeout(() => this.reloadSigners(), 100);
   }
 
   willUpdate(changedProperties: PropertyValues): void {
@@ -177,11 +179,13 @@ export class WebComponentConnector extends LitElement {
         return;
       }
 
-      await signer.signer.replaceClient(this.client);
-
-      this.signer = {
-        ...signer,
-      };
+      if (await signer.signer.replaceClient(this.client)) {
+        this.signer = {
+          ...signer,
+        };
+      } else {
+        this.signer = undefined;
+      }
     })();
 
     this.resetListeners.forEach((listener) => listener());
@@ -207,6 +211,11 @@ export class WebComponentConnector extends LitElement {
     const okxBitcoinSigner = ccc.Okx.getOKXBitcoinSigner(this.client);
     if (okxBitcoinSigner) {
       this.addSigner("OKX Wallet", "BTC", OKX_SVG, okxBitcoinSigner);
+    }
+
+    const nip07Signer = ccc.Nip07.getNip07Signer(this.client);
+    if (nip07Signer) {
+      this.addSigner("Nostr", "Nostr", NOSTR_SVG, nip07Signer);
     }
 
     const eip6963Manager = new ccc.Eip6963.SignerFactory(this.client);

@@ -3,7 +3,7 @@ import { KnownScript } from "./client";
 
 export const MAINNET_SCRIPTS: Record<
   KnownScript,
-  Pick<Script, "codeHash" | "hashType">
+  Pick<Script, "codeHash" | "hashType"> | undefined
 > = {
   [KnownScript.Secp256k1Blake160]: {
     codeHash:
@@ -35,4 +35,5 @@ export const MAINNET_SCRIPTS: Record<
       "0x9b819793a64463aed77c615d6cb226eea5487ccfc0783043a587254cda2b6f26",
     hashType: "type",
   },
+  [KnownScript.NostrLock]: undefined,
 };

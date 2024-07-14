@@ -17,12 +17,13 @@ import {
 } from "./clientTypes";
 
 export enum KnownScript {
-  Secp256k1Blake160,
-  Secp256k1Multisig,
-  AnyoneCanPay,
-  JoyId,
-  COTA,
-  OmniLock,
+  Secp256k1Blake160 = "Secp256k1Blake160",
+  Secp256k1Multisig = "Secp256k1Multisig",
+  AnyoneCanPay = "AnyoneCanPay",
+  JoyId = "JoyId",
+  COTA = "COTA",
+  OmniLock = "OmniLock",
+  NostrLock = "NostrLock",
 }
 
 export abstract class Client {

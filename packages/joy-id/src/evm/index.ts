@@ -7,10 +7,21 @@ import {
   ConnectionsRepoLocalStorage,
 } from "../connectionsStorage";
 
+/**
+ * Class representing an EVM signer that extends SignerEvm from @ckb-ccc/core.
+ * @class
+ * @extends {ccc.SignerEvm}
+ */
 export class EvmSigner extends ccc.SignerEvm {
   private connection?: Connection;
 
-  private assertConnection() {
+  /**
+   * Ensures that the signer is connected and returns the connection.
+   * @private
+   * @throws Will throw an error if not connected.
+   * @returns {Connection} The current connection.
+   */
+  private assertConnection(): Connection {
     if (!this.isConnected() || !this.connection) {
       throw new Error("Not connected");
     }
@@ -18,6 +29,14 @@ export class EvmSigner extends ccc.SignerEvm {
     return this.connection;
   }
 
+  /**
+   * Creates an instance of EvmSigner.
+   * @param {ccc.Client} client - The client instance.
+   * @param {string} name - The name of the signer.
+   * @param {string} icon - The icon URL of the signer.
+   * @param {string} [appUri="https://app.joy.id"] - The application URI.
+   * @param {ConnectionsRepo} [connectionsRepo=new ConnectionsRepoLocalStorage()] - The connections repository.
+   */
   constructor(
     client: ccc.Client,
     private readonly name: string,
@@ -28,6 +47,11 @@ export class EvmSigner extends ccc.SignerEvm {
     super(client);
   }
 
+  /**
+   * Gets the configuration for JoyID.
+   * @private
+   * @returns {object} The configuration object.
+   */
   private getConfig() {
     return {
       redirectURL: location.href,
@@ -38,12 +62,20 @@ export class EvmSigner extends ccc.SignerEvm {
     };
   }
 
-  async getEvmAccount() {
+  /**
+   * Gets the EVM account address.
+   * @returns {Promise<string>} A promise that resolves to the EVM account address.
+   */
+  async getEvmAccount(): Promise<string> {
     return this.assertConnection().address;
   }
 
+  /**
+   * Connects to the provider by requesting authentication.
+   * @returns {Promise<void>} A promise that resolves when the connection is established.
+   */
   async connect(): Promise<void> {
-    const config = await this.getConfig();
+    const config = this.getConfig();
 
     const res = await createPopup(buildJoyIDURL(config, "popup", "/auth"), {
       ...config,
@@ -58,6 +90,10 @@ export class EvmSigner extends ccc.SignerEvm {
     await this.saveConnection();
   }
 
+  /**
+   * Checks if the signer is connected.
+   * @returns {Promise<boolean>} A promise that resolves to true if connected, false otherwise.
+   */
   async isConnected(): Promise<boolean> {
     if (this.connection) {
       return true;
@@ -66,6 +102,11 @@ export class EvmSigner extends ccc.SignerEvm {
     return this.connection !== undefined;
   }
 
+  /**
+   * Signs a raw message with the EVM account.
+   * @param {string | ccc.BytesLike} message - The message to sign.
+   * @returns {Promise<ccc.Hex>} A promise that resolves to the signed message.
+   */
   async signMessageRaw(message: string | ccc.BytesLike): Promise<ccc.Hex> {
     const { address } = this.assertConnection();
 
@@ -89,7 +130,12 @@ export class EvmSigner extends ccc.SignerEvm {
     return ccc.hexFrom(signature);
   }
 
-  private async saveConnection() {
+  /**
+   * Saves the current connection.
+   * @private
+   * @returns {Promise<void>}
+   */
+  private async saveConnection(): Promise<void> {
     return this.connectionsRepo.set(
       {
         uri: this.getConfig().joyidAppURL,
@@ -99,7 +145,12 @@ export class EvmSigner extends ccc.SignerEvm {
     );
   }
 
-  private async restoreConnection() {
+  /**
+   * Restores the previous connection.
+   * @private
+   * @returns {Promise<void>}
+   */
+  private async restoreConnection(): Promise<void> {
     this.connection = await this.connectionsRepo.get({
       uri: this.getConfig().joyidAppURL,
       addressType: "ethereum",

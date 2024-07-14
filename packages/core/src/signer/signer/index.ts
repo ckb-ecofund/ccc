@@ -7,12 +7,14 @@ import { Num } from "../../num";
 import { verifyMessageBtcEcdsa } from "../btc";
 import { verifyMessageJoyId } from "../ckb/verifyJoyId";
 import { verifyMessageEvmPersonal } from "../evm/verify";
+import { verifyMessageNostrEvent } from "../nostr/verify";
 
 export enum SignerSignType {
   Unknown = "Unknown",
   BtcEcdsa = "BtcEcdsa",
   EvmPersonal = "EvmPersonal",
   JoyId = "JoyId",
+  NostrEvent = "NostrEvent",
 }
 
 /**
@@ -22,6 +24,7 @@ export enum SignerType {
   EVM = "EVM",
   BTC = "BTC",
   CKB = "CKB",
+  Nostr = "Nostr",
 }
 
 export class Signature {
@@ -69,6 +72,12 @@ export abstract class Signer {
           signature.signature,
           signature.identity,
         );
+      case SignerSignType.NostrEvent:
+        return verifyMessageNostrEvent(
+          message,
+          signature.signature,
+          signature.identity,
+        );
       case SignerSignType.Unknown:
         throw new Error("Unknown signer sign type");
     }
@@ -76,9 +85,11 @@ export abstract class Signer {
 
   /**
    * Replace the current client.
+   * returns false if the new client is invalid for this signer.
    */
-  async replaceClient(client: Client): Promise<void> {
+  async replaceClient(client: Client): Promise<boolean> {
     this.client_ = client;
+    return true;
   }
 
   /**
@@ -87,13 +98,6 @@ export abstract class Signer {
    * @returns A promise that resolves when the connection is complete.
    */
   abstract connect(): Promise<void>;
-
-  /**
-   * Disconnects to the signer.
-   *
-   * @returns A promise that resolves when disconnected.
-   */
-  async disconnect(): Promise<void> {}
 
   /**
    * Check if the signer is connected.

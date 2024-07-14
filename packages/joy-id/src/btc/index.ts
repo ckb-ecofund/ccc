@@ -7,10 +7,21 @@ import {
   ConnectionsRepoLocalStorage,
 } from "../connectionsStorage";
 
+/**
+ * Class representing a Bitcoin signer that extends SignerBtc from @ckb-ccc/core.
+ * @class
+ * @extends {ccc.SignerBtc}
+ */
 export class BitcoinSigner extends ccc.SignerBtc {
   private connection?: Connection;
 
-  private assertConnection() {
+  /**
+   * Ensures that the signer is connected and returns the connection.
+   * @private
+   * @throws Will throw an error if not connected.
+   * @returns {Connection} The current connection.
+   */
+  private assertConnection(): Connection {
     if (!this.isConnected() || !this.connection) {
       throw new Error("Not connected");
     }
@@ -18,6 +29,15 @@ export class BitcoinSigner extends ccc.SignerBtc {
     return this.connection;
   }
 
+  /**
+   * Creates an instance of BitcoinSigner.
+   * @param {ccc.Client} client - The client instance.
+   * @param {string} name - The name of the signer.
+   * @param {string} icon - The icon URL of the signer.
+   * @param {"auto" | "p2wpkh" | "p2tr"} [addressType="auto"] - The address type.
+   * @param {string} [appUri="https://app.joy.id"] - The application URI.
+   * @param {ConnectionsRepo} [connectionsRepo=new ConnectionsRepoLocalStorage()] - The connections repository.
+   */
   constructor(
     client: ccc.Client,
     private readonly name: string,
@@ -29,6 +49,11 @@ export class BitcoinSigner extends ccc.SignerBtc {
     super(client);
   }
 
+  /**
+   * Gets the configuration for JoyID.
+   * @private
+   * @returns {object} The configuration object.
+   */
   private getConfig() {
     return {
       redirectURL: location.href,
@@ -39,16 +64,28 @@ export class BitcoinSigner extends ccc.SignerBtc {
     };
   }
 
+  /**
+   * Gets the Bitcoin account address.
+   * @returns {Promise<string>} A promise that resolves to the Bitcoin account address.
+   */
   async getBtcAccount(): Promise<string> {
     const { address } = this.assertConnection();
     return address;
   }
 
+  /**
+   * Gets the Bitcoin public key.
+   * @returns {Promise<ccc.Hex>} A promise that resolves to the Bitcoin public key.
+   */
   async getBtcPublicKey(): Promise<ccc.Hex> {
     const { publicKey } = this.assertConnection();
     return publicKey;
   }
 
+  /**
+   * Connects to the provider by requesting authentication.
+   * @returns {Promise<void>} A promise that resolves when the connection is established.
+   */
   async connect(): Promise<void> {
     const config = this.getConfig();
     const res = await createPopup(buildJoyIDURL(config, "popup", "/auth"), {
@@ -80,6 +117,10 @@ export class BitcoinSigner extends ccc.SignerBtc {
     ]);
   }
 
+  /**
+   * Checks if the signer is connected.
+   * @returns {Promise<boolean>} A promise that resolves to true if connected, false otherwise.
+   */
   async isConnected(): Promise<boolean> {
     if (this.connection) {
       return true;
@@ -92,6 +133,11 @@ export class BitcoinSigner extends ccc.SignerBtc {
     return this.connection !== undefined;
   }
 
+  /**
+   * Signs a raw message with the Bitcoin account.
+   * @param {string | ccc.BytesLike} message - The message to sign.
+   * @returns {Promise<string>} A promise that resolves to the signed message.
+   */
   async signMessageRaw(message: string | ccc.BytesLike): Promise<string> {
     const { address } = this.assertConnection();
 

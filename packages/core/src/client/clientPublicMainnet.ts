@@ -15,6 +15,12 @@ export class ClientPublicMainnet extends ClientJsonRpc {
   async getKnownScript(
     script: KnownScript,
   ): Promise<Pick<Script, "codeHash" | "hashType">> {
-    return { ...MAINNET_SCRIPTS[script] };
+    const found = MAINNET_SCRIPTS[script];
+    if (!found) {
+      throw new Error(
+        `No script information was found for ${script} on ${this.addressPrefix}`,
+      );
+    }
+    return { ...found };
   }
 }

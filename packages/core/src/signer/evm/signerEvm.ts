@@ -137,7 +137,7 @@ export abstract class SignerEvm extends Signer {
       ),
     );
 
-    tx.witnesses[info.position] = hexFrom(witness.toBytes());
+    tx.setWitnessArgsAt(info.position, witness);
 
     return tx;
   }
