@@ -178,7 +178,7 @@ export class CkbSigner extends ccc.Signer {
     txLike: ccc.TransactionLike,
   ): Promise<ccc.Transaction> {
     const tx = ccc.Transaction.from(txLike);
-    await tx.addCellDepsKnownScript(this.client, ccc.KnownScript.JoyId);
+    await tx.addCellDepsOfKnownScripts(this.client, ccc.KnownScript.JoyId);
     const position = await tx.findInputIndexByLock(
       (await this.getAddressObj()).script,
       this.client,
@@ -222,10 +222,10 @@ export class CkbSigner extends ccc.Signer {
     witness.outputType = ccc.hexFrom(unlockEntry);
 
     const cotaDeps: ccc.CellDep[] = [];
-    for await (const cell of this.client.findCellsByLockAndType(lock, {
-      ...(await this.client.getKnownScript(ccc.KnownScript.COTA)),
-      args: "0x",
-    })) {
+    for await (const cell of this.client.findCellsByLockAndType(
+      lock,
+      await ccc.Script.fromKnownScript(this.client, ccc.KnownScript.COTA, "0x"),
+    )) {
       cotaDeps.push(
         ccc.CellDep.from({
           depType: "code",

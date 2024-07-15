@@ -51,17 +51,17 @@ export abstract class SignerEvm extends Signer {
 
   async _getOmniLockEvmAddressObj(account: string): Promise<Address> {
     return Address.fromKnownScript(
+      this.client,
       KnownScript.OmniLock,
       hexFrom([0x12, ...bytesFrom(account), 0x00]),
-      this.client,
     );
   }
 
   async _getOmniLockOldEvmAddressObj(account: string): Promise<Address> {
     return Address.fromKnownScript(
+      this.client,
       KnownScript.OmniLock,
       hexFrom([0x1, ...bytesFrom(account), 0x00]),
-      this.client,
     );
   }
 
@@ -73,7 +73,7 @@ export abstract class SignerEvm extends Signer {
    */
   async prepareTransaction(txLike: TransactionLike): Promise<Transaction> {
     const tx = Transaction.from(txLike);
-    await tx.addCellDepsKnownScript(this.client, KnownScript.OmniLock);
+    await tx.addCellDepsOfKnownScripts(this.client, KnownScript.OmniLock);
     return reduceAsync(
       await this.getAddressObjs(),
       (tx: Transaction, { script }) =>

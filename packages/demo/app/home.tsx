@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { KnownScript, ccc } from "@ckb-ccc/connector-react";
+import { ccc } from "@ckb-ccc/connector-react";
 import React, { ReactNode, useEffect, useState } from "react";
 import { common } from "@ckb-lumos/common-scripts";
 import { TransactionSkeleton } from "@ckb-lumos/helpers";
@@ -206,6 +206,104 @@ function Transfer() {
   );
 }
 
+function TransferXUdt() {
+  const signer = ccc.useSigner();
+  const [xUdtArgs, setXUdtArgs] = useState<string>("");
+  const [transferTo, setTransferTo] = useState<string>("");
+  const [amount, setAmount] = useState<string>("");
+  const [hash, setHash] = useState<string>("");
+
+  return (
+    <>
+      {hash !== "" ? (
+        <p className="mb-1 w-full whitespace-normal text-balance break-all text-center">
+          {hash}
+        </p>
+      ) : (
+        <></>
+      )}
+      <div className="mb-1 flex flex-col items-center">
+        <div className="flex flex-col">
+          <input
+            className="rounded-full border border-black px-4 py-2"
+            type="text"
+            value={xUdtArgs}
+            onInput={(e) => setXUdtArgs(e.currentTarget.value)}
+            placeholder="xUdt args to transfer"
+          />
+          <input
+            className="mt-1 rounded-full border border-black px-4 py-2"
+            type="text"
+            value={transferTo}
+            onInput={(e) => setTransferTo(e.currentTarget.value)}
+            placeholder="Address to transfer to"
+          />
+          <input
+            className="mt-1 rounded-full border border-black px-4 py-2"
+            type="text"
+            value={amount}
+            onInput={(e) => setAmount(e.currentTarget.value)}
+            placeholder="Amount to transfer"
+          />
+        </div>
+        <Button
+          className="mt-1"
+          onClick={async () => {
+            if (!signer) {
+              return;
+            }
+            const { script: toScript } = await ccc.Address.fromString(
+              transferTo,
+              signer.client,
+            );
+            const { script: change } = await signer.getRecommendedAddressObj();
+
+            const xUdtType = await ccc.Script.fromKnownScript(
+              signer.client,
+              ccc.KnownScript.XUdt,
+              xUdtArgs,
+            );
+
+            const tx = ccc.Transaction.from({
+              outputs: [
+                {
+                  lock: toScript,
+                  type: xUdtType,
+                },
+              ],
+              outputsData: [ccc.numLeToBytes(amount, 16)],
+            });
+            await tx.completeInputsByUdt(signer, xUdtType);
+            const balanceDiff =
+              (await tx.getInputsUdtBalance(signer.client, xUdtType)) -
+              tx.getOutputsUdtBalance(xUdtType);
+            if (balanceDiff > ccc.Zero) {
+              tx.addOutput(
+                {
+                  lock: change,
+                  type: xUdtType,
+                },
+                ccc.numLeToBytes(balanceDiff, 16),
+              );
+            }
+            await tx.addCellDepsOfKnownScripts(
+              signer.client,
+              ccc.KnownScript.XUdt,
+            );
+            await tx.completeInputsByCapacity(signer);
+            await tx.completeFeeChangeToLock(signer, change, 1000);
+
+            // Sign and send the transaction
+            setHash(await signer.sendTransaction(tx));
+          }}
+        >
+          Transfer
+        </Button>
+      </div>
+    </>
+  );
+}
+
 function IssueXUdtSul() {
   const signer = ccc.useSigner();
   const [amount, setAmount] = useState<string>("");
@@ -250,24 +348,20 @@ function IssueXUdtSul() {
                   lock: script,
                 },
               ],
-              outputsData: ["0x"],
             });
             await susTx.completeInputsByCapacity(signer);
-            await susTx.completeFeeToLock(signer, script, 1000);
-            console.log(susTx);
+            await susTx.completeFeeChangeToLock(signer, script, 1000);
             const susTxHash = await signer.sendTransaction(susTx);
-            console.log(susTxHash);
             await signer.client.markUnusable({ txHash: susTxHash, index: 0 });
 
-            const singleUseLock = ccc.Script.from({
-              ...(await signer.client.getKnownScript(
-                ccc.KnownScript.SingleUseLock,
-              )),
-              args: ccc.OutPoint.from({
+            const singleUseLock = await ccc.Script.fromKnownScript(
+              signer.client,
+              ccc.KnownScript.SingleUseLock,
+              ccc.OutPoint.from({
                 txHash: susTxHash,
                 index: 0,
               }).toBytes(),
-            });
+            );
             const lockTx = ccc.Transaction.from({
               outputs: [
                 // Owner cell
@@ -275,13 +369,10 @@ function IssueXUdtSul() {
                   lock: singleUseLock,
                 },
               ],
-              outputsData: ["0x"],
             });
             await lockTx.completeInputsByCapacity(signer);
-            await lockTx.completeFeeToLock(signer, script, 1000);
-            console.log(lockTx);
+            await lockTx.completeFeeChangeToLock(signer, script, 1000);
             const lockTxHash = await signer.sendTransaction(lockTx);
-            console.log(lockTxHash);
 
             const mintTx = ccc.Transaction.from({
               inputs: [
@@ -304,27 +395,22 @@ function IssueXUdtSul() {
                 // Issued xUDT
                 {
                   lock: script,
-                  type: {
-                    ...(await signer.client.getKnownScript(
-                      ccc.KnownScript.XUdt,
-                    )),
-                    args: singleUseLock.hash(),
-                  },
+                  type: await ccc.Script.fromKnownScript(
+                    signer.client,
+                    ccc.KnownScript.XUdt,
+                    singleUseLock.hash(),
+                  ),
                 },
               ],
-              outputsData: [ccc.numLeToBytes(amount, 8)],
+              outputsData: [ccc.numLeToBytes(amount, 16)],
             });
-            await mintTx.addCellDepsKnownScript(
+            await mintTx.addCellDepsOfKnownScripts(
               signer.client,
-              KnownScript.SingleUseLock,
-            );
-            await mintTx.addCellDepsKnownScript(
-              signer.client,
-              KnownScript.XUdt,
+              ccc.KnownScript.SingleUseLock,
+              ccc.KnownScript.XUdt,
             );
             await mintTx.completeInputsByCapacity(signer);
-            await mintTx.completeFeeToLock(signer, script, 1000);
-            console.log(mintTx);
+            await mintTx.completeFeeChangeToLock(signer, script, 1000);
             const mintTxHash = await signer.sendTransaction(mintTx);
 
             setHashes([susTxHash, lockTxHash, mintTxHash]);
@@ -360,7 +446,8 @@ export default function Home() {
   const tabs: [string, ReactNode][] = [
     ["Sign", <Sign key="Sign" />],
     ["Transfer", <Transfer key="Transfer" />],
-    ["Issue xUDT (SUS)", <IssueXUdtSul key="Transfer" />],
+    ["Transfer xUDT", <TransferXUdt key="Transfer xUdt" />],
+    ["Issue xUDT (SUS)", <IssueXUdtSul key="Issue xUDT (SUS)" />],
   ];
 
   useEffect(() => {
@@ -396,11 +483,11 @@ export default function Home() {
           <Button className="mt-2" onClick={open}>
             {internalAddress.slice(0, 7)}...{internalAddress.slice(-5)}
           </Button>
-          <div className="mb-2 mt-2 flex">
+          <div className="no-scrollbar mb-2 mt-2 flex w-full overflow-x-auto">
             {tabs.map(([name]) => (
               <button
                 key={name}
-                className={`flex items-center border-b border-black px-5 py-2 text-lg ${tab === name ? "border-b-4" : ""}`}
+                className={`flex items-center border-b border-black px-5 py-2 text-lg ${tab === name ? "border-b-4" : ""} whitespace-nowrap`}
                 onClick={() => setTab(name)}
               >
                 {name}

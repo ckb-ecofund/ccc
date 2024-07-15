@@ -78,9 +78,9 @@ export abstract class SignerNostr extends Signer {
     const publicKey = await this.getNostrPublicKey();
     return [
       await Address.fromKnownScript(
+        this.client,
         KnownScript.NostrLock,
         hexFrom(bytesConcat([0x00], ckbHash(publicKey).slice(0, 42))),
-        this.client,
       ),
     ];
   }
@@ -94,7 +94,7 @@ export abstract class SignerNostr extends Signer {
   async prepareTransaction(txLike: TransactionLike): Promise<Transaction> {
     const tx = Transaction.from(txLike);
     const { script } = await this.getRecommendedAddressObj();
-    await tx.addCellDepsKnownScript(this.client, KnownScript.NostrLock);
+    await tx.addCellDepsOfKnownScripts(this.client, KnownScript.NostrLock);
     await tx.prepareSighashAllWitness(script, 572, this.client);
     return tx;
   }

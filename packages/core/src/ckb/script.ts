@@ -1,6 +1,7 @@
 import { Bytes, BytesLike, bytesFrom } from "../bytes";
+import { Client, KnownScript } from "../client";
 import { ckbHash } from "../hasher";
-import { Hex, hexFrom } from "../hex";
+import { Hex, HexLike, hexFrom } from "../hex";
 import * as mol from "./molecule.advanced";
 import {
   HASH_TYPES,
@@ -144,6 +145,33 @@ export class Script {
       hashTypeFrom(script.hashType),
       hexFrom(script.args),
     );
+  }
+
+  /**
+   * Creates a Script instance from client and known script.
+   *
+   * @param knownScript - A KnownScript enum.
+   * @param args - Args for the script.
+   * @param client - A ScriptLike object or an instance of Script.
+   * @returns A promise that resolves to the script instance.
+   *
+   * @example
+   * ```typescript
+   * const script = await Script.fromKnownScript(
+   *   client,
+   *   KnownScript.XUdt,
+   *   args: "0xabcd..."
+   * );
+   * ```
+   */
+
+  static async fromKnownScript(
+    client: Client,
+    knownScript: KnownScript,
+    args: HexLike,
+  ): Promise<Script> {
+    const script = await client.getKnownScript(knownScript);
+    return new Script(script.codeHash, script.hashType, hexFrom(args));
   }
 
   /**

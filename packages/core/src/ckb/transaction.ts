@@ -761,6 +761,15 @@ export class WitnessArgs {
   }
 }
 
+export function udtBalanceFrom(dataLike: BytesLike) {
+  const data = bytesFrom(dataLike).slice(0, 16);
+  if (data.length !== 16) {
+    throw new Error("Invalid UDT cell data");
+  }
+
+  return numFromBytes(data);
+}
+
 export type TransactionLike = {
   version?: NumLike;
   cellDeps?: CellDepLike[];
@@ -873,12 +882,7 @@ export class Transaction {
     if (tx instanceof Transaction) {
       return tx;
     }
-
-    return new Transaction(
-      numFrom(tx.version ?? 0),
-      tx.cellDeps?.map((cellDep) => CellDep.from(cellDep)) ?? [],
-      tx.headerDeps?.map(hexFrom) ?? [],
-      tx.inputs?.map((input) => CellInput.from(input)) ?? [],
+    const outputs =
       tx.outputs?.map((output, i) => {
         const o = CellOutput.from({
           ...output,
@@ -888,8 +892,26 @@ export class Transaction {
           o.occupiedSize + (apply(bytesFrom, tx.outputsData?.[i])?.length ?? 0),
         );
         return o;
-      }) ?? [],
-      tx.outputsData?.map(hexFrom) ?? [],
+      }) ?? [];
+    const outputsData = outputs.map((_, i) =>
+      hexFrom(tx.outputsData?.[i] ?? "0x"),
+    );
+    if (
+      tx.outputsData !== undefined &&
+      outputsData.length < tx.outputsData.length
+    ) {
+      outputsData.push(
+        ...tx.outputsData.slice(outputsData.length).map((d) => hexFrom(d)),
+      );
+    }
+
+    return new Transaction(
+      numFrom(tx.version ?? 0),
+      tx.cellDeps?.map((cellDep) => CellDep.from(cellDep)) ?? [],
+      tx.headerDeps?.map(hexFrom) ?? [],
+      tx.inputs?.map((input) => CellInput.from(input)) ?? [],
+      outputs,
+      outputsData,
       tx.witnesses?.map(hexFrom) ?? [],
     );
   }
@@ -1187,20 +1209,26 @@ export class Transaction {
    * Add cell deps from known script
    *
    * @param client - The client for searching known script and cell deps
-   * @param script - The known script to add
+   * @param scripts - The known scripts to add
    *
    * @example
    * ```typescript
-   * tx.addCellDepsKnownScript(client, KnownScript.OmniLock);
+   * tx.addCellDepsOfKnownScripts(client, KnownScript.OmniLock);
    * ```
    */
-  async addCellDepsKnownScript(
+  async addCellDepsOfKnownScripts(
     client: Client,
-    script: KnownScript,
+    ...scripts: (KnownScript | KnownScript[])[]
   ): Promise<void> {
-    return this.addCellDepInfos(
-      client,
-      (await client.getKnownScript(script)).cellDeps,
+    await Promise.all(
+      scripts
+        .flat()
+        .map(async (script) =>
+          this.addCellDepInfos(
+            client,
+            (await client.getKnownScript(script)).cellDeps,
+          ),
+        ),
     );
   }
 
@@ -1226,6 +1254,35 @@ export class Transaction {
     }
 
     this.outputsData[index] = hexFrom(data);
+  }
+
+  /**
+   * Add output
+   *
+   * @param output - The cell output to add
+   * @param data - optional output data
+   *
+   * @example
+   * ```typescript
+   * await tx.addOutput(cellOutput, "0xabcd");
+   * ```
+   */
+  addOutput(
+    outputLike: Omit<CellOutputLike, "capacity"> &
+      Partial<Pick<CellOutputLike, "capacity">>,
+    outputData: HexLike = "0x",
+  ): void {
+    const output = CellOutput.from({
+      ...outputLike,
+      capacity: outputLike.capacity ?? 0,
+    });
+    if (output.capacity === Zero) {
+      output.capacity = fixedPointFrom(
+        output.occupiedSize + bytesFrom(outputData).length,
+      );
+    }
+    const i = this.outputs.push(output) - 1;
+    this.setOutputDataAt(i, outputData);
   }
 
   /**
@@ -1319,6 +1376,34 @@ export class Transaction {
     );
   }
 
+  async getInputsUdtBalance(client: Client, type: ScriptLike): Promise<Num> {
+    return reduceAsync(
+      this.inputs,
+      async (acc, input) => {
+        await input.completeExtraInfos(client);
+        if (!input.cellOutput || !input.outputData) {
+          throw new Error("Unable to complete input");
+        }
+        if (!input.cellOutput.type?.eq(type)) {
+          return;
+        }
+
+        return acc + udtBalanceFrom(input.outputData);
+      },
+      numFrom(0),
+    );
+  }
+
+  getOutputsUdtBalance(type: ScriptLike): Num {
+    return this.outputs.reduce((acc, output, i) => {
+      if (!output.type?.eq(type)) {
+        return acc;
+      }
+
+      return acc + udtBalanceFrom(this.outputsData[i]);
+    }, numFrom(0));
+  }
+
   async completeInputs<T>(
     from: Signer,
     filter: ClientCollectableSearchKeyFilterLike,
@@ -1399,6 +1484,28 @@ export class Transaction {
     );
   }
 
+  async completeInputsByUdt(from: Signer, type: ScriptLike): Promise<number> {
+    const exceptedBalance = this.getOutputsUdtBalance(type);
+    const inputsBalance = await this.getInputsUdtBalance(from.client, type);
+    if (inputsBalance >= exceptedBalance) {
+      return 0;
+    }
+
+    return this.completeInputs(
+      from,
+      {
+        script: type,
+        outputDataLenRange: [16, numFrom("0xffffffff")],
+      },
+      (acc, { outputData }) => {
+        const balance = udtBalanceFrom(outputData);
+        const sum = acc + balance;
+        return sum > exceptedBalance ? undefined : sum;
+      },
+      inputsBalance,
+    );
+  }
+
   estimateFee(feeRate: NumLike): Num {
     const txSize = this.toBytes().length + 4;
     return (numFrom(txSize) * numFrom(feeRate) + numFrom(1000)) / numFrom(1000);
@@ -1470,7 +1577,7 @@ export class Transaction {
     }
   }
 
-  completeFeeToLock(
+  completeFeeChangeToLock(
     from: Signer,
     change: ScriptLike,
     feeRate: NumLike,
@@ -1487,8 +1594,28 @@ export class Transaction {
           return occupiedCapacity;
         }
         changeCell.capacity = capacity;
-        const i = tx.outputs.push(changeCell) - 1;
-        tx.setOutputDataAt(i, "0x");
+        tx.addOutput(changeCell);
+        return 0;
+      },
+      feeRate,
+      filter,
+    );
+  }
+
+  completeFeeChangeToOutput(
+    from: Signer,
+    index: NumLike,
+    feeRate: NumLike,
+    filter?: ClientCollectableSearchKeyFilterLike,
+  ): Promise<[number, boolean]> {
+    const change = Number(numFrom(index));
+    if (!this.outputs[change]) {
+      throw new Error("Non-existed output to change");
+    }
+    return this.completeFee(
+      from,
+      (tx, capacity) => {
+        tx.outputs[change].capacity += capacity;
         return 0;
       },
       feeRate,
