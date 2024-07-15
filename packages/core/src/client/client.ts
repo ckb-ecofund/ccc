@@ -101,7 +101,14 @@ export abstract class Client {
     txHash: HexLike,
   ): Promise<ClientTransactionResponse | null>;
 
-  async getCellNoCache(outPoint: OutPointLike): Promise<Cell | null> {
+  async getCell(outPointLike: OutPointLike): Promise<Cell | null> {
+    const outPoint = OutPoint.from(outPointLike);
+    const cached = this.knownCells.find((cell) => cell.outPoint.eq(outPoint));
+
+    if (cached) {
+      return cached.clone();
+    }
+
     const transaction = await this.getTransactionNoCache(outPoint.txHash);
     if (!transaction) {
       return null;
@@ -112,11 +119,13 @@ export abstract class Client {
       return null;
     }
 
-    return Cell.from({
+    const cell = Cell.from({
       outPoint,
       cellOutput: transaction.transaction.outputs[index],
       outputData: transaction.transaction.outputsData[index] ?? "0x",
     });
+    this.knownCells.push(cell);
+    return cell.clone();
   }
 
   abstract findCellsPagedNoCache(
@@ -160,6 +169,31 @@ export abstract class Client {
     }
   }
 
+  /**
+   * Find cells by search key designed for collectable cells.
+   *
+   * @param key - The search key.
+   * @returns A async generator for yielding cells.
+   */
+  async *findCellsByCollectableSearchKey(
+    keyLike: ClientCollectableSearchKeyLike,
+    order?: "asc" | "desc",
+    limit = 10,
+  ): AsyncGenerator<Cell> {
+    const key = ClientIndexerSearchKey.from(keyLike);
+    for (const cell of this.usableCells) {
+      if (filterCell(key, cell)) {
+        yield cell;
+      }
+    }
+
+    for await (const cell of this.findCells(key, order, limit)) {
+      if (!this.unusableOutPoints.some((o) => o.eq(cell.outPoint))) {
+        yield cell;
+      }
+    }
+  }
+
   findCellsByLockAndType(
     lock: ScriptLike,
     type: ScriptLike,
@@ -167,7 +201,7 @@ export abstract class Client {
     order?: "asc" | "desc",
     limit = 10,
   ): AsyncGenerator<Cell> {
-    return this.findCells(
+    return this.findCellsByCollectableSearchKey(
       {
         script: lock,
         scriptType: "lock",
@@ -188,7 +222,7 @@ export abstract class Client {
     order?: "asc" | "desc",
     limit = 10,
   ): AsyncGenerator<Cell> {
-    return this.findCells(
+    return this.findCellsByCollectableSearchKey(
       {
         script: type,
         scriptType: "type",
@@ -303,43 +337,5 @@ export abstract class Client {
       transaction: tx,
       status: "proposed",
     };
-  }
-
-  async getCell(outPointLike: OutPointLike): Promise<Cell | null> {
-    const outPoint = OutPoint.from(outPointLike);
-    const cached = this.knownCells.find((cell) => cell.outPoint.eq(outPoint));
-
-    if (cached) {
-      return cached.clone();
-    }
-
-    const cell = await this.getCellNoCache(outPoint);
-    if (cell) {
-      this.knownCells.push(cell);
-    }
-    return cell;
-  }
-
-  /**
-   * Find cells by search key designed for collectable cells.
-   *
-   * @param key - The search key.
-   * @returns A async generator for yielding cells.
-   */
-  async *findCellsByCollectableSearchKey(
-    keyLike: ClientCollectableSearchKeyLike,
-  ): AsyncGenerator<Cell> {
-    const key = ClientIndexerSearchKey.from(keyLike);
-    for (const cell of this.usableCells) {
-      if (filterCell(key, cell)) {
-        yield cell;
-      }
-    }
-
-    for await (const cell of this.findCells(key)) {
-      if (!this.unusableOutPoints.some((o) => o.eq(cell.outPoint))) {
-        yield cell;
-      }
-    }
   }
 }
