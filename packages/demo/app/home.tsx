@@ -142,6 +142,91 @@ function Transfer() {
             if (!signer) {
               return;
             }
+            const { script: change } = await signer.getRecommendedAddressObj();
+            // Verify destination address
+            const { script: toLock } = await ccc.Address.fromString(
+              transferTo,
+              signer.client,
+            );
+
+            const dataBytes = (() => {
+              try {
+                return ccc.bytesFrom(data);
+              } catch (e) {}
+
+              return ccc.bytesFrom(data, "utf8");
+            })();
+            const tx = ccc.Transaction.from({
+              outputs: [{ lock: toLock }],
+              outputsData: [dataBytes],
+            });
+
+            // CCC transactions are easy to be edited
+            if (tx.outputs[0].capacity > ccc.fixedPointFrom(amount)) {
+              throw new Error("Insufficient capacity to store data");
+            }
+            tx.outputs[0].capacity = ccc.fixedPointFrom(amount);
+
+            // Complete missing parts for transaction
+            await tx.completeInputsByCapacity(signer);
+            await tx.completeFeeChangeToLock(signer, change, 1000);
+
+            // Sign and send the transaction
+            setHash(await signer.sendTransaction(tx));
+          }}
+        >
+          Transfer
+        </Button>
+      </div>
+    </>
+  );
+}
+
+function TransferLumos() {
+  const signer = ccc.useSigner();
+  const [transferTo, setTransferTo] = useState<string>("");
+  const [amount, setAmount] = useState<string>("");
+  const [hash, setHash] = useState<string>("");
+  const [data, setData] = useState<string>("");
+
+  return (
+    <>
+      {hash !== "" ? (
+        <p className="mb-1 w-full whitespace-normal text-balance break-all text-center">
+          {hash}
+        </p>
+      ) : (
+        <></>
+      )}
+      <div className="mb-1 flex flex-col items-center">
+        <div className="flex flex-col">
+          <input
+            className="rounded-full border border-black px-4 py-2"
+            type="text"
+            value={transferTo}
+            onInput={(e) => setTransferTo(e.currentTarget.value)}
+            placeholder="Address to transfer to"
+          />
+          <input
+            className="mt-1 rounded-full border border-black px-4 py-2"
+            type="text"
+            value={amount}
+            onInput={(e) => setAmount(e.currentTarget.value)}
+            placeholder="Amount to transfer"
+          />
+          <textarea
+            className="mt-1 rounded-3xl border border-black px-4 py-2"
+            value={data}
+            onInput={(e) => setData(e.currentTarget.value)}
+            placeholder="Data in the cell. Hex string will be parsed."
+          />
+        </div>
+        <Button
+          className="mt-1"
+          onClick={async () => {
+            if (!signer) {
+              return;
+            }
             // Verify destination address
             await ccc.Address.fromString(transferTo, signer.client);
 
@@ -597,13 +682,16 @@ export default function Home() {
   const [balance, setBalance] = useState(ccc.Zero);
   const [isTestnet] = useState(true);
   const [tab, setTab] = useState("Sign");
+  /* eslint-disable react/jsx-key */
   const tabs: [string, ReactNode][] = [
-    ["Sign", <Sign key="Sign" />],
-    ["Transfer", <Transfer key="Transfer" />],
-    ["Transfer xUDT", <TransferXUdt key="Transfer xUdt" />],
-    ["Issue xUDT (SUS)", <IssueXUdtSul key="Issue xUDT (SUS)" />],
-    ["Issue xUDT (Type ID)", <IssueXUdtTypeId key="Issue xUDT (Type ID)" />],
+    ["Sign", <Sign />],
+    ["Transfer", <Transfer />],
+    ["Transfer with Lumos", <TransferLumos />],
+    ["Transfer xUDT", <TransferXUdt />],
+    ["Issue xUDT (SUS)", <IssueXUdtSul />],
+    ["Issue xUDT (Type ID)", <IssueXUdtTypeId />],
   ];
+  /* eslint-enable react/jsx-key */
 
   useEffect(() => {
     if (!signer) {
