@@ -638,7 +638,7 @@ export default function Home() {
           <Button className="mt-2" onClick={open}>
             {internalAddress.slice(0, 7)}...{internalAddress.slice(-5)}
           </Button>
-          <div className="mb-2 mt-2 flex w-full overflow-x-auto pb-1">
+          <div className="mb-2 mt-2 flex max-w-full overflow-x-auto pb-1">
             {tabs.map(([name]) => (
               <button
                 key={name}
