@@ -71,6 +71,8 @@ export class Hasher {
  * ```
  */
 
-export function ckbHash(data: BytesLike): Hex {
-  return new Hasher().update(data).digest();
+export function ckbHash(...data: BytesLike[]): Hex {
+  const hasher = new Hasher();
+  data.forEach((d) => hasher.update(d));
+  return hasher.digest();
 }

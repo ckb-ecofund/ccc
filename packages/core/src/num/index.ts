@@ -13,6 +13,28 @@ export type Num = bigint;
 export type NumLike = string | number | bigint | HexLike;
 
 /**
+ * Get the max among all numbers.
+ *
+ * @param numbers - numbers.
+ * @returns The max numbers among them.
+ *
+ * @example
+ * ```typescript
+ * numMax(1, 2, 3); // Outputs 3n
+ * ```
+ */
+export function numMax(a: NumLike, ...numbers: NumLike[]): Num {
+  let max = numFrom(a);
+  numbers.forEach((nLike) => {
+    const n = numFrom(nLike);
+    if (n > max) {
+      max = n;
+    }
+  });
+  return max;
+}
+
+/**
  * Converts a NumLike value to a Num (bigint).
  *
  * @param val - The value to convert, which can be a string, number, bigint, or HexLike.

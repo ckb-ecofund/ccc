@@ -65,9 +65,9 @@ export abstract class SignerBtc extends Signer {
 
     return [
       await Address.fromKnownScript(
+        this.client,
         KnownScript.OmniLock,
         hexFrom([0x04, ...hash, 0x00]),
-        this.client,
       ),
     ];
   }
@@ -81,6 +81,7 @@ export abstract class SignerBtc extends Signer {
   async prepareTransaction(txLike: TransactionLike): Promise<Transaction> {
     const tx = Transaction.from(txLike);
     const { script } = await this.getRecommendedAddressObj();
+    await tx.addCellDepsOfKnownScripts(this.client, KnownScript.OmniLock);
     await tx.prepareSighashAllWitness(script, 85, this.client);
     return tx;
   }

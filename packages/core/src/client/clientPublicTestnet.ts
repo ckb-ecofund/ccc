@@ -1,5 +1,5 @@
 import { Script } from "../ckb";
-import { KnownScript } from "./client";
+import { CellDepInfo, KnownScript } from "./client";
 import { TESTNET_SCRIPTS } from "./clientPublicTestnet.advanced";
 import { ClientJsonRpc } from "./jsonRpc";
 
@@ -14,7 +14,13 @@ export class ClientPublicTestnet extends ClientJsonRpc {
 
   async getKnownScript(
     script: KnownScript,
-  ): Promise<Pick<Script, "codeHash" | "hashType">> {
-    return { ...TESTNET_SCRIPTS[script] };
+  ): Promise<
+    Pick<Script, "codeHash" | "hashType"> & { cellDeps: CellDepInfo[] }
+  > {
+    const found = TESTNET_SCRIPTS[script];
+    return {
+      ...found,
+      cellDeps: found.cellDeps.map((c) => CellDepInfo.from(c)),
+    };
   }
 }

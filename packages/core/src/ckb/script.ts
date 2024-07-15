@@ -1,5 +1,7 @@
 import { Bytes, BytesLike, bytesFrom } from "../bytes";
-import { Hex, hexFrom } from "../hex";
+import { Client, KnownScript } from "../client";
+import { ckbHash } from "../hasher";
+import { Hex, HexLike, hexFrom } from "../hex";
 import * as mol from "./molecule.advanced";
 import {
   HASH_TYPES,
@@ -93,12 +95,29 @@ export class Script {
    * @param hashType - The hash type of the script.
    * @param args - The arguments for the script.
    */
-
   constructor(
     public codeHash: Hex,
     public hashType: HashType,
     public args: Hex,
   ) {}
+
+  get occupiedSize(): number {
+    return 33 + bytesFrom(this.args).length;
+  }
+
+  /**
+   * Clone a script.
+   *
+   * @returns A cloned Script instance.
+   *
+   * @example
+   * ```typescript
+   * const script1 = script0.clone();
+   * ```
+   */
+  clone(): Script {
+    return new Script(this.codeHash, this.hashType, this.args);
+  }
 
   /**
    * Creates a Script instance from a ScriptLike object.
@@ -129,6 +148,33 @@ export class Script {
   }
 
   /**
+   * Creates a Script instance from client and known script.
+   *
+   * @param knownScript - A KnownScript enum.
+   * @param args - Args for the script.
+   * @param client - A ScriptLike object or an instance of Script.
+   * @returns A promise that resolves to the script instance.
+   *
+   * @example
+   * ```typescript
+   * const script = await Script.fromKnownScript(
+   *   client,
+   *   KnownScript.XUdt,
+   *   args: "0xabcd..."
+   * );
+   * ```
+   */
+
+  static async fromKnownScript(
+    client: Client,
+    knownScript: KnownScript,
+    args: HexLike,
+  ): Promise<Script> {
+    const script = await client.getKnownScript(knownScript);
+    return new Script(script.codeHash, script.hashType, hexFrom(args));
+  }
+
+  /**
    * Converts the Script instance to molecule data format.
    *
    * @returns An object representing the script in molecule data format.
@@ -155,6 +201,20 @@ export class Script {
 
   toBytes(): Bytes {
     return bytesFrom(mol.SerializeScript(this._toMolData()));
+  }
+
+  /**
+   * Get hash of a script
+   *
+   * @returns Hash of this script
+   *
+   * @example
+   * ```typescript
+   * const hash = script.hash();
+   * ```
+   */
+  hash(): Hex {
+    return ckbHash(this.toBytes());
   }
 
   /**

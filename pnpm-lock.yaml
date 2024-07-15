@@ -376,11 +376,11 @@ importers:
         specifier: workspace:*
         version: link:../core
       '@joyid/ckb':
-        specifier: ^0.0.11
-        version: 0.0.11(encoding@0.1.13)(typescript@5.4.5)
+        specifier: ^1.0.0
+        version: 1.0.0(encoding@0.1.13)(typescript@5.4.5)
       '@joyid/common':
-        specifier: ^0.0.3
-        version: 0.0.3(typescript@5.4.5)
+        specifier: ^0.2.0
+        version: 0.2.0(typescript@5.4.5)
     devDependencies:
       '@eslint/js':
         specifier: ^9.1.1
@@ -955,8 +955,14 @@ packages:
   '@joyid/ckb@0.0.11':
     resolution: {integrity: sha512-Nxl+vHju57qChP+QI3ycnlTpQCLsQc+Kp/YUxjDoPkbHikBXPsKGyvTOgO1RIqZMAoQpYbO6FDt1P+nIVxVVCQ==}
 
+  '@joyid/ckb@1.0.0':
+    resolution: {integrity: sha512-uJocaVSN9sBXun/ANkNohZtG8ByfC7B3PZtCrmhzEQ6etpbPa6ByGMZZubIFwjOG5i1ynPWXLvAi8CW2SKOmCw==}
+
   '@joyid/common@0.0.3':
     resolution: {integrity: sha512-bih1dRqFpNP6tLNpebO2pp72r8L9WFtlGUa7a2x3l336G66ieS1uyNGb/yZzY+f3Fs1E40s10m7D+qSnfwtjJQ==}
+
+  '@joyid/common@0.2.0':
+    resolution: {integrity: sha512-WBZtgdEccWxjiGHIoDgRFIbnC42ZvmfvFRCTxmx9D4BLvtiFdhAa+g70lUmiHwO28GjgHIHgzHRGNRdLuk81xw==}
 
   '@jridgewell/gen-mapping@0.3.5':
     resolution: {integrity: sha512-IzL8ZoEDIBRWEzlCcRhOaCupYyN5gdIK+Q6fbFdPDg6HqX6jpkItn7DFIpW9LQzXG6Df9sA7+OKnq0qlz/GaQg==}
@@ -5664,7 +5670,26 @@ snapshots:
       - typescript
       - zod
 
+  '@joyid/ckb@1.0.0(encoding@0.1.13)(typescript@5.4.5)':
+    dependencies:
+      '@joyid/common': 0.2.0(typescript@5.4.5)
+      '@nervosnetwork/ckb-sdk-utils': 0.109.1
+      cross-fetch: 4.0.0(encoding@0.1.13)
+      uncrypto: 0.1.3
+    transitivePeerDependencies:
+      - encoding
+      - typescript
+      - zod
+
   '@joyid/common@0.0.3(typescript@5.4.5)':
+    dependencies:
+      abitype: 0.8.7(typescript@5.4.5)
+      type-fest: 4.6.0
+    transitivePeerDependencies:
+      - typescript
+      - zod
+
+  '@joyid/common@0.2.0(typescript@5.4.5)':
     dependencies:
       abitype: 0.8.7(typescript@5.4.5)
       type-fest: 4.6.0

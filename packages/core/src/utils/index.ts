@@ -103,6 +103,8 @@ export async function reduceAsync<T, V>(
   accumulator: (
     a: T,
     b: V,
+    i: number,
+    values: V[],
   ) => Promise<T | undefined | null | void> | T | undefined | null | void,
   init: T,
 ): Promise<T>;
@@ -111,6 +113,8 @@ export async function reduceAsync<T, V>(
   accumulator: (
     a: T,
     b: T | V,
+    i: number,
+    values: (V | T)[],
   ) => Promise<T | undefined | null | void> | T | undefined | null | void,
   init?: T,
 ): Promise<T> {
@@ -123,9 +127,9 @@ export async function reduceAsync<T, V>(
   }
 
   return values.reduce(
-    (current: Promise<T>, b: T | V) =>
+    (current: Promise<T>, b: T | V, i, array) =>
       current.then((v) =>
-        Promise.resolve(accumulator(v, b)).then((r) => r ?? v),
+        Promise.resolve(accumulator(v, b, i, array)).then((r) => r ?? v),
       ),
     Promise.resolve(init),
   );

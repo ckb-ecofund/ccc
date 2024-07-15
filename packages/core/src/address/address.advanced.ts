@@ -1,5 +1,5 @@
 import { bech32, bech32m } from "bech32";
-import { hashTypeFromBytes } from "../ckb";
+import { Script, hashTypeFromBytes } from "../ckb";
 import { Client, KnownScript } from "../client";
 import { hexFrom } from "../hex";
 import { type AddressLike } from "./index";
@@ -148,10 +148,7 @@ export async function addressFromPayload(
   }
 
   return {
-    script: {
-      ...(await client.getKnownScript(script)),
-      args: payload.slice(1),
-    },
+    script: await Script.fromKnownScript(client, script, payload.slice(1)),
     prefix,
   };
 }

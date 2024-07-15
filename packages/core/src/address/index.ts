@@ -91,15 +91,12 @@ export class Address {
   }
 
   static async fromKnownScript(
+    client: Client,
     script: KnownScript,
     args: HexLike,
-    client: Client,
   ) {
     return Address.from({
-      script: {
-        ...(await client.getKnownScript(script)),
-        args,
-      },
+      script: await Script.fromKnownScript(client, script, args),
       prefix: client.addressPrefix,
     });
   }

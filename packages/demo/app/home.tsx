@@ -206,6 +206,377 @@ function Transfer() {
   );
 }
 
+function TransferXUdt() {
+  const signer = ccc.useSigner();
+  const [xUdtArgs, setXUdtArgs] = useState<string>("");
+  const [transferTo, setTransferTo] = useState<string>("");
+  const [amount, setAmount] = useState<string>("");
+  const [hash, setHash] = useState<string>("");
+
+  return (
+    <>
+      {hash !== "" ? (
+        <p className="mb-1 w-full whitespace-normal text-balance break-all text-center">
+          {hash}
+        </p>
+      ) : (
+        <></>
+      )}
+      <div className="mb-1 flex flex-col items-center">
+        <div className="flex flex-col">
+          <input
+            className="rounded-full border border-black px-4 py-2"
+            type="text"
+            value={xUdtArgs}
+            onInput={(e) => setXUdtArgs(e.currentTarget.value)}
+            placeholder="xUdt args to transfer"
+          />
+          <input
+            className="mt-1 rounded-full border border-black px-4 py-2"
+            type="text"
+            value={transferTo}
+            onInput={(e) => setTransferTo(e.currentTarget.value)}
+            placeholder="Address to transfer to"
+          />
+          <input
+            className="mt-1 rounded-full border border-black px-4 py-2"
+            type="text"
+            value={amount}
+            onInput={(e) => setAmount(e.currentTarget.value)}
+            placeholder="Amount to transfer"
+          />
+        </div>
+        <Button
+          className="mt-1"
+          onClick={async () => {
+            if (!signer) {
+              return;
+            }
+            const { script: toScript } = await ccc.Address.fromString(
+              transferTo,
+              signer.client,
+            );
+            const { script: change } = await signer.getRecommendedAddressObj();
+
+            const xUdtType = await ccc.Script.fromKnownScript(
+              signer.client,
+              ccc.KnownScript.XUdt,
+              xUdtArgs,
+            );
+
+            const tx = ccc.Transaction.from({
+              outputs: [
+                {
+                  lock: toScript,
+                  type: xUdtType,
+                },
+              ],
+              outputsData: [ccc.numLeToBytes(amount, 16)],
+            });
+            await tx.completeInputsByUdt(signer, xUdtType);
+            const balanceDiff =
+              (await tx.getInputsUdtBalance(signer.client, xUdtType)) -
+              tx.getOutputsUdtBalance(xUdtType);
+            if (balanceDiff > ccc.Zero) {
+              tx.addOutput(
+                {
+                  lock: change,
+                  type: xUdtType,
+                },
+                ccc.numLeToBytes(balanceDiff, 16),
+              );
+            }
+            await tx.addCellDepsOfKnownScripts(
+              signer.client,
+              ccc.KnownScript.XUdt,
+            );
+            await tx.completeInputsByCapacity(signer);
+            await tx.completeFeeChangeToLock(signer, change, 1000);
+
+            // Sign and send the transaction
+            setHash(await signer.sendTransaction(tx));
+          }}
+        >
+          Transfer
+        </Button>
+      </div>
+    </>
+  );
+}
+
+function IssueXUdtSul() {
+  const signer = ccc.useSigner();
+  const [amount, setAmount] = useState<string>("");
+  const [hashes, setHashes] = useState<string[]>([]);
+
+  return (
+    <>
+      {hashes.length !== 0 ? (
+        hashes.map((hash, i) => (
+          <p
+            className="mb-1 w-full whitespace-normal text-balance break-all text-center"
+            key={i}
+          >
+            {hash}
+          </p>
+        ))
+      ) : (
+        <></>
+      )}
+      <div className="mb-1 flex flex-col items-center">
+        <div className="flex flex-col">
+          You will need to sign three transactions.
+          <input
+            className="mt-1 rounded-full border border-black px-4 py-2"
+            type="text"
+            value={amount}
+            onInput={(e) => setAmount(e.currentTarget.value)}
+            placeholder="Amount to issue"
+          />
+        </div>
+        <Button
+          className="mt-1"
+          onClick={async () => {
+            if (!signer) {
+              return;
+            }
+            const { script } = await signer.getRecommendedAddressObj();
+
+            const susTx = ccc.Transaction.from({
+              outputs: [
+                {
+                  lock: script,
+                },
+              ],
+            });
+            await susTx.completeInputsByCapacity(signer);
+            await susTx.completeFeeChangeToLock(signer, script, 1000);
+            const susTxHash = await signer.sendTransaction(susTx);
+            await signer.client.markUnusable({ txHash: susTxHash, index: 0 });
+
+            const singleUseLock = await ccc.Script.fromKnownScript(
+              signer.client,
+              ccc.KnownScript.SingleUseLock,
+              ccc.OutPoint.from({
+                txHash: susTxHash,
+                index: 0,
+              }).toBytes(),
+            );
+            const lockTx = ccc.Transaction.from({
+              outputs: [
+                // Owner cell
+                {
+                  lock: singleUseLock,
+                },
+              ],
+            });
+            await lockTx.completeInputsByCapacity(signer);
+            await lockTx.completeFeeChangeToLock(signer, script, 1000);
+            const lockTxHash = await signer.sendTransaction(lockTx);
+
+            const mintTx = ccc.Transaction.from({
+              inputs: [
+                // SUS
+                {
+                  previousOutput: {
+                    txHash: susTxHash,
+                    index: 0,
+                  },
+                },
+                // Owner cell
+                {
+                  previousOutput: {
+                    txHash: lockTxHash,
+                    index: 0,
+                  },
+                },
+              ],
+              outputs: [
+                // Issued xUDT
+                {
+                  lock: script,
+                  type: await ccc.Script.fromKnownScript(
+                    signer.client,
+                    ccc.KnownScript.XUdt,
+                    singleUseLock.hash(),
+                  ),
+                },
+              ],
+              outputsData: [ccc.numLeToBytes(amount, 16)],
+            });
+            await mintTx.addCellDepsOfKnownScripts(
+              signer.client,
+              ccc.KnownScript.SingleUseLock,
+              ccc.KnownScript.XUdt,
+            );
+            await mintTx.completeInputsByCapacity(signer);
+            await mintTx.completeFeeChangeToLock(signer, script, 1000);
+            const mintTxHash = await signer.sendTransaction(mintTx);
+
+            setHashes([susTxHash, lockTxHash, mintTxHash]);
+          }}
+        >
+          Issue
+        </Button>
+      </div>
+    </>
+  );
+}
+
+function IssueXUdtTypeId() {
+  const signer = ccc.useSigner();
+
+  const [typeIdArgs, setTypeIdArgs] = useState<string>("");
+  const [amount, setAmount] = useState<string>("");
+  const [hashes, setHashes] = useState<string[]>([]);
+
+  return (
+    <>
+      {hashes.length !== 0 ? (
+        hashes.map((hash, i) => (
+          <p
+            className="mb-1 w-full whitespace-normal text-balance break-all text-center"
+            key={i}
+          >
+            {hash}
+          </p>
+        ))
+      ) : (
+        <></>
+      )}
+      <div className="mb-1 flex flex-col items-center">
+        <div className="flex flex-col">
+          You will need to sign two or three transactions.
+          <input
+            className="mt-1 rounded-full border border-black px-4 py-2"
+            type="text"
+            value={typeIdArgs}
+            onInput={(e) => setTypeIdArgs(e.currentTarget.value)}
+            placeholder="Type ID args, empty to create new"
+          />
+          <input
+            className="mt-1 rounded-full border border-black px-4 py-2"
+            type="text"
+            value={amount}
+            onInput={(e) => setAmount(e.currentTarget.value)}
+            placeholder="Amount to issue"
+          />
+        </div>
+        <Button
+          className="mt-1"
+          onClick={async () => {
+            if (!signer) {
+              return;
+            }
+            const hashes: ccc.Hex[] = [];
+            const { script } = await signer.getRecommendedAddressObj();
+
+            const typeId = await (async () => {
+              if (typeIdArgs !== "") {
+                return ccc.Script.fromKnownScript(
+                  signer.client,
+                  ccc.KnownScript.TypeId,
+                  typeIdArgs,
+                );
+              }
+              const typeIdTx = ccc.Transaction.from({
+                outputs: [
+                  {
+                    lock: script,
+                    type: await ccc.Script.fromKnownScript(
+                      signer.client,
+                      ccc.KnownScript.TypeId,
+                      "00".repeat(32),
+                    ),
+                  },
+                ],
+              });
+              await typeIdTx.completeInputsByCapacity(signer);
+              if (!typeIdTx.outputs[0].type) {
+                throw new Error("Unexpected disappeared output");
+              }
+              typeIdTx.outputs[0].type.args = ccc.ckbHash(
+                typeIdTx.inputs[0].toBytes(),
+                ccc.numLeToBytes(0, 8),
+              );
+              await typeIdTx.completeFeeChangeToLock(signer, script, 1000);
+              hashes.push(await signer.sendTransaction(typeIdTx));
+              return typeIdTx.outputs[0].type;
+            })();
+
+            const outputTypeLock = await ccc.Script.fromKnownScript(
+              signer.client,
+              ccc.KnownScript.OutputTypeProxyLock,
+              typeId.hash(),
+            );
+            const lockTx = ccc.Transaction.from({
+              outputs: [
+                // Owner cell
+                {
+                  lock: outputTypeLock,
+                },
+              ],
+            });
+            await lockTx.completeInputsByCapacity(signer);
+            await lockTx.completeFeeChangeToLock(signer, script, 1000);
+            const lockTxHash = await signer.sendTransaction(lockTx);
+
+            const typeIdCell =
+              await signer.client.findSingletonCellByType(typeId);
+            if (!typeIdCell) {
+              throw new Error("Type ID cell not found");
+            }
+            const mintTx = ccc.Transaction.from({
+              inputs: [
+                // Type ID
+                {
+                  previousOutput: typeIdCell.outPoint,
+                },
+                // Owner cell
+                {
+                  previousOutput: {
+                    txHash: lockTxHash,
+                    index: 0,
+                  },
+                },
+              ],
+              outputs: [
+                // Keep the Type ID cell
+                typeIdCell.cellOutput,
+                // Issued xUDT
+                {
+                  lock: script,
+                  type: await ccc.Script.fromKnownScript(
+                    signer.client,
+                    ccc.KnownScript.XUdt,
+                    outputTypeLock.hash(),
+                  ),
+                },
+              ],
+              outputsData: [
+                typeIdCell.outputData,
+                ccc.numLeToBytes(amount, 16),
+              ],
+            });
+            await mintTx.addCellDepsOfKnownScripts(
+              signer.client,
+              ccc.KnownScript.OutputTypeProxyLock,
+              ccc.KnownScript.XUdt,
+            );
+            await mintTx.completeInputsByCapacity(signer);
+            await mintTx.completeFeeChangeToLock(signer, script, 1000);
+            const mintTxHash = await signer.sendTransaction(mintTx);
+
+            setHashes([typeId.args, ...hashes, lockTxHash, mintTxHash]);
+          }}
+        >
+          Issue
+        </Button>
+      </div>
+    </>
+  );
+}
+
 export default function Home() {
   const [error, setError] = useState<string | undefined>(undefined);
   useEffect(() => {
@@ -229,6 +600,9 @@ export default function Home() {
   const tabs: [string, ReactNode][] = [
     ["Sign", <Sign key="Sign" />],
     ["Transfer", <Transfer key="Transfer" />],
+    ["Transfer xUDT", <TransferXUdt key="Transfer xUdt" />],
+    ["Issue xUDT (SUS)", <IssueXUdtSul key="Issue xUDT (SUS)" />],
+    ["Issue xUDT (Type ID)", <IssueXUdtTypeId key="Issue xUDT (Type ID)" />],
   ];
 
   useEffect(() => {
@@ -264,11 +638,11 @@ export default function Home() {
           <Button className="mt-2" onClick={open}>
             {internalAddress.slice(0, 7)}...{internalAddress.slice(-5)}
           </Button>
-          <div className="mb-2 mt-2 flex">
+          <div className="mb-2 mt-2 flex w-full overflow-x-auto pb-1">
             {tabs.map(([name]) => (
               <button
                 key={name}
-                className={`flex items-center border-b border-black px-5 py-2 text-lg ${tab === name ? "border-b-4" : ""}`}
+                className={`flex items-center border-b border-black px-5 py-2 text-lg ${tab === name ? "border-b-4" : ""} whitespace-nowrap`}
                 onClick={() => setTab(name)}
               >
                 {name}

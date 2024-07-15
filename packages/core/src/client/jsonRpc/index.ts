@@ -73,7 +73,7 @@ export abstract class ClientJsonRpc extends Client {
    * @returns Transaction hash.
    */
 
-  sendTransaction = this.buildSender(
+  sendTransactionNoCache = this.buildSender(
     "send_transaction",
     [JsonRpcTransformers.transactionFrom],
     hexFrom,
@@ -89,11 +89,11 @@ export abstract class ClientJsonRpc extends Client {
    * @returns The transaction with status.
    */
 
-  getTransaction = this.buildSender(
+  getTransactionNoCache = this.buildSender(
     "get_transaction",
     [hexFrom],
     JsonRpcTransformers.transactionResponseTo,
-  ) as (txHash: HexLike) => Promise<ClientTransactionResponse>;
+  ) as (txHash: HexLike) => Promise<ClientTransactionResponse | null>;
 
   /**
    * find cells from node.
@@ -105,7 +105,7 @@ export abstract class ClientJsonRpc extends Client {
    * @returns The found cells.
    */
 
-  findCellsPaged = this.buildSender(
+  findCellsPagedNoCache = this.buildSender(
     "get_cells",
     [
       JsonRpcTransformers.indexerSearchKeyFrom,
