@@ -2,7 +2,13 @@
 "use client";
 
 import { ccc } from "@ckb-ccc/connector-react";
-import React, { ReactNode, useEffect, useState } from "react";
+import React, {
+  createElement,
+  FunctionComponent,
+  ReactNode,
+  useEffect,
+  useState,
+} from "react";
 import { common } from "@ckb-lumos/common-scripts";
 import { TransactionSkeleton } from "@ckb-lumos/helpers";
 import { Indexer } from "@ckb-lumos/ckb-indexer";
@@ -37,25 +43,13 @@ function Button(props: React.ButtonHTMLAttributes<HTMLButtonElement>) {
   );
 }
 
-function Sign() {
+function Sign({ sendMessage }: { sendMessage: (...msg: string[]) => void }) {
   const signer = ccc.useSigner();
   const [messageToSign, setMessageToSign] = useState<string>("");
   const [signature, setSignature] = useState<string>("");
-  const [isValid, setIsValid] = useState<boolean | undefined>(undefined);
 
   return (
     <>
-      {signature !== "" ? (
-        <>
-          <p className="mb-1">Signature</p>
-          <p className="mb-1 w-full whitespace-normal text-balance break-all text-center">
-            {signature}
-          </p>
-          {isValid !== undefined ? (
-            <p className="mb-1">{isValid ? "Valid" : "Invalid"}</p>
-          ) : null}
-        </>
-      ) : null}
       <div className="mb-1 flex flex-col items-center">
         <input
           className="mb-1 rounded-full border border-black px-4 py-2"
@@ -70,10 +64,11 @@ function Sign() {
               if (!signer) {
                 return;
               }
-              setSignature(
-                JSON.stringify(await signer.signMessage(messageToSign)),
+              const sig = JSON.stringify(
+                await signer.signMessage(messageToSign),
               );
-              setIsValid(undefined);
+              setSignature(sig);
+              sendMessage("Signature:", sig);
             }}
           >
             Sign
@@ -81,11 +76,13 @@ function Sign() {
           <Button
             className="ml-2"
             onClick={async () => {
-              setIsValid(
-                await ccc.Signer.verifyMessage(
+              sendMessage(
+                (await ccc.Signer.verifyMessage(
                   messageToSign,
                   JSON.parse(signature),
-                ),
+                ))
+                  ? "Valid"
+                  : "Invalid",
               );
             }}
           >
@@ -97,22 +94,18 @@ function Sign() {
   );
 }
 
-function Transfer() {
+function Transfer({
+  sendMessage,
+}: {
+  sendMessage: (...msg: string[]) => void;
+}) {
   const signer = ccc.useSigner();
   const [transferTo, setTransferTo] = useState<string>("");
   const [amount, setAmount] = useState<string>("");
-  const [hash, setHash] = useState<string>("");
   const [data, setData] = useState<string>("");
 
   return (
     <>
-      {hash !== "" ? (
-        <p className="mb-1 w-full whitespace-normal text-balance break-all text-center">
-          {hash}
-        </p>
-      ) : (
-        <></>
-      )}
       <div className="mb-1 flex flex-col items-center">
         <div className="flex flex-col">
           <input
@@ -172,7 +165,7 @@ function Transfer() {
             await tx.completeFeeChangeToLock(signer, change, 1000);
 
             // Sign and send the transaction
-            setHash(await signer.sendTransaction(tx));
+            sendMessage("Transaction sent:", await signer.sendTransaction(tx));
           }}
         >
           Transfer
@@ -182,22 +175,18 @@ function Transfer() {
   );
 }
 
-function TransferLumos() {
+function TransferLumos({
+  sendMessage,
+}: {
+  sendMessage: (...msg: string[]) => void;
+}) {
   const signer = ccc.useSigner();
   const [transferTo, setTransferTo] = useState<string>("");
   const [amount, setAmount] = useState<string>("");
-  const [hash, setHash] = useState<string>("");
   const [data, setData] = useState<string>("");
 
   return (
     <>
-      {hash !== "" ? (
-        <p className="mb-1 w-full whitespace-normal text-balance break-all text-center">
-          {hash}
-        </p>
-      ) : (
-        <></>
-      )}
       <div className="mb-1 flex flex-col items-center">
         <div className="flex flex-col">
           <input
@@ -281,7 +270,7 @@ function TransferLumos() {
             tx.outputsData[0] = ccc.hexFrom(dataBytes);
 
             // Sign and send the transaction
-            setHash(await signer.sendTransaction(tx));
+            sendMessage("Transaction sent:", await signer.sendTransaction(tx));
           }}
         >
           Transfer
@@ -291,22 +280,18 @@ function TransferLumos() {
   );
 }
 
-function TransferXUdt() {
+function TransferXUdt({
+  sendMessage,
+}: {
+  sendMessage: (...msg: string[]) => void;
+}) {
   const signer = ccc.useSigner();
   const [xUdtArgs, setXUdtArgs] = useState<string>("");
   const [transferTo, setTransferTo] = useState<string>("");
   const [amount, setAmount] = useState<string>("");
-  const [hash, setHash] = useState<string>("");
 
   return (
     <>
-      {hash !== "" ? (
-        <p className="mb-1 w-full whitespace-normal text-balance break-all text-center">
-          {hash}
-        </p>
-      ) : (
-        <></>
-      )}
       <div className="mb-1 flex flex-col items-center">
         <div className="flex flex-col">
           <input
@@ -379,7 +364,7 @@ function TransferXUdt() {
             await tx.completeFeeChangeToLock(signer, change, 1000);
 
             // Sign and send the transaction
-            setHash(await signer.sendTransaction(tx));
+            sendMessage("Transaction sent:", await signer.sendTransaction(tx));
           }}
         >
           Transfer
@@ -389,25 +374,16 @@ function TransferXUdt() {
   );
 }
 
-function IssueXUdtSul() {
+function IssueXUdtSul({
+  sendMessage,
+}: {
+  sendMessage: (...msg: string[]) => void;
+}) {
   const signer = ccc.useSigner();
   const [amount, setAmount] = useState<string>("");
-  const [hashes, setHashes] = useState<string[]>([]);
 
   return (
     <>
-      {hashes.length !== 0 ? (
-        hashes.map((hash, i) => (
-          <p
-            className="mb-1 w-full whitespace-normal text-balance break-all text-center"
-            key={i}
-          >
-            {hash}
-          </p>
-        ))
-      ) : (
-        <></>
-      )}
       <div className="mb-1 flex flex-col items-center">
         <div className="flex flex-col">
           You will need to sign three transactions.
@@ -437,6 +413,7 @@ function IssueXUdtSul() {
             await susTx.completeInputsByCapacity(signer);
             await susTx.completeFeeChangeToLock(signer, script, 1000);
             const susTxHash = await signer.sendTransaction(susTx);
+            sendMessage("Transaction sent:", susTxHash);
             await signer.client.markUnusable({ txHash: susTxHash, index: 0 });
 
             const singleUseLock = await ccc.Script.fromKnownScript(
@@ -458,6 +435,7 @@ function IssueXUdtSul() {
             await lockTx.completeInputsByCapacity(signer);
             await lockTx.completeFeeChangeToLock(signer, script, 1000);
             const lockTxHash = await signer.sendTransaction(lockTx);
+            sendMessage("Transaction sent:", lockTxHash);
 
             const mintTx = ccc.Transaction.from({
               inputs: [
@@ -496,9 +474,10 @@ function IssueXUdtSul() {
             );
             await mintTx.completeInputsByCapacity(signer);
             await mintTx.completeFeeChangeToLock(signer, script, 1000);
-            const mintTxHash = await signer.sendTransaction(mintTx);
-
-            setHashes([susTxHash, lockTxHash, mintTxHash]);
+            sendMessage(
+              "Transaction sent:",
+              await signer.sendTransaction(mintTx),
+            );
           }}
         >
           Issue
@@ -508,27 +487,18 @@ function IssueXUdtSul() {
   );
 }
 
-function IssueXUdtTypeId() {
+function IssueXUdtTypeId({
+  sendMessage,
+}: {
+  sendMessage: (...msg: string[]) => void;
+}) {
   const signer = ccc.useSigner();
 
   const [typeIdArgs, setTypeIdArgs] = useState<string>("");
   const [amount, setAmount] = useState<string>("");
-  const [hashes, setHashes] = useState<string[]>([]);
 
   return (
     <>
-      {hashes.length !== 0 ? (
-        hashes.map((hash, i) => (
-          <p
-            className="mb-1 w-full whitespace-normal text-balance break-all text-center"
-            key={i}
-          >
-            {hash}
-          </p>
-        ))
-      ) : (
-        <></>
-      )}
       <div className="mb-1 flex flex-col items-center">
         <div className="flex flex-col">
           You will need to sign two or three transactions.
@@ -585,7 +555,11 @@ function IssueXUdtTypeId() {
                 ccc.numLeToBytes(0, 8),
               );
               await typeIdTx.completeFeeChangeToLock(signer, script, 1000);
-              hashes.push(await signer.sendTransaction(typeIdTx));
+              sendMessage(
+                "Transaction sent:",
+                await signer.sendTransaction(typeIdTx),
+              );
+              sendMessage("Type ID created: ", typeIdTx.outputs[0].type.args);
               return typeIdTx.outputs[0].type;
             })();
 
@@ -605,6 +579,7 @@ function IssueXUdtTypeId() {
             await lockTx.completeInputsByCapacity(signer);
             await lockTx.completeFeeChangeToLock(signer, script, 1000);
             const lockTxHash = await signer.sendTransaction(lockTx);
+            sendMessage("Transaction sent:", lockTxHash);
 
             const typeIdCell =
               await signer.client.findSingletonCellByType(typeId);
@@ -650,9 +625,10 @@ function IssueXUdtTypeId() {
             );
             await mintTx.completeInputsByCapacity(signer);
             await mintTx.completeFeeChangeToLock(signer, script, 1000);
-            const mintTxHash = await signer.sendTransaction(mintTx);
-
-            setHashes([typeId.args, ...hashes, lockTxHash, mintTxHash]);
+            sendMessage(
+              "Transaction sent:",
+              await signer.sendTransaction(mintTx),
+            );
           }}
         >
           Issue
@@ -663,16 +639,19 @@ function IssueXUdtTypeId() {
 }
 
 export default function Home() {
-  const [error, setError] = useState<string | undefined>(undefined);
+  const [messages, setMessages] = useState<["error" | "info", string][]>([]);
   useEffect(() => {
     const handler = (event: PromiseRejectionEvent) => {
       const { name, message, stack, cause } = event.reason as Error;
-      setError(JSON.stringify({ name, message, stack, cause }));
+      setMessages([
+        ["error", JSON.stringify({ name, message, stack, cause })],
+        ...messages,
+      ]);
     };
 
     window.addEventListener("unhandledrejection", handler);
     return () => window.removeEventListener("unhandledrejection", handler);
-  }, []);
+  }, [messages, setMessages]);
 
   const { wallet, open, setClient } = ccc.useCcc();
   const signer = ccc.useSigner();
@@ -682,16 +661,19 @@ export default function Home() {
   const [balance, setBalance] = useState(ccc.Zero);
   const [isTestnet] = useState(true);
   const [tab, setTab] = useState("Sign");
-  /* eslint-disable react/jsx-key */
-  const tabs: [string, ReactNode][] = [
-    ["Sign", <Sign />],
-    ["Transfer", <Transfer />],
-    ["Transfer with Lumos", <TransferLumos />],
-    ["Transfer xUDT", <TransferXUdt />],
-    ["Issue xUDT (SUS)", <IssueXUdtSul />],
-    ["Issue xUDT (Type ID)", <IssueXUdtTypeId />],
+  const tabs: [
+    string,
+    FunctionComponent<{
+      sendMessage: (...msg: string[]) => void;
+    }>,
+  ][] = [
+    ["Sign", Sign],
+    ["Transfer", Transfer],
+    ["Transfer with Lumos", TransferLumos],
+    ["Transfer xUDT", TransferXUdt],
+    ["Issue xUDT (SUS)", IssueXUdtSul],
+    ["Issue xUDT (Type ID)", IssueXUdtTypeId],
   ];
-  /* eslint-enable react/jsx-key */
 
   useEffect(() => {
     if (!signer) {
@@ -737,7 +719,21 @@ export default function Home() {
               </button>
             ))}
           </div>
-          {tabs.find(([name]) => name === tab)?.[1]}
+          {ccc.apply(
+            (
+              e: FunctionComponent<{
+                sendMessage: (...msg: string[]) => void;
+              }>,
+            ) =>
+              createElement(e, {
+                sendMessage: (...msg: string[]) =>
+                  setMessages((messages) => [
+                    ["info", `(${tab}) ${msg.join(" ")}`],
+                    ...messages,
+                  ]),
+              }),
+            tabs.find(([name]) => name === tab)?.[1],
+          )}
         </>
       ) : (
         <>
@@ -749,13 +745,8 @@ export default function Home() {
           <Button onClick={open}>Connect Wallet</Button>
         </>
       )}
-      {error !== undefined ? (
-        <p className="mt-4 text-balance break-all text-center font-bold text-red-400">
-          {error}
-        </p>
-      ) : null}
       <Link
-        className="mt-10 h-6 w-6"
+        className="mb-5 mt-10 h-6 w-6"
         href="https://github.com/ckb-ecofund/ccc"
         target="_blank"
       >
@@ -763,6 +754,14 @@ export default function Home() {
           <path d="M7.999 0C3.582 0 0 3.596 0 8.032a8.031 8.031 0 0 0 5.472 7.621c.4.074.546-.174.546-.387 0-.191-.007-.696-.011-1.366-2.225.485-2.695-1.077-2.695-1.077-.363-.928-.888-1.175-.888-1.175-.727-.498.054-.488.054-.488.803.057 1.225.828 1.225.828.714 1.227 1.873.873 2.329.667.072-.519.279-.873.508-1.074-1.776-.203-3.644-.892-3.644-3.969 0-.877.312-1.594.824-2.156-.083-.203-.357-1.02.078-2.125 0 0 .672-.216 2.2.823a7.633 7.633 0 0 1 2.003-.27 7.65 7.65 0 0 1 2.003.271c1.527-1.039 2.198-.823 2.198-.823.436 1.106.162 1.922.08 2.125.513.562.822 1.279.822 2.156 0 3.085-1.87 3.764-3.652 3.963.287.248.543.738.543 1.487 0 1.074-.01 1.94-.01 2.203 0 .215.144.465.55.386A8.032 8.032 0 0 0 16 8.032C16 3.596 12.418 0 7.999 0z"></path>
         </svg>
       </Link>
+      {messages.map(([level, msg], i) => (
+        <p
+          className={`break-all border-b border-gray-400 pb-1 text-center font-bold ${level === "info" ? "text-green-400" : "text-red-400"}`}
+          key={messages.length - i}
+        >
+          {messages.length - i}: {msg}
+        </p>
+      ))}
     </main>
   );
 }
