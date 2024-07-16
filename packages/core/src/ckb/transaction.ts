@@ -888,9 +888,12 @@ export class Transaction {
           ...output,
           capacity: output.capacity ?? 0,
         });
-        o.capacity = fixedPointFrom(
-          o.occupiedSize + (apply(bytesFrom, tx.outputsData?.[i])?.length ?? 0),
-        );
+        if (o.capacity === Zero) {
+          o.capacity = fixedPointFrom(
+            o.occupiedSize +
+              (apply(bytesFrom, tx.outputsData?.[i])?.length ?? 0),
+          );
+        }
         return o;
       }) ?? [];
     const outputsData = outputs.map((_, i) =>
