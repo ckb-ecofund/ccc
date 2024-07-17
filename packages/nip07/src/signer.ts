@@ -28,6 +28,11 @@ export class Signer extends ccc.SignerNostr {
   }
 
   async getNostrPublicKey(): Promise<ccc.Hex> {
+    if (this.publicKey) {
+      return this.publicKey;
+    }
+
+    this.publicKey = (await this.connectionsRepo.get())?.publicKey;
     if (!this.publicKey) {
       throw new Error("Not connected");
     }
@@ -47,7 +52,11 @@ export class Signer extends ccc.SignerNostr {
   }
 
   async isConnected(): Promise<boolean> {
-    this.publicKey = (await this.connectionsRepo.get())?.publicKey;
-    return this.publicKey !== undefined;
+    try {
+      await this.getNostrPublicKey();
+      return true;
+    } catch (_) {
+      return false;
+    }
   }
 }
