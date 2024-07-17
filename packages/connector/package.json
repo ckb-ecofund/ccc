@@ -1,7 +1,7 @@
 {
   "name": "@ckb-ccc/connector",
   "version": "0.0.8-alpha.3",
-  "description": "Common Chains Connector UI",
+  "description": "CCC - CKBer's Codebase. Common Chains Connector UI",
   "author": "Hanssen0 <hanssen0@hanssen0.com>",
   "license": "MIT",
   "private": false,
