@@ -696,7 +696,7 @@ export default function Home() {
   }, [isTestnet, setClient]);
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-white p-24">
+    <main className="flex min-h-screen flex-col items-center justify-center bg-white p-6 md:p-24">
       {wallet ? (
         <>
           <WalletIcon wallet={wallet} className="mb-1" />

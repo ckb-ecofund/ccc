@@ -212,7 +212,7 @@ export class CkbSigner extends ccc.Signer {
 
     const pubkeyHash = ccc.ckbHash(this.connection.publicKey).substring(0, 42);
     const lock = (await this.getAddressObj()).script;
-    const aggregator = new Aggregator(await this.getAggregatorUri());
+    const aggregator = new Aggregator(this.getAggregatorUri());
     const { unlock_entry: unlockEntry } =
       await aggregator.generateSubkeyUnlockSmt({
         alg_index: 1,

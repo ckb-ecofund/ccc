@@ -1074,9 +1074,10 @@ export class Transaction {
     hasher.update(this.hash());
 
     for (let i = 0; i < this.witnesses.length; i += 1) {
-      const input = await this.inputs[i];
-      await input.completeExtraInfos(client);
+      const input = this.inputs[i];
       if (input) {
+        await input.completeExtraInfos(client);
+
         if (!input.cellOutput) {
           throw new Error("Unable to complete input");
         }
