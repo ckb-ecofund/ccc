@@ -112,11 +112,7 @@ export class NostrSigner extends ccc.SignerNostr {
   }
 
   async getNostrPublicKey(): Promise<ccc.Hex> {
-    if (!this.connection) {
-      throw new Error("Not connected");
-    }
-
-    return this.connection.publicKey;
+    return this.assertConnection().publicKey;
   }
 
   async signNostrEvent(

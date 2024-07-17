@@ -52,11 +52,11 @@ export class Signer extends ccc.SignerNostr {
   }
 
   async isConnected(): Promise<boolean> {
-    try {
-      await this.getNostrPublicKey();
+    if (this.publicKey) {
       return true;
-    } catch (_) {
-      return false;
     }
+
+    this.publicKey = (await this.connectionsRepo.get())?.publicKey;
+    return this.publicKey !== undefined;
   }
 }
