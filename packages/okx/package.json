@@ -42,6 +42,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@ckb-ccc/core": "workspace:*"
+    "@ckb-ccc/core": "workspace:*",
+    "@ckb-ccc/nip07": "workspace:*"
   }
 }

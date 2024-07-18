@@ -1,2 +1,2 @@
-export * from "./signer";
+export * from "./btc";
 export * from "./signersFactory";

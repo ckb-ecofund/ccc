@@ -230,13 +230,11 @@ export class WebComponentConnector extends LitElement {
       this.addSigner("UniSat", "BTC", UNI_SAT_SVG, uniSatSigner);
     }
 
-    const okxBitcoinSigner = ccc.Okx.getOKXBitcoinSigner(
-      this.client,
-      preferredNetworks,
+    ccc.Okx.getOKXBitcoinSigner(this.client, preferredNetworks).forEach(
+      (signer) => {
+        this.addSigner("OKX Wallet", signer.type, OKX_SVG, signer);
+      },
     );
-    if (okxBitcoinSigner) {
-      this.addSigner("OKX Wallet", "BTC", OKX_SVG, okxBitcoinSigner);
-    }
 
     const nip07Signer = ccc.Nip07.getNip07Signer(this.client);
     if (nip07Signer) {

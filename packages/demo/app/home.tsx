@@ -88,14 +88,16 @@ function Sign({ sendMessage }: { sendMessage: (...msg: string[]) => void }) {
           <Button
             className="ml-2"
             onClick={async () => {
-              sendMessage(
-                (await ccc.Signer.verifyMessage(
+              if (
+                await ccc.Signer.verifyMessage(
                   messageToSign,
                   JSON.parse(signature),
-                ))
-                  ? "Valid"
-                  : "Invalid",
-              );
+                )
+              ) {
+                sendMessage("Valid");
+                return;
+              }
+              throw "Invalid";
             }}
           >
             Verify
@@ -744,16 +746,22 @@ export default function Home() {
   const [messages, setMessages] = useState<["error" | "info", string][]>([]);
   useEffect(() => {
     const handler = (event: PromiseRejectionEvent) => {
-      const { name, message, stack, cause } = event.reason as Error;
-      setMessages([
-        ["error", JSON.stringify({ name, message, stack, cause })],
-        ...messages,
-      ]);
+      const msg = (() => {
+        if (typeof event.reason === "object" && event.reason !== null) {
+          const { name, message, stack, cause } = (event as any).reason;
+          return JSON.stringify({ name, message, stack, cause });
+        }
+        if (typeof event.reason === "string") {
+          return event.reason;
+        }
+        return JSON.stringify(event);
+      })();
+      setMessages((messages) => [["error", msg], ...messages]);
     };
 
     window.addEventListener("unhandledrejection", handler);
     return () => window.removeEventListener("unhandledrejection", handler);
-  }, [messages, setMessages]);
+  }, [setMessages]);
 
   const { wallet, open, setClient } = ccc.useCcc();
   const signer = ccc.useSigner();
