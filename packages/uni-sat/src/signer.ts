@@ -15,8 +15,54 @@ export class Signer extends ccc.SignerBtc {
   constructor(
     client: ccc.Client,
     public readonly provider: Provider,
+    private readonly preferredNetworks: ccc.NetworkPreference[],
   ) {
     super(client);
+  }
+
+  /**
+   * Ensure the BTC network is the same as CKB network.
+   */
+  async ensureNetwork(): Promise<void> {
+    const currentNetwork = await (async () => {
+      if (this.provider.getChain) {
+        return (
+          {
+            BITCOIN_MAINNET: "btc",
+            BITCOIN_TESTNET: "btcTestnet",
+            FRACTAL_BITCOIN_MAINNET: "fractalBtc",
+          }[(await this.provider.getChain()).enum] ?? ""
+        );
+      }
+      return (await this.provider.getNetwork()) === "livenet"
+        ? "btc"
+        : "btcTestnet";
+    })();
+    const { network } = this.matchNetworkPreference(
+      this.preferredNetworks,
+      currentNetwork,
+    ) ?? { network: currentNetwork };
+    if (network === currentNetwork) {
+      return;
+    }
+    if (this.provider.switchChain) {
+      const chain = {
+        btc: "BITCOIN_MAINNET",
+        btcTestnet: "BITCOIN_TESTNET",
+        fractalBtc: "FRACTAL_BITCOIN_MAINNET",
+      }[network];
+      if (chain) {
+        await this.provider.switchChain(chain);
+        return;
+      }
+    } else if (network === "btc" || network === "btcTestnet") {
+      await this.provider.switchNetwork(
+        network === "btc" ? "livenet" : "testnet",
+      );
+    }
+    throw new Error(
+      `UniSat wallet doesn't support the requested chain ${network}`,
+    );
   }
 
   /**
@@ -41,6 +87,15 @@ export class Signer extends ccc.SignerBtc {
    */
   async connect(): Promise<void> {
     await this.provider.requestAccounts();
+    await this.ensureNetwork();
+  }
+
+  async replaceClient(client: ccc.Client): Promise<boolean> {
+    if (await super.replaceClient(client)) {
+      await this.ensureNetwork();
+      return true;
+    }
+    return false;
   }
 
   /**

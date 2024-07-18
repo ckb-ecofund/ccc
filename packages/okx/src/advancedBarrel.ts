@@ -1,3 +1,15 @@
-import { UniSatA } from "@ckb-ccc/uni-sat/advanced";
+export interface BitcoinProvider {
+  connect(): Promise<{
+    address: string;
+    publicKey: string;
+    compressedPublicKey: string;
+  }>;
 
-export interface BitcoinProvider extends UniSatA.Provider {}
+  getSelectedAccount(): Promise<{
+    address: string;
+    publicKey: string;
+    compressedPublicKey: string;
+  } | null>;
+
+  signMessage(msg: string, type: "ecdsa" | "bip322-simple"): Promise<string>;
+}

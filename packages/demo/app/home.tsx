@@ -761,7 +761,7 @@ export default function Home() {
   const [internalAddress, setInternalAddress] = useState("");
   const [address, setAddress] = useState("");
   const [balance, setBalance] = useState(ccc.Zero);
-  const [isTestnet] = useState(true);
+  const [isTestnet, setIsTestnet] = useState(true);
   const [tab, setTab] = useState("Sign");
   const tabs: [
     string,
@@ -847,6 +847,9 @@ export default function Home() {
           <Button onClick={open}>Connect Wallet</Button>
         </>
       )}
+      <Button onClick={() => setIsTestnet(!isTestnet)} className="mt-4">
+        Switch to {isTestnet ? "Mainnet" : "Testnet"}
+      </Button>
       <Link
         className="mb-5 mt-10 h-6 w-6"
         href="https://github.com/ckb-ecofund/ccc"

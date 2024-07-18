@@ -9,12 +9,13 @@ import { BitcoinSigner } from "./signer";
  */
 export function getOKXBitcoinSigner(
   client: ccc.Client,
+  preferredNetworks: ccc.NetworkPreference[],
 ): BitcoinSigner | undefined {
-  const windowRef = window as { okxwallet?: { bitcoin: BitcoinProvider } };
+  const windowRef = window as { okxwallet?: Record<string, BitcoinProvider> };
 
   if (typeof windowRef.okxwallet === "undefined") {
     return undefined;
   }
 
-  return new BitcoinSigner(client, windowRef.okxwallet.bitcoin);
+  return new BitcoinSigner(client, windowRef.okxwallet, preferredNetworks);
 }

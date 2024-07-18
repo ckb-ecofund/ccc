@@ -21,7 +21,7 @@ export class Signer extends ccc.SignerEvm {
 
   /**
    * Gets the EVM account address.
-   * @returns {Promise<string>} A promise that resolves to the EVM account address.
+   * @returns A promise that resolves to the EVM account address.
    */
   async getEvmAccount() {
     return (await this.detail.provider.request({ method: "eth_accounts" }))[0];

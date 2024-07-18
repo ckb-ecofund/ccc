@@ -3,7 +3,6 @@ import { html } from "lit";
 import { CKB_SVG } from "../assets/chains";
 import { COPY_SVG } from "../assets/copy.svg";
 import { DISCONNECT_SVG } from "../assets/diconnect.svg";
-import { SWAP_SVG } from "../assets/swap.svg";
 import { signerTypeToIcon } from "./signers";
 
 function copyAddress(address?: string) {
@@ -32,7 +31,6 @@ export function generateConnectedScene(
   internalAddress: string | undefined,
   balance: ccc.Num | undefined,
   disconnect: () => void,
-  handleSwitchClick: () => void,
 ) {
   return [
     undefined,
@@ -74,11 +72,10 @@ export function generateConnectedScene(
 
       <div class="switch-btn-container align-center flex justify-center mt-1">
         <div class="switch-line"></div>
-        <div class="switch-content flex align-center cursor-pointer ml-2 mr-2 fs-sm" @click=${handleSwitchClick}>
+        <div class="switch-content flex align-center ml-2 mr-2 fs-sm">
           <img class="mr-1 sm-chain-logo" src=${CKB_SVG} alt="Nervos Network">
           ${signer.signer.client.addressPrefix === "ckb" ? "Mainnet" : "Testnet"}
           ${["ckb", "ckt"].includes(signer.signer.client.addressPrefix) ? "" : ` ${signer.signer.client.addressPrefix}`}
-          <img class="ml-1" src=${SWAP_SVG} alt="Nervos Network">
         </div>
         <div class="switch-line"></div>
       </div>

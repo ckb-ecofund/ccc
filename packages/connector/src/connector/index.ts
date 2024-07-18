@@ -16,7 +16,6 @@ import {
   generateWalletsScene,
 } from "../scenes";
 import { generateConnectedScene } from "../scenes/connected";
-import { generateNetworksScene } from "../scenes/networks";
 import { WalletWithSigners } from "../types";
 
 enum Scene {
@@ -24,7 +23,6 @@ enum Scene {
   SelectingSigners = "SelectingSigners",
   Connecting = "Connecting",
   Connected = "Connected",
-  SwitchingNetworks = "SwitchingNetworks",
 }
 
 @customElement("ccc-connector")
@@ -40,11 +38,14 @@ export class WebComponentConnector extends LitElement {
   private resetListeners: (() => void)[] = [];
 
   @property()
+  public preferredNetworks?: ccc.NetworkPreference[];
+
+  @property()
   public name?: string;
   @property()
   public icon?: string;
 
-  @property()
+  @state()
   public client: ccc.Client = new ccc.ClientPublicTestnet();
   public setClient(client: ccc.Client) {
     this.client = client;
@@ -137,7 +138,8 @@ export class WebComponentConnector extends LitElement {
   willUpdate(changedProperties: PropertyValues): void {
     if (
       changedProperties.has("client") ||
-      changedProperties.has("signerFilter")
+      changedProperties.has("signerFilter") ||
+      changedProperties.has("preferredNetworks")
     ) {
       this.reloadSigners();
     }
@@ -196,19 +198,41 @@ export class WebComponentConnector extends LitElement {
     const icon =
       this.icon ??
       (document.querySelector('link[rel="icon"]') as HTMLLinkElement).href;
-
-    ccc.JoyId.getJoyIdSigners(this.client, name, icon).forEach(
-      ({ signer, name }) => {
-        this.addSigner("JoyID", name, JOY_ID_SVG, signer);
+    const preferredNetworks = [
+      ...(this.preferredNetworks ?? []),
+      {
+        addressPrefix: "ckb",
+        signerType: ccc.SignerType.BTC,
+        network: "btc",
       },
-    );
+      {
+        addressPrefix: "ckt",
+        signerType: ccc.SignerType.BTC,
+        network: "btcTestnet",
+      },
+    ];
 
-    const uniSatSigner = ccc.UniSat.getUniSatSigner(this.client);
+    ccc.JoyId.getJoyIdSigners(
+      this.client,
+      name,
+      icon,
+      preferredNetworks,
+    ).forEach(({ signer, name }) => {
+      this.addSigner("JoyID", name, JOY_ID_SVG, signer);
+    });
+
+    const uniSatSigner = ccc.UniSat.getUniSatSigner(
+      this.client,
+      preferredNetworks,
+    );
     if (uniSatSigner) {
       this.addSigner("UniSat", "BTC", UNI_SAT_SVG, uniSatSigner);
     }
 
-    const okxBitcoinSigner = ccc.Okx.getOKXBitcoinSigner(this.client);
+    const okxBitcoinSigner = ccc.Okx.getOKXBitcoinSigner(
+      this.client,
+      preferredNetworks,
+    );
     if (okxBitcoinSigner) {
       this.addSigner("OKX Wallet", "BTC", OKX_SVG, okxBitcoinSigner);
     }
@@ -325,16 +349,7 @@ export class WebComponentConnector extends LitElement {
           this.internalAddress,
           this.balance,
           this.disconnect.bind(this),
-          () => {
-            this.scene = Scene.SwitchingNetworks;
-          },
         );
-      }
-      if (this.scene === Scene.SwitchingNetworks) {
-        return generateNetworksScene(this.client, (client) => {
-          this.setClient(client);
-          this.closedHandler();
-        });
       }
       if (this.scene === Scene.SelectingWallets || !this.selectedWallet) {
         return generateWalletsScene(
@@ -360,11 +375,9 @@ export class WebComponentConnector extends LitElement {
       );
     })();
 
-    const canBack = [
-      Scene.SelectingSigners,
-      Scene.Connecting,
-      Scene.SwitchingNetworks,
-    ].includes(this.scene);
+    const canBack = [Scene.SelectingSigners, Scene.Connecting].includes(
+      this.scene,
+    );
 
     return html` <div
       class="background"
@@ -393,8 +406,6 @@ export class WebComponentConnector extends LitElement {
                 }
               } else if (this.scene === Scene.SelectingSigners) {
                 this.scene = Scene.SelectingWallets;
-              } else if (this.scene === Scene.SwitchingNetworks) {
-                this.scene = Scene.Connected;
               }
             }}
           />
@@ -431,8 +442,6 @@ export class WebComponentConnector extends LitElement {
       this.scene = Scene.SelectingWallets;
       this.selectedSigner = undefined;
       this.selectedWallet = undefined;
-    } else if ([Scene.SwitchingNetworks].includes(this.scene)) {
-      this.scene = Scene.Connected;
     }
 
     this.dispatchEvent(new ClosedEvent());

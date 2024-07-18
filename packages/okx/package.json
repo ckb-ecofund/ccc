@@ -42,7 +42,6 @@
     "access": "public"
   },
   "dependencies": {
-    "@ckb-ccc/core": "workspace:*",
-    "@ckb-ccc/uni-sat": "workspace:*"
+    "@ckb-ccc/core": "workspace:*"
   }
 }

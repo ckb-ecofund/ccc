@@ -31,24 +31,28 @@ export class NostrSigner extends ccc.SignerNostr {
 
   /**
    * Creates an instance of NostrSigner.
-   * @param {ccc.Client} client - The client instance.
-   * @param {string} name - The name of the signer.
-   * @param {string} icon - The icon URL of the signer.
-   * @param {string} [appUri="https://app.joy.id"] - The application URI.
-   * @param {ConnectionsRepo} [connectionsRepo=new ConnectionsRepoLocalStorage()] - The connections repository.
+   * @param client - The client instance.
+   * @param name - The name of the signer.
+   * @param icon - The icon URL of the signer.
+   * @param appUri - The application URI.
+   * @param connectionsRepo - The connections repository.
    */
   constructor(
     client: ccc.Client,
     private readonly name: string,
     private readonly icon: string,
-    private readonly appUri = "https://app.joy.id",
+    private readonly _appUri?: string,
     private readonly connectionsRepo: ConnectionsRepo = new ConnectionsRepoLocalStorage(),
   ) {
     super(client);
   }
 
   async replaceClient(client: ccc.Client): Promise<boolean> {
-    return super.replaceClient(client);
+    if (!(await super.replaceClient(client))) {
+      return false;
+    }
+    this.connection = undefined;
+    return true;
   }
 
   /**
@@ -59,7 +63,10 @@ export class NostrSigner extends ccc.SignerNostr {
   private getConfig() {
     return {
       redirectURL: location.href,
-      joyidAppURL: this.appUri,
+      joyidAppURL:
+        this._appUri ?? this.client.addressPrefix === "ckb"
+          ? "https://app.joy.id"
+          : "https://testnet.joyid.dev",
       requestNetwork: "nostr",
       name: this.name,
       logo: this.icon,
@@ -83,7 +90,7 @@ export class NostrSigner extends ccc.SignerNostr {
       keyType: res.keyType,
     };
     await this.connectionsRepo.set(
-      { uri: this.appUri, addressType: "nostr" },
+      { uri: config.joyidAppURL, addressType: "nostr" },
       this.connection,
     );
   }
@@ -98,7 +105,7 @@ export class NostrSigner extends ccc.SignerNostr {
     }
 
     this.connection = await this.connectionsRepo.get({
-      uri: this.appUri,
+      uri: this.getConfig().joyidAppURL,
       addressType: "nostr",
     });
     return this.connection !== undefined;
