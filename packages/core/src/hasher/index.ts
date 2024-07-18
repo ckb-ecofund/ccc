@@ -1,6 +1,8 @@
 import blake2b, { Blake2b } from "blake2b";
 import { BytesLike, bytesFrom } from "../bytes";
+import { CellInput, CellInputLike } from "../ckb";
 import { Hex } from "../hex";
+import { NumLike, numLeToBytes } from "../num";
 import { CKB_BLAKE2B_PERSONAL } from "./advanced";
 
 export class Hasher {
@@ -67,12 +69,35 @@ export class Hasher {
  *
  * @example
  * ```typescript
- * const hash = ckbHash("some data"); // Outputs something like "0x..."
+ * const hash = hashCkb("some data"); // Outputs something like "0x..."
  * ```
  */
 
-export function ckbHash(...data: BytesLike[]): Hex {
+export function hashCkb(...data: BytesLike[]): Hex {
   const hasher = new Hasher();
   data.forEach((d) => hasher.update(d));
   return hasher.digest();
+}
+
+/**
+ * Computes the Type ID hash of the given data.
+ *
+ * @param cellInput - The first cell input of the transaction.
+ * @param outputIndex - The output index of the Type ID cell.
+ * @returns The hexadecimal string representation of the hash.
+ *
+ * @example
+ * ```typescript
+ * const hash = hashTypeId(cellInput, outputIndex); // Outputs something like "0x..."
+ * ```
+ */
+
+export function hashTypeId(
+  cellInputLike: CellInputLike,
+  outputIndex: NumLike,
+): Hex {
+  return hashCkb(
+    CellInput.from(cellInputLike).toBytes(),
+    numLeToBytes(outputIndex, 8),
+  );
 }

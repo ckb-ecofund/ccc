@@ -34,6 +34,7 @@ export enum KnownScript {
   COTA = "COTA",
   OmniLock = "OmniLock",
   NostrLock = "NostrLock",
+  UniqueType = "UniqueType",
   SingleUseLock = "SingleUseLock",
   OutputTypeProxyLock = "OutputTypeProxyLock",
 }

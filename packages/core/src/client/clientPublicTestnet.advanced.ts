@@ -175,6 +175,29 @@ export const TESTNET_SCRIPTS: Record<
       },
     ],
   },
+  [KnownScript.UniqueType]: {
+    codeHash:
+      "0x8e341bcfec6393dcd41e635733ff2dca00a6af546949f70c57a706c0f344df8b",
+    hashType: "type",
+    cellDeps: [
+      {
+        cellDep: {
+          outPoint: {
+            txHash:
+              "0xff91b063c78ed06f10a1ed436122bd7d671f9a72ef5f5fa28d05252c17cf4cef",
+            index: 0,
+          },
+          depType: "code",
+        },
+        type: {
+          codeHash:
+            "0x00000000000000000000000000000000000000000000000000545950455f4944",
+          hashType: "type",
+          args: "0xe04976b67600fd25ac50305f77b33aee2c12e3c18e63ece9119e5b32117884b5",
+        },
+      },
+    ],
+  },
   [KnownScript.SingleUseLock]: {
     codeHash:
       "0x8290467a512e5b9a6b816469b0edabba1f4ac474e28ffdd604c2a7c76446bbaf",

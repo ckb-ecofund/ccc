@@ -3,7 +3,7 @@ import { ClientCollectableSearchKeyFilterLike } from "../advancedBarrel";
 import { Bytes, BytesLike, bytesFrom } from "../bytes";
 import { CellDepInfoLike, Client, KnownScript } from "../client";
 import { Zero, fixedPointFrom } from "../fixedPoint";
-import { Hasher, ckbHash } from "../hasher";
+import { Hasher, hashCkb } from "../hasher";
 import { Hex, HexLike, hexFrom } from "../hex";
 import {
   Num,
@@ -1026,7 +1026,7 @@ export class Transaction {
    */
 
   hash() {
-    return ckbHash(this.rawToBytes());
+    return hashCkb(this.rawToBytes());
   }
 
   /**

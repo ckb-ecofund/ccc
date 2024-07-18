@@ -3,7 +3,7 @@ import { Address } from "../../address";
 import { BytesLike, bytesConcat, bytesFrom } from "../../bytes";
 import { Transaction, TransactionLike, WitnessArgs } from "../../ckb";
 import { KnownScript } from "../../client";
-import { ckbHash } from "../../hasher";
+import { hashCkb } from "../../hasher";
 import { Hex, hexFrom } from "../../hex";
 import { Signer, SignerSignType, SignerType } from "../signer";
 import { buildNostrEventFromMessage } from "./verify";
@@ -80,7 +80,7 @@ export abstract class SignerNostr extends Signer {
       await Address.fromKnownScript(
         this.client,
         KnownScript.NostrLock,
-        hexFrom(bytesConcat([0x00], ckbHash(publicKey).slice(0, 42))),
+        hexFrom(bytesConcat([0x00], hashCkb(publicKey).slice(0, 42))),
       ),
     ];
   }

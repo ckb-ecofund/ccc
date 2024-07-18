@@ -147,7 +147,46 @@ export const MAINNET_SCRIPTS: Record<
       },
     ],
   },
-  [KnownScript.NostrLock]: undefined,
+  [KnownScript.NostrLock]: {
+    codeHash:
+      "0x641a89ad2f77721b803cd50d01351c1f308444072d5fa20088567196c0574c68",
+    hashType: "type",
+    cellDeps: [
+      {
+        cellDep: {
+          outPoint: {
+            txHash:
+              "0x1911208b136957d5f7c1708a8835edfe8ae1d02700d5cb2c3a6aacf4d5906306",
+            index: 0,
+          },
+          depType: "code",
+        },
+        type: {
+          codeHash:
+            "0x00000000000000000000000000000000000000000000000000545950455f4944",
+          hashType: "type",
+          args: "0xfad8cb75eb0bb01718e2336002064568bc05887af107f74ed5dd501829e192f8",
+        },
+      },
+    ],
+  },
+  [KnownScript.UniqueType]: {
+    codeHash:
+      "0x2c8c11c985da60b0a330c61a85507416d6382c130ba67f0c47ab071e00aec628",
+    hashType: "data1",
+    cellDeps: [
+      {
+        cellDep: {
+          outPoint: {
+            txHash:
+              "0x67524c01c0cb5492e499c7c7e406f2f9d823e162d6b0cf432eacde0c9808c2ad",
+            index: 0,
+          },
+          depType: "code",
+        },
+      },
+    ],
+  },
   [KnownScript.SingleUseLock]: undefined,
   [KnownScript.OutputTypeProxyLock]: undefined,
 };

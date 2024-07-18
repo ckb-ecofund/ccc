@@ -1,6 +1,6 @@
 import { Bytes, BytesLike, bytesFrom } from "../bytes";
 import { Client, KnownScript } from "../client";
-import { ckbHash } from "../hasher";
+import { hashCkb } from "../hasher";
 import { Hex, HexLike, hexFrom } from "../hex";
 import * as mol from "./molecule.advanced";
 import {
@@ -214,7 +214,7 @@ export class Script {
    * ```
    */
   hash(): Hex {
-    return ckbHash(this.toBytes());
+    return hashCkb(this.toBytes());
   }
 
   /**

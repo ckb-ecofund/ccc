@@ -5,7 +5,7 @@ import { Signer } from "./signer";
 export function getNip07Signer(client: ccc.Client): Signer | undefined {
   const windowRef = window as { nostr?: Provider };
 
-  if (typeof windowRef.nostr === "undefined" || !Signer.isValidClient(client)) {
+  if (typeof windowRef.nostr === "undefined") {
     return;
   }
 

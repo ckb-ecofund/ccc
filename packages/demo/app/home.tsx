@@ -17,6 +17,18 @@ import { registerCustomLockScriptInfos } from "@ckb-lumos/common-scripts/lib/com
 import { generateDefaultScriptInfos } from "@ckb-ccc/lumos-patches";
 import Link from "next/link";
 
+function tokenInfoToBytes(decimals: ccc.NumLike, symbol: string, name: string) {
+  const symbolBytes = ccc.bytesFrom(symbol, "utf8");
+  const nameBytes = ccc.bytesFrom(name === "" ? symbol : name, "utf8");
+  return ccc.bytesConcat(
+    ccc.numToBytes(decimals, 1),
+    ccc.numToBytes(nameBytes.length, 1),
+    nameBytes,
+    ccc.numToBytes(symbolBytes.length, 1),
+    symbolBytes,
+  );
+}
+
 function WalletIcon({
   wallet,
   className,
@@ -381,6 +393,9 @@ function IssueXUdtSul({
 }) {
   const signer = ccc.useSigner();
   const [amount, setAmount] = useState<string>("");
+  const [decimals, setDecimals] = useState<string>("");
+  const [name, setName] = useState<string>("");
+  const [symbol, setSymbol] = useState<string>("");
 
   return (
     <>
@@ -394,6 +409,27 @@ function IssueXUdtSul({
             onInput={(e) => setAmount(e.currentTarget.value)}
             placeholder="Amount to issue"
           />
+          <input
+            className="mt-1 rounded-full border border-black px-4 py-2"
+            type="text"
+            value={decimals}
+            onInput={(e) => setDecimals(e.currentTarget.value)}
+            placeholder="Decimals of the token"
+          />
+          <input
+            className="mt-1 rounded-full border border-black px-4 py-2"
+            type="text"
+            value={symbol}
+            onInput={(e) => setSymbol(e.currentTarget.value)}
+            placeholder="Symbol of the token"
+          />
+          <input
+            className="mt-1 rounded-full border border-black px-4 py-2"
+            type="text"
+            value={name}
+            onInput={(e) => setName(e.currentTarget.value)}
+            placeholder="Name of the token, same as symbol if empty"
+          />
         </div>
         <Button
           className="mt-1"
@@ -401,6 +437,10 @@ function IssueXUdtSul({
             if (!signer) {
               return;
             }
+            if (decimals === "" || symbol === "") {
+              throw new Error("Invalid token info");
+            }
+
             const { script } = await signer.getRecommendedAddressObj();
 
             const susTx = ccc.Transaction.from({
@@ -464,15 +504,34 @@ function IssueXUdtSul({
                     singleUseLock.hash(),
                   ),
                 },
+                // xUDT Info
+                {
+                  lock: script,
+                  type: await ccc.Script.fromKnownScript(
+                    signer.client,
+                    ccc.KnownScript.UniqueType,
+                    "00".repeat(32),
+                  ),
+                },
               ],
-              outputsData: [ccc.numLeToBytes(amount, 16)],
+              outputsData: [
+                ccc.numLeToBytes(amount, 16),
+                tokenInfoToBytes(decimals, symbol, name),
+              ],
             });
             await mintTx.addCellDepsOfKnownScripts(
               signer.client,
               ccc.KnownScript.SingleUseLock,
               ccc.KnownScript.XUdt,
+              ccc.KnownScript.UniqueType,
             );
             await mintTx.completeInputsByCapacity(signer);
+            if (!mintTx.outputs[1].type) {
+              throw new Error("Unexpected disappeared output");
+            }
+            mintTx.outputs[1].type!.args = ccc.hexFrom(
+              ccc.bytesFrom(ccc.hashTypeId(mintTx.inputs[0], 1)).slice(0, 20),
+            );
             await mintTx.completeFeeChangeToLock(signer, script, 1000);
             sendMessage(
               "Transaction sent:",
@@ -496,6 +555,9 @@ function IssueXUdtTypeId({
 
   const [typeIdArgs, setTypeIdArgs] = useState<string>("");
   const [amount, setAmount] = useState<string>("");
+  const [decimals, setDecimals] = useState<string>("");
+  const [name, setName] = useState<string>("");
+  const [symbol, setSymbol] = useState<string>("");
 
   return (
     <>
@@ -516,6 +578,27 @@ function IssueXUdtTypeId({
             onInput={(e) => setAmount(e.currentTarget.value)}
             placeholder="Amount to issue"
           />
+          <input
+            className="mt-1 rounded-full border border-black px-4 py-2"
+            type="text"
+            value={decimals}
+            onInput={(e) => setDecimals(e.currentTarget.value)}
+            placeholder="Decimals of the token"
+          />
+          <input
+            className="mt-1 rounded-full border border-black px-4 py-2"
+            type="text"
+            value={symbol}
+            onInput={(e) => setSymbol(e.currentTarget.value)}
+            placeholder="Symbol of the token"
+          />
+          <input
+            className="mt-1 rounded-full border border-black px-4 py-2"
+            type="text"
+            value={name}
+            onInput={(e) => setName(e.currentTarget.value)}
+            placeholder="Name of the token, same as symbol if empty"
+          />
         </div>
         <Button
           className="mt-1"
@@ -523,8 +606,10 @@ function IssueXUdtTypeId({
             if (!signer) {
               return;
             }
-            const hashes: ccc.Hex[] = [];
             const { script } = await signer.getRecommendedAddressObj();
+            if (decimals === "" || symbol === "") {
+              throw new Error("Invalid token info");
+            }
 
             const typeId = await (async () => {
               if (typeIdArgs !== "") {
@@ -550,9 +635,9 @@ function IssueXUdtTypeId({
               if (!typeIdTx.outputs[0].type) {
                 throw new Error("Unexpected disappeared output");
               }
-              typeIdTx.outputs[0].type.args = ccc.ckbHash(
-                typeIdTx.inputs[0].toBytes(),
-                ccc.numLeToBytes(0, 8),
+              typeIdTx.outputs[0].type.args = ccc.hashTypeId(
+                typeIdTx.inputs[0],
+                0,
               );
               await typeIdTx.completeFeeChangeToLock(signer, script, 1000);
               sendMessage(
@@ -612,18 +697,35 @@ function IssueXUdtTypeId({
                     outputTypeLock.hash(),
                   ),
                 },
+                // xUDT Info
+                {
+                  lock: script,
+                  type: await ccc.Script.fromKnownScript(
+                    signer.client,
+                    ccc.KnownScript.UniqueType,
+                    "00".repeat(32),
+                  ),
+                },
               ],
               outputsData: [
                 typeIdCell.outputData,
                 ccc.numLeToBytes(amount, 16),
+                tokenInfoToBytes(decimals, symbol, name),
               ],
             });
             await mintTx.addCellDepsOfKnownScripts(
               signer.client,
               ccc.KnownScript.OutputTypeProxyLock,
               ccc.KnownScript.XUdt,
+              ccc.KnownScript.UniqueType,
             );
             await mintTx.completeInputsByCapacity(signer);
+            if (!mintTx.outputs[2].type) {
+              throw new Error("Unexpected disappeared output");
+            }
+            mintTx.outputs[2].type!.args = ccc.hexFrom(
+              ccc.bytesFrom(ccc.hashTypeId(mintTx.inputs[0], 2)).slice(0, 20),
+            );
             await mintTx.completeFeeChangeToLock(signer, script, 1000);
             sendMessage(
               "Transaction sent:",

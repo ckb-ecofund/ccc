@@ -16,14 +16,7 @@ export class Signer extends ccc.SignerNostr {
     super(client);
   }
 
-  static isValidClient(client: ccc.Client): boolean {
-    return client.addressPrefix === "ckt";
-  }
-
   async replaceClient(client: ccc.Client): Promise<boolean> {
-    if (!Signer.isValidClient(client)) {
-      return false;
-    }
     return super.replaceClient(client);
   }
 
