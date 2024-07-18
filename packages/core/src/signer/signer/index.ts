@@ -138,6 +138,13 @@ export abstract class Signer {
   abstract connect(): Promise<void>;
 
   /**
+   * Disconnects to the signer.
+   *
+   * @returns A promise that resolves when the signer is disconnected.
+   */
+  async disconnect(): Promise<void> {}
+
+  /**
    * Check if the signer is connected.
    *
    * @returns A promise that resolves the connection status.

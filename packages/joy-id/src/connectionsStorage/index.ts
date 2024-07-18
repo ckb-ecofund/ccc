@@ -17,8 +17,11 @@ export type AccountSelector = {
  * @param {AccountSelector} b - The second account selector.
  * @returns {boolean} True if the selectors are equal, false otherwise.
  */
-export function isSelectorEq(a: AccountSelector, b: AccountSelector): boolean {
-  return a.uri === b.uri && a.addressType === b.addressType;
+export function isSelectorMatch(
+  a: AccountSelector,
+  filter: AccountSelector,
+): boolean {
+  return a.uri === filter.uri && a.addressType.startsWith(filter.addressType);
 }
 
 /**
@@ -85,7 +88,7 @@ export class ConnectionsRepoLocalStorage implements ConnectionsRepo {
    */
   async get(selector: AccountSelector): Promise<Connection | undefined> {
     return (await this.readConnections()).find(([s]) =>
-      isSelectorEq(selector, s),
+      isSelectorMatch(selector, s),
     )?.[1];
   }
 
@@ -102,7 +105,7 @@ export class ConnectionsRepoLocalStorage implements ConnectionsRepo {
     const connections = await this.readConnections();
 
     if (connection) {
-      const existed = connections.find(([s]) => isSelectorEq(s, selector));
+      const existed = connections.find(([s]) => isSelectorMatch(s, selector));
       if (existed) {
         existed[1] = connection;
       } else {
@@ -112,7 +115,9 @@ export class ConnectionsRepoLocalStorage implements ConnectionsRepo {
     } else {
       window.localStorage.setItem(
         this.storageKey,
-        JSON.stringify(connections.filter(([s]) => !isSelectorEq(s, selector))),
+        JSON.stringify(
+          connections.filter(([s]) => !isSelectorMatch(s, selector)),
+        ),
       );
     }
   }

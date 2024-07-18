@@ -93,6 +93,15 @@ export class BitcoinSigner extends ccc.SignerBtc {
     };
   }
 
+  async disconnect(): Promise<void> {
+    await super.disconnect();
+
+    await this.connectionsRepo.set(
+      { uri: this.getConfig().joyidAppURL, addressType: "btc" },
+      undefined,
+    );
+  }
+
   /**
    * Gets the Bitcoin account address.
    * @returns {Promise<string>} A promise that resolves to the Bitcoin account address.

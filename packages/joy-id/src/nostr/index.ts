@@ -89,10 +89,14 @@ export class NostrSigner extends ccc.SignerNostr {
       publicKey: ccc.hexFrom(res.nostrPubkey),
       keyType: res.keyType,
     };
-    await this.connectionsRepo.set(
-      { uri: config.joyidAppURL, addressType: "nostr" },
-      this.connection,
-    );
+    await this.saveConnection();
+  }
+
+  async disconnect(): Promise<void> {
+    await super.disconnect();
+
+    this.connection = undefined;
+    await this.saveConnection();
   }
 
   /**
@@ -104,10 +108,7 @@ export class NostrSigner extends ccc.SignerNostr {
       return true;
     }
 
-    this.connection = await this.connectionsRepo.get({
-      uri: this.getConfig().joyidAppURL,
-      addressType: "nostr",
-    });
+    await this.restoreConnection();
     return this.connection !== undefined;
   }
 
@@ -127,5 +128,32 @@ export class NostrSigner extends ccc.SignerNostr {
       },
     );
     return res.event;
+  }
+
+  /**
+   * Saves the current connection.
+   * @private
+   * @returns {Promise<void>}
+   */
+  private async saveConnection(): Promise<void> {
+    return this.connectionsRepo.set(
+      {
+        uri: this.getConfig().joyidAppURL,
+        addressType: "nostr",
+      },
+      this.connection,
+    );
+  }
+
+  /**
+   * Restores the previous connection.
+   * @private
+   * @returns {Promise<void>}
+   */
+  private async restoreConnection(): Promise<void> {
+    this.connection = await this.connectionsRepo.get({
+      uri: this.getConfig().joyidAppURL,
+      addressType: "nostr",
+    });
   }
 }

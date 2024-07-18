@@ -103,6 +103,7 @@ export class WebComponentConnector extends LitElement {
     this.signerName = undefined;
     this.saveConnection();
     this.closedHandler();
+    this.signer?.signer.disconnect();
   }
 
   private loadConnection() {
