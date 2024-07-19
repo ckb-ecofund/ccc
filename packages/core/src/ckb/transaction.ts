@@ -1606,6 +1606,16 @@ export class Transaction {
     );
   }
 
+  async completeFeeBy(
+    from: Signer,
+    feeRate: NumLike,
+    filter?: ClientCollectableSearchKeyFilterLike,
+  ): Promise<[number, boolean]> {
+    const { script } = await from.getRecommendedAddressObj();
+
+    return this.completeFeeChangeToLock(from, script, feeRate, filter);
+  }
+
   completeFeeChangeToOutput(
     from: Signer,
     index: NumLike,

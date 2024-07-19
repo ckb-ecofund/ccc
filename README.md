@@ -54,7 +54,7 @@ Tell CCC what you need, and then...
 
 ```typescript
 await tx.completeInputsByCapacity(signer);
-await tx.completeFeeChangeToLock(signer, signerLock, 1000); // Transaction fee rate
+await tx.completeFeeBy(signer, 1000); // Transaction fee rate
 const txHash = await signer.sendTransaction(tx);
 ```
 

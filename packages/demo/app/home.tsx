@@ -149,7 +149,6 @@ function Transfer({
             if (!signer) {
               return;
             }
-            const { script: change } = await signer.getRecommendedAddressObj();
             // Verify destination address
             const { script: toLock } = await ccc.Address.fromString(
               transferTo,
@@ -176,7 +175,7 @@ function Transfer({
 
             // Complete missing parts for transaction
             await tx.completeInputsByCapacity(signer);
-            await tx.completeFeeChangeToLock(signer, change, 1000);
+            await tx.completeFeeBy(signer, 1000);
 
             // Sign and send the transaction
             sendMessage("Transaction sent:", await signer.sendTransaction(tx));
@@ -375,7 +374,7 @@ function TransferXUdt({
               ccc.KnownScript.XUdt,
             );
             await tx.completeInputsByCapacity(signer);
-            await tx.completeFeeChangeToLock(signer, change, 1000);
+            await tx.completeFeeBy(signer, 1000);
 
             // Sign and send the transaction
             sendMessage("Transaction sent:", await signer.sendTransaction(tx));
@@ -453,7 +452,7 @@ function IssueXUdtSul({
               ],
             });
             await susTx.completeInputsByCapacity(signer);
-            await susTx.completeFeeChangeToLock(signer, script, 1000);
+            await susTx.completeFeeBy(signer, 1000);
             const susTxHash = await signer.sendTransaction(susTx);
             sendMessage("Transaction sent:", susTxHash);
             await signer.client.markUnusable({ txHash: susTxHash, index: 0 });
@@ -475,7 +474,7 @@ function IssueXUdtSul({
               ],
             });
             await lockTx.completeInputsByCapacity(signer);
-            await lockTx.completeFeeChangeToLock(signer, script, 1000);
+            await lockTx.completeFeeBy(signer, 1000);
             const lockTxHash = await signer.sendTransaction(lockTx);
             sendMessage("Transaction sent:", lockTxHash);
 
@@ -534,7 +533,7 @@ function IssueXUdtSul({
             mintTx.outputs[1].type!.args = ccc.hexFrom(
               ccc.bytesFrom(ccc.hashTypeId(mintTx.inputs[0], 1)).slice(0, 20),
             );
-            await mintTx.completeFeeChangeToLock(signer, script, 1000);
+            await mintTx.completeFeeBy(signer, 1000);
             sendMessage(
               "Transaction sent:",
               await signer.sendTransaction(mintTx),
@@ -641,7 +640,7 @@ function IssueXUdtTypeId({
                 typeIdTx.inputs[0],
                 0,
               );
-              await typeIdTx.completeFeeChangeToLock(signer, script, 1000);
+              await typeIdTx.completeFeeBy(signer, 1000);
               sendMessage(
                 "Transaction sent:",
                 await signer.sendTransaction(typeIdTx),
@@ -664,7 +663,7 @@ function IssueXUdtTypeId({
               ],
             });
             await lockTx.completeInputsByCapacity(signer);
-            await lockTx.completeFeeChangeToLock(signer, script, 1000);
+            await lockTx.completeFeeBy(signer, 1000);
             const lockTxHash = await signer.sendTransaction(lockTx);
             sendMessage("Transaction sent:", lockTxHash);
 
@@ -728,7 +727,7 @@ function IssueXUdtTypeId({
             mintTx.outputs[2].type!.args = ccc.hexFrom(
               ccc.bytesFrom(ccc.hashTypeId(mintTx.inputs[0], 2)).slice(0, 20),
             );
-            await mintTx.completeFeeChangeToLock(signer, script, 1000);
+            await mintTx.completeFeeBy(signer, 1000);
             sendMessage(
               "Transaction sent:",
               await signer.sendTransaction(mintTx),
