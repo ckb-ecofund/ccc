@@ -19,6 +19,15 @@ import { TabProps } from "./types";
 import { Sign } from "./tabs/Sign";
 import { TextInput } from "./components/Input";
 
+const TABS: [string, FunctionComponent<TabProps>][] = [
+  ["Sign", Sign],
+  ["Transfer", Transfer],
+  ["Transfer with Lumos", TransferLumos],
+  ["Transfer xUDT", TransferXUdt],
+  ["Issue xUDT (SUS)", IssueXUdtSul],
+  ["Issue xUDT (Type ID)", IssueXUdtTypeId],
+];
+
 function WalletIcon({
   wallet,
   className,
@@ -33,86 +42,6 @@ function WalletIcon({
       alt={wallet.name}
       className={`h-8 w-8 rounded-full ${className}`}
     />
-  );
-}
-
-function PrivateKeyComponents({
-  sendMessage,
-}: {
-  sendMessage: (...msg: string[]) => void;
-}) {
-  const [privateKey, setPrivateKey] = useState<string>();
-  const [balance, setBalance] = useState<string>();
-  const [address, setAddress] = useState<string>();
-  const [transferTo, setTransferTo] = useState<string>();
-  const [amount, setAmount] = useState<string>();
-  const { client } = ccc.useCcc();
-
-  useEffect(() => {
-    (async () => {
-      if (!privateKey) {
-        return;
-      }
-
-      try {
-        const signer: ccc.Signer = new ccc.SignerCkbPrivateKey(
-          client,
-          privateKey,
-        );
-        setAddress(await signer.getRecommendedAddress());
-        setBalance(ccc.fixedPointToString(await signer.getBalance()));
-      } catch (_) {
-        setAddress("");
-        setBalance("");
-      }
-    })();
-  }, [privateKey, client]);
-
-  const transfer = async () => {
-    if (!privateKey || !transferTo || !amount) {
-      return;
-    }
-
-    const signer: ccc.Signer = new ccc.SignerCkbPrivateKey(client, privateKey);
-    const { script: toLock } = await ccc.Address.fromString(transferTo, client);
-
-    const tx = ccc.Transaction.from({
-      outputs: [{ lock: toLock, capacity: ccc.fixedPointFrom(amount) }],
-    });
-    await tx.completeInputsByCapacity(signer);
-    await tx.completeFeeBy(signer, 1000);
-
-    sendMessage("Transaction sent:", await signer.sendTransaction(tx));
-  };
-
-  return (
-    <>
-      <div>{address}</div>
-      <div>{balance}</div>
-      <input
-        className="my-1 rounded-full border border-black px-4 py-2"
-        placeholder="Enter your private key"
-        value={privateKey}
-        onInput={(e) => setPrivateKey(e.currentTarget.value)}
-      />
-      <input
-        className="my-1 rounded-full border border-black px-4 py-2"
-        placeholder="Enter the recipient's CKB address"
-        onChange={(e) => {
-          setTransferTo(e.target.value);
-        }}
-      />
-      <input
-        className="mb-1 rounded-full border border-black px-4 py-2"
-        placeholder="Enter the amount to transfer"
-        onChange={(e) => {
-          setAmount(e.target.value);
-        }}
-      />
-      <Button className="my-1" onClick={transfer}>
-        Transfer
-      </Button>
-    </>
   );
 }
 
@@ -151,15 +80,6 @@ export default function Home() {
   const [balance, setBalance] = useState(ccc.Zero);
   const [isTestnet, setIsTestnet] = useState(true);
   const [tab, setTab] = useState("Sign");
-  const tabs: [string, FunctionComponent<TabProps>][] = [
-    ["Sign", Sign],
-    ["Transfer", Transfer],
-    ["Transfer with Lumos", TransferLumos],
-    ["Transfer xUDT", TransferXUdt],
-    ["Issue xUDT (SUS)", IssueXUdtSul],
-    ["Issue xUDT (Type ID)", IssueXUdtTypeId],
-    ["Private Key", PrivateKeyComponents],
-  ];
 
   useEffect(() => {
     if (!signer) {
@@ -209,7 +129,7 @@ export default function Home() {
           )}
 
           <div className="mb-2 mt-2 flex max-w-full overflow-x-auto pb-1">
-            {tabs.map(([name]) => (
+            {TABS.map(([name]) => (
               <button
                 key={name}
                 className={`flex items-center border-b border-black px-5 py-2 text-lg ${tab === name ? "border-b-4" : ""} whitespace-nowrap`}
@@ -229,7 +149,7 @@ export default function Home() {
                   ]),
                 signer,
               }),
-            tabs.find(([name]) => name === tab)?.[1],
+            TABS.find(([name]) => name === tab)?.[1],
           )}
         </>
       ) : (
