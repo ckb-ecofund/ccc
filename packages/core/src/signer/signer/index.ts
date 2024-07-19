@@ -15,6 +15,7 @@ export enum SignerSignType {
   EvmPersonal = "EvmPersonal",
   JoyId = "JoyId",
   NostrEvent = "NostrEvent",
+  CkbSecp256k1 = "CkbSecp256k1",
 }
 
 /**
@@ -116,6 +117,7 @@ export abstract class Signer {
           signature.signature,
           signature.identity,
         );
+      case SignerSignType.CkbSecp256k1:
       case SignerSignType.Unknown:
         throw new Error("Unknown signer sign type");
     }
