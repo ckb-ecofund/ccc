@@ -6,7 +6,7 @@ import { NostrProvider } from "../advancedBarrel";
  * @class
  * @extends {ccc.SignerBtc}
  */
-export class SignerNostr extends ccc.SignerNostr {
+export class NostrSigner extends ccc.SignerNostr {
   constructor(
     client: ccc.Client,
     public readonly provider: NostrProvider,

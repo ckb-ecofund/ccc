@@ -17,7 +17,18 @@ export class BitcoinSigner extends ccc.SignerBtc {
   constructor(
     client: ccc.Client,
     public readonly providers: Record<string, BitcoinProvider>,
-    private readonly preferredNetworks: ccc.NetworkPreference[],
+    private readonly preferredNetworks: ccc.NetworkPreference[] = [
+      {
+        addressPrefix: "ckb",
+        signerType: ccc.SignerType.BTC,
+        network: "btc",
+      },
+      {
+        addressPrefix: "ckt",
+        signerType: ccc.SignerType.BTC,
+        network: "btcTestnet",
+      },
+    ],
   ) {
     super(client);
   }

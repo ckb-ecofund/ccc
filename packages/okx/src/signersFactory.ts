@@ -1,7 +1,7 @@
 import { ccc } from "@ckb-ccc/core";
 import { BitcoinProvider, NostrProvider } from "./advancedBarrel";
 import { BitcoinSigner } from "./btc";
-import { SignerNostr } from "./nostr";
+import { NostrSigner } from "./nostr";
 
 /**
  * Retrieves the OKX Bitcoin signer if available.
@@ -22,6 +22,6 @@ export function getOKXBitcoinSigner(
 
   return [
     new BitcoinSigner(client, windowRef.okxwallet, preferredNetworks),
-    new SignerNostr(client, windowRef.okxwallet.nostr),
+    new NostrSigner(client, windowRef.okxwallet.nostr),
   ];
 }
