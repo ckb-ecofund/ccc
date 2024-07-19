@@ -102,11 +102,8 @@ export class Signer extends ccc.SignerBtc {
   }
 
   async replaceClient(client: ccc.Client): Promise<boolean> {
-    if (await super.replaceClient(client)) {
-      await this.ensureNetwork();
-      return true;
-    }
-    return false;
+    await this.ensureNetwork();
+    return super.replaceClient(client);
   }
 
   /**
