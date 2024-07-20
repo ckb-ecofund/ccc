@@ -4,7 +4,7 @@ import { TESTNET_SCRIPTS } from "./clientPublicTestnet.advanced";
 import { ClientJsonRpc } from "./jsonRpc";
 
 export class ClientPublicTestnet extends ClientJsonRpc {
-  constructor(url = "https://testnet.ckbapp.dev/", timeout?: number) {
+  constructor(url = "https://testnet.ckb.dev/", timeout?: number) {
     super(url, timeout);
   }
 

@@ -4,7 +4,7 @@ import { MAINNET_SCRIPTS } from "./clientPublicMainnet.advanced";
 import { ClientJsonRpc } from "./jsonRpc";
 
 export class ClientPublicMainnet extends ClientJsonRpc {
-  constructor(url = "https://mainnet.ckbapp.dev/", timeout?: number) {
+  constructor(url = "https://mainnet.ckb.dev/", timeout?: number) {
     super(url, timeout);
   }
 
