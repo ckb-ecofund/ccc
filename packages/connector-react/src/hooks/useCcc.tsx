@@ -85,7 +85,7 @@ export function Provider({
         signerFilter={signerFilter}
         ref={setRef}
         onWillUpdate={() => setFlag((f) => f + 1)}
-        onClosed={() => setIsOpen(false)}
+        onClose={() => setIsOpen(false)}
         preferredNetworks={preferredNetworks}
         {...{
           ...connectorProps,

@@ -18,9 +18,11 @@ import { IssueXUdtTypeId } from "./tabs/IssueXUdtTypeId";
 import { TabProps } from "./types";
 import { Sign } from "./tabs/Sign";
 import { TextInput } from "./components/Input";
+import { Hash } from "./tabs/hash";
 
 const TABS: [string, FunctionComponent<TabProps>][] = [
   ["Sign", Sign],
+  ["Hash", Hash],
   ["Transfer", Transfer],
   ["Transfer with Lumos", TransferLumos],
   ["Transfer xUDT", TransferXUdt],
