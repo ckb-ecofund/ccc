@@ -1,4 +1,4 @@
-import { ccc, Client } from "@ckb-ccc/core";
+import { ccc } from "@ckb-ccc/core";
 import { BitcoinProvider } from "../advancedBarrel";
 
 /**
@@ -95,10 +95,19 @@ export class BitcoinSigner extends ccc.SignerBtc {
     await this.provider.connect();
   }
 
-  async replaceClient(client: Client): Promise<boolean> {
-    const res = await super.replaceClient(client);
-    this.provider; // Check if the network is valid
-    return res;
+  onReplaced(listener: () => void): () => void {
+    const stop: (() => void)[] = [];
+    const replacer = async () => {
+      listener();
+      stop[0]?.();
+    };
+    stop.push(() => {
+      this.provider.removeListener("accountChanged", replacer);
+    });
+
+    this.provider.on("accountChanged", replacer);
+
+    return stop[0];
   }
 
   /**
@@ -106,7 +115,12 @@ export class BitcoinSigner extends ccc.SignerBtc {
    * @returns {Promise<boolean>} A promise that resolves to true if connected, false otherwise.
    */
   async isConnected(): Promise<boolean> {
-    return (await this.provider.getSelectedAccount()) !== null;
+    if ((await this.provider.getSelectedAccount()) === null) {
+      return false;
+    }
+
+    await this.connect();
+    return true;
   }
 
   /**

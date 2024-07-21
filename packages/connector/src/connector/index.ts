@@ -35,6 +35,8 @@ export class WebComponentConnector extends LitElement {
   public wallet?: ccc.Wallet;
   @state()
   public signer?: ccc.SignerInfo;
+  @state()
+  private unregisterSignerReplacer?: () => void;
 
   public disconnect() {
     this.walletName = undefined;
@@ -85,24 +87,42 @@ export class WebComponentConnector extends LitElement {
       changedProperties.has("walletName") ||
       changedProperties.has("signerName")
     ) {
-      (async () => {
-        const wallet = this.signersController.wallets.find(
-          ({ name }) => name === this.walletName,
-        );
-        const signer = wallet?.signers.find(
-          ({ name }) => name === this.signerName,
-        );
-        if (signer && (await signer.signer.isConnected())) {
-          this.wallet = wallet;
-          this.signer = signer;
-        } else {
-          this.wallet = undefined;
-          this.signer = undefined;
-        }
-      })();
+      this.refreshSigner();
     }
 
     this.dispatchEvent(new Event("willUpdate"));
+  }
+
+  async refreshSigner() {
+    const wallet = this.signersController.wallets.find(
+      ({ name }) => name === this.walletName,
+    );
+    const signer = wallet?.signers.find(({ name }) => name === this.signerName);
+    this.updateSigner(wallet, signer);
+  }
+
+  async updateSigner(
+    wallet: ccc.Wallet | undefined,
+    signerInfo: ccc.SignerInfo | undefined,
+  ) {
+    if (signerInfo?.signer === this.signer?.signer) {
+      return;
+    }
+
+    this.unregisterSignerReplacer?.();
+    this.unregisterSignerReplacer = undefined;
+
+    if (signerInfo && (await signerInfo.signer.isConnected())) {
+      this.wallet = wallet;
+      this.signer = signerInfo;
+      (this.unregisterSignerReplacer as unknown as () => void)?.();
+      this.unregisterSignerReplacer = signerInfo.signer.onReplaced(() => {
+        this.signersController.refresh();
+      });
+    } else {
+      this.wallet = undefined;
+      this.signer = undefined;
+    }
   }
 
   private readonly mainRef: Ref<HTMLDivElement> = createRef();
@@ -110,7 +130,7 @@ export class WebComponentConnector extends LitElement {
     createRef();
 
   render() {
-    return html` <div
+    return html`<div
       class="background"
       @click=${(event: Event) => {
         if (event.target === event.currentTarget) {
@@ -138,6 +158,7 @@ export class WebComponentConnector extends LitElement {
                 @connected=${({ walletName, signerName }: ConnectedEvent) => {
                   this.walletName = walletName;
                   this.signerName = signerName;
+                  this.refreshSigner();
                   this.saveConnection();
                 }}
                 ${ref(this.bodyRef)}

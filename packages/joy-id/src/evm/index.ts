@@ -47,14 +47,6 @@ export class EvmSigner extends ccc.SignerEvm {
     super(client);
   }
 
-  async replaceClient(client: ccc.Client): Promise<boolean> {
-    if (!(await super.replaceClient(client))) {
-      return false;
-    }
-    this.connection = undefined;
-    return true;
-  }
-
   /**
    * Gets the configuration for JoyID.
    * @private

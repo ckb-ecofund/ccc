@@ -101,9 +101,21 @@ export class Signer extends ccc.SignerBtc {
     await this.ensureNetwork();
   }
 
-  async replaceClient(client: ccc.Client): Promise<boolean> {
-    await this.ensureNetwork();
-    return super.replaceClient(client);
+  onReplaced(listener: () => void): () => void {
+    const stop: (() => void)[] = [];
+    const replacer = async () => {
+      listener();
+      stop[0]?.();
+    };
+    stop.push(() => {
+      this.provider.removeListener("accountsChanged", replacer);
+      this.provider.removeListener("networkChanged", replacer);
+    });
+
+    this.provider.on("accountsChanged", replacer);
+    this.provider.on("networkChanged", replacer);
+
+    return stop[0];
   }
 
   /**
@@ -111,6 +123,7 @@ export class Signer extends ccc.SignerBtc {
    * @returns {Promise<boolean>} A promise that resolves to true if connected, false otherwise.
    */
   async isConnected(): Promise<boolean> {
+    await this.ensureNetwork();
     return (await this.provider.getAccounts()).length !== 0;
   }
 

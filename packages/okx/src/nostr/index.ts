@@ -14,10 +14,6 @@ export class NostrSigner extends ccc.SignerNostr {
     super(client);
   }
 
-  async replaceClient(client: ccc.Client): Promise<boolean> {
-    return super.replaceClient(client);
-  }
-
   async getNostrPublicKey(): Promise<ccc.Hex> {
     if (!this.provider.selectedAccount) {
       throw new Error("Not connected");
@@ -34,6 +30,22 @@ export class NostrSigner extends ccc.SignerNostr {
 
   async connect(): Promise<void> {
     await this.provider.getPublicKey();
+    await this.provider.connect();
+  }
+
+  onReplaced(listener: () => void): () => void {
+    const stop: (() => void)[] = [];
+    const replacer = async () => {
+      listener();
+      stop[0]?.();
+    };
+    stop.push(() => {
+      this.provider.removeListener("accountChanged", replacer);
+    });
+
+    this.provider.on("accountChanged", replacer);
+
+    return stop[0];
   }
 
   async isConnected(): Promise<boolean> {

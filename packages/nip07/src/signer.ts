@@ -16,10 +16,6 @@ export class Signer extends ccc.SignerNostr {
     super(client);
   }
 
-  async replaceClient(client: ccc.Client): Promise<boolean> {
-    return super.replaceClient(client);
-  }
-
   async getNostrPublicKey(): Promise<ccc.Hex> {
     if (this.publicKey) {
       return this.publicKey;
@@ -36,7 +32,7 @@ export class Signer extends ccc.SignerNostr {
   async signNostrEvent(
     event: ccc.NostrEvent,
   ): Promise<Required<ccc.NostrEvent>> {
-    return this.provider.signEvent(event);
+    return this.provider.signEvent({ ...event, pubkey: this.publicKey });
   }
 
   async connect(): Promise<void> {

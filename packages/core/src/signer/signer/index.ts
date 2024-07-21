@@ -124,20 +124,20 @@ export abstract class Signer {
   }
 
   /**
-   * Replace the current client.
-   * returns false if the new client is invalid for this signer.
-   */
-  async replaceClient(client: Client): Promise<boolean> {
-    this.client_ = client;
-    return true;
-  }
-
-  /**
    * Connects to the signer.
    *
    * @returns A promise that resolves when the connection is complete.
    */
   abstract connect(): Promise<void>;
+
+  /**
+   * Register a listener to be called when this signer is replaced.
+   *
+   * @returns A function for unregister
+   */
+  onReplaced(_: () => void): () => void {
+    return () => {};
+  }
 
   /**
    * Disconnects to the signer.

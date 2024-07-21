@@ -22,6 +22,7 @@ export class SignersController implements ReactiveController {
       preferredNetworks?: ccc.NetworkPreference[];
       name?: string;
       icon?: string;
+      refreshSigner: () => void;
     },
   ) {
     host.addController(this);
@@ -54,6 +55,11 @@ export class SignersController implements ReactiveController {
       icon,
       preferredNetworks,
     };
+  }
+
+  update() {
+    this.host.refreshSigner();
+    this.host.requestUpdate();
   }
 
   refresh() {
@@ -93,7 +99,7 @@ export class SignersController implements ReactiveController {
           signer.detail.info.icon,
           signer,
         );
-        this.host.requestUpdate();
+        this.update();
       }),
     );
 
@@ -168,7 +174,7 @@ export class SignersController implements ReactiveController {
       wallet.signers = signers.length !== 0 ? signers : [signerInfo];
     }
 
-    this.host.requestUpdate();
+    this.update();
   }
 
   hostConnected(): void {
