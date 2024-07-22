@@ -77,7 +77,7 @@ export class Signer extends ccc.SignerEvm {
     const challenge =
       typeof message === "string" ? ccc.bytesFrom(message, "utf8") : message;
 
-    const account = this.accountCache ?? await this.getEvmAccount();
+    const account = this.accountCache ?? (await this.getEvmAccount());
 
     return this.detail.provider.request({
       method: "personal_sign",
