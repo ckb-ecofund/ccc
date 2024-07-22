@@ -173,7 +173,7 @@ export class WebComponentConnector extends LitElement {
       return;
     }
     this.mainRef.value.style.height = `${
-      this.bodyRef.value?.offsetHeight ?? 0
+      this.bodyRef.value?.clientHeight ?? 0
     }px`;
   }
 

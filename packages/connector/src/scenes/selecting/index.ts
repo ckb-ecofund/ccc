@@ -174,4 +174,8 @@ export class SelectingScene extends LitElement {
       text-align: center;
     }
   `;
+
+  updated() {
+    this.dispatchEvent(new Event("updated", { bubbles: true, composed: true }));
+  }
 }

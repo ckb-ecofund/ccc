@@ -7,7 +7,7 @@ import { NostrProvider } from "../advancedBarrel";
  * @extends {ccc.SignerBtc}
  */
 export class NostrSigner extends ccc.SignerNostr {
-  private publicKeyCache?: string = undefined;
+  private publicKeyCache?: Promise<string> = undefined;
 
   constructor(
     client: ccc.Client,
@@ -17,14 +17,19 @@ export class NostrSigner extends ccc.SignerNostr {
   }
 
   async getNostrPublicKey(): Promise<ccc.Hex> {
-    this.publicKeyCache = await this.provider.getPublicKey();
-    return ccc.hexFrom(this.publicKeyCache);
+    if (!this.publicKeyCache) {
+      this.publicKeyCache = this.provider.getPublicKey();
+    }
+    return ccc.hexFrom(await this.publicKeyCache);
   }
 
   async signNostrEvent(
     event: ccc.NostrEvent,
   ): Promise<Required<ccc.NostrEvent>> {
-    return this.provider.signEvent({ ...event, pubkey: this.publicKeyCache });
+    return this.provider.signEvent({
+      ...event,
+      pubkey: await this.publicKeyCache,
+    });
   }
 
   async connect(): Promise<void> {
