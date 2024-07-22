@@ -120,6 +120,10 @@ export class SelectingScene extends LitElement {
   };
 
   static styles = css`
+    :host {
+      display: block;
+    }
+
     .text-bold {
       font-weight: bold;
     }
