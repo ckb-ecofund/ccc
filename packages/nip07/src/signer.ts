@@ -2,7 +2,7 @@ import { ccc } from "@ckb-ccc/core";
 import { Provider } from "./nip07.advanced";
 
 export class Signer extends ccc.SignerNostr {
-  private publicKeyCache?: string = undefined;
+  private publicKeyCache?: Promise<string> = undefined;
 
   constructor(
     client: ccc.Client,
@@ -13,17 +13,20 @@ export class Signer extends ccc.SignerNostr {
 
   async getNostrPublicKey(): Promise<ccc.Hex> {
     if (this.publicKeyCache) {
-      return ccc.hexFrom(this.publicKeyCache);
+      return ccc.hexFrom(await this.publicKeyCache);
     }
 
-    this.publicKeyCache = await this.provider.getPublicKey();
-    return ccc.hexFrom(this.publicKeyCache);
+    this.publicKeyCache = this.provider.getPublicKey();
+    return ccc.hexFrom(await this.publicKeyCache);
   }
 
   async signNostrEvent(
     event: ccc.NostrEvent,
   ): Promise<Required<ccc.NostrEvent>> {
-    return this.provider.signEvent({ ...event, pubkey: this.publicKeyCache });
+    return this.provider.signEvent({
+      ...event,
+      pubkey: await this.publicKeyCache,
+    });
   }
 
   async connect(): Promise<void> {
