@@ -53,7 +53,7 @@ export class SignerEvmAddressReadonly extends SignerEvm {
    * const account = await signer.getEvmAccount(); // Outputs the EVM account
    * ```
    */
-  async getEvmAccount(): Promise<string> {
+  async getEvmAccount(): Promise<Hex> {
     return this.address;
   }
 }

@@ -67,10 +67,10 @@ export class EvmSigner extends ccc.SignerEvm {
 
   /**
    * Gets the EVM account address.
-   * @returns {Promise<string>} A promise that resolves to the EVM account address.
+   * @returns A promise that resolves to the EVM account address.
    */
-  async getEvmAccount(): Promise<string> {
-    return this.assertConnection().address;
+  async getEvmAccount(): Promise<ccc.Hex> {
+    return this.assertConnection().address as ccc.Hex;
   }
 
   /**

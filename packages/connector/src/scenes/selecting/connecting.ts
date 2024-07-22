@@ -16,7 +16,7 @@ export function generateConnectingScene(
     wallet.name,
     html`
       <img
-        class="connecting-wallet-icon mb-1"
+        class="connecting-wallet-icon mb-1 mt-1"
         src=${wallet.icon}
         alt=${wallet.name}
       />
@@ -29,7 +29,7 @@ export function generateConnectingScene(
         >${error ?? "Confirm connection in the wallet"}</span
       >
       <ccc-button-pill
-        class="mt-2 mb-2"
+        class="mt-2"
         @click=${() => onSignerSelected(wallet, signer)}
       >
         <img src=${RETRY_SVG} alt="retry" />

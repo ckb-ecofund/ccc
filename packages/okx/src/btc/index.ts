@@ -60,23 +60,23 @@ export class BitcoinSigner extends ccc.SignerBtc {
   }
 
   /**
-   * Get account info if the signer is connected.
-   * @returns Account information
-   */
-  async assertConnection(): Promise<{ address: string; publicKey: string }> {
-    const account = await this.provider.getSelectedAccount();
-    if (!account) {
-      throw Error("Not connected");
-    }
-    return account;
-  }
-
-  /**
    * Gets the Bitcoin account address.
    * @returns {Promise<string>} A promise that resolves to the Bitcoin account address.
    */
   async getBtcAccount(): Promise<string> {
-    return (await this.assertConnection()).address;
+    if (this.provider.getSelectedAccount) {
+      const account = await this.provider.getSelectedAccount();
+      if (!account) {
+        throw Error("Not connected");
+      }
+      return account.address;
+    }
+
+    const address = (await this.provider.getAccounts())[0];
+    if (!address) {
+      throw Error("Not connected");
+    }
+    return address;
   }
 
   /**
@@ -84,7 +84,15 @@ export class BitcoinSigner extends ccc.SignerBtc {
    * @returns {Promise<ccc.Hex>} A promise that resolves to the Bitcoin public key.
    */
   async getBtcPublicKey(): Promise<ccc.Hex> {
-    return ccc.hexFrom((await this.assertConnection()).publicKey);
+    if (this.provider.getSelectedAccount) {
+      const account = await this.provider.getSelectedAccount();
+      if (!account) {
+        throw Error("Not connected");
+      }
+      return ccc.hexFrom(account.publicKey);
+    }
+
+    return ccc.hexFrom(await this.provider.getPublicKey());
   }
 
   /**
@@ -92,7 +100,11 @@ export class BitcoinSigner extends ccc.SignerBtc {
    * @returns {Promise<void>} A promise that resolves when the connection is established.
    */
   async connect(): Promise<void> {
-    await this.provider.connect();
+    if (this.provider.connect) {
+      await this.provider.connect();
+      return;
+    }
+    await this.provider.requestAccounts();
   }
 
   onReplaced(listener: () => void): () => void {
@@ -115,7 +127,13 @@ export class BitcoinSigner extends ccc.SignerBtc {
    * @returns {Promise<boolean>} A promise that resolves to true if connected, false otherwise.
    */
   async isConnected(): Promise<boolean> {
-    if ((await this.provider.getSelectedAccount()) === null) {
+    if (
+      this.provider.getSelectedAccount &&
+      (await this.provider.getSelectedAccount()) === null
+    ) {
+      return false;
+    }
+    if ((await this.provider.getAccounts()).length === 0) {
       return false;
     }
 

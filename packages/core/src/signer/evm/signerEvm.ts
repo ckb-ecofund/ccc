@@ -2,7 +2,7 @@ import { Address } from "../../address";
 import { BytesLike, bytesConcat, bytesFrom } from "../../bytes";
 import { Script, Transaction, TransactionLike, WitnessArgs } from "../../ckb";
 import { KnownScript } from "../../client";
-import { hexFrom } from "../../hex";
+import { Hex, hexFrom } from "../../hex";
 import { numToBytes } from "../../num";
 import { reduceAsync } from "../../utils";
 import { Signer, SignerSignType, SignerType } from "../signer";
@@ -25,7 +25,7 @@ export abstract class SignerEvm extends Signer {
    *
    * @returns A promise that resolves to a string representing the EVM account.
    */
-  abstract getEvmAccount(): Promise<string>;
+  abstract getEvmAccount(): Promise<Hex>;
 
   /**
    * Gets the internal address, which is the EVM account in this case.

@@ -43,6 +43,7 @@
   },
   "dependencies": {
     "@ckb-ccc/core": "workspace:*",
-    "@ckb-ccc/nip07": "workspace:*"
+    "@ckb-ccc/nip07": "workspace:*",
+    "@ckb-ccc/uni-sat": "workspace:*"
   }
 }
