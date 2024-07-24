@@ -31,10 +31,7 @@ export class Signer extends ccc.SignerBtc {
     super(client);
   }
 
-  /**
-   * Ensure the BTC network is the same as CKB network.
-   */
-  async ensureNetwork(): Promise<void> {
+  async _getNetworkToChange(): Promise<string | undefined> {
     const currentNetwork = await (async () => {
       if (this.provider.getChain) {
         return (
@@ -56,6 +53,18 @@ export class Signer extends ccc.SignerBtc {
     if (network === currentNetwork) {
       return;
     }
+
+    return network;
+  }
+
+  /**
+   * Ensure the BTC network is the same as CKB network.
+   */
+  async ensureNetwork(): Promise<void> {
+    const network = await this._getNetworkToChange();
+    if (!network) {
+      return;
+    }
     if (this.provider.switchChain) {
       const chain = {
         btc: "BITCOIN_MAINNET",
@@ -70,7 +79,9 @@ export class Signer extends ccc.SignerBtc {
       await this.provider.switchNetwork(
         network === "btc" ? "livenet" : "testnet",
       );
+      return;
     }
+
     throw new Error(
       `UniSat wallet doesn't support the requested chain ${network}`,
     );
@@ -123,6 +134,9 @@ export class Signer extends ccc.SignerBtc {
    * @returns {Promise<boolean>} A promise that resolves to true if connected, false otherwise.
    */
   async isConnected(): Promise<boolean> {
+    if (await this._getNetworkToChange()) {
+      return false;
+    }
     return (await this.provider.getAccounts()).length !== 0;
   }
 
