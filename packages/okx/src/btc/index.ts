@@ -89,7 +89,7 @@ export class BitcoinSigner extends ccc.SignerBtc {
       if (!account) {
         throw Error("Not connected");
       }
-      return ccc.hexFrom(account.publicKey);
+      return ccc.hexFrom(account.compressedPublicKey);
     }
 
     return ccc.hexFrom(await this.provider.getPublicKey());
