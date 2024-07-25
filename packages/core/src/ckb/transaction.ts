@@ -2,7 +2,7 @@ import type { TransactionSkeletonType } from "@ckb-lumos/helpers";
 import { ClientCollectableSearchKeyFilterLike } from "../advancedBarrel";
 import { Bytes, BytesLike, bytesFrom } from "../bytes";
 import { CellDepInfoLike, Client, KnownScript } from "../client";
-import { Zero, fixedPointFrom } from "../fixedPoint";
+import { Zero, fixedPointFrom, fixedPointToString } from "../fixedPoint";
 import { Hasher, hashCkb } from "../hasher";
 import { Hex, HexLike, hexFrom } from "../hex";
 import {
@@ -1418,7 +1418,10 @@ export class Transaction {
       array: Cell[],
     ) => Promise<T | undefined> | T | undefined,
     init: T,
-  ): Promise<number> {
+  ): Promise<{
+    addedCount: number;
+    accumulated?: T;
+  }> {
     const scripts = (await from.getAddressObjs()).map(({ script }) => script);
     const collectedCells = [];
     let acc: T = init;
@@ -1453,13 +1456,18 @@ export class Transaction {
               }),
             ),
           );
-          return collectedCells.length;
+          return {
+            addedCount: collectedCells.length,
+          };
         }
         acc = next;
       }
     }
 
-    throw new Error("Failed to find enough cells for input");
+    return {
+      addedCount: collectedCells.length,
+      accumulated: acc,
+    };
   }
 
   async completeInputsByCapacity(
@@ -1474,7 +1482,7 @@ export class Transaction {
       return 0;
     }
 
-    return this.completeInputs(
+    const { addedCount, accumulated } = await this.completeInputs(
       from,
       filter ?? {
         scriptLenRange: [0, 1],
@@ -1486,6 +1494,31 @@ export class Transaction {
       },
       inputsCapacity,
     );
+
+    if (accumulated === undefined) {
+      return addedCount;
+    }
+
+    throw new Error(
+      `Insufficient CKB, need ${fixedPointToString(exceptedCapacity - accumulated)} extra CKB`,
+    );
+  }
+
+  async completeInputsAll(
+    from: Signer,
+    filter?: ClientCollectableSearchKeyFilterLike,
+  ): Promise<number> {
+    const { addedCount } = await this.completeInputs(
+      from,
+      filter ?? {
+        scriptLenRange: [0, 1],
+        outputDataLenRange: [0, 1],
+      },
+      (acc, { cellOutput: { capacity } }) => acc + capacity,
+      Zero,
+    );
+
+    return addedCount;
   }
 
   async completeInputsByUdt(from: Signer, type: ScriptLike): Promise<number> {
@@ -1495,7 +1528,7 @@ export class Transaction {
       return 0;
     }
 
-    return this.completeInputs(
+    const { addedCount, accumulated } = await this.completeInputs(
       from,
       {
         script: type,
@@ -1507,6 +1540,14 @@ export class Transaction {
         return sum >= exceptedBalance ? undefined : sum;
       },
       inputsBalance,
+    );
+
+    if (accumulated === undefined) {
+      return addedCount;
+    }
+
+    throw new Error(
+      `Insufficient coin, need ${exceptedBalance - accumulated} extra coin`,
     );
   }
 
@@ -1524,17 +1565,31 @@ export class Transaction {
     // Complete all inputs extra infos for cache
     await this.getInputsCapacity(from.client);
 
-    let leastFee = this.estimateFee(feeRate);
+    let leastFee = Zero;
     let leastExtraCapacity = Zero;
 
     while (true) {
       const prepared = await from.prepareTransaction(this.clone());
-      const collected = await prepared.completeInputsByCapacity(
-        from,
-        leastFee + leastExtraCapacity,
-        filter,
-      );
+      const collected = await (async () => {
+        try {
+          return await prepared.completeInputsByCapacity(
+            from,
+            leastFee + leastExtraCapacity,
+            filter,
+          );
+        } catch (err) {
+          if (leastExtraCapacity !== Zero) {
+            throw new Error("Not enough capacity for the change cell");
+          }
 
+          throw err;
+        }
+      })();
+
+      if (leastFee === Zero) {
+        // The initial fee is calculated based on prepared transaction
+        leastFee = prepared.estimateFee(feeRate);
+      }
       const extraCapacity =
         (await prepared.getInputsCapacity(from.client)) -
         prepared.getOutputsCapacity();

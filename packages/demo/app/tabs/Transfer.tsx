@@ -34,6 +34,43 @@ export function Transfer({ sendMessage, signer }: TabProps) {
           if (!signer) {
             return;
           }
+          sendMessage("Calculating the max amount...");
+          // Verify destination address
+          const { script: toLock } = await ccc.Address.fromString(
+            transferTo,
+            signer.client,
+          );
+
+          // Build the full transaction to estimate the fee
+          const dataBytes = (() => {
+            try {
+              return ccc.bytesFrom(data);
+            } catch (e) {}
+
+            return ccc.bytesFrom(data, "utf8");
+          })();
+          const tx = ccc.Transaction.from({
+            outputs: [{ lock: toLock }],
+            outputsData: [dataBytes],
+          });
+
+          // Complete missing parts for transaction
+          await tx.completeInputsAll(signer);
+          // Change all balance to the first output
+          await tx.completeFeeChangeToOutput(signer, 0, 1000);
+          const amount = ccc.fixedPointToString(tx.outputs[0].capacity);
+          sendMessage("You can transfer at most", amount, "CKB");
+          setAmount(amount);
+        }}
+      >
+        Max Amount
+      </Button>
+      <Button
+        className="mt-1"
+        onClick={async () => {
+          if (!signer) {
+            return;
+          }
           // Verify destination address
           const { script: toLock } = await ccc.Address.fromString(
             transferTo,
