@@ -207,7 +207,7 @@ export const TESTNET_SCRIPTS: Record<
         cellDep: {
           outPoint: {
             txHash:
-              "0x968c326f7a418f07a128f30d9a415251beaa2ec8bd6bbfda65780c94bebb2a85",
+              "0xb4f171c9c9caf7401f54a8e56225ae21d95032150a87a4678eac3f66a3137b93",
             index: 4,
           },
           depType: "code",
@@ -217,14 +217,14 @@ export const TESTNET_SCRIPTS: Record<
   },
   [KnownScript.OutputTypeProxyLock]: {
     codeHash:
-      "0xc0382e4109cff68a4f536441c0266d2e22f2808e61573129c9289ee0e5e5ed43",
+      "0x2df53b592db3ae3685b7787adcfef0332a611edb83ca3feca435809964c3aff2",
     hashType: "data1",
     cellDeps: [
       {
         cellDep: {
           outPoint: {
             txHash:
-              "0x968c326f7a418f07a128f30d9a415251beaa2ec8bd6bbfda65780c94bebb2a85",
+              "0xb4f171c9c9caf7401f54a8e56225ae21d95032150a87a4678eac3f66a3137b93",
             index: 2,
           },
           depType: "code",
