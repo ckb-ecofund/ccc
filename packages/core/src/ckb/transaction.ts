@@ -1482,7 +1482,7 @@ export class Transaction {
       },
       (acc, { cellOutput: { capacity } }) => {
         const sum = acc + capacity;
-        return sum > exceptedCapacity ? undefined : sum;
+        return sum >= exceptedCapacity ? undefined : sum;
       },
       inputsCapacity,
     );
@@ -1504,7 +1504,7 @@ export class Transaction {
       (acc, { outputData }) => {
         const balance = udtBalanceFrom(outputData);
         const sum = acc + balance;
-        return sum > exceptedBalance ? undefined : sum;
+        return sum >= exceptedBalance ? undefined : sum;
       },
       inputsBalance,
     );
