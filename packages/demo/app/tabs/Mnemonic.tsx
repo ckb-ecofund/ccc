@@ -1,13 +1,13 @@
-import { ccc, useCcc } from "@ckb-ccc/connector-react";
-import { useEffect, useMemo, useState } from "react";
+import { ccc, SignerMnemonicphrase, useCcc } from "@ckb-ccc/connector-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Button } from "../components/Button";
 import { TextInput } from "../components/Input";
 import * as hd from "@ckb-lumos/hd";
 
 export function Mnemonic() {
   const { client } = useCcc();
-
-  const [mnemonic, setMnemonic] = useState<string>("");
+  const MnemonicSigner = new ccc.SignerMnemonicphrase(client);
+  const [mnemonic, setMnemonic] = useState<string>(MnemonicSigner.getMnemonic());
   const [countStr, setCountStr] = useState<string>("10");
   const [accounts, setAccount] = useState<
     {
@@ -21,6 +21,20 @@ export function Mnemonic() {
     () => hd.mnemonic.validateMnemonic(mnemonic),
     [mnemonic],
   );
+
+  const generateMoreAccounts = useCallback(() => {
+    const count = parseInt(countStr, 10);
+    if (isNaN(count)) return;
+
+    const newAccounts = MnemonicSigner.expendPrivateKey(count, accounts.length);
+    setAccount(prevAccounts => [
+      ...prevAccounts,
+      ...newAccounts.map(account => ({
+        ...account,
+        address: "", 
+      }))
+    ]);
+  }, [MnemonicSigner, countStr, accounts.length]);
 
   useEffect(() => setAccount([]), [mnemonic]);
 
@@ -60,8 +74,8 @@ export function Mnemonic() {
       />
       <div className="flex">
         <Button
-          onClick={() => {
-            setMnemonic(hd.mnemonic.generateMnemonic());
+          onClick={async () => {
+            setMnemonic(await SignerMnemonicphrase.generateMnemonic());
           }}
         >
           Generate Random Mnemonic
@@ -69,25 +83,7 @@ export function Mnemonic() {
         <Button
           className="ml-2"
           onClick={async () => {
-            const count = parseInt(countStr, 10);
-            const seed = await hd.mnemonic.mnemonicToSeed(mnemonic);
-            const extendedPrivateKey = hd.ExtendedPrivateKey.fromSeed(seed);
-            setAccount([
-              ...accounts,
-              ...Array.from(new Array(count), (_, i) => {
-                const { publicKey, privateKey, path } =
-                  extendedPrivateKey.privateKeyInfo(
-                    hd.AddressType.Receiving,
-                    accounts.length + i,
-                  );
-                return {
-                  publicKey,
-                  privateKey,
-                  path,
-                  address: "",
-                };
-              }),
-            ]);
+            generateMoreAccounts();
           }}
           disabled={!isValid || Number.isNaN(parseInt(countStr, 10))}
         >
