@@ -10,6 +10,7 @@ import { generateDefaultScriptInfos } from "@ckb-ccc/lumos-patches";
 import { Indexer } from "@ckb-lumos/ckb-indexer";
 import { TransactionSkeleton } from "@ckb-lumos/helpers";
 import { predefined } from "@ckb-lumos/config-manager";
+import { Textarea } from "../components/Textarea";
 
 export function TransferLumos({ sendMessage, signer }: TabProps) {
   const [transferTo, setTransferTo] = useState<string>("");
@@ -19,20 +20,20 @@ export function TransferLumos({ sendMessage, signer }: TabProps) {
   return (
     <>
       <div className="mb-1 flex flex-col items-center">
-        <div className="flex flex-col">
+        <div className="flex w-9/12 flex-col items-center">
           <TextInput
+            className="w-full"
             placeholder="Address to transfer to"
             state={[transferTo, setTransferTo]}
           />
           <TextInput
-            className="mt-1"
+            className="mt-1 w-full"
             placeholder="Amount to transfer"
             state={[amount, setAmount]}
           />
-          <textarea
-            className="mt-1 rounded-3xl border border-black px-4 py-2"
-            value={data}
-            onInput={(e) => setData(e.currentTarget.value)}
+          <Textarea
+            className="mt-1 w-full"
+            state={[data, setData]}
             placeholder="Data in the cell. Hex string will be parsed."
           />
         </div>

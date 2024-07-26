@@ -2,7 +2,9 @@ import { useState } from "react";
 import { TabProps } from "../types";
 import { TextInput } from "../components/Input";
 import { Button } from "../components/Button";
+import { Textarea } from "../components/Textarea";
 import { ccc } from "@ckb-ccc/connector-react";
+import { bytesFromAnyString } from "../utils";
 
 export function Transfer({ sendMessage, signer }: TabProps) {
   const [transferTo, setTransferTo] = useState<string>("");
@@ -11,21 +13,21 @@ export function Transfer({ sendMessage, signer }: TabProps) {
 
   return (
     <div className="mb-1 flex flex-col items-center">
-      <div className="flex flex-col">
-        <TextInput
-          placeholder="Address to transfer to"
+      <div className="flex w-9/12 flex-col items-center">
+        <Textarea
+          className="w-full"
+          placeholder="Addresses to transfer to, separated by lines"
           state={[transferTo, setTransferTo]}
         />
         <TextInput
-          className="mt-1"
+          className="mt-1 w-full"
           placeholder="Amount to transfer"
           state={[amount, setAmount]}
         />
-        <textarea
-          className="mt-1 rounded-3xl border border-black px-4 py-2"
-          value={data}
-          onInput={(e) => setData(e.currentTarget.value)}
-          placeholder="Data in the cell. Hex string will be parsed."
+        <Textarea
+          className="mt-1 w-full"
+          state={[data, setData]}
+          placeholder="Leave empty if you don't know what this is. Data in the first output. Hex string will be parsed."
         />
       </div>
       <Button
@@ -34,6 +36,10 @@ export function Transfer({ sendMessage, signer }: TabProps) {
           if (!signer) {
             return;
           }
+          if (transferTo.split("\n").length !== 1) {
+            throw new Error("Only one destination is allowed for max amount");
+          }
+
           sendMessage("Calculating the max amount...");
           // Verify destination address
           const { script: toLock } = await ccc.Address.fromString(
@@ -42,16 +48,9 @@ export function Transfer({ sendMessage, signer }: TabProps) {
           );
 
           // Build the full transaction to estimate the fee
-          const dataBytes = (() => {
-            try {
-              return ccc.bytesFrom(data);
-            } catch (e) {}
-
-            return ccc.bytesFrom(data, "utf8");
-          })();
           const tx = ccc.Transaction.from({
             outputs: [{ lock: toLock }],
-            outputsData: [dataBytes],
+            outputsData: [bytesFromAnyString(data)],
           });
 
           // Complete missing parts for transaction
@@ -71,29 +70,27 @@ export function Transfer({ sendMessage, signer }: TabProps) {
           if (!signer) {
             return;
           }
-          // Verify destination address
-          const { script: toLock } = await ccc.Address.fromString(
-            transferTo,
-            signer.client,
+          // Verify destination addresses
+          const toAddresses = await Promise.all(
+            transferTo
+              .split("\n")
+              .map((addr) => ccc.Address.fromString(addr, signer.client)),
           );
 
-          const dataBytes = (() => {
-            try {
-              return ccc.bytesFrom(data);
-            } catch (e) {}
-
-            return ccc.bytesFrom(data, "utf8");
-          })();
           const tx = ccc.Transaction.from({
-            outputs: [{ lock: toLock }],
-            outputsData: [dataBytes],
+            outputs: toAddresses.map(({ script }) => ({ lock: script })),
+            outputsData: [bytesFromAnyString(data)],
           });
 
           // CCC transactions are easy to be edited
-          if (tx.outputs[0].capacity > ccc.fixedPointFrom(amount)) {
-            throw new Error("Insufficient capacity to store data");
-          }
-          tx.outputs[0].capacity = ccc.fixedPointFrom(amount);
+          tx.outputs.forEach((output, i) => {
+            if (output.capacity > ccc.fixedPointFrom(amount)) {
+              throw new Error(
+                `Insufficient capacity at output ${i} to store data`,
+              );
+            }
+            output.capacity = ccc.fixedPointFrom(amount);
+          });
 
           // Complete missing parts for transaction
           await tx.completeInputsByCapacity(signer);

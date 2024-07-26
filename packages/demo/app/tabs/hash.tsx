@@ -10,7 +10,7 @@ export function Hash({ sendMessage }: TabProps) {
   return (
     <div className="mb-1 flex flex-col items-center">
       <TextInput
-        className="mb-1"
+        className="mb-1 w-9/12"
         placeholder="Message to hash"
         state={[messageToHash, setMessageToHash]}
       />

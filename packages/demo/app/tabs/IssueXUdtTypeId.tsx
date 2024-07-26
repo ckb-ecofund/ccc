@@ -15,30 +15,30 @@ export function IssueXUdtTypeId({ sendMessage, signer }: TabProps) {
   return (
     <>
       <div className="mb-1 flex flex-col items-center">
-        <div className="flex flex-col">
+        <div className="flex w-9/12 flex-col items-center">
           You will need to sign two or three transactions.
           <TextInput
-            className="mt-1"
+            className="mt-1 w-full"
             placeholder="Type ID args, empty to create new"
             state={[typeIdArgs, setTypeIdArgs]}
           />
           <TextInput
-            className="mt-1"
+            className="mt-1 w-full"
             placeholder="Amount to issue"
             state={[amount, setAmount]}
           />
           <TextInput
-            className="mt-1"
+            className="mt-1 w-full"
             placeholder="Decimals of the token"
             state={[decimals, setDecimals]}
           />
           <TextInput
-            className="mt-1"
+            className="mt-1 w-full"
             placeholder="Symbol of the token"
             state={[symbol, setSymbol]}
           />
           <TextInput
-            className="mt-1"
+            className="mt-1 w-full"
             placeholder="Name of the token, same as symbol if empty"
             state={[name, setName]}
           />

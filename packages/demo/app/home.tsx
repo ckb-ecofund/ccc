@@ -141,18 +141,20 @@ export default function Home() {
               </button>
             ))}
           </div>
-          {ccc.apply(
-            (e: FunctionComponent<TabProps>) =>
-              createElement(e, {
-                sendMessage: (...msg: string[]) =>
-                  setMessages((messages) => [
-                    ["info", `(${tab}) ${msg.join(" ")}`],
-                    ...messages,
-                  ]),
-                signer,
-              }),
-            TABS.find(([name]) => name === tab)?.[1],
-          )}
+          <div className="w-full">
+            {ccc.apply(
+              (e: FunctionComponent<TabProps>) =>
+                createElement(e, {
+                  sendMessage: (...msg: string[]) =>
+                    setMessages((messages) => [
+                      ["info", `(${tab}) ${msg.join(" ")}`],
+                      ...messages,
+                    ]),
+                  signer,
+                }),
+              TABS.find(([name]) => name === tab)?.[1],
+            )}
+          </div>
         </>
       ) : (
         <>
