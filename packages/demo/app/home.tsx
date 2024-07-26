@@ -134,14 +134,14 @@ export default function Home() {
     () =>
       signer
         ? [
-            ["Hash", Hash],
-            ["Mnemonic", Mnemonic],
             ["Sign", Sign],
             ["Transfer", Transfer],
             ["Transfer with Lumos", TransferLumos],
             ["Transfer xUDT", TransferXUdt],
             ["Issue xUDT (SUS)", IssueXUdtSul],
             ["Issue xUDT (Type ID)", IssueXUdtTypeId],
+            ["Hash", Hash],
+            ["Mnemonic", Mnemonic],
           ]
         : [
             ["Hash", Hash],
@@ -149,6 +149,16 @@ export default function Home() {
           ],
     [signer],
   );
+
+  useEffect(() => setTab(tabs[0][0]), [tabs]);
+
+  useEffect(() => {
+    if (!privateKeySigner || privateKeySigner.client === client) {
+      return;
+    }
+
+    setPrivateKeySigner(new ccc.SignerCkbPrivateKey(client, privateKey));
+  }, [privateKeySigner, client, privateKey]);
 
   useEffect(() => {
     if (!signer) {
