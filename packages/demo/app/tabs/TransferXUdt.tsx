@@ -25,7 +25,7 @@ export function TransferXUdt({ sendMessage, signer }: TabProps) {
         />
         <TextInput
           className="mt-1 w-full"
-          placeholder="Amount to transfer"
+          placeholder="Amount to transfer for each"
           state={[amount, setAmount]}
         />
       </div>
