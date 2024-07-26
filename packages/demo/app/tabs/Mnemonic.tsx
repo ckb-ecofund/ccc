@@ -11,6 +11,7 @@ export function Mnemonic() {
   const [countStr, setCountStr] = useState<string>("10");
   const [accounts, setAccount] = useState<
     {
+      publicKey: string;
       privateKey: string;
       address: string;
       path: string;
@@ -22,6 +23,28 @@ export function Mnemonic() {
   );
 
   useEffect(() => setAccount([]), [mnemonic]);
+
+  useEffect(() => {
+    (async () => {
+      let modified = false;
+      const newAccounts = await Promise.all(
+        accounts.map(async (acc) => {
+          const address = await new ccc.SignerCkbPublicKey(
+            client,
+            acc.publicKey,
+          ).getRecommendedAddress();
+          if (address !== acc.address) {
+            modified = true;
+          }
+          acc.address = address;
+          return acc;
+        }),
+      );
+      if (modified) {
+        setAccount(newAccounts);
+      }
+    })();
+  }, [client, accounts]);
 
   return (
     <div className="mb-1 flex w-full flex-col items-center">
@@ -51,21 +74,19 @@ export function Mnemonic() {
             const extendedPrivateKey = hd.ExtendedPrivateKey.fromSeed(seed);
             setAccount([
               ...accounts,
-              ...(await Promise.all(
-                Array.from(new Array(count), async (_, i) => {
-                  const { publicKey, privateKey, path } =
-                    extendedPrivateKey.privateKeyInfo(
-                      hd.AddressType.Receiving,
-                      accounts.length + i,
-                    );
-                  const signer = new ccc.SignerCkbPublicKey(client, publicKey);
-                  return {
-                    privateKey,
-                    path,
-                    address: await signer.getRecommendedAddress(),
-                  };
-                }),
-              )),
+              ...Array.from(new Array(count), (_, i) => {
+                const { publicKey, privateKey, path } =
+                  extendedPrivateKey.privateKeyInfo(
+                    hd.AddressType.Receiving,
+                    accounts.length + i,
+                  );
+                return {
+                  publicKey,
+                  privateKey,
+                  path,
+                  address: "",
+                };
+              }),
             ]);
           }}
           disabled={!isValid || Number.isNaN(parseInt(countStr, 10))}
@@ -77,7 +98,7 @@ export function Mnemonic() {
         <div className="mt-2 w-full overflow-scroll whitespace-nowrap">
           <p>path, address, private key</p>
           {accounts.map(({ privateKey, address, path }) => (
-            <p key={address}>
+            <p key={path}>
               {path}, {address}, {privateKey}
             </p>
           ))}
