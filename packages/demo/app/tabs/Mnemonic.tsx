@@ -95,14 +95,27 @@ export function Mnemonic() {
         </Button>
       </div>
       {accounts.length !== 0 ? (
-        <div className="mt-2 w-full overflow-scroll whitespace-nowrap">
-          <p>path, address, private key</p>
-          {accounts.map(({ privateKey, address, path }) => (
-            <p key={path}>
-              {path}, {address}, {privateKey}
-            </p>
-          ))}
-        </div>
+        <>
+          <a
+            className="mt-2 flex items-center rounded-full bg-black px-5 py-3 text-white"
+            href={`data:application/octet-stream,path%2C%20address%2C%20private%20key%0A${accounts
+              .map(({ privateKey, address, path }) =>
+                encodeURIComponent(`${path}, ${address}, ${privateKey}`),
+              )
+              .join("\n")}`}
+            download={`ckb_accounts_${Date.now()}.csv`}
+          >
+            Save as CSV
+          </a>
+          <div className="mt-1 w-full overflow-scroll whitespace-nowrap">
+            <p>path, address, private key</p>
+            {accounts.map(({ privateKey, address, path }) => (
+              <p key={path}>
+                {path}, {address}, {privateKey}
+              </p>
+            ))}
+          </div>
+        </>
       ) : undefined}
     </div>
   );
