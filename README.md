@@ -74,9 +74,17 @@ CCC exports everything on the `ccc` object:
 import { ccc } from "@ckb-ccc/<package-name>";
 ```
 
-## Lumos Patches
+## FAQs
 
-For developers who use Lumos to compose CKB transactions, CCC provides patches to:
+### Property '*' does not exist on type 'typeof import("\*/@ckb-ccc/connector-react/dist/barrel")'.ts(2339)
+
+CCC uses JS's [Package Entry Points](https://nodejs.org/api/packages.html#packages_package_entry_points) feature to help tree shaking while exporting everything on the `ccc` object. Ensure in your `tsconfig.json`, `moduleResolution` is set to `node16`, `nodenext`, or `bundler`, and `resolvePackageJsonExports` is not disabled.
+
+Read the [TypeScript's Guide](https://www.typescriptlang.org/docs/handbook/modules/reference.html#packagejson-exports) for more.
+
+### Can I use Lumos with CCC?
+
+While we recommend using CCC for composing transactions, we also provide Lumos patches to:
 
 - Support the JoyID Wallet.
 - Support the Nostr Wallet.
