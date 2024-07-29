@@ -27,17 +27,17 @@ export function addressPayloadFromString(address: string): {
   payload: number[];
 } {
   // Try parse full format address
-  {
+  try {
     const { words, prefix } = bech32m.decode(address, ADDRESS_BECH32_LIMIT);
     const [formatType, ...payload] = bech32m.fromWords(words);
 
     if (formatType === (AddressFormat.Full as number)) {
       return { prefix, format: AddressFormat.Full, payload };
     }
-  }
+  } catch (_) {}
 
   // Try parse legacy 2019 format address
-  {
+  try {
     const { prefix, words } = bech32.decode(address, ADDRESS_BECH32_LIMIT);
     const [formatType, ...payload] = bech32.fromWords(words);
     if (
@@ -49,7 +49,7 @@ export function addressPayloadFromString(address: string): {
     ) {
       return { prefix, format: formatType, payload };
     }
-  }
+  } catch (_) {}
 
   throw Error(`Unknown address format ${address}`);
 }
