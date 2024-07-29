@@ -193,8 +193,8 @@ importers:
         specifier: ^0.22.2
         version: 0.22.2(encoding@0.1.13)
       '@joyid/ckb':
-        specifier: ^0.0.11
-        version: 0.0.11(encoding@0.1.13)(typescript@5.4.5)
+        specifier: ^1.0.1
+        version: 1.0.1(encoding@0.1.13)(typescript@5.4.5)
       '@noble/curves':
         specifier: ^1.4.2
         version: 1.4.2
@@ -379,8 +379,8 @@ importers:
         specifier: workspace:*
         version: link:../core
       '@joyid/ckb':
-        specifier: ^1.0.0
-        version: 1.0.0(encoding@0.1.13)(typescript@5.4.5)
+        specifier: ^1.0.1
+        version: 1.0.1(encoding@0.1.13)(typescript@5.4.5)
       '@joyid/common':
         specifier: ^0.2.0
         version: 0.2.0(typescript@5.4.5)
@@ -428,8 +428,8 @@ importers:
         specifier: ^0.24.0-next.1
         version: 0.24.0-next.1(encoding@0.1.13)
       '@joyid/ckb':
-        specifier: ^0.0.11
-        version: 0.0.11(encoding@0.1.13)(typescript@5.4.5)
+        specifier: ^1.0.1
+        version: 1.0.1(encoding@0.1.13)(typescript@5.4.5)
     devDependencies:
       '@eslint/js':
         specifier: ^9.1.1
@@ -978,14 +978,8 @@ packages:
     resolution: {integrity: sha512-u3UPsIilWKOM3F9CXtrG8LEJmNxwoCQC/XVj4IKYXvvpx7QIi/Kg1LI5uDmDpKlac62NUtX7eLjRh+jVZcLOzw==}
     engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
 
-  '@joyid/ckb@0.0.11':
-    resolution: {integrity: sha512-Nxl+vHju57qChP+QI3ycnlTpQCLsQc+Kp/YUxjDoPkbHikBXPsKGyvTOgO1RIqZMAoQpYbO6FDt1P+nIVxVVCQ==}
-
-  '@joyid/ckb@1.0.0':
-    resolution: {integrity: sha512-uJocaVSN9sBXun/ANkNohZtG8ByfC7B3PZtCrmhzEQ6etpbPa6ByGMZZubIFwjOG5i1ynPWXLvAi8CW2SKOmCw==}
-
-  '@joyid/common@0.0.3':
-    resolution: {integrity: sha512-bih1dRqFpNP6tLNpebO2pp72r8L9WFtlGUa7a2x3l336G66ieS1uyNGb/yZzY+f3Fs1E40s10m7D+qSnfwtjJQ==}
+  '@joyid/ckb@1.0.1':
+    resolution: {integrity: sha512-pKAJouigChqcwKgtLw4RNOwi+nBh3NVjpU+qZd+uu3wmoTpivnSRLbJH8/SlkgQcWn2aJ+mDJchR8GpQYh5H6Q==}
 
   '@joyid/common@0.2.0':
     resolution: {integrity: sha512-WBZtgdEccWxjiGHIoDgRFIbnC42ZvmfvFRCTxmx9D4BLvtiFdhAa+g70lUmiHwO28GjgHIHgzHRGNRdLuk81xw==}
@@ -1023,11 +1017,11 @@ packages:
   '@lit/reactive-element@2.0.4':
     resolution: {integrity: sha512-GFn91inaUa2oHLak8awSIigYz0cU0Payr1rcFsrkf5OJ5eSPxElyZfKh0f2p9FsTiZWXQdWGJeXZICEfXXYSXQ==}
 
-  '@nervosnetwork/ckb-sdk-utils@0.109.1':
-    resolution: {integrity: sha512-KK8w+JZGPt/Gq/Y0b87AuQp8mGR46fBSkqnjwASdBAi2rts9tJ6srEaZ3FVVa9LtjTlThQ120hex+mcyastrkQ==}
+  '@nervosnetwork/ckb-sdk-utils@0.109.2':
+    resolution: {integrity: sha512-pXgQvQQA2TuXiAmKGvL9kWjXdCsX+qP8HqHSLt6kwrjFe846d4dZxZ5AunpP+xsQNst+L5V7xcvunaBOkTdD6g==}
 
-  '@nervosnetwork/ckb-types@0.109.1':
-    resolution: {integrity: sha512-mD5mOCGa1JertKZekHSUVYwFPW27VJ0/MdwblWvEEK7pNIU6az+dLiIxgvl4TxR+j+7/GqmXNH1U59CM92y/wg==}
+  '@nervosnetwork/ckb-types@0.109.2':
+    resolution: {integrity: sha512-NAQbUi+j6tWlUYijvHqWIUwrbawIeAeSlxUQm0wkqSKbtAEoiR4L6RZS7cgn7uH+SMsp78mciXP8gixrfH3rEQ==}
 
   '@next/env@14.2.2':
     resolution: {integrity: sha512-sk72qRfM1Q90XZWYRoJKu/UWlTgihrASiYw/scb15u+tyzcze3bOuJ/UV6TBOQEeUaxOkRqGeuGUdiiuxc5oqw==}
@@ -5739,33 +5733,14 @@ snapshots:
       '@types/yargs': 17.0.32
       chalk: 4.1.2
 
-  '@joyid/ckb@0.0.11(encoding@0.1.13)(typescript@5.4.5)':
-    dependencies:
-      '@joyid/common': 0.0.3(typescript@5.4.5)
-      '@nervosnetwork/ckb-sdk-utils': 0.109.1
-      cross-fetch: 4.0.0(encoding@0.1.13)
-      uncrypto: 0.1.3
-    transitivePeerDependencies:
-      - encoding
-      - typescript
-      - zod
-
-  '@joyid/ckb@1.0.0(encoding@0.1.13)(typescript@5.4.5)':
+  '@joyid/ckb@1.0.1(encoding@0.1.13)(typescript@5.4.5)':
     dependencies:
       '@joyid/common': 0.2.0(typescript@5.4.5)
-      '@nervosnetwork/ckb-sdk-utils': 0.109.1
+      '@nervosnetwork/ckb-sdk-utils': 0.109.2
       cross-fetch: 4.0.0(encoding@0.1.13)
       uncrypto: 0.1.3
     transitivePeerDependencies:
       - encoding
-      - typescript
-      - zod
-
-  '@joyid/common@0.0.3(typescript@5.4.5)':
-    dependencies:
-      abitype: 0.8.7(typescript@5.4.5)
-      type-fest: 4.6.0
-    transitivePeerDependencies:
       - typescript
       - zod
 
@@ -5879,15 +5854,15 @@ snapshots:
     dependencies:
       '@lit-labs/ssr-dom-shim': 1.2.0
 
-  '@nervosnetwork/ckb-sdk-utils@0.109.1':
+  '@nervosnetwork/ckb-sdk-utils@0.109.2':
     dependencies:
-      '@nervosnetwork/ckb-types': 0.109.1
+      '@nervosnetwork/ckb-types': 0.109.2
       bech32: 2.0.0
       elliptic: 6.5.4
       jsbi: 3.1.3
       tslib: 2.3.1
 
-  '@nervosnetwork/ckb-types@0.109.1': {}
+  '@nervosnetwork/ckb-types@0.109.2': {}
 
   '@next/env@14.2.2': {}
 

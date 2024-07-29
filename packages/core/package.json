@@ -57,7 +57,7 @@
   },
   "dependencies": {
     "@ckb-lumos/helpers": "^0.22.2",
-    "@joyid/ckb": "^0.0.11",
+    "@joyid/ckb": "^1.0.1",
     "@noble/curves": "^1.4.2",
     "@noble/hashes": "^1.4.0",
     "abort-controller": "^3.0.0",
