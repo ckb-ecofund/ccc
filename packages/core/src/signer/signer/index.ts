@@ -263,7 +263,11 @@ export abstract class Signer {
     signature: string | Signature,
   ): Promise<boolean> {
     if (typeof signature === "string") {
-      return this.verifyMessageRaw(message, signature);
+      return Signer.verifyMessage(message, {
+        signType: this.signType,
+        signature,
+        identity: await this.getIdentity(),
+      });
     }
 
     if (
@@ -273,19 +277,7 @@ export abstract class Signer {
       return false;
     }
 
-    return this.verifyMessageRaw(message, signature.signature);
-  }
-
-  /**
-   * Verify a string signature. This method is not implemented and should be overridden by subclasses.
-   *
-   * @param _0 - The original message.
-   * @param _1 - The signature to verify.
-   * @returns A promise that resolves to the verification result.
-   * @throws Will throw an error if not implemented.
-   */
-  verifyMessageRaw(_0: string | BytesLike, _1: string): Promise<boolean> {
-    throw Error("Signer.verifyMessageRaw not implemented");
+    return Signer.verifyMessage(message, signature);
   }
 
   /**
