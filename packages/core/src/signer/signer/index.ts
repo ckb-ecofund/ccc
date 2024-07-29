@@ -5,6 +5,7 @@ import { Client } from "../../client";
 import { Hex } from "../../hex";
 import { Num } from "../../num";
 import { verifyMessageBtcEcdsa } from "../btc";
+import { verifyMessageCkbSecp256k1 } from "../ckb/verifyCkbSecp256k1";
 import { verifyMessageJoyId } from "../ckb/verifyJoyId";
 import { verifyMessageEvmPersonal } from "../evm/verify";
 import { verifyMessageNostrEvent } from "../nostr/verify";
@@ -118,6 +119,11 @@ export abstract class Signer {
           signature.identity,
         );
       case SignerSignType.CkbSecp256k1:
+        return verifyMessageCkbSecp256k1(
+          message,
+          signature.signature,
+          signature.identity,
+        );
       case SignerSignType.Unknown:
         throw new Error("Unknown signer sign type");
     }

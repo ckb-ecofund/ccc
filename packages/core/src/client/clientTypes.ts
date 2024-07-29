@@ -23,7 +23,7 @@ export type ClientTransactionResponse = {
 
 export type ClientIndexerSearchKeyFilterLike =
   ClientCollectableSearchKeyFilterLike & {
-    blockRange?: [NumLike, NumLike];
+    blockRange?: [NumLike, NumLike] | null;
   };
 export class ClientIndexerSearchKeyFilter {
   constructor(
@@ -43,7 +43,7 @@ export class ClientIndexerSearchKeyFilter {
       apply(Script.from, filterLike.script),
       apply(clientSearchKeyRangeFrom, filterLike.scriptLenRange),
       apply(hexFrom, filterLike.outputData),
-      filterLike.outputDataSearchMode,
+      filterLike.outputDataSearchMode ?? undefined,
       apply(clientSearchKeyRangeFrom, filterLike.outputDataLenRange),
       apply(clientSearchKeyRangeFrom, filterLike.outputCapacityRange),
       apply(clientSearchKeyRangeFrom, filterLike.blockRange),
@@ -52,7 +52,7 @@ export class ClientIndexerSearchKeyFilter {
 }
 
 export type ClientIndexerSearchKeyLike = ClientCollectableSearchKeyLike & {
-  filter?: ClientIndexerSearchKeyFilterLike;
+  filter?: ClientIndexerSearchKeyFilterLike | null;
 };
 
 export class ClientIndexerSearchKey {
@@ -70,7 +70,7 @@ export class ClientIndexerSearchKey {
       keyLike.scriptType,
       keyLike.scriptSearchMode,
       apply(ClientIndexerSearchKeyFilter.from, keyLike.filter),
-      keyLike.withData,
+      keyLike.withData ?? undefined,
     );
   }
 }

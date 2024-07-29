@@ -36,6 +36,10 @@ export class SignerCkbPublicKey extends Signer {
     return this.getRecommendedAddress();
   }
 
+  async getIdentity(): Promise<string> {
+    return this.publicKey;
+  }
+
   async getAddressObjs(): Promise<Address[]> {
     return [
       await Address.fromKnownScript(

@@ -41,7 +41,7 @@ export enum KnownScript {
 
 export type CellDepInfoLike = {
   cellDep: CellDepLike;
-  type?: ScriptLike;
+  type?: ScriptLike | null;
 };
 
 export class CellDepInfo {

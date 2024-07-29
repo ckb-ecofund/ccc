@@ -2,6 +2,7 @@ import { secp256k1 } from "@noble/curves/secp256k1";
 import { bytesConcat, bytesFrom, BytesLike } from "../../bytes";
 import { Transaction, TransactionLike, WitnessArgs } from "../../ckb";
 import { Client } from "../../client";
+import { hashCkb } from "../../hasher";
 import { Hex, hexFrom, HexLike } from "../../hex";
 import { numBeToBytes } from "../../num";
 import { SignerCkbPublicKey } from "./signerCkbPublicKey";
@@ -20,8 +21,12 @@ export class SignerCkbPrivateKey extends SignerCkbPublicKey {
   }
 
   async signMessageRaw(message: string | BytesLike): Promise<Hex> {
+    const msg = typeof message === "string" ? message : hexFrom(message);
+    const buffer = bytesFrom(`Nervos Message:${msg}`, "utf8");
+    const hash = hashCkb(buffer);
+
     const signature = secp256k1.sign(
-      bytesFrom(message),
+      bytesFrom(hash),
       bytesFrom(this.privateKey),
     );
     const { r, s, recovery } = signature;

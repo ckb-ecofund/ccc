@@ -210,7 +210,7 @@ export class OutPoint {
 export type CellOutputLike = {
   capacity: NumLike;
   lock: ScriptLike;
-  type?: ScriptLike;
+  type?: ScriptLike | null;
 };
 export class CellOutput {
   /**
@@ -387,9 +387,9 @@ export class Cell {
 
 export type CellInputLike = {
   previousOutput: OutPointLike;
-  since?: NumLike;
-  cellOutput?: CellOutputLike;
-  outputData?: HexLike;
+  since?: NumLike | null;
+  cellOutput?: CellOutputLike | null;
+  outputData?: HexLike | null;
 };
 export class CellInput {
   /**
@@ -659,9 +659,9 @@ export class CellDep {
 }
 
 export type WitnessArgsLike = {
-  lock?: HexLike;
-  inputType?: HexLike;
-  outputType?: HexLike;
+  lock?: HexLike | null;
+  inputType?: HexLike | null;
+  outputType?: HexLike | null;
 };
 export class WitnessArgs {
   /**
@@ -771,14 +771,16 @@ export function udtBalanceFrom(dataLike: BytesLike) {
 }
 
 export type TransactionLike = {
-  version?: NumLike;
-  cellDeps?: CellDepLike[];
-  headerDeps?: HexLike[];
-  inputs?: CellInputLike[];
-  outputs?: (Omit<CellOutputLike, "capacity"> &
-    Partial<Pick<CellOutputLike, "capacity">>)[];
-  outputsData?: HexLike[];
-  witnesses?: HexLike[];
+  version?: NumLike | null;
+  cellDeps?: CellDepLike[] | null;
+  headerDeps?: HexLike[] | null;
+  inputs?: CellInputLike[] | null;
+  outputs?:
+    | (Omit<CellOutputLike, "capacity"> &
+        Partial<Pick<CellOutputLike, "capacity">>)[]
+    | null;
+  outputsData?: HexLike[] | null;
+  witnesses?: HexLike[] | null;
 };
 export class Transaction {
   /**
@@ -899,10 +901,7 @@ export class Transaction {
     const outputsData = outputs.map((_, i) =>
       hexFrom(tx.outputsData?.[i] ?? "0x"),
     );
-    if (
-      tx.outputsData !== undefined &&
-      outputsData.length < tx.outputsData.length
-    ) {
+    if (tx.outputsData != null && outputsData.length < tx.outputsData.length) {
       outputsData.push(
         ...tx.outputsData.slice(outputsData.length).map((d) => hexFrom(d)),
       );

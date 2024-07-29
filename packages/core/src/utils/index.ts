@@ -3,7 +3,7 @@
  *
  * @param transformer - The transformer.
  * @param value - The value to be transformed.
- * @returns If the value is empty, it remains its type. Otherwise it will be transformed.
+ * @returns If the value is empty, it becomes undefined. Otherwise it will be transformed.
  */
 export function apply<T, R>(
   transformer: (val: T) => R,
@@ -14,15 +14,15 @@ export function apply<T, R>(
  *
  * @param transformer - The transformer.
  * @param value - The value to be transformed.
- * @returns If the value is empty, it remains its type. Otherwise it will be transformed.
+ * @returns If the value is empty, it becomes undefined. Otherwise it will be transformed.
  */
-export function apply<T, R>(transformer: (val: T) => R, value: null): null;
+export function apply<T, R>(transformer: (val: T) => R, value: null): undefined;
 /**
  * A type safe way to apply a transformer on a value if it's not empty.
  *
  * @param transformer - The transformer.
  * @param value - The value to be transformed.
- * @returns If the value is empty, it remains its type. Otherwise it will be transformed.
+ * @returns If the value is empty, it becomes undefined. Otherwise it will be transformed.
  */
 export function apply<T, R>(transformer: (val: T) => R, value: T): R;
 /**
@@ -30,7 +30,7 @@ export function apply<T, R>(transformer: (val: T) => R, value: T): R;
  *
  * @param transformer - The transformer.
  * @param value - The value to be transformed.
- * @returns If the value is empty, it remains its type. Otherwise it will be transformed.
+ * @returns If the value is empty, it becomes undefined. Otherwise it will be transformed.
  */
 export function apply<T, R>(
   transformer: (val: T) => R,
@@ -41,36 +41,48 @@ export function apply<T, R>(
  *
  * @param transformer - The transformer.
  * @param value - The value to be transformed.
- * @returns If the value is empty, it remains its type. Otherwise it will be transformed.
+ * @returns If the value is empty, it becomes undefined. Otherwise it will be transformed.
  */
 export function apply<T, R>(
   transformer: (val: T) => R,
   value: T | null,
-): R | null;
+): R | undefined;
 /**
  * A type safe way to apply a transformer on a value if it's not empty.
  *
  * @param transformer - The transformer.
  * @param value - The value to be transformed.
- * @returns If the value is empty, it remains its type. Otherwise it will be transformed.
+ * @returns If the value is empty, it becomes undefined. Otherwise it will be transformed.
  */
 export function apply<T, R>(
   transformer: (val: T) => R,
   value: undefined | null,
-): undefined | null;
+): undefined;
+/**
 /**
  * A type safe way to apply a transformer on a value if it's not empty.
  *
  * @param transformer - The transformer.
  * @param value - The value to be transformed.
- * @returns If the value is empty, it remains its type. Otherwise it will be transformed.
+ * @returns If the value is empty, it becomes undefined. Otherwise it will be transformed.
  */
 export function apply<T, R>(
   transformer: (val: T) => R,
   value: T | undefined | null,
-): R | undefined | null {
+): R | undefined;
+/**
+ * A type safe way to apply a transformer on a value if it's not empty.
+ *
+ * @param transformer - The transformer.
+ * @param value - The value to be transformed.
+ * @returns If the value is empty, it becomes undefined. Otherwise it will be transformed.
+ */
+export function apply<T, R>(
+  transformer: (val: T) => R,
+  value: T | undefined | null,
+): R | undefined {
   if (value == null) {
-    return value as undefined | null;
+    return undefined;
   }
 
   return transformer(value);
