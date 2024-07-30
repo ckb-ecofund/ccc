@@ -1,5 +1,5 @@
 import { ccc } from "@ckb-ccc/core";
-import { BitcoinProvider } from "../advancedBarrel";
+import { BitcoinProvider } from "../advancedBarrel.js";
 
 /**
  * Class representing a Bitcoin signer that extends SignerBtc from @ckb-ccc/core.

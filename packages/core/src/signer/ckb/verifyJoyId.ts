@@ -1,6 +1,6 @@
 import { verifySignature } from "@joyid/ckb";
-import { BytesLike } from "../../bytes";
-import { hexFrom } from "../../hex";
+import { BytesLike } from "../../bytes/index.js";
+import { hexFrom } from "../../hex/index.js";
 
 export function verifyMessageJoyId(
   message: string | BytesLike,

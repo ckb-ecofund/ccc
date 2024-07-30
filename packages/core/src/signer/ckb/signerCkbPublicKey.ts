@@ -1,10 +1,10 @@
-import { Address } from "../../address";
-import { bytesFrom } from "../../bytes";
-import { Transaction, TransactionLike } from "../../ckb";
-import { Client, KnownScript } from "../../client";
-import { hashCkb } from "../../hasher";
-import { Hex, HexLike, hexFrom } from "../../hex";
-import { Signer, SignerSignType, SignerType } from "../signer";
+import { Address } from "../../address/index.js";
+import { bytesFrom } from "../../bytes/index.js";
+import { Transaction, TransactionLike } from "../../ckb/index.js";
+import { Client, KnownScript } from "../../client/index.js";
+import { hashCkb } from "../../hasher/index.js";
+import { Hex, HexLike, hexFrom } from "../../hex/index.js";
+import { Signer, SignerSignType, SignerType } from "../signer/index.js";
 
 export class SignerCkbPublicKey extends Signer {
   get type(): SignerType {

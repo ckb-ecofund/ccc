@@ -1,4 +1,4 @@
-import { Provider as EIP1193Provider } from "./eip1193.advanced";
+import { Provider as EIP1193Provider } from "./eip1193.advanced.js";
 
 /**
  * Interface representing an event announcing a provider.

@@ -1,7 +1,7 @@
-import { Script } from "../ckb";
-import { CellDepInfo, KnownScript } from "./client";
-import { MAINNET_SCRIPTS } from "./clientPublicMainnet.advanced";
-import { ClientJsonRpc } from "./jsonRpc";
+import { Script } from "../ckb/index.js";
+import { CellDepInfo, KnownScript } from "./client.js";
+import { MAINNET_SCRIPTS } from "./clientPublicMainnet.advanced.js";
+import { ClientJsonRpc } from "./jsonRpc/index.js";
 
 export class ClientPublicMainnet extends ClientJsonRpc {
   constructor(url = "https://mainnet.ckb.dev/", timeout?: number) {

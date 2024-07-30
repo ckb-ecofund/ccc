@@ -1,4 +1,4 @@
-import { Hex } from "../../hex";
+import { Hex } from "../../hex/index.js";
 
 export type JsonRpcPayload = {
   id: number;

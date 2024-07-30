@@ -1,15 +1,15 @@
 import fetch from "cross-fetch";
-import { TransactionLike } from "../../ckb";
-import { Hex, HexLike, hexFrom } from "../../hex";
-import { Num, NumLike, numFrom, numToHex } from "../../num";
-import { Client } from "../client";
+import { TransactionLike } from "../../ckb/index.js";
+import { Hex, HexLike, hexFrom } from "../../hex/index.js";
+import { Num, NumLike, numFrom, numToHex } from "../../num/index.js";
+import { Client } from "../client.js";
 import {
   ClientFindCellsResponse,
   ClientIndexerSearchKeyLike,
   ClientTransactionResponse,
   OutputsValidator,
-} from "../clientTypes";
-import { JsonRpcPayload, JsonRpcTransformers } from "./advanced";
+} from "../clientTypes.js";
+import { JsonRpcPayload, JsonRpcTransformers } from "./advanced.js";
 
 /**
  * Applies a transformation function to a value if the transformer is provided.

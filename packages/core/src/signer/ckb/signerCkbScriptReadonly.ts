@@ -1,7 +1,7 @@
-import { Address } from "../../address";
-import { Script, ScriptLike } from "../../ckb";
-import { Client } from "../../client";
-import { Signer, SignerSignType, SignerType } from "../signer";
+import { Address } from "../../address/index.js";
+import { Script, ScriptLike } from "../../ckb/index.js";
+import { Client } from "../../client/index.js";
+import { Signer, SignerSignType, SignerType } from "../signer/index.js";
 
 /**
  * A class extending Signer that provides read-only access to a CKB script.

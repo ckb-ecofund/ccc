@@ -18,10 +18,10 @@ import {
   TransactionLike,
   depTypeFrom,
   hashTypeFrom,
-} from "../../ckb";
-import { Hex } from "../../hex";
-import { NumLike, numFrom, numToHex } from "../../num";
-import { apply } from "../../utils";
+} from "../../ckb/index.js";
+import { Hex } from "../../hex/index.js";
+import { NumLike, numFrom, numToHex } from "../../num/index.js";
+import { apply } from "../../utils/index.js";
 import {
   ClientFindCellsResponse,
   ClientFindTransactionsGroupedResponse,
@@ -33,7 +33,7 @@ import {
   ClientIndexerSearchKeyTransactionLike,
   ClientTransactionResponse,
   TransactionStatus,
-} from "../clientTypes";
+} from "../clientTypes.js";
 import {
   JsonRpcCellDep,
   JsonRpcCellInput,
@@ -48,7 +48,7 @@ import {
   JsonRpcOutPoint,
   JsonRpcScript,
   JsonRpcTransaction,
-} from "./types";
+} from "./types.js";
 
 export class JsonRpcTransformers {
   static hashTypeFrom(hashType: HashTypeLike): JsonRpcHashType {

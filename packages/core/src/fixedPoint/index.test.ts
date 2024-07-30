@@ -1,4 +1,4 @@
-import { fixedPointFrom, fixedPointToString } from ".";
+import { fixedPointFrom, fixedPointToString } from "./index.js";
 
 describe("fixedPointToString", () => {
   const cases: [bigint, string, number?][] = [

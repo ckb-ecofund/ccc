@@ -9,12 +9,13 @@ import {
   ScriptLike,
   Transaction,
   TransactionLike,
-} from "../ckb";
-import { Zero } from "../fixedPoint";
-import { Hex, HexLike, hexFrom } from "../hex";
-import { Num, NumLike, numFrom } from "../num";
-import { apply, reduceAsync } from "../utils";
-import { filterCell } from "./client.advanced";
+} from "../ckb/index.js";
+import { Zero } from "../fixedPoint/index.js";
+import { Hex, HexLike, hexFrom } from "../hex/index.js";
+import { Num, NumLike, numFrom } from "../num/index.js";
+import { apply, reduceAsync } from "../utils/index.js";
+import { filterCell } from "./client.advanced.js";
+import { ClientCollectableSearchKeyLike } from "./clientTypes.advanced.js";
 import {
   ClientFindCellsResponse,
   ClientFindTransactionsGroupedResponse,
@@ -24,8 +25,7 @@ import {
   ClientIndexerSearchKeyTransactionLike,
   ClientTransactionResponse,
   OutputsValidator,
-} from "./clientTypes";
-import { ClientCollectableSearchKeyLike } from "./clientTypes.advanced";
+} from "./clientTypes.js";
 
 export enum KnownScript {
   Secp256k1Blake160 = "Secp256k1Blake160",

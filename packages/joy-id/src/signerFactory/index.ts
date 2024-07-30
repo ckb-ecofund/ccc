@@ -1,9 +1,9 @@
 import { ccc } from "@ckb-ccc/core";
 import { isStandaloneBrowser } from "@joyid/common";
-import { BitcoinSigner } from "../btc";
-import { CkbSigner } from "../ckb";
-import { EvmSigner } from "../evm";
-import { NostrSigner } from "../nostr";
+import { BitcoinSigner } from "../btc/index.js";
+import { CkbSigner } from "../ckb/index.js";
+import { EvmSigner } from "../evm/index.js";
+import { NostrSigner } from "../nostr/index.js";
 
 /**
  * Gets the JoyID signers based on the client, name, and icon.

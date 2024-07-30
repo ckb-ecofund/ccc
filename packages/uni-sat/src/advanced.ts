@@ -1,1 +1,1 @@
-export * as UniSatA from "./advancedBarrel";
+export * as UniSatA from "./advancedBarrel.js";

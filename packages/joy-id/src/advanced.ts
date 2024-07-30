@@ -1,1 +1,1 @@
-export * as JoyIdA from "./advancedBarrel";
+export * as JoyIdA from "./advancedBarrel.js";

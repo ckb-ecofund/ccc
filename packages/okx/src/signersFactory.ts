@@ -1,7 +1,7 @@
 import { ccc } from "@ckb-ccc/core";
-import { BitcoinProvider, NostrProvider } from "./advancedBarrel";
-import { BitcoinSigner } from "./btc";
-import { NostrSigner } from "./nostr";
+import { BitcoinProvider, NostrProvider } from "./advancedBarrel.js";
+import { BitcoinSigner } from "./btc/index.js";
+import { NostrSigner } from "./nostr/index.js";
 
 /**
  * Retrieves the OKX Bitcoin signer if available.

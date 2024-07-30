@@ -1,5 +1,5 @@
 import { ccc } from "@ckb-ccc/core";
-import { Provider } from "./nip07.advanced";
+import { Provider } from "./nip07.advanced.js";
 
 export class Signer extends ccc.SignerNostr {
   private publicKeyCache?: Promise<string> = undefined;

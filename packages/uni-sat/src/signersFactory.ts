@@ -1,6 +1,6 @@
 import { ccc } from "@ckb-ccc/core";
-import { Provider } from "./advancedBarrel";
-import { Signer } from "./signer";
+import { Provider } from "./advancedBarrel.js";
+import { Signer } from "./signer.js";
 
 /**
  * Retrieves the UniSat signer if available.

@@ -13,12 +13,13 @@
   "main": "dist.commonjs/index.js",
   "module": "dist/index.js",
   "scripts": {
-    "build": "rimraf ./dist && rimraf ./dist.commonjs && tsc && tsc --project tsconfig.commonjs.json",
+    "build": "rimraf ./dist && rimraf ./dist.commonjs && tsc && tsc --project tsconfig.commonjs.json && copyfiles -u 2 misc/basedirs/**/* .",
     "lint": "eslint",
     "format": "prettier --write . && eslint --fix"
   },
   "devDependencies": {
     "@eslint/js": "^9.1.1",
+    "copyfiles": "^2.4.1",
     "eslint": "^9.1.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.1.3",

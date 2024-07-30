@@ -1,11 +1,11 @@
 import { secp256k1 } from "@noble/curves/secp256k1";
-import { bytesConcat, bytesFrom, BytesLike } from "../../bytes";
-import { Transaction, TransactionLike, WitnessArgs } from "../../ckb";
-import { Client } from "../../client";
-import { Hex, hexFrom, HexLike } from "../../hex";
-import { numBeToBytes } from "../../num";
-import { SignerCkbPublicKey } from "./signerCkbPublicKey";
-import { messageHashCkbSecp256k1 } from "./verifyCkbSecp256k1";
+import { bytesConcat, bytesFrom, BytesLike } from "../../bytes/index.js";
+import { Transaction, TransactionLike, WitnessArgs } from "../../ckb/index.js";
+import { Client } from "../../client/index.js";
+import { Hex, hexFrom, HexLike } from "../../hex/index.js";
+import { numBeToBytes } from "../../num/index.js";
+import { SignerCkbPublicKey } from "./signerCkbPublicKey.js";
+import { messageHashCkbSecp256k1 } from "./verifyCkbSecp256k1.js";
 
 export class SignerCkbPrivateKey extends SignerCkbPublicKey {
   public readonly privateKey: Hex;

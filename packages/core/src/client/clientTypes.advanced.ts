@@ -1,6 +1,6 @@
-import { ScriptLike } from "../ckb";
-import { HexLike } from "../hex";
-import { Num, numFrom, NumLike } from "../num";
+import { ScriptLike } from "../ckb/index.js";
+import { HexLike } from "../hex/index.js";
+import { Num, numFrom, NumLike } from "../num/index.js";
 
 export function clientSearchKeyRangeFrom([a, b]: [NumLike, NumLike]): [
   Num,

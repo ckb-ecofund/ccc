@@ -1,1 +1,1 @@
-export * as JoyId from "./barrel";
+export * as JoyId from "./barrel.js";

@@ -1,14 +1,14 @@
-import { Address } from "../../address";
-import { BytesLike } from "../../bytes";
-import { Transaction, TransactionLike } from "../../ckb";
-import { Client } from "../../client";
-import { Hex } from "../../hex";
-import { Num } from "../../num";
-import { verifyMessageBtcEcdsa } from "../btc";
-import { verifyMessageCkbSecp256k1 } from "../ckb/verifyCkbSecp256k1";
-import { verifyMessageJoyId } from "../ckb/verifyJoyId";
-import { verifyMessageEvmPersonal } from "../evm/verify";
-import { verifyMessageNostrEvent } from "../nostr/verify";
+import { Address } from "../../address/index.js";
+import { BytesLike } from "../../bytes/index.js";
+import { Transaction, TransactionLike } from "../../ckb/index.js";
+import { Client } from "../../client/index.js";
+import { Hex } from "../../hex/index.js";
+import { Num } from "../../num/index.js";
+import { verifyMessageBtcEcdsa } from "../btc/index.js";
+import { verifyMessageCkbSecp256k1 } from "../ckb/verifyCkbSecp256k1.js";
+import { verifyMessageJoyId } from "../ckb/verifyJoyId.js";
+import { verifyMessageEvmPersonal } from "../evm/verify.js";
+import { verifyMessageNostrEvent } from "../nostr/verify.js";
 
 export enum SignerSignType {
   Unknown = "Unknown",

@@ -1,11 +1,11 @@
 import { ccc } from "@ckb-ccc/core";
 import { DappRequestType, buildJoyIDURL } from "@joyid/common";
-import { createPopup } from "../common";
+import { createPopup } from "../common/index.js";
 import {
   Connection,
   ConnectionsRepo,
   ConnectionsRepoLocalStorage,
-} from "../connectionsStorage";
+} from "../connectionsStorage/index.js";
 
 /**
  * Class representing an EVM signer that extends SignerEvm from @ckb-ccc/core.

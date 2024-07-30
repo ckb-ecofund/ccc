@@ -1,1 +1,1 @@
-export * from "./address.advanced";
+export * from "./address.advanced.js";

@@ -1,6 +1,6 @@
-import { Client } from "../../client";
-import { Hex, HexLike, hexFrom } from "../../hex";
-import { SignerEvm } from "./signerEvm";
+import { Client } from "../../client/index.js";
+import { Hex, HexLike, hexFrom } from "../../hex/index.js";
+import { SignerEvm } from "./signerEvm.js";
 
 /**
  * A class extending SignerEvm that provides read-only access to an EVM address.

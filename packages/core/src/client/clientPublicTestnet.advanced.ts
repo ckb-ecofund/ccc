@@ -1,5 +1,5 @@
-import { Script } from "../ckb";
-import { CellDepInfoLike, KnownScript } from "./client";
+import { Script } from "../ckb/index.js";
+import { CellDepInfoLike, KnownScript } from "./client.js";
 
 export const TESTNET_SCRIPTS: Record<
   KnownScript,

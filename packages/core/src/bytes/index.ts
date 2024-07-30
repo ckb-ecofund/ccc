@@ -1,5 +1,5 @@
-import { Buffer } from "buffer/";
-import { BytesFromEncoding } from "./advanced";
+import { Buffer } from "buffer/index.js";
+import { BytesFromEncoding } from "./advanced.js";
 
 export type Bytes = Uint8Array;
 export type BytesLike = string | Uint8Array | ArrayBuffer | number[];

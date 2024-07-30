@@ -1,5 +1,5 @@
 import { ccc } from "@ckb-ccc/core";
-import { ProviderDetail as EIP6963ProviderDetail } from "./eip6963.advanced";
+import { ProviderDetail as EIP6963ProviderDetail } from "./eip6963.advanced.js";
 
 /**
  * Class representing an EVM signer that extends SignerEvm from @ckb-ccc/core.

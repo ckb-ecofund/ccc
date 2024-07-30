@@ -1,4 +1,4 @@
-import { bytesFrom, BytesLike, bytesTo } from "../bytes";
+import { bytesFrom, BytesLike, bytesTo } from "../bytes/index.js";
 
 /**
  * Represents a hexadecimal string prefixed with "0x".

@@ -1,12 +1,12 @@
 import { ccc } from "@ckb-ccc/core";
 import { Aggregator } from "@joyid/ckb";
 import { DappRequestType, buildJoyIDURL } from "@joyid/common";
-import { createPopup } from "../common";
+import { createPopup } from "../common/index.js";
 import {
   Connection,
   ConnectionsRepo,
   ConnectionsRepoLocalStorage,
-} from "../connectionsStorage";
+} from "../connectionsStorage/index.js";
 
 /**
  * Class representing a CKB signer that extends Signer from @ckb-ccc/core.

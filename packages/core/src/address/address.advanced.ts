@@ -1,8 +1,8 @@
 import { bech32, bech32m } from "bech32";
-import { Script, hashTypeFromBytes } from "../ckb";
-import { Client, KnownScript } from "../client";
-import { hexFrom } from "../hex";
-import { type AddressLike } from "./index";
+import { Script, hashTypeFromBytes } from "../ckb/index.js";
+import { Client, KnownScript } from "../client/index.js";
+import { hexFrom } from "../hex/index.js";
+import { type AddressLike } from "./index.js";
 
 /**
  * Parses an address string into an address information object.

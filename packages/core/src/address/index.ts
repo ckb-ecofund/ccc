@@ -1,14 +1,14 @@
 import { bech32m } from "bech32";
-import { bytesConcat, bytesFrom } from "../bytes";
-import { Script, ScriptLike, hashTypeToBytes } from "../ckb";
-import { Client, KnownScript } from "../client";
-import { HexLike } from "../hex";
+import { bytesConcat, bytesFrom } from "../bytes/index.js";
+import { Script, ScriptLike, hashTypeToBytes } from "../ckb/index.js";
+import { Client, KnownScript } from "../client/index.js";
+import { HexLike } from "../hex/index.js";
 import {
   ADDRESS_BECH32_LIMIT,
   AddressFormat,
   addressFromPayload,
   addressPayloadFromString,
-} from "./address.advanced";
+} from "./address.advanced.js";
 
 export type AddressLike = {
   script: ScriptLike;

@@ -1,3 +1,3 @@
-export * from "./signerBtc";
-export * from "./signerBtcPublicKeyReadonly";
-export * from "./verify";
+export * from "./signerBtc.js";
+export * from "./signerBtcPublicKeyReadonly.js";
+export * from "./verify.js";

@@ -1,9 +1,9 @@
 import blake2b, { Blake2b } from "blake2b";
-import { BytesLike, bytesFrom } from "../bytes";
-import { CellInput, CellInputLike } from "../ckb";
-import { Hex } from "../hex";
-import { NumLike, numLeToBytes } from "../num";
-import { CKB_BLAKE2B_PERSONAL } from "./advanced";
+import { BytesLike, bytesFrom } from "../bytes/index.js";
+import { CellInput, CellInputLike } from "../ckb/index.js";
+import { Hex } from "../hex/index.js";
+import { NumLike, numLeToBytes } from "../num/index.js";
+import { CKB_BLAKE2B_PERSONAL } from "./advanced.js";
 
 export class Hasher {
   private readonly hasher: Blake2b;

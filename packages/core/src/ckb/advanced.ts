@@ -1,3 +1,3 @@
-export * as moleculeCodecCkb from "./molecule.advanced";
-export * from "./script.advanced";
-export * from "./transaction.advanced";
+export * as moleculeCodecCkb from "./molecule.advanced/index.js";
+export * from "./script.advanced.js";
+export * from "./transaction.advanced.js";

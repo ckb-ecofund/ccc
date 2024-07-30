@@ -1,6 +1,6 @@
 import { ccc } from "@ckb-ccc/core";
-import { Provider } from "./nip07.advanced";
-import { Signer } from "./signer";
+import { Provider } from "./nip07.advanced.js";
+import { Signer } from "./signer.js";
 
 export function getNip07Signer(client: ccc.Client): Signer | undefined {
   const windowRef = window as { nostr?: Provider };

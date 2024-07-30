@@ -1,2 +1,2 @@
-export * from "./barrel";
-export * as ccc from "./barrel";
+export * from "./barrel.js";
+export * as ccc from "./barrel.js";

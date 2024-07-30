@@ -1,10 +1,14 @@
 import type { TransactionSkeletonType } from "@ckb-lumos/helpers";
-import { ClientCollectableSearchKeyFilterLike } from "../advancedBarrel";
-import { Bytes, BytesLike, bytesFrom } from "../bytes";
-import { CellDepInfoLike, Client, KnownScript } from "../client";
-import { Zero, fixedPointFrom, fixedPointToString } from "../fixedPoint";
-import { Hasher, hashCkb } from "../hasher";
-import { Hex, HexLike, hexFrom } from "../hex";
+import { ClientCollectableSearchKeyFilterLike } from "../advancedBarrel.js";
+import { Bytes, BytesLike, bytesFrom } from "../bytes/index.js";
+import { CellDepInfoLike, Client, KnownScript } from "../client/index.js";
+import {
+  Zero,
+  fixedPointFrom,
+  fixedPointToString,
+} from "../fixedPoint/index.js";
+import { Hasher, hashCkb } from "../hasher/index.js";
+import { Hex, HexLike, hexFrom } from "../hex/index.js";
 import {
   Num,
   NumLike,
@@ -12,12 +16,12 @@ import {
   numFromBytes,
   numToBytes,
   numToHex,
-} from "../num";
-import { Signer } from "../signer";
-import { apply, reduceAsync } from "../utils";
-import * as mol from "./molecule.advanced";
-import { Script, ScriptLike } from "./script";
-import { DEP_TYPE_TO_NUM, NUM_TO_DEP_TYPE } from "./transaction.advanced";
+} from "../num/index.js";
+import { Signer } from "../signer/index.js";
+import { apply, reduceAsync } from "../utils/index.js";
+import * as mol from "./molecule.advanced/index.js";
+import { Script, ScriptLike } from "./script.js";
+import { DEP_TYPE_TO_NUM, NUM_TO_DEP_TYPE } from "./transaction.advanced.js";
 
 export type DepTypeLike = string | number | bigint;
 export type DepType = "depGroup" | "code";

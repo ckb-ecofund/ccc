@@ -1,8 +1,8 @@
 import { secp256k1 } from "@noble/curves/secp256k1";
-import { BytesLike, bytesFrom } from "../../bytes";
-import { hashCkb } from "../../hasher";
-import { Hex, hexFrom } from "../../hex";
-import { numFrom } from "../../num";
+import { BytesLike, bytesFrom } from "../../bytes/index.js";
+import { hashCkb } from "../../hasher/index.js";
+import { Hex, hexFrom } from "../../hex/index.js";
+import { numFrom } from "../../num/index.js";
 
 export function messageHashCkbSecp256k1(message: string | BytesLike): Hex {
   const msg = typeof message === "string" ? message : hexFrom(message);

@@ -1,6 +1,6 @@
 import { ccc } from "@ckb-ccc/core";
-import { AnnounceProviderEvent as EIP6963AnnounceProviderEvent } from "./eip6963.advanced";
-import { Signer as EIP6963Signer } from "./signer";
+import { AnnounceProviderEvent as EIP6963AnnounceProviderEvent } from "./eip6963.advanced.js";
+import { Signer as EIP6963Signer } from "./signer.js";
 
 /**
  * Class representing a factory for creating and managing Signer instances.

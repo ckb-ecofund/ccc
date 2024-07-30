@@ -1,2 +1,2 @@
-export * from "./common";
-export * from "./connectionsStorage";
+export * from "./common/index.js";
+export * from "./connectionsStorage/index.js";

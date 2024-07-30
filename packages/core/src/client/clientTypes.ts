@@ -1,12 +1,12 @@
-import { Cell, Script, Transaction } from "../ckb";
-import { Hex, hexFrom } from "../hex";
-import { Num, NumLike } from "../num";
-import { apply } from "../utils";
+import { Cell, Script, Transaction } from "../ckb/index.js";
+import { Hex, hexFrom } from "../hex/index.js";
+import { Num, NumLike } from "../num/index.js";
+import { apply } from "../utils/index.js";
 import {
   ClientCollectableSearchKeyFilterLike,
   ClientCollectableSearchKeyLike,
   clientSearchKeyRangeFrom,
-} from "./clientTypes.advanced";
+} from "./clientTypes.advanced.js";
 
 export type OutputsValidator = "passthrough" | "well_known_scripts_only";
 

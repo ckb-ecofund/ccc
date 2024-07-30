@@ -1,3 +1,3 @@
-export * from "./alwaysError";
-export * from "./dummy";
-export * from "./openLink";
+export * from "./alwaysError.js";
+export * from "./dummy.js";
+export * from "./openLink.js";

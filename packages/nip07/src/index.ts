@@ -1,1 +1,1 @@
-export * as Nip07 from "./barrel";
+export * as Nip07 from "./barrel.js";

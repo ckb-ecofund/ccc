@@ -1,5 +1,5 @@
-import { Bytes, BytesLike, bytesConcat, bytesFrom } from "../bytes";
-import { Hex, HexLike, hexFrom } from "../hex";
+import { Bytes, BytesLike, bytesConcat, bytesFrom } from "../bytes/index.js";
+import { Hex, HexLike, hexFrom } from "../hex/index.js";
 
 /**
  * Represents a numeric value as a bigint.
