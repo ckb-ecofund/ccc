@@ -1,0 +1,5 @@
+port: 8080
+
+server_mnemonic: zebra chalk pitch middle odor defense debris void blind emerge never fade
+hd_path_prefix: m/44'/309'/0'/0/
+fee_rate: 1000
