@@ -20,12 +20,17 @@ import {
   hashTypeFrom,
 } from "../../ckb";
 import { Hex } from "../../hex";
-import { NumLike, numToHex } from "../../num";
+import { NumLike, numFrom, numToHex } from "../../num";
 import { apply } from "../../utils";
 import {
   ClientFindCellsResponse,
+  ClientFindTransactionsGroupedResponse,
+  ClientFindTransactionsResponse,
   ClientIndexerSearchKey,
+  ClientIndexerSearchKeyFilter,
   ClientIndexerSearchKeyLike,
+  ClientIndexerSearchKeyTransaction,
+  ClientIndexerSearchKeyTransactionLike,
   ClientTransactionResponse,
   TransactionStatus,
 } from "../clientTypes";
@@ -35,7 +40,11 @@ import {
   JsonRpcCellOutput,
   JsonRpcDepType,
   JsonRpcHashType,
+  JsonRpcIndexerFindTransactionsGroupedResponse,
+  JsonRpcIndexerFindTransactionsResponse,
   JsonRpcIndexerSearchKey,
+  JsonRpcIndexerSearchKeyFilter,
+  JsonRpcIndexerSearchKeyTransaction,
   JsonRpcOutPoint,
   JsonRpcScript,
   JsonRpcTransaction,
@@ -175,6 +184,28 @@ export class JsonRpcTransformers {
   static rangeFrom([a, b]: [NumLike, NumLike]): [Hex, Hex] {
     return [numToHex(a), numToHex(b)];
   }
+  static indexerSearchKeyFilterFrom(
+    filter: ClientIndexerSearchKeyFilter,
+  ): JsonRpcIndexerSearchKeyFilter {
+    return {
+      script: apply(JsonRpcTransformers.scriptFrom, filter.script),
+      script_len_range: apply(
+        JsonRpcTransformers.rangeFrom,
+        filter.scriptLenRange,
+      ),
+      output_data: filter.outputData,
+      output_data_filter_mode: filter.outputDataSearchMode,
+      output_data_len_range: apply(
+        JsonRpcTransformers.rangeFrom,
+        filter.outputDataLenRange,
+      ),
+      output_capacity_range: apply(
+        JsonRpcTransformers.rangeFrom,
+        filter.outputCapacityRange,
+      ),
+      block_range: apply(JsonRpcTransformers.rangeFrom, filter.blockRange),
+    };
+  }
   static indexerSearchKeyFrom(
     keyLike: ClientIndexerSearchKeyLike,
   ): JsonRpcIndexerSearchKey {
@@ -183,27 +214,7 @@ export class JsonRpcTransformers {
       script: JsonRpcTransformers.scriptFrom(key.script),
       script_type: key.scriptType,
       script_search_mode: key.scriptSearchMode,
-      filter: apply(
-        (filter: NonNullable<ClientIndexerSearchKey["filter"]>) => ({
-          script: apply(JsonRpcTransformers.scriptFrom, filter.script),
-          script_len_range: apply(
-            JsonRpcTransformers.rangeFrom,
-            filter.scriptLenRange,
-          ),
-          output_data: filter.outputData,
-          output_data_filter_mode: filter.outputDataSearchMode,
-          output_data_len_range: apply(
-            JsonRpcTransformers.rangeFrom,
-            filter.outputDataLenRange,
-          ),
-          output_capacity_range: apply(
-            JsonRpcTransformers.rangeFrom,
-            filter.outputCapacityRange,
-          ),
-          block_range: apply(JsonRpcTransformers.rangeFrom, filter.blockRange),
-        }),
-        key.filter,
-      ),
+      filter: apply(JsonRpcTransformers.indexerSearchKeyFilterFrom, key.filter),
       with_data: key.withData,
     };
   }
@@ -227,6 +238,62 @@ export class JsonRpcTransformers {
           outputData: cell.output_data ?? "0x",
         }),
       ),
+    };
+  }
+  static indexerSearchKeyTransactionFrom(
+    keyLike: ClientIndexerSearchKeyTransactionLike,
+  ): JsonRpcIndexerSearchKeyTransaction {
+    const key = ClientIndexerSearchKeyTransaction.from(keyLike);
+    return {
+      script: JsonRpcTransformers.scriptFrom(key.script),
+      script_type: key.scriptType,
+      script_search_mode: key.scriptSearchMode,
+      filter: apply(JsonRpcTransformers.indexerSearchKeyFilterFrom, key.filter),
+      group_by_transaction: key.groupByTransaction,
+    };
+  }
+  static findTransactionsResponseTo({
+    last_cursor,
+    objects,
+  }:
+    | JsonRpcIndexerFindTransactionsResponse
+    | JsonRpcIndexerFindTransactionsGroupedResponse):
+    | ClientFindTransactionsResponse
+    | ClientFindTransactionsGroupedResponse {
+    if (objects.length === 0) {
+      return {
+        lastCursor: last_cursor,
+        transactions: [],
+      };
+    }
+    if ("io_index" in objects[0]) {
+      return {
+        lastCursor: last_cursor,
+        transactions: (
+          objects as JsonRpcIndexerFindTransactionsResponse["objects"]
+        ).map((tx) => ({
+          txHash: tx.tx_hash,
+          blockNumber: numFrom(tx.block_number),
+          txIndex: numFrom(tx.tx_index),
+          cellIndex: numFrom(tx.io_index),
+          isInput: tx.io_type === "input",
+        })),
+      };
+    }
+
+    return {
+      lastCursor: last_cursor,
+      transactions: (
+        objects as JsonRpcIndexerFindTransactionsGroupedResponse["objects"]
+      ).map((tx) => ({
+        txHash: tx.tx_hash,
+        blockNumber: numFrom(tx.block_number),
+        txIndex: numFrom(tx.tx_index),
+        cells: tx.cells.map(([type, i]) => ({
+          isInput: type === "input",
+          cellIndex: numFrom(i),
+        })),
+      })),
     };
   }
 }

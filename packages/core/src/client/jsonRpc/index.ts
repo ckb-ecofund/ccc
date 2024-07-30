@@ -121,6 +121,26 @@ export abstract class ClientJsonRpc extends Client {
   ) => Promise<ClientFindCellsResponse>;
 
   /**
+   * find transactions from node.
+   *
+   * @param key - The search key of transactions.
+   * @param order - The order of transactions.
+   * @param limit - The max return size of transactions.
+   * @param after - Pagination parameter.
+   * @returns The found transactions.
+   */
+
+  findTransactionsPaged = this.buildSender(
+    "get_transactions",
+    [
+      JsonRpcTransformers.indexerSearchKeyTransactionFrom,
+      (order) => order ?? "asc",
+      (limit) => numToHex(limit ?? 10),
+    ],
+    JsonRpcTransformers.findTransactionsResponseTo,
+  ) as Client["findTransactionsPaged"];
+
+  /**
    * get cells capacity from node.
    *
    * @param key - The search key of cells.

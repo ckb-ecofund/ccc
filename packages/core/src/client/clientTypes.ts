@@ -79,3 +79,57 @@ export type ClientFindCellsResponse = {
   lastCursor: string;
   cells: Cell[];
 };
+
+export type ClientIndexerSearchKeyTransactionLike = Omit<
+  ClientCollectableSearchKeyLike,
+  "withData"
+> & {
+  filter?: ClientIndexerSearchKeyFilterLike | null;
+  groupByTransaction?: boolean | null;
+};
+
+export class ClientIndexerSearchKeyTransaction {
+  constructor(
+    public script: Script,
+    public scriptType: "lock" | "type",
+    public scriptSearchMode: "prefix" | "exact" | "partial",
+    public filter: ClientIndexerSearchKeyFilter | undefined,
+    public groupByTransaction: boolean | undefined,
+  ) {}
+
+  static from(
+    keyLike: ClientIndexerSearchKeyTransactionLike,
+  ): ClientIndexerSearchKeyTransaction {
+    return new ClientIndexerSearchKeyTransaction(
+      Script.from(keyLike.script),
+      keyLike.scriptType,
+      keyLike.scriptSearchMode,
+      apply(ClientIndexerSearchKeyFilter.from, keyLike.filter),
+      keyLike.groupByTransaction ?? undefined,
+    );
+  }
+}
+
+export type ClientFindTransactionsResponse = {
+  lastCursor: string;
+  transactions: {
+    txHash: Hex;
+    blockNumber: Num;
+    txIndex: Num;
+    isInput: boolean;
+    cellIndex: Num;
+  }[];
+};
+
+export type ClientFindTransactionsGroupedResponse = {
+  lastCursor: string;
+  transactions: {
+    txHash: Hex;
+    blockNumber: Num;
+    txIndex: Num;
+    cells: {
+      isInput: boolean;
+      cellIndex: Num;
+    }[];
+  }[];
+};

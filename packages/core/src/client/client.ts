@@ -17,8 +17,11 @@ import { apply, reduceAsync } from "../utils";
 import { filterCell } from "./client.advanced";
 import {
   ClientFindCellsResponse,
+  ClientFindTransactionsGroupedResponse,
+  ClientFindTransactionsResponse,
   ClientIndexerSearchKey,
   ClientIndexerSearchKeyLike,
+  ClientIndexerSearchKeyTransactionLike,
   ClientTransactionResponse,
   OutputsValidator,
 } from "./clientTypes";
@@ -268,6 +271,172 @@ export abstract class Client {
           depType: cellDep.depType,
         });
       }),
+    );
+  }
+
+  abstract findTransactionsPaged(
+    key: Omit<ClientIndexerSearchKeyTransactionLike, "groupByTransaction"> & {
+      groupByTransaction: true;
+    },
+    order?: "asc" | "desc",
+    limit?: NumLike,
+    after?: string,
+  ): Promise<ClientFindTransactionsGroupedResponse>;
+  abstract findTransactionsPaged(
+    key: Omit<ClientIndexerSearchKeyTransactionLike, "groupByTransaction"> & {
+      groupByTransaction?: false | null;
+    },
+    order?: "asc" | "desc",
+    limit?: NumLike,
+    after?: string,
+  ): Promise<ClientFindTransactionsResponse>;
+  abstract findTransactionsPaged(
+    key: ClientIndexerSearchKeyTransactionLike,
+    order?: "asc" | "desc",
+    limit?: NumLike,
+    after?: string,
+  ): Promise<
+    ClientFindTransactionsResponse | ClientFindTransactionsGroupedResponse
+  >;
+
+  findTransactions(
+    key: Omit<ClientIndexerSearchKeyTransactionLike, "groupByTransaction"> & {
+      groupByTransaction: true;
+    },
+    order?: "asc" | "desc",
+    limit?: number,
+  ): AsyncGenerator<ClientFindTransactionsGroupedResponse["transactions"][0]>;
+  findTransactions(
+    key: Omit<ClientIndexerSearchKeyTransactionLike, "groupByTransaction"> & {
+      groupByTransaction?: false | null;
+    },
+    order?: "asc" | "desc",
+    limit?: number,
+  ): AsyncGenerator<ClientFindTransactionsResponse["transactions"][0]>;
+  findTransactions(
+    key: ClientIndexerSearchKeyTransactionLike,
+    order?: "asc" | "desc",
+    limit?: number,
+  ): AsyncGenerator<
+    | ClientFindTransactionsResponse["transactions"][0]
+    | ClientFindTransactionsGroupedResponse["transactions"][0]
+  >;
+  async *findTransactions(
+    key: ClientIndexerSearchKeyTransactionLike,
+    order?: "asc" | "desc",
+    limit = 10,
+  ): AsyncGenerator<
+    | ClientFindTransactionsResponse["transactions"][0]
+    | ClientFindTransactionsGroupedResponse["transactions"][0]
+  > {
+    let last: string | undefined = undefined;
+
+    while (true) {
+      const {
+        transactions,
+        lastCursor,
+      }:
+        | ClientFindTransactionsResponse
+        | ClientFindTransactionsGroupedResponse =
+        await this.findTransactionsPaged(key, order, limit, last);
+      for (const tx of transactions) {
+        yield tx;
+      }
+      if (transactions.length === 0 || transactions.length < limit) {
+        return;
+      }
+      last = lastCursor;
+    }
+  }
+
+  findTransactionsByLockAndType(
+    lock: ScriptLike,
+    type: ScriptLike,
+    groupByTransaction: true,
+    order?: "asc" | "desc",
+    limit?: number,
+  ): AsyncGenerator<ClientFindTransactionsGroupedResponse["transactions"][0]>;
+  findTransactionsByLockAndType(
+    lock: ScriptLike,
+    type: ScriptLike,
+    groupByTransaction?: false | null,
+    order?: "asc" | "desc",
+    limit?: number,
+  ): AsyncGenerator<ClientFindTransactionsResponse["transactions"][0]>;
+  findTransactionsByLockAndType(
+    lock: ScriptLike,
+    type: ScriptLike,
+    groupByTransaction?: boolean | null,
+    order?: "asc" | "desc",
+    limit?: number,
+  ): AsyncGenerator<
+    | ClientFindTransactionsResponse["transactions"][0]
+    | ClientFindTransactionsGroupedResponse["transactions"][0]
+  >;
+  findTransactionsByLockAndType(
+    lock: ScriptLike,
+    type: ScriptLike,
+    groupByTransaction?: boolean | null,
+    order?: "asc" | "desc",
+    limit = 10,
+  ): AsyncGenerator<
+    | ClientFindTransactionsResponse["transactions"][0]
+    | ClientFindTransactionsGroupedResponse["transactions"][0]
+  > {
+    return this.findTransactions(
+      {
+        script: lock,
+        scriptType: "lock",
+        scriptSearchMode: "exact",
+        filter: {
+          script: type,
+        },
+        groupByTransaction,
+      },
+      order,
+      limit,
+    );
+  }
+
+  findTransactionsByType(
+    type: ScriptLike,
+    groupByTransaction: true,
+    order?: "asc" | "desc",
+    limit?: number,
+  ): AsyncGenerator<ClientFindTransactionsGroupedResponse["transactions"][0]>;
+  findTransactionsByType(
+    type: ScriptLike,
+    groupByTransaction?: false | null,
+    order?: "asc" | "desc",
+    limit?: number,
+  ): AsyncGenerator<ClientFindTransactionsResponse["transactions"][0]>;
+  findTransactionsByType(
+    type: ScriptLike,
+    groupByTransaction?: boolean | null,
+    order?: "asc" | "desc",
+    limit?: number,
+  ): AsyncGenerator<
+    | ClientFindTransactionsResponse["transactions"][0]
+    | ClientFindTransactionsGroupedResponse["transactions"][0]
+  >;
+  findTransactionsByType(
+    type: ScriptLike,
+    groupByTransaction?: boolean | null,
+    order?: "asc" | "desc",
+    limit = 10,
+  ): AsyncGenerator<
+    | ClientFindTransactionsResponse["transactions"][0]
+    | ClientFindTransactionsGroupedResponse["transactions"][0]
+  > {
+    return this.findTransactions(
+      {
+        script: type,
+        scriptType: "type",
+        scriptSearchMode: "exact",
+        groupByTransaction,
+      },
+      order,
+      limit,
     );
   }
 
