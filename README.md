@@ -64,7 +64,8 @@ We have done everything! Check [the demo source code](./packages/demo) for compl
 
 We design CCC for both front-end and back-end developers. You need only one package to fulfil all your needs:
 
-- [NodeJS](https://www.npmjs.com/package/@ckb-ccc/ccc): `npm install @ckb-ccc/ccc`
+- [NodeJS](https://www.npmjs.com/package/@ckb-ccc/core): `npm install @ckb-ccc/core`
+- [Custom UI](https://www.npmjs.com/package/@ckb-ccc/ccc): `npm install @ckb-ccc/ccc`
 - [Web Component](https://www.npmjs.com/package/@ckb-ccc/connector): `npm install @ckb-ccc/connector`
 - [React](https://www.npmjs.com/package/@ckb-ccc/connector-react): `npm install @ckb-ccc/connector-react`
 
@@ -74,9 +75,17 @@ CCC exports everything on the `ccc` object:
 import { ccc } from "@ckb-ccc/<package-name>";
 ```
 
+## Who uses CCC?
+
+| [<img height="50" src="./assets/projects/utxoswap.svg" />](https://utxoswap.xyz/) | [<img height="50" src="./assets/projects/mobit.png" />](https://mobit.app/) | [<img height="50" src="./assets/projects/did.png" />](https://d.id/) | [<img height="50" src="./assets/projects/omiga.svg" />](https://omiga.io/) |
+| --------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | -------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+
+| [<img height="50" src="./assets/projects/nervape.svg" />](https://www.nervape.com/) | [<img height="50" src="./assets/projects/utxoglobal.svg" />](https://utxo.global/) | [<img height="50" src="./assets/projects/boolnetwork.svg" />](https://bool.network/) | [<img height="50" src="./assets/projects/joydao.svg" />](https://joydao.cc/) | [<img height="50" src="./assets/projects/world3.svg" />](https://world3.ai/) |
+| ----------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+
 ## FAQs
 
-### Property '*' does not exist on type 'typeof import("\*/@ckb-ccc/connector-react/dist/barrel")'.ts(2339)
+### Property '\*' does not exist on type 'typeof import("\*/@ckb-ccc/connector-react/dist/barrel")'.ts(2339)
 
 CCC uses JS's [Package Entry Points](https://nodejs.org/api/packages.html#packages_package_entry_points) feature to help tree shaking while exporting everything on the `ccc` object. Ensure in your `tsconfig.json`, `moduleResolution` is set to `node16`, `nodenext`, or `bundler`, and `resolvePackageJsonExports` is not disabled.
 
@@ -99,14 +108,6 @@ import { generateDefaultScriptInfos } from "@ckb-ccc/lumos-patches";
 // Before using Lumos. You don't need @ckb-lumos/joyid anymore.
 registerCustomLockScriptInfos(generateDefaultScriptInfos());
 ```
-
-## Who uses CCC?
-
-| [<img height="50" src="./assets/projects/utxoswap.svg" />](https://utxoswap.xyz/) | [<img height="50" src="./assets/projects/mobit.png" />](https://mobit.app/) | [<img height="50" src="./assets/projects/did.png" />](https://d.id/) | [<img height="50" src="./assets/projects/omiga.svg" />](https://omiga.io/) |
-| --------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | -------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-
-| [<img height="50" src="./assets/projects/nervape.svg" />](https://www.nervape.com/) | [<img height="50" src="./assets/projects/utxoglobal.svg" />](https://utxo.global/) | [<img height="50" src="./assets/projects/boolnetwork.svg" />](https://bool.network/) | [<img height="50" src="./assets/projects/joydao.svg" />](https://joydao.cc/) | [<img height="50" src="./assets/projects/world3.svg" />](https://world3.ai/) |
-| ----------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
 
 ## Links
 
