@@ -20,9 +20,9 @@ export class SignerCkbPrivateKey extends SignerCkbPublicKey {
     this.privateKey = pk;
   }
 
-  async signMessageRaw(message: string | BytesLike): Promise<Hex> {
+  async _signMessage(message: HexLike): Promise<Hex> {
     const signature = secp256k1.sign(
-      bytesFrom(messageHashCkbSecp256k1(message)),
+      bytesFrom(message),
       bytesFrom(this.privateKey),
     );
     const { r, s, recovery } = signature;
@@ -36,6 +36,10 @@ export class SignerCkbPrivateKey extends SignerCkbPublicKey {
     );
   }
 
+  async signMessageRaw(message: string | BytesLike): Promise<Hex> {
+    return this._signMessage(messageHashCkbSecp256k1(message));
+  }
+
   async signOnlyTransaction(txLike: TransactionLike): Promise<Transaction> {
     const tx = Transaction.from(txLike);
     const { script } = await this.getRecommendedAddressObj();
@@ -44,7 +48,7 @@ export class SignerCkbPrivateKey extends SignerCkbPublicKey {
       return tx;
     }
 
-    const signature = await this.signMessageRaw(info.message);
+    const signature = await this._signMessage(info.message);
 
     const witness = tx.getWitnessArgsAt(info.position) ?? WitnessArgs.from({});
     witness.lock = signature;
