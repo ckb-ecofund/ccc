@@ -1,16 +1,15 @@
 import { ccc, useCcc } from "@ckb-ccc/connector-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "../components/Button";
 import { TextInput } from "../components/Input";
-import * as bip39 from "@scure/bip39";
-import { wordlist } from "@scure/bip39/wordlists/english";
 import { HDKey } from "@scure/bip32";
 import { TabProps } from "../types";
+import { Textarea } from "../components/Textarea";
 
-export function Mnemonic({ sendMessage }: TabProps) {
+export function Keystore({ sendMessage }: TabProps) {
   const { client } = useCcc();
 
-  const [mnemonic, setMnemonic] = useState<string>("");
+  const [keystore, setKeystore] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [countStr, setCountStr] = useState<string>("10");
   const [accounts, setAccount] = useState<
@@ -21,12 +20,12 @@ export function Mnemonic({ sendMessage }: TabProps) {
       path: string;
     }[]
   >([]);
-  const isValid = useMemo(
-    () => bip39.validateMnemonic(mnemonic, wordlist),
-    [mnemonic],
-  );
+  const [hdKey, setHdKey] = useState<HDKey | undefined>(undefined);
 
-  useEffect(() => setAccount([]), [mnemonic]);
+  useEffect(() => {
+    setAccount([]);
+    setHdKey(undefined);
+  }, [keystore, password]);
 
   useEffect(() => {
     (async () => {
@@ -52,10 +51,10 @@ export function Mnemonic({ sendMessage }: TabProps) {
 
   return (
     <div className="mb-1 flex w-full flex-col items-center">
-      <TextInput
+      <Textarea
         className="mb-1 w-9/12"
-        placeholder="Mnemonic"
-        state={[mnemonic, setMnemonic]}
+        placeholder="Keystore"
+        state={[keystore, setKeystore]}
       />
       <TextInput
         className="mb-1 w-9/12"
@@ -69,18 +68,30 @@ export function Mnemonic({ sendMessage }: TabProps) {
       />
       <div className="flex">
         <Button
-          onClick={() => {
-            setMnemonic(bip39.generateMnemonic(wordlist));
+          onClick={async () => {
+            try {
+              const { privateKey, chainCode } = await ccc.keystoreDecrypt(
+                JSON.parse(keystore),
+                password,
+              );
+              console.log(privateKey, chainCode);
+              setHdKey(new HDKey({ privateKey, chainCode }));
+            } catch (err) {
+              console.log(err);
+              throw "Invalid";
+            }
+            sendMessage("Valid");
           }}
         >
-          Random Mnemonic
+          Verify Keystore
         </Button>
         <Button
           className="ml-2"
           onClick={async () => {
+            if (!hdKey) {
+              return;
+            }
             const count = parseInt(countStr, 10);
-            const seed = await bip39.mnemonicToSeed(mnemonic);
-            const hdKey = HDKey.fromMasterSeed(seed);
             setAccount([
               ...accounts,
               ...Array.from(new Array(count), (_, i) => {
@@ -95,28 +106,9 @@ export function Mnemonic({ sendMessage }: TabProps) {
               }),
             ]);
           }}
-          disabled={!isValid || Number.isNaN(parseInt(countStr, 10))}
+          disabled={!hdKey || Number.isNaN(parseInt(countStr, 10))}
         >
           More accounts
-        </Button>
-        <Button
-          className="ml-2"
-          onClick={async () => {
-            const seed = await bip39.mnemonicToSeed(mnemonic);
-            const hdKey = HDKey.fromMasterSeed(seed);
-            sendMessage(
-              JSON.stringify(
-                await ccc.keystoreEncrypt(
-                  hdKey.privateKey!,
-                  hdKey.chainCode!,
-                  password,
-                ),
-              ),
-            );
-          }}
-          disabled={!isValid}
-        >
-          To Keystore
         </Button>
       </div>
       {accounts.length !== 0 ? (

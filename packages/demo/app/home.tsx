@@ -21,6 +21,7 @@ import { Sign } from "./tabs/Sign";
 import { TextInput } from "./components/Input";
 import { Hash } from "./tabs/Hash";
 import { Mnemonic } from "./tabs/Mnemonic";
+import { Keystore } from "./tabs/Keystore";
 
 function WalletIcon({
   wallet,
@@ -142,10 +143,12 @@ export default function Home() {
             ["Issue xUDT (Type ID)", IssueXUdtTypeId],
             ["Hash", Hash],
             ["Mnemonic", Mnemonic],
+            ["Keystore", Keystore],
           ]
         : [
             ["Hash", Hash],
             ["Mnemonic", Mnemonic],
+            ["Keystore", Keystore],
           ],
     [signer],
   );
