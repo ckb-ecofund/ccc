@@ -1,6 +1,6 @@
-import { ScriptLike } from "../ckb";
-import { HexLike } from "../hex";
-import { Num, numFrom, NumLike } from "../num";
+import { ScriptLike } from "../ckb/index.js";
+import { HexLike } from "../hex/index.js";
+import { Num, numFrom, NumLike } from "../num/index.js";
 
 export function clientSearchKeyRangeFrom([a, b]: [NumLike, NumLike]): [
   Num,
@@ -10,17 +10,17 @@ export function clientSearchKeyRangeFrom([a, b]: [NumLike, NumLike]): [
 }
 
 export type ClientCollectableSearchKeyFilterLike = {
-  script?: ScriptLike;
-  scriptLenRange?: [NumLike, NumLike];
-  outputData?: HexLike;
-  outputDataSearchMode?: "prefix" | "exact" | "partial";
-  outputDataLenRange?: [NumLike, NumLike];
-  outputCapacityRange?: [NumLike, NumLike];
+  script?: ScriptLike | null;
+  scriptLenRange?: [NumLike, NumLike] | null;
+  outputData?: HexLike | null;
+  outputDataSearchMode?: "prefix" | "exact" | "partial" | null;
+  outputDataLenRange?: [NumLike, NumLike] | null;
+  outputCapacityRange?: [NumLike, NumLike] | null;
 };
 export type ClientCollectableSearchKeyLike = {
   script: ScriptLike;
   scriptType: "lock" | "type";
   scriptSearchMode: "prefix" | "exact" | "partial";
-  filter?: ClientCollectableSearchKeyFilterLike;
-  withData?: boolean;
+  filter?: ClientCollectableSearchKeyFilterLike | null;
+  withData?: boolean | null;
 };

@@ -1,1 +1,1 @@
-export * as UniSat from "./barrel";
+export * as UniSat from "./barrel.js";

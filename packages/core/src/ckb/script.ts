@@ -1,13 +1,13 @@
-import { Bytes, BytesLike, bytesFrom } from "../bytes";
-import { Client, KnownScript } from "../client";
-import { ckbHash } from "../hasher";
-import { Hex, HexLike, hexFrom } from "../hex";
-import * as mol from "./molecule.advanced";
+import { Bytes, BytesLike, bytesFrom } from "../bytes/index.js";
+import { Client, KnownScript } from "../client/index.js";
+import { hashCkb } from "../hasher/index.js";
+import { Hex, HexLike, hexFrom } from "../hex/index.js";
+import * as mol from "./molecule.advanced/index.js";
 import {
   HASH_TYPES,
   HASH_TYPE_TO_NUM,
   NUM_TO_HASH_TYPE,
-} from "./script.advanced";
+} from "./script.advanced.js";
 
 export type HashTypeLike = string | number | bigint;
 export type HashType = "type" | "data" | "data1" | "data2";
@@ -214,7 +214,7 @@ export class Script {
    * ```
    */
   hash(): Hex {
-    return ckbHash(this.toBytes());
+    return hashCkb(this.toBytes());
   }
 
   /**

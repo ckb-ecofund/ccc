@@ -1,11 +1,16 @@
-import { Address } from "../../address";
-import { BytesLike, bytesConcat, bytesFrom } from "../../bytes";
-import { Script, Transaction, TransactionLike, WitnessArgs } from "../../ckb";
-import { KnownScript } from "../../client";
-import { hexFrom } from "../../hex";
-import { numToBytes } from "../../num";
-import { reduceAsync } from "../../utils";
-import { Signer, SignerSignType, SignerType } from "../signer";
+import { Address } from "../../address/index.js";
+import { BytesLike, bytesConcat, bytesFrom } from "../../bytes/index.js";
+import {
+  Script,
+  Transaction,
+  TransactionLike,
+  WitnessArgs,
+} from "../../ckb/index.js";
+import { KnownScript } from "../../client/index.js";
+import { Hex, hexFrom } from "../../hex/index.js";
+import { numToBytes } from "../../num/index.js";
+import { reduceAsync } from "../../utils/index.js";
+import { Signer, SignerSignType, SignerType } from "../signer/index.js";
 
 /**
  * An abstract class extending Signer for Ethereum Virtual Machine (EVM) based signing operations.
@@ -25,7 +30,7 @@ export abstract class SignerEvm extends Signer {
    *
    * @returns A promise that resolves to a string representing the EVM account.
    */
-  abstract getEvmAccount(): Promise<string>;
+  abstract getEvmAccount(): Promise<Hex>;
 
   /**
    * Gets the internal address, which is the EVM account in this case.

@@ -1,6 +1,6 @@
-import { Client } from "../../client";
-import { SignerType } from "../signer";
-import { SignerDummy } from "./dummy";
+import { Client } from "../../client/index.js";
+import { SignerType } from "../signer/index.js";
+import { SignerDummy } from "./dummy.js";
 
 export class SignerOpenLink extends SignerDummy {
   constructor(

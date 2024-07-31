@@ -1,12 +1,12 @@
 import { ccc } from "@ckb-ccc/core";
 import { Aggregator } from "@joyid/ckb";
 import { DappRequestType, buildJoyIDURL } from "@joyid/common";
-import { createPopup } from "../common";
+import { createPopup } from "../common/index.js";
 import {
   Connection,
   ConnectionsRepo,
   ConnectionsRepoLocalStorage,
-} from "../connectionsStorage";
+} from "../connectionsStorage/index.js";
 
 /**
  * Class representing a CKB signer that extends Signer from @ckb-ccc/core.
@@ -69,7 +69,7 @@ export class CkbSigner extends ccc.Signer {
   /**
    * Gets the configuration for JoyID.
    * @private
-   * @returns {object} The configuration object.
+   * @returns The configuration object.
    */
   private getConfig() {
     return {
@@ -115,6 +115,13 @@ export class CkbSigner extends ccc.Signer {
       publicKey: ccc.hexFrom(res.pubkey),
       keyType: res.keyType,
     };
+    await this.saveConnection();
+  }
+
+  async disconnect(): Promise<void> {
+    await super.disconnect();
+
+    this.connection = undefined;
     await this.saveConnection();
   }
 
@@ -210,9 +217,9 @@ export class CkbSigner extends ccc.Signer {
       return [];
     }
 
-    const pubkeyHash = ccc.ckbHash(this.connection.publicKey).substring(0, 42);
+    const pubkeyHash = ccc.hashCkb(this.connection.publicKey).substring(0, 42);
     const lock = (await this.getAddressObj()).script;
-    const aggregator = new Aggregator(await this.getAggregatorUri());
+    const aggregator = new Aggregator(this.getAggregatorUri());
     const { unlock_entry: unlockEntry } =
       await aggregator.generateSubkeyUnlockSmt({
         alg_index: 1,

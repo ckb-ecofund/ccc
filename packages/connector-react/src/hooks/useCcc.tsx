@@ -1,5 +1,11 @@
 import { WebComponentConnector, ccc } from "@ckb-ccc/connector";
-import React, { createContext, useCallback, useMemo, useState } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { Connector } from "../components";
 
 const CCC_CONTEXT = createContext<
@@ -20,7 +26,8 @@ export function Provider({
   name,
   icon,
   signerFilter,
-  client: clientArg,
+  defaultClient,
+  preferredNetworks,
 }: {
   children: React.ReactNode;
   connectorProps?: React.HTMLAttributes<{}>;
@@ -30,7 +37,8 @@ export function Provider({
     signerInfo: ccc.SignerInfo,
     wallet: ccc.Wallet,
   ) => Promise<boolean>;
-  client?: ccc.Client;
+  defaultClient?: ccc.Client;
+  preferredNetworks?: ccc.NetworkPreference[];
 }) {
   const [ref, setRef] = useState<WebComponentConnector | null>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -53,6 +61,12 @@ export function Provider({
     [ref, ref?.setClient],
   );
 
+  useEffect(() => {
+    if (defaultClient) {
+      setClient(defaultClient);
+    }
+  }, [setClient]);
+
   return (
     <CCC_CONTEXT.Provider
       value={{
@@ -71,7 +85,8 @@ export function Provider({
         signerFilter={signerFilter}
         ref={setRef}
         onWillUpdate={() => setFlag((f) => f + 1)}
-        onClosed={() => setIsOpen(false)}
+        onClose={() => setIsOpen(false)}
+        preferredNetworks={preferredNetworks}
         {...{
           ...connectorProps,
           style: {
@@ -89,7 +104,6 @@ export function Provider({
               "--tip-color": "#666",
             } as React.CSSProperties),
           },
-          ...(clientArg ? { client: clientArg } : {}),
         }}
       />
       {children}

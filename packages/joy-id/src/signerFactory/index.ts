@@ -1,9 +1,9 @@
 import { ccc } from "@ckb-ccc/core";
 import { isStandaloneBrowser } from "@joyid/common";
-import { BitcoinSigner } from "../btc";
-import { CkbSigner } from "../ckb";
-import { EvmSigner } from "../evm";
-import { NostrSigner } from "../nostr";
+import { BitcoinSigner } from "../btc/index.js";
+import { CkbSigner } from "../ckb/index.js";
+import { EvmSigner } from "../evm/index.js";
+import { NostrSigner } from "../nostr/index.js";
 
 /**
  * Gets the JoyID signers based on the client, name, and icon.
@@ -18,6 +18,7 @@ export function getJoyIdSigners(
   client: ccc.Client,
   name: string,
   icon: string,
+  preferredNetworks: ccc.NetworkPreference[],
 ): ccc.SignerInfo[] {
   if (isStandaloneBrowser() || ccc.isWebview(window.navigator.userAgent)) {
     return [ccc.SignerType.CKB, ccc.SignerType.EVM, ccc.SignerType.BTC].map(
@@ -39,7 +40,7 @@ export function getJoyIdSigners(
     },
     {
       name: "BTC",
-      signer: new BitcoinSigner(client, name, icon),
+      signer: new BitcoinSigner(client, name, icon, preferredNetworks),
     },
     {
       name: "Nostr",
@@ -51,11 +52,17 @@ export function getJoyIdSigners(
     },
     {
       name: "BTC (P2WPKH)",
-      signer: new BitcoinSigner(client, name, icon, "p2wpkh"),
+      signer: new BitcoinSigner(
+        client,
+        name,
+        icon,
+        preferredNetworks,
+        "p2wpkh",
+      ),
     },
     {
       name: "BTC (P2TR)",
-      signer: new BitcoinSigner(client, name, icon, "p2tr"),
+      signer: new BitcoinSigner(client, name, icon, preferredNetworks, "p2tr"),
     },
   ];
 }

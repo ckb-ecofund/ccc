@@ -1,4 +1,4 @@
-import { type HashType } from "./script";
+import { type HashType } from "./script.js";
 
 export const HASH_TYPE_TO_NUM: Record<HashType, number> = {
   type: 0x01,

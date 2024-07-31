@@ -1,10 +1,14 @@
 import type { TransactionSkeletonType } from "@ckb-lumos/helpers";
-import { ClientCollectableSearchKeyFilterLike } from "../advancedBarrel";
-import { Bytes, BytesLike, bytesFrom } from "../bytes";
-import { CellDepInfoLike, Client, KnownScript } from "../client";
-import { Zero, fixedPointFrom } from "../fixedPoint";
-import { Hasher, ckbHash } from "../hasher";
-import { Hex, HexLike, hexFrom } from "../hex";
+import { ClientCollectableSearchKeyFilterLike } from "../advancedBarrel.js";
+import { Bytes, BytesLike, bytesFrom } from "../bytes/index.js";
+import { CellDepInfoLike, Client, KnownScript } from "../client/index.js";
+import {
+  Zero,
+  fixedPointFrom,
+  fixedPointToString,
+} from "../fixedPoint/index.js";
+import { Hasher, hashCkb } from "../hasher/index.js";
+import { Hex, HexLike, hexFrom } from "../hex/index.js";
 import {
   Num,
   NumLike,
@@ -12,12 +16,12 @@ import {
   numFromBytes,
   numToBytes,
   numToHex,
-} from "../num";
-import { Signer } from "../signer";
-import { apply, reduceAsync } from "../utils";
-import * as mol from "./molecule.advanced";
-import { Script, ScriptLike } from "./script";
-import { DEP_TYPE_TO_NUM, NUM_TO_DEP_TYPE } from "./transaction.advanced";
+} from "../num/index.js";
+import { Signer } from "../signer/index.js";
+import { apply, reduceAsync } from "../utils/index.js";
+import * as mol from "./molecule.advanced/index.js";
+import { Script, ScriptLike } from "./script.js";
+import { DEP_TYPE_TO_NUM, NUM_TO_DEP_TYPE } from "./transaction.advanced.js";
 
 export type DepTypeLike = string | number | bigint;
 export type DepType = "depGroup" | "code";
@@ -210,7 +214,7 @@ export class OutPoint {
 export type CellOutputLike = {
   capacity: NumLike;
   lock: ScriptLike;
-  type?: ScriptLike;
+  type?: ScriptLike | null;
 };
 export class CellOutput {
   /**
@@ -387,9 +391,9 @@ export class Cell {
 
 export type CellInputLike = {
   previousOutput: OutPointLike;
-  since?: NumLike;
-  cellOutput?: CellOutputLike;
-  outputData?: HexLike;
+  since?: NumLike | null;
+  cellOutput?: CellOutputLike | null;
+  outputData?: HexLike | null;
 };
 export class CellInput {
   /**
@@ -659,9 +663,9 @@ export class CellDep {
 }
 
 export type WitnessArgsLike = {
-  lock?: HexLike;
-  inputType?: HexLike;
-  outputType?: HexLike;
+  lock?: HexLike | null;
+  inputType?: HexLike | null;
+  outputType?: HexLike | null;
 };
 export class WitnessArgs {
   /**
@@ -771,14 +775,16 @@ export function udtBalanceFrom(dataLike: BytesLike) {
 }
 
 export type TransactionLike = {
-  version?: NumLike;
-  cellDeps?: CellDepLike[];
-  headerDeps?: HexLike[];
-  inputs?: CellInputLike[];
-  outputs?: (Omit<CellOutputLike, "capacity"> &
-    Partial<Pick<CellOutputLike, "capacity">>)[];
-  outputsData?: HexLike[];
-  witnesses?: HexLike[];
+  version?: NumLike | null;
+  cellDeps?: CellDepLike[] | null;
+  headerDeps?: HexLike[] | null;
+  inputs?: CellInputLike[] | null;
+  outputs?:
+    | (Omit<CellOutputLike, "capacity"> &
+        Partial<Pick<CellOutputLike, "capacity">>)[]
+    | null;
+  outputsData?: HexLike[] | null;
+  witnesses?: HexLike[] | null;
 };
 export class Transaction {
   /**
@@ -888,18 +894,18 @@ export class Transaction {
           ...output,
           capacity: output.capacity ?? 0,
         });
-        o.capacity = fixedPointFrom(
-          o.occupiedSize + (apply(bytesFrom, tx.outputsData?.[i])?.length ?? 0),
-        );
+        if (o.capacity === Zero) {
+          o.capacity = fixedPointFrom(
+            o.occupiedSize +
+              (apply(bytesFrom, tx.outputsData?.[i])?.length ?? 0),
+          );
+        }
         return o;
       }) ?? [];
     const outputsData = outputs.map((_, i) =>
       hexFrom(tx.outputsData?.[i] ?? "0x"),
     );
-    if (
-      tx.outputsData !== undefined &&
-      outputsData.length < tx.outputsData.length
-    ) {
+    if (tx.outputsData != null && outputsData.length < tx.outputsData.length) {
       outputsData.push(
         ...tx.outputsData.slice(outputsData.length).map((d) => hexFrom(d)),
       );
@@ -1023,7 +1029,7 @@ export class Transaction {
    */
 
   hash() {
-    return ckbHash(this.rawToBytes());
+    return hashCkb(this.rawToBytes());
   }
 
   /**
@@ -1071,9 +1077,10 @@ export class Transaction {
     hasher.update(this.hash());
 
     for (let i = 0; i < this.witnesses.length; i += 1) {
-      const input = await this.inputs[i];
-      await input.completeExtraInfos(client);
+      const input = this.inputs[i];
       if (input) {
+        await input.completeExtraInfos(client);
+
         if (!input.cellOutput) {
           throw new Error("Unable to complete input");
         }
@@ -1414,7 +1421,10 @@ export class Transaction {
       array: Cell[],
     ) => Promise<T | undefined> | T | undefined,
     init: T,
-  ): Promise<number> {
+  ): Promise<{
+    addedCount: number;
+    accumulated?: T;
+  }> {
     const scripts = (await from.getAddressObjs()).map(({ script }) => script);
     const collectedCells = [];
     let acc: T = init;
@@ -1449,13 +1459,18 @@ export class Transaction {
               }),
             ),
           );
-          return collectedCells.length;
+          return {
+            addedCount: collectedCells.length,
+          };
         }
         acc = next;
       }
     }
 
-    throw new Error("Failed to find enough cells for input");
+    return {
+      addedCount: collectedCells.length,
+      accumulated: acc,
+    };
   }
 
   async completeInputsByCapacity(
@@ -1470,7 +1485,7 @@ export class Transaction {
       return 0;
     }
 
-    return this.completeInputs(
+    const { addedCount, accumulated } = await this.completeInputs(
       from,
       filter ?? {
         scriptLenRange: [0, 1],
@@ -1478,10 +1493,35 @@ export class Transaction {
       },
       (acc, { cellOutput: { capacity } }) => {
         const sum = acc + capacity;
-        return sum > exceptedCapacity ? undefined : sum;
+        return sum >= exceptedCapacity ? undefined : sum;
       },
       inputsCapacity,
     );
+
+    if (accumulated === undefined) {
+      return addedCount;
+    }
+
+    throw new Error(
+      `Insufficient CKB, need ${fixedPointToString(exceptedCapacity - accumulated)} extra CKB`,
+    );
+  }
+
+  async completeInputsAll(
+    from: Signer,
+    filter?: ClientCollectableSearchKeyFilterLike,
+  ): Promise<number> {
+    const { addedCount } = await this.completeInputs(
+      from,
+      filter ?? {
+        scriptLenRange: [0, 1],
+        outputDataLenRange: [0, 1],
+      },
+      (acc, { cellOutput: { capacity } }) => acc + capacity,
+      Zero,
+    );
+
+    return addedCount;
   }
 
   async completeInputsByUdt(from: Signer, type: ScriptLike): Promise<number> {
@@ -1491,7 +1531,7 @@ export class Transaction {
       return 0;
     }
 
-    return this.completeInputs(
+    const { addedCount, accumulated } = await this.completeInputs(
       from,
       {
         script: type,
@@ -1500,9 +1540,17 @@ export class Transaction {
       (acc, { outputData }) => {
         const balance = udtBalanceFrom(outputData);
         const sum = acc + balance;
-        return sum > exceptedBalance ? undefined : sum;
+        return sum >= exceptedBalance ? undefined : sum;
       },
       inputsBalance,
+    );
+
+    if (accumulated === undefined) {
+      return addedCount;
+    }
+
+    throw new Error(
+      `Insufficient coin, need ${exceptedBalance - accumulated} extra coin`,
     );
   }
 
@@ -1520,17 +1568,31 @@ export class Transaction {
     // Complete all inputs extra infos for cache
     await this.getInputsCapacity(from.client);
 
-    let leastFee = this.estimateFee(feeRate);
+    let leastFee = Zero;
     let leastExtraCapacity = Zero;
 
     while (true) {
       const prepared = await from.prepareTransaction(this.clone());
-      const collected = await prepared.completeInputsByCapacity(
-        from,
-        leastFee + leastExtraCapacity,
-        filter,
-      );
+      const collected = await (async () => {
+        try {
+          return await prepared.completeInputsByCapacity(
+            from,
+            leastFee + leastExtraCapacity,
+            filter,
+          );
+        } catch (err) {
+          if (leastExtraCapacity !== Zero) {
+            throw new Error("Not enough capacity for the change cell");
+          }
 
+          throw err;
+        }
+      })();
+
+      if (leastFee === Zero) {
+        // The initial fee is calculated based on prepared transaction
+        leastFee = prepared.estimateFee(feeRate);
+      }
       const extraCapacity =
         (await prepared.getInputsCapacity(from.client)) -
         prepared.getOutputsCapacity();
@@ -1600,6 +1662,16 @@ export class Transaction {
       feeRate,
       filter,
     );
+  }
+
+  async completeFeeBy(
+    from: Signer,
+    feeRate: NumLike,
+    filter?: ClientCollectableSearchKeyFilterLike,
+  ): Promise<[number, boolean]> {
+    const { script } = await from.getRecommendedAddressObj();
+
+    return this.completeFeeChangeToLock(from, script, feeRate, filter);
   }
 
   completeFeeChangeToOutput(

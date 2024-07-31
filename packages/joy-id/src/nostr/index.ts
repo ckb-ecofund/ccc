@@ -1,11 +1,11 @@
 import { ccc } from "@ckb-ccc/core";
 import { DappRequestType, buildJoyIDURL } from "@joyid/common";
-import { createPopup } from "../common";
+import { createPopup } from "../common/index.js";
 import {
   Connection,
   ConnectionsRepo,
   ConnectionsRepoLocalStorage,
-} from "../connectionsStorage";
+} from "../connectionsStorage/index.js";
 
 /**
  * Class representing a Nostr signer that extends SignerNostr from @ckb-ccc/core.
@@ -31,31 +31,20 @@ export class NostrSigner extends ccc.SignerNostr {
 
   /**
    * Creates an instance of NostrSigner.
-   * @param {ccc.Client} client - The client instance.
-   * @param {string} name - The name of the signer.
-   * @param {string} icon - The icon URL of the signer.
-   * @param {string} [appUri="https://app.joy.id"] - The application URI.
-   * @param {ConnectionsRepo} [connectionsRepo=new ConnectionsRepoLocalStorage()] - The connections repository.
+   * @param client - The client instance.
+   * @param name - The name of the signer.
+   * @param icon - The icon URL of the signer.
+   * @param appUri - The application URI.
+   * @param connectionsRepo - The connections repository.
    */
   constructor(
     client: ccc.Client,
     private readonly name: string,
     private readonly icon: string,
-    private readonly appUri = "https://app.joy.id",
+    private readonly _appUri?: string,
     private readonly connectionsRepo: ConnectionsRepo = new ConnectionsRepoLocalStorage(),
   ) {
     super(client);
-  }
-
-  static isValidClient(client: ccc.Client): boolean {
-    return client.addressPrefix === "ckt";
-  }
-
-  async replaceClient(client: ccc.Client): Promise<boolean> {
-    if (!NostrSigner.isValidClient(client)) {
-      return false;
-    }
-    return super.replaceClient(client);
   }
 
   /**
@@ -66,7 +55,10 @@ export class NostrSigner extends ccc.SignerNostr {
   private getConfig() {
     return {
       redirectURL: location.href,
-      joyidAppURL: this.appUri,
+      joyidAppURL:
+        this._appUri ?? this.client.addressPrefix === "ckb"
+          ? "https://app.joy.id"
+          : "https://testnet.joyid.dev",
       requestNetwork: "nostr",
       name: this.name,
       logo: this.icon,
@@ -89,10 +81,14 @@ export class NostrSigner extends ccc.SignerNostr {
       publicKey: ccc.hexFrom(res.nostrPubkey),
       keyType: res.keyType,
     };
-    await this.connectionsRepo.set(
-      { uri: this.appUri, addressType: "nostr" },
-      this.connection,
-    );
+    await this.saveConnection();
+  }
+
+  async disconnect(): Promise<void> {
+    await super.disconnect();
+
+    this.connection = undefined;
+    await this.saveConnection();
   }
 
   /**
@@ -104,19 +100,12 @@ export class NostrSigner extends ccc.SignerNostr {
       return true;
     }
 
-    this.connection = await this.connectionsRepo.get({
-      uri: this.appUri,
-      addressType: "nostr",
-    });
+    await this.restoreConnection();
     return this.connection !== undefined;
   }
 
   async getNostrPublicKey(): Promise<ccc.Hex> {
-    if (!this.connection) {
-      throw new Error("Not connected");
-    }
-
-    return this.connection.publicKey;
+    return this.assertConnection().publicKey;
   }
 
   async signNostrEvent(
@@ -131,5 +120,32 @@ export class NostrSigner extends ccc.SignerNostr {
       },
     );
     return res.event;
+  }
+
+  /**
+   * Saves the current connection.
+   * @private
+   * @returns {Promise<void>}
+   */
+  private async saveConnection(): Promise<void> {
+    return this.connectionsRepo.set(
+      {
+        uri: this.getConfig().joyidAppURL,
+        addressType: "nostr",
+      },
+      this.connection,
+    );
+  }
+
+  /**
+   * Restores the previous connection.
+   * @private
+   * @returns {Promise<void>}
+   */
+  private async restoreConnection(): Promise<void> {
+    this.connection = await this.connectionsRepo.get({
+      uri: this.getConfig().joyidAppURL,
+      addressType: "nostr",
+    });
   }
 }

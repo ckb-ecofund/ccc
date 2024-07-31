@@ -1,5 +1,5 @@
 import { ccc } from "@ckb-ccc/core";
-import { Provider } from "./advancedBarrel";
+import { Provider } from "./advancedBarrel.js";
 
 /**
  * Class representing a Bitcoin signer that extends SignerBtc from @ckb-ccc/core.
@@ -15,8 +15,76 @@ export class Signer extends ccc.SignerBtc {
   constructor(
     client: ccc.Client,
     public readonly provider: Provider,
+    private readonly preferredNetworks: ccc.NetworkPreference[] = [
+      {
+        addressPrefix: "ckb",
+        signerType: ccc.SignerType.BTC,
+        network: "btc",
+      },
+      {
+        addressPrefix: "ckt",
+        signerType: ccc.SignerType.BTC,
+        network: "btcTestnet",
+      },
+    ],
   ) {
     super(client);
+  }
+
+  async _getNetworkToChange(): Promise<string | undefined> {
+    const currentNetwork = await (async () => {
+      if (this.provider.getChain) {
+        return (
+          {
+            BITCOIN_MAINNET: "btc",
+            BITCOIN_TESTNET: "btcTestnet",
+            FRACTAL_BITCOIN_MAINNET: "fractalBtc",
+          }[(await this.provider.getChain()).enum] ?? ""
+        );
+      }
+      return (await this.provider.getNetwork()) === "livenet"
+        ? "btc"
+        : "btcTestnet";
+    })();
+    const { network } = this.matchNetworkPreference(
+      this.preferredNetworks,
+      currentNetwork,
+    ) ?? { network: currentNetwork };
+    if (network === currentNetwork) {
+      return;
+    }
+
+    return network;
+  }
+
+  /**
+   * Ensure the BTC network is the same as CKB network.
+   */
+  async ensureNetwork(): Promise<void> {
+    const network = await this._getNetworkToChange();
+    if (!network) {
+      return;
+    }
+    if (this.provider.switchChain) {
+      const chain = {
+        btc: "BITCOIN_MAINNET",
+        btcTestnet: "BITCOIN_TESTNET",
+        fractalBtc: "FRACTAL_BITCOIN_MAINNET",
+      }[network];
+      if (chain) {
+        await this.provider.switchChain(chain);
+        return;
+      }
+    } else if (network === "btc" || network === "btcTestnet") {
+      await this.provider.switchNetwork(
+        network === "btc" ? "livenet" : "testnet",
+      );
+      return;
+    }
+
+    throw new Error(
+      `UniSat wallet doesn't support the requested chain ${network}`,
+    );
   }
 
   /**
@@ -41,6 +109,24 @@ export class Signer extends ccc.SignerBtc {
    */
   async connect(): Promise<void> {
     await this.provider.requestAccounts();
+    await this.ensureNetwork();
+  }
+
+  onReplaced(listener: () => void): () => void {
+    const stop: (() => void)[] = [];
+    const replacer = async () => {
+      listener();
+      stop[0]?.();
+    };
+    stop.push(() => {
+      this.provider.removeListener("accountsChanged", replacer);
+      this.provider.removeListener("networkChanged", replacer);
+    });
+
+    this.provider.on("accountsChanged", replacer);
+    this.provider.on("networkChanged", replacer);
+
+    return stop[0];
   }
 
   /**
@@ -48,6 +134,9 @@ export class Signer extends ccc.SignerBtc {
    * @returns {Promise<boolean>} A promise that resolves to true if connected, false otherwise.
    */
   async isConnected(): Promise<boolean> {
+    if (await this._getNetworkToChange()) {
+      return false;
+    }
     return (await this.provider.getAccounts()).length !== 0;
   }
 

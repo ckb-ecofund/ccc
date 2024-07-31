@@ -1,7 +1,7 @@
 import { secp256k1 } from "@noble/curves/secp256k1";
 import { magicHash } from "bitcoinjs-message";
-import { BytesLike, bytesFrom } from "../../bytes";
-import { hexFrom } from "../../hex";
+import { BytesLike, bytesFrom } from "../../bytes/index.js";
+import { hexFrom } from "../../hex/index.js";
 
 export function verifyMessageBtcEcdsa(
   message: string | BytesLike,

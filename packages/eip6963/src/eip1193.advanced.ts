@@ -36,19 +36,19 @@ export interface Provider {
 export interface RequestMethod {
   /**
    * Signs a message with the personal account.
-   * @param {object} request - The request object.
-   * @param {"personal_sign"} request.method - The method name.
-   * @param {[string, Hex]} request.params - The method parameters.
-   * @returns {Promise<Hex>} A promise that resolves to the signed message.
+   * @param request - The request object.
+   * @param request.method - The method name.
+   * @param request.params - The method parameters.
+   * @returns A promise that resolves to the signed message.
    */
   (request: { method: "personal_sign"; params: [string, Hex] }): Promise<Hex>;
 
   /**
    * Requests the accounts from the provider.
-   * @param {object} request - The request object.
-   * @param {"eth_requestAccounts"} request.method - The method name.
-   * @param {undefined} [request.params] - The optional method parameters.
-   * @returns {Promise<Hex[]>} A promise that resolves to an array of account addresses.
+   * @param request - The request object.
+   * @param request.method - The method name.
+   * @param request.params - The optional method parameters.
+   * @returns A promise that resolves to an array of account addresses.
    */
   (request: {
     method: "eth_requestAccounts";
@@ -57,19 +57,19 @@ export interface RequestMethod {
 
   /**
    * Gets the accounts from the provider.
-   * @param {object} request - The request object.
-   * @param {"eth_accounts"} request.method - The method name.
-   * @param {undefined} [request.params] - The optional method parameters.
-   * @returns {Promise<Hex[]>} A promise that resolves to an array of account addresses.
+   * @param request - The request object.
+   * @param request.method - The method name.
+   * @param request.params - The optional method parameters.
+   * @returns A promise that resolves to an array of account addresses.
    */
   (request: { method: "eth_accounts"; params?: undefined }): Promise<Hex[]>;
 
   /**
    * Sends a generic request to the provider.
-   * @param {object} request - The request object.
-   * @param {string} request.method - The method name.
-   * @param {Array<unknown> | Record<string, unknown>} [request.params] - The optional method parameters.
-   * @returns {Promise<unknown>} A promise that resolves to the response from the provider.
+   * @param request - The request object.
+   * @param request.method - The method name.
+   * @param request.params - The optional method parameters.
+   * @returns A promise that resolves to the response from the provider.
    */
   (request: {
     method: string;
@@ -84,9 +84,9 @@ export interface RequestMethod {
 export interface OnMethod {
   /**
    * Adds an event listener to the provider.
-   * @param {string} eventName - The name of the event.
-   * @param {(...args: unknown[]) => unknown} listener - The listener function.
-   * @returns {Provider} The provider instance.
+   * @param eventName - The name of the event.
+   * @param listener - The listener function.
+   * @returns The provider instance.
    */
   (eventName: string, listener: (...args: unknown[]) => unknown): Provider;
 }

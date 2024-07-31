@@ -1,1 +1,1 @@
-export * as Okx from "./barrel";
+export * as Okx from "./barrel.js";

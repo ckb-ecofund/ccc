@@ -1,11 +1,11 @@
 import { ccc } from "@ckb-ccc/core";
 import { DappRequestType, buildJoyIDURL } from "@joyid/common";
-import { createPopup } from "../common";
+import { createPopup } from "../common/index.js";
 import {
   Connection,
   ConnectionsRepo,
   ConnectionsRepoLocalStorage,
-} from "../connectionsStorage";
+} from "../connectionsStorage/index.js";
 
 /**
  * Class representing a Bitcoin signer that extends SignerBtc from @ckb-ccc/core.
@@ -14,6 +14,7 @@ import {
  */
 export class BitcoinSigner extends ccc.SignerBtc {
   private connection?: Connection;
+  private network = "btcTestnet";
 
   /**
    * Ensures that the signer is connected and returns the connection.
@@ -31,19 +32,31 @@ export class BitcoinSigner extends ccc.SignerBtc {
 
   /**
    * Creates an instance of BitcoinSigner.
-   * @param {ccc.Client} client - The client instance.
-   * @param {string} name - The name of the signer.
-   * @param {string} icon - The icon URL of the signer.
-   * @param {"auto" | "p2wpkh" | "p2tr"} [addressType="auto"] - The address type.
-   * @param {string} [appUri="https://app.joy.id"] - The application URI.
-   * @param {ConnectionsRepo} [connectionsRepo=new ConnectionsRepoLocalStorage()] - The connections repository.
+   * @param client - The client instance.
+   * @param name - The name of the signer.
+   * @param icon - The icon URL of the signer.
+   * @param addressType - The address type.
+   * @param _appUri - The application URI.
+   * @param connectionsRepo - The connections repository.
    */
   constructor(
     client: ccc.Client,
-    private readonly name: string,
-    private readonly icon: string,
-    private readonly addressType: "auto" | "p2wpkh" | "p2tr" = "auto",
-    private readonly appUri = "https://app.joy.id",
+    public readonly name: string,
+    public readonly icon: string,
+    private readonly preferredNetworks: ccc.NetworkPreference[] = [
+      {
+        addressPrefix: "ckb",
+        signerType: ccc.SignerType.BTC,
+        network: "btc",
+      },
+      {
+        addressPrefix: "ckt",
+        signerType: ccc.SignerType.BTC,
+        network: "btcTestnet",
+      },
+    ],
+    public readonly addressType: "auto" | "p2wpkh" | "p2tr" = "auto",
+    private readonly _appUri?: string,
     private readonly connectionsRepo: ConnectionsRepo = new ConnectionsRepoLocalStorage(),
   ) {
     super(client);
@@ -52,16 +65,44 @@ export class BitcoinSigner extends ccc.SignerBtc {
   /**
    * Gets the configuration for JoyID.
    * @private
-   * @returns {object} The configuration object.
+   * @returns The configuration object.
    */
   private getConfig() {
+    const { network } = this.matchNetworkPreference(
+      this.preferredNetworks,
+      this.network,
+    ) ?? { network: this.network };
+    if (this.network !== network) {
+      this.connection = undefined;
+    }
+    this.network = network;
+
+    const url = {
+      btc: "https://app.joy.id",
+      btcTestnet: "https://testnet.joyid.dev",
+    }[network];
+    if (!url) {
+      throw new Error(
+        `JoyID wallet doesn't support the requested chain ${this.network}`,
+      );
+    }
+
     return {
       redirectURL: location.href,
-      joyidAppURL: this.appUri,
+      joyidAppURL: this._appUri ?? url,
       requestNetwork: `btc-${this.addressType}`,
       name: this.name,
       logo: this.icon,
     };
+  }
+
+  async disconnect(): Promise<void> {
+    await super.disconnect();
+
+    await this.connectionsRepo.set(
+      { uri: this.getConfig().joyidAppURL, addressType: "btc" },
+      undefined,
+    );
   }
 
   /**
@@ -107,11 +148,11 @@ export class BitcoinSigner extends ccc.SignerBtc {
     };
     await Promise.all([
       this.connectionsRepo.set(
-        { uri: this.appUri, addressType: `btc-${res.btcAddressType}` },
+        { uri: config.joyidAppURL, addressType: `btc-${res.btcAddressType}` },
         this.connection,
       ),
       this.connectionsRepo.set(
-        { uri: this.appUri, addressType: "btc-auto" },
+        { uri: config.joyidAppURL, addressType: "btc-auto" },
         this.connection,
       ),
     ]);
@@ -127,7 +168,7 @@ export class BitcoinSigner extends ccc.SignerBtc {
     }
 
     this.connection = await this.connectionsRepo.get({
-      uri: this.appUri,
+      uri: this.getConfig().joyidAppURL,
       addressType: `btc-${this.addressType}`,
     });
     return this.connection !== undefined;

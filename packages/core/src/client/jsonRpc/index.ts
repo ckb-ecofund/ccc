@@ -1,15 +1,15 @@
 import fetch from "cross-fetch";
-import { TransactionLike } from "../../ckb";
-import { Hex, HexLike, hexFrom } from "../../hex";
-import { Num, NumLike, numFrom, numToHex } from "../../num";
-import { Client } from "../client";
+import { TransactionLike } from "../../ckb/index.js";
+import { Hex, HexLike, hexFrom } from "../../hex/index.js";
+import { Num, NumLike, numFrom, numToHex } from "../../num/index.js";
+import { Client } from "../client.js";
 import {
   ClientFindCellsResponse,
   ClientIndexerSearchKeyLike,
   ClientTransactionResponse,
   OutputsValidator,
-} from "../clientTypes";
-import { JsonRpcPayload, JsonRpcTransformers } from "./advanced";
+} from "../clientTypes.js";
+import { JsonRpcPayload, JsonRpcTransformers } from "./advanced.js";
 
 /**
  * Applies a transformation function to a value if the transformer is provided.
@@ -119,6 +119,26 @@ export abstract class ClientJsonRpc extends Client {
     limit?: NumLike,
     after?: string,
   ) => Promise<ClientFindCellsResponse>;
+
+  /**
+   * find transactions from node.
+   *
+   * @param key - The search key of transactions.
+   * @param order - The order of transactions.
+   * @param limit - The max return size of transactions.
+   * @param after - Pagination parameter.
+   * @returns The found transactions.
+   */
+
+  findTransactionsPaged = this.buildSender(
+    "get_transactions",
+    [
+      JsonRpcTransformers.indexerSearchKeyTransactionFrom,
+      (order) => order ?? "asc",
+      (limit) => numToHex(limit ?? 10),
+    ],
+    JsonRpcTransformers.findTransactionsResponseTo,
+  ) as Client["findTransactionsPaged"];
 
   /**
    * get cells capacity from node.

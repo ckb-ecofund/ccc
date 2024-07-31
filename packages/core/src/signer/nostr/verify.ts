@@ -1,9 +1,9 @@
 import { schnorr } from "@noble/curves/secp256k1";
 import { sha256 } from "@noble/hashes/sha256";
 import { bech32 } from "bech32";
-import { BytesLike, bytesFrom } from "../../bytes";
-import { hexFrom } from "../../hex";
-import { NostrEvent } from "./signerNostr";
+import { BytesLike, bytesFrom } from "../../bytes/index.js";
+import { hexFrom } from "../../hex/index.js";
+import { NostrEvent } from "./signerNostr.js";
 
 export function buildNostrEventFromMessage(
   message: string | BytesLike,

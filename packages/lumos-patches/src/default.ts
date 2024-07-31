@@ -13,7 +13,7 @@ import { bytes } from "@ckb-lumos/codec";
 import { FromInfo, parseFromInfo } from "@ckb-lumos/common-scripts";
 import { addCellDep } from "@ckb-lumos/common-scripts/lib/helper";
 import { Config, getConfig } from "@ckb-lumos/config-manager";
-import { asserts } from "./utils";
+import { asserts } from "./utils.js";
 
 /**
  * Generates a class for collecting custom script cells.

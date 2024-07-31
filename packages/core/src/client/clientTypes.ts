@@ -1,12 +1,12 @@
-import { Cell, Script, Transaction } from "../ckb";
-import { Hex, hexFrom } from "../hex";
-import { Num, NumLike } from "../num";
-import { apply } from "../utils";
+import { Cell, Script, Transaction } from "../ckb/index.js";
+import { Hex, hexFrom } from "../hex/index.js";
+import { Num, NumLike } from "../num/index.js";
+import { apply } from "../utils/index.js";
 import {
   ClientCollectableSearchKeyFilterLike,
   ClientCollectableSearchKeyLike,
   clientSearchKeyRangeFrom,
-} from "./clientTypes.advanced";
+} from "./clientTypes.advanced.js";
 
 export type OutputsValidator = "passthrough" | "well_known_scripts_only";
 
@@ -23,7 +23,7 @@ export type ClientTransactionResponse = {
 
 export type ClientIndexerSearchKeyFilterLike =
   ClientCollectableSearchKeyFilterLike & {
-    blockRange?: [NumLike, NumLike];
+    blockRange?: [NumLike, NumLike] | null;
   };
 export class ClientIndexerSearchKeyFilter {
   constructor(
@@ -43,7 +43,7 @@ export class ClientIndexerSearchKeyFilter {
       apply(Script.from, filterLike.script),
       apply(clientSearchKeyRangeFrom, filterLike.scriptLenRange),
       apply(hexFrom, filterLike.outputData),
-      filterLike.outputDataSearchMode,
+      filterLike.outputDataSearchMode ?? undefined,
       apply(clientSearchKeyRangeFrom, filterLike.outputDataLenRange),
       apply(clientSearchKeyRangeFrom, filterLike.outputCapacityRange),
       apply(clientSearchKeyRangeFrom, filterLike.blockRange),
@@ -52,7 +52,7 @@ export class ClientIndexerSearchKeyFilter {
 }
 
 export type ClientIndexerSearchKeyLike = ClientCollectableSearchKeyLike & {
-  filter?: ClientIndexerSearchKeyFilterLike;
+  filter?: ClientIndexerSearchKeyFilterLike | null;
 };
 
 export class ClientIndexerSearchKey {
@@ -70,7 +70,7 @@ export class ClientIndexerSearchKey {
       keyLike.scriptType,
       keyLike.scriptSearchMode,
       apply(ClientIndexerSearchKeyFilter.from, keyLike.filter),
-      keyLike.withData,
+      keyLike.withData ?? undefined,
     );
   }
 }
@@ -78,4 +78,58 @@ export class ClientIndexerSearchKey {
 export type ClientFindCellsResponse = {
   lastCursor: string;
   cells: Cell[];
+};
+
+export type ClientIndexerSearchKeyTransactionLike = Omit<
+  ClientCollectableSearchKeyLike,
+  "withData"
+> & {
+  filter?: ClientIndexerSearchKeyFilterLike | null;
+  groupByTransaction?: boolean | null;
+};
+
+export class ClientIndexerSearchKeyTransaction {
+  constructor(
+    public script: Script,
+    public scriptType: "lock" | "type",
+    public scriptSearchMode: "prefix" | "exact" | "partial",
+    public filter: ClientIndexerSearchKeyFilter | undefined,
+    public groupByTransaction: boolean | undefined,
+  ) {}
+
+  static from(
+    keyLike: ClientIndexerSearchKeyTransactionLike,
+  ): ClientIndexerSearchKeyTransaction {
+    return new ClientIndexerSearchKeyTransaction(
+      Script.from(keyLike.script),
+      keyLike.scriptType,
+      keyLike.scriptSearchMode,
+      apply(ClientIndexerSearchKeyFilter.from, keyLike.filter),
+      keyLike.groupByTransaction ?? undefined,
+    );
+  }
+}
+
+export type ClientFindTransactionsResponse = {
+  lastCursor: string;
+  transactions: {
+    txHash: Hex;
+    blockNumber: Num;
+    txIndex: Num;
+    isInput: boolean;
+    cellIndex: Num;
+  }[];
+};
+
+export type ClientFindTransactionsGroupedResponse = {
+  lastCursor: string;
+  transactions: {
+    txHash: Hex;
+    blockNumber: Num;
+    txIndex: Num;
+    cells: {
+      isInput: boolean;
+      cellIndex: Num;
+    }[];
+  }[];
 };

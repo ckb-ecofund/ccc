@@ -1,4 +1,4 @@
-export * from "./generated";
+export * from "./generated.js";
 
 export function molOptional<T>(mol: {
   hasValue: () => boolean;

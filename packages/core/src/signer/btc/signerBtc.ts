@@ -1,12 +1,12 @@
 import { ripemd160 } from "@noble/hashes/ripemd160";
 import { sha256 } from "@noble/hashes/sha256";
-import { Address } from "../../address";
-import { bytesConcat, bytesFrom } from "../../bytes";
-import { Transaction, TransactionLike, WitnessArgs } from "../../ckb";
-import { KnownScript } from "../../client";
-import { HexLike, hexFrom } from "../../hex";
-import { numToBytes } from "../../num";
-import { Signer, SignerSignType, SignerType } from "../signer";
+import { Address } from "../../address/index.js";
+import { bytesConcat, bytesFrom } from "../../bytes/index.js";
+import { Transaction, TransactionLike, WitnessArgs } from "../../ckb/index.js";
+import { KnownScript } from "../../client/index.js";
+import { HexLike, hexFrom } from "../../hex/index.js";
+import { numToBytes } from "../../num/index.js";
+import { Signer, SignerSignType, SignerType } from "../signer/index.js";
 
 /**
  * An abstract class extending the Signer class for Bitcoin-like signing operations.

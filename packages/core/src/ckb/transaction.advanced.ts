@@ -1,4 +1,4 @@
-import { type DepType } from "./transaction";
+import { type DepType } from "./transaction.js";
 
 export const DEP_TYPE_TO_NUM: Record<DepType, number> = {
   code: 0x00,

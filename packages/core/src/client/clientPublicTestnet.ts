@@ -1,10 +1,10 @@
-import { Script } from "../ckb";
-import { CellDepInfo, KnownScript } from "./client";
-import { TESTNET_SCRIPTS } from "./clientPublicTestnet.advanced";
-import { ClientJsonRpc } from "./jsonRpc";
+import { Script } from "../ckb/index.js";
+import { CellDepInfo, KnownScript } from "./client.js";
+import { TESTNET_SCRIPTS } from "./clientPublicTestnet.advanced.js";
+import { ClientJsonRpc } from "./jsonRpc/index.js";
 
 export class ClientPublicTestnet extends ClientJsonRpc {
-  constructor(url = "https://testnet.ckbapp.dev/", timeout?: number) {
+  constructor(url = "https://testnet.ckb.dev/", timeout?: number) {
     super(url, timeout);
   }
 

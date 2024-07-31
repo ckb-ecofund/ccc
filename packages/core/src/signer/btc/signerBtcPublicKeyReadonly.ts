@@ -1,6 +1,6 @@
-import { Client } from "../../client";
-import { Hex, HexLike, hexFrom } from "../../hex";
-import { SignerBtc } from "./signerBtc";
+import { Client } from "../../client/index.js";
+import { Hex, HexLike, hexFrom } from "../../hex/index.js";
+import { SignerBtc } from "./signerBtc.js";
 
 /**
  * A class extending SignerBtc that provides read-only access to a Bitcoin public key and account.

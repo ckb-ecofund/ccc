@@ -1,4 +1,4 @@
-import { Hex } from "../../hex";
+import { Hex } from "../../hex/index.js";
 
 export type JsonRpcPayload = {
   id: number;
@@ -47,18 +47,49 @@ export type JsonRpcTransaction = {
   witnesses: Hex[];
 };
 
+export type JsonRpcIndexerSearchKeyFilter = {
+  script?: JsonRpcScript;
+  script_len_range?: [Hex, Hex];
+  output_data?: Hex;
+  output_data_filter_mode?: "prefix" | "exact" | "partial";
+  output_data_len_range?: [Hex, Hex];
+  output_capacity_range?: [Hex, Hex];
+  block_range?: [Hex, Hex];
+};
+
 export type JsonRpcIndexerSearchKey = {
   script: JsonRpcScript;
   script_type: "lock" | "type";
   script_search_mode?: "prefix" | "exact" | "partial";
-  filter?: {
-    script?: JsonRpcScript;
-    script_len_range?: [Hex, Hex];
-    output_data?: Hex;
-    output_data_filter_mode?: "prefix" | "exact" | "partial";
-    output_data_len_range?: [Hex, Hex];
-    output_capacity_range?: [Hex, Hex];
-    block_range?: [Hex, Hex];
-  };
+  filter?: JsonRpcIndexerSearchKeyFilter;
   with_data?: boolean;
+};
+
+export type JsonRpcIndexerSearchKeyTransaction = {
+  script: JsonRpcScript;
+  script_type: "lock" | "type";
+  script_search_mode?: "prefix" | "exact" | "partial";
+  filter?: JsonRpcIndexerSearchKeyFilter;
+  group_by_transaction?: boolean;
+};
+
+export type JsonRpcIndexerFindTransactionsResponse = {
+  last_cursor: string;
+  objects: {
+    tx_hash: Hex;
+    block_number: Hex;
+    tx_index: Hex;
+    io_type: "input" | "output";
+    io_index: Hex;
+  }[];
+};
+
+export type JsonRpcIndexerFindTransactionsGroupedResponse = {
+  last_cursor: string;
+  objects: {
+    tx_hash: Hex;
+    block_number: Hex;
+    tx_index: Hex;
+    cells: ["input" | "output", Hex][];
+  }[];
 };

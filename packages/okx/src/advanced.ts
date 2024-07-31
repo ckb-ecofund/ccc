@@ -1,1 +1,1 @@
-export * as OkxA from "./advancedBarrel";
+export * as OkxA from "./advancedBarrel.js";

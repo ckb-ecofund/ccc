@@ -9,20 +9,23 @@ import {
   ScriptLike,
   Transaction,
   TransactionLike,
-} from "../ckb";
-import { Zero } from "../fixedPoint";
-import { Hex, HexLike, hexFrom } from "../hex";
-import { Num, NumLike, numFrom } from "../num";
-import { apply, reduceAsync } from "../utils";
-import { filterCell } from "./client.advanced";
+} from "../ckb/index.js";
+import { Zero } from "../fixedPoint/index.js";
+import { Hex, HexLike, hexFrom } from "../hex/index.js";
+import { Num, NumLike, numFrom } from "../num/index.js";
+import { apply, reduceAsync } from "../utils/index.js";
+import { filterCell } from "./client.advanced.js";
+import { ClientCollectableSearchKeyLike } from "./clientTypes.advanced.js";
 import {
   ClientFindCellsResponse,
+  ClientFindTransactionsGroupedResponse,
+  ClientFindTransactionsResponse,
   ClientIndexerSearchKey,
   ClientIndexerSearchKeyLike,
+  ClientIndexerSearchKeyTransactionLike,
   ClientTransactionResponse,
   OutputsValidator,
-} from "./clientTypes";
-import { ClientCollectableSearchKeyLike } from "./clientTypes.advanced";
+} from "./clientTypes.js";
 
 export enum KnownScript {
   Secp256k1Blake160 = "Secp256k1Blake160",
@@ -34,13 +37,14 @@ export enum KnownScript {
   COTA = "COTA",
   OmniLock = "OmniLock",
   NostrLock = "NostrLock",
+  UniqueType = "UniqueType",
   SingleUseLock = "SingleUseLock",
   OutputTypeProxyLock = "OutputTypeProxyLock",
 }
 
 export type CellDepInfoLike = {
   cellDep: CellDepLike;
-  type?: ScriptLike;
+  type?: ScriptLike | null;
 };
 
 export class CellDepInfo {
@@ -267,6 +271,172 @@ export abstract class Client {
           depType: cellDep.depType,
         });
       }),
+    );
+  }
+
+  abstract findTransactionsPaged(
+    key: Omit<ClientIndexerSearchKeyTransactionLike, "groupByTransaction"> & {
+      groupByTransaction: true;
+    },
+    order?: "asc" | "desc",
+    limit?: NumLike,
+    after?: string,
+  ): Promise<ClientFindTransactionsGroupedResponse>;
+  abstract findTransactionsPaged(
+    key: Omit<ClientIndexerSearchKeyTransactionLike, "groupByTransaction"> & {
+      groupByTransaction?: false | null;
+    },
+    order?: "asc" | "desc",
+    limit?: NumLike,
+    after?: string,
+  ): Promise<ClientFindTransactionsResponse>;
+  abstract findTransactionsPaged(
+    key: ClientIndexerSearchKeyTransactionLike,
+    order?: "asc" | "desc",
+    limit?: NumLike,
+    after?: string,
+  ): Promise<
+    ClientFindTransactionsResponse | ClientFindTransactionsGroupedResponse
+  >;
+
+  findTransactions(
+    key: Omit<ClientIndexerSearchKeyTransactionLike, "groupByTransaction"> & {
+      groupByTransaction: true;
+    },
+    order?: "asc" | "desc",
+    limit?: number,
+  ): AsyncGenerator<ClientFindTransactionsGroupedResponse["transactions"][0]>;
+  findTransactions(
+    key: Omit<ClientIndexerSearchKeyTransactionLike, "groupByTransaction"> & {
+      groupByTransaction?: false | null;
+    },
+    order?: "asc" | "desc",
+    limit?: number,
+  ): AsyncGenerator<ClientFindTransactionsResponse["transactions"][0]>;
+  findTransactions(
+    key: ClientIndexerSearchKeyTransactionLike,
+    order?: "asc" | "desc",
+    limit?: number,
+  ): AsyncGenerator<
+    | ClientFindTransactionsResponse["transactions"][0]
+    | ClientFindTransactionsGroupedResponse["transactions"][0]
+  >;
+  async *findTransactions(
+    key: ClientIndexerSearchKeyTransactionLike,
+    order?: "asc" | "desc",
+    limit = 10,
+  ): AsyncGenerator<
+    | ClientFindTransactionsResponse["transactions"][0]
+    | ClientFindTransactionsGroupedResponse["transactions"][0]
+  > {
+    let last: string | undefined = undefined;
+
+    while (true) {
+      const {
+        transactions,
+        lastCursor,
+      }:
+        | ClientFindTransactionsResponse
+        | ClientFindTransactionsGroupedResponse =
+        await this.findTransactionsPaged(key, order, limit, last);
+      for (const tx of transactions) {
+        yield tx;
+      }
+      if (transactions.length === 0 || transactions.length < limit) {
+        return;
+      }
+      last = lastCursor;
+    }
+  }
+
+  findTransactionsByLockAndType(
+    lock: ScriptLike,
+    type: ScriptLike,
+    groupByTransaction: true,
+    order?: "asc" | "desc",
+    limit?: number,
+  ): AsyncGenerator<ClientFindTransactionsGroupedResponse["transactions"][0]>;
+  findTransactionsByLockAndType(
+    lock: ScriptLike,
+    type: ScriptLike,
+    groupByTransaction?: false | null,
+    order?: "asc" | "desc",
+    limit?: number,
+  ): AsyncGenerator<ClientFindTransactionsResponse["transactions"][0]>;
+  findTransactionsByLockAndType(
+    lock: ScriptLike,
+    type: ScriptLike,
+    groupByTransaction?: boolean | null,
+    order?: "asc" | "desc",
+    limit?: number,
+  ): AsyncGenerator<
+    | ClientFindTransactionsResponse["transactions"][0]
+    | ClientFindTransactionsGroupedResponse["transactions"][0]
+  >;
+  findTransactionsByLockAndType(
+    lock: ScriptLike,
+    type: ScriptLike,
+    groupByTransaction?: boolean | null,
+    order?: "asc" | "desc",
+    limit = 10,
+  ): AsyncGenerator<
+    | ClientFindTransactionsResponse["transactions"][0]
+    | ClientFindTransactionsGroupedResponse["transactions"][0]
+  > {
+    return this.findTransactions(
+      {
+        script: lock,
+        scriptType: "lock",
+        scriptSearchMode: "exact",
+        filter: {
+          script: type,
+        },
+        groupByTransaction,
+      },
+      order,
+      limit,
+    );
+  }
+
+  findTransactionsByType(
+    type: ScriptLike,
+    groupByTransaction: true,
+    order?: "asc" | "desc",
+    limit?: number,
+  ): AsyncGenerator<ClientFindTransactionsGroupedResponse["transactions"][0]>;
+  findTransactionsByType(
+    type: ScriptLike,
+    groupByTransaction?: false | null,
+    order?: "asc" | "desc",
+    limit?: number,
+  ): AsyncGenerator<ClientFindTransactionsResponse["transactions"][0]>;
+  findTransactionsByType(
+    type: ScriptLike,
+    groupByTransaction?: boolean | null,
+    order?: "asc" | "desc",
+    limit?: number,
+  ): AsyncGenerator<
+    | ClientFindTransactionsResponse["transactions"][0]
+    | ClientFindTransactionsGroupedResponse["transactions"][0]
+  >;
+  findTransactionsByType(
+    type: ScriptLike,
+    groupByTransaction?: boolean | null,
+    order?: "asc" | "desc",
+    limit = 10,
+  ): AsyncGenerator<
+    | ClientFindTransactionsResponse["transactions"][0]
+    | ClientFindTransactionsGroupedResponse["transactions"][0]
+  > {
+    return this.findTransactions(
+      {
+        script: type,
+        scriptType: "type",
+        scriptSearchMode: "exact",
+        groupByTransaction,
+      },
+      order,
+      limit,
     );
   }
 

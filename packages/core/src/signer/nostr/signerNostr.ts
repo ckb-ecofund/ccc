@@ -1,12 +1,12 @@
 import { bech32 } from "bech32";
-import { Address } from "../../address";
-import { BytesLike, bytesConcat, bytesFrom } from "../../bytes";
-import { Transaction, TransactionLike, WitnessArgs } from "../../ckb";
-import { KnownScript } from "../../client";
-import { ckbHash } from "../../hasher";
-import { Hex, hexFrom } from "../../hex";
-import { Signer, SignerSignType, SignerType } from "../signer";
-import { buildNostrEventFromMessage } from "./verify";
+import { Address } from "../../address/index.js";
+import { BytesLike, bytesConcat, bytesFrom } from "../../bytes/index.js";
+import { Transaction, TransactionLike, WitnessArgs } from "../../ckb/index.js";
+import { KnownScript } from "../../client/index.js";
+import { hashCkb } from "../../hasher/index.js";
+import { Hex, hexFrom } from "../../hex/index.js";
+import { Signer, SignerSignType, SignerType } from "../signer/index.js";
+import { buildNostrEventFromMessage } from "./verify.js";
 
 export interface NostrEvent {
   id?: string;
@@ -80,7 +80,7 @@ export abstract class SignerNostr extends Signer {
       await Address.fromKnownScript(
         this.client,
         KnownScript.NostrLock,
-        hexFrom(bytesConcat([0x00], ckbHash(publicKey).slice(0, 42))),
+        hexFrom(bytesConcat([0x00], hashCkb(publicKey).slice(0, 42))),
       ),
     ];
   }

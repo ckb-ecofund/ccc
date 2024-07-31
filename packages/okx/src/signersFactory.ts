@@ -1,6 +1,7 @@
 import { ccc } from "@ckb-ccc/core";
-import { BitcoinProvider } from "./advancedBarrel";
-import { BitcoinSigner } from "./signer";
+import { BitcoinProvider, NostrProvider } from "./advancedBarrel.js";
+import { BitcoinSigner } from "./btc/index.js";
+import { NostrSigner } from "./nostr/index.js";
 
 /**
  * Retrieves the OKX Bitcoin signer if available.
@@ -9,12 +10,18 @@ import { BitcoinSigner } from "./signer";
  */
 export function getOKXBitcoinSigner(
   client: ccc.Client,
-): BitcoinSigner | undefined {
-  const windowRef = window as { okxwallet?: { bitcoin: BitcoinProvider } };
+  preferredNetworks: ccc.NetworkPreference[],
+): ccc.Signer[] {
+  const windowRef = window as {
+    okxwallet?: Record<string, BitcoinProvider> & { nostr: NostrProvider };
+  };
 
   if (typeof windowRef.okxwallet === "undefined") {
-    return undefined;
+    return [];
   }
 
-  return new BitcoinSigner(client, windowRef.okxwallet.bitcoin);
+  return [
+    new BitcoinSigner(client, windowRef.okxwallet, preferredNetworks),
+    new NostrSigner(client, windowRef.okxwallet.nostr),
+  ];
 }

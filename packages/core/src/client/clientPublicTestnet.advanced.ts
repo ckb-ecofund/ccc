@@ -1,5 +1,5 @@
-import { Script } from "../ckb";
-import { CellDepInfoLike, KnownScript } from "./client";
+import { Script } from "../ckb/index.js";
+import { CellDepInfoLike, KnownScript } from "./client.js";
 
 export const TESTNET_SCRIPTS: Record<
   KnownScript,
@@ -175,6 +175,29 @@ export const TESTNET_SCRIPTS: Record<
       },
     ],
   },
+  [KnownScript.UniqueType]: {
+    codeHash:
+      "0x8e341bcfec6393dcd41e635733ff2dca00a6af546949f70c57a706c0f344df8b",
+    hashType: "type",
+    cellDeps: [
+      {
+        cellDep: {
+          outPoint: {
+            txHash:
+              "0xff91b063c78ed06f10a1ed436122bd7d671f9a72ef5f5fa28d05252c17cf4cef",
+            index: 0,
+          },
+          depType: "code",
+        },
+        type: {
+          codeHash:
+            "0x00000000000000000000000000000000000000000000000000545950455f4944",
+          hashType: "type",
+          args: "0xe04976b67600fd25ac50305f77b33aee2c12e3c18e63ece9119e5b32117884b5",
+        },
+      },
+    ],
+  },
   [KnownScript.SingleUseLock]: {
     codeHash:
       "0x8290467a512e5b9a6b816469b0edabba1f4ac474e28ffdd604c2a7c76446bbaf",
@@ -184,7 +207,7 @@ export const TESTNET_SCRIPTS: Record<
         cellDep: {
           outPoint: {
             txHash:
-              "0x968c326f7a418f07a128f30d9a415251beaa2ec8bd6bbfda65780c94bebb2a85",
+              "0xb4f171c9c9caf7401f54a8e56225ae21d95032150a87a4678eac3f66a3137b93",
             index: 4,
           },
           depType: "code",
@@ -194,14 +217,14 @@ export const TESTNET_SCRIPTS: Record<
   },
   [KnownScript.OutputTypeProxyLock]: {
     codeHash:
-      "0xc0382e4109cff68a4f536441c0266d2e22f2808e61573129c9289ee0e5e5ed43",
+      "0x2df53b592db3ae3685b7787adcfef0332a611edb83ca3feca435809964c3aff2",
     hashType: "data1",
     cellDeps: [
       {
         cellDep: {
           outPoint: {
             txHash:
-              "0x968c326f7a418f07a128f30d9a415251beaa2ec8bd6bbfda65780c94bebb2a85",
+              "0xb4f171c9c9caf7401f54a8e56225ae21d95032150a87a4678eac3f66a3137b93",
             index: 2,
           },
           depType: "code",

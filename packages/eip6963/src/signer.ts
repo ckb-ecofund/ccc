@@ -1,5 +1,5 @@
 import { ccc } from "@ckb-ccc/core";
-import { ProviderDetail as EIP6963ProviderDetail } from "./eip6963.advanced";
+import { ProviderDetail as EIP6963ProviderDetail } from "./eip6963.advanced.js";
 
 /**
  * Class representing an EVM signer that extends SignerEvm from @ckb-ccc/core.
@@ -7,6 +7,8 @@ import { ProviderDetail as EIP6963ProviderDetail } from "./eip6963.advanced";
  * @extends {ccc.SignerEvm}
  */
 export class Signer extends ccc.SignerEvm {
+  private accountCache?: ccc.Hex = undefined;
+
   /**
    * Creates an instance of Signer.
    * @param {ccc.Client} client - The client instance.
@@ -21,10 +23,13 @@ export class Signer extends ccc.SignerEvm {
 
   /**
    * Gets the EVM account address.
-   * @returns {Promise<string>} A promise that resolves to the EVM account address.
+   * @returns A promise that resolves to the EVM account address.
    */
-  async getEvmAccount() {
-    return (await this.detail.provider.request({ method: "eth_accounts" }))[0];
+  async getEvmAccount(): Promise<ccc.Hex> {
+    this.accountCache = (
+      await this.detail.provider.request({ method: "eth_accounts" })
+    )[0];
+    return this.accountCache;
   }
 
   /**
@@ -33,6 +38,23 @@ export class Signer extends ccc.SignerEvm {
    */
   async connect(): Promise<void> {
     await this.detail.provider.request({ method: "eth_requestAccounts" });
+  }
+
+  onReplaced(listener: () => void): () => void {
+    const stop: (() => void)[] = [];
+    const replacer = async () => {
+      listener();
+      stop[0]?.();
+    };
+    stop.push(() => {
+      this.detail.provider.removeListener("accountsChanged", replacer);
+      this.detail.provider.removeListener("disconnect", replacer);
+    });
+
+    this.detail.provider.on("accountsChanged", replacer);
+    this.detail.provider.on("disconnect", replacer);
+
+    return stop[0];
   }
 
   /**
@@ -54,11 +76,12 @@ export class Signer extends ccc.SignerEvm {
   async signMessageRaw(message: string | ccc.BytesLike): Promise<ccc.Hex> {
     const challenge =
       typeof message === "string" ? ccc.bytesFrom(message, "utf8") : message;
-    const address = await this.getEvmAccount();
+
+    const account = this.accountCache ?? (await this.getEvmAccount());
 
     return this.detail.provider.request({
       method: "personal_sign",
-      params: [ccc.hexFrom(challenge), address],
+      params: [ccc.hexFrom(challenge), account],
     });
   }
 }

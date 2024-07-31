@@ -1,1 +1,1 @@
-export * as Eip6963 from "./barrel";
+export * as Eip6963 from "./barrel.js";

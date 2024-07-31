@@ -10,6 +10,30 @@ export interface Provider {
   requestAccounts(): Promise<string[]>;
 
   /**
+   * Gets the current network.
+   * @returns current network.
+   */
+  getNetwork(): Promise<"livenet" | "testnet">;
+
+  /**
+   * Switch the current network.
+   */
+  switchNetwork(chain: "livenet" | "testnet"): Promise<void>;
+
+  /**
+   * Gets the current chain.
+   * @returns current chain.
+   */
+  getChain?(): Promise<{ enum: string; name: string; network: string }>;
+
+  /**
+   * Switch the current chain.
+   */
+  switchChain?(
+    chain: string,
+  ): Promise<{ enum: string; name: string; network: string }>;
+
+  /**
    * Gets the current accounts.
    * @returns {Promise<string[]>} A promise that resolves to an array of account addresses.
    */

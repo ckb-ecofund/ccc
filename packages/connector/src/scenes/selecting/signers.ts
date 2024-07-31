@@ -1,0 +1,49 @@
+import { ccc } from "@ckb-ccc/ccc";
+import { html } from "lit";
+import { repeat } from "lit/directives/repeat.js";
+import { BTC_SVG, CKB_SVG, ETH_SVG, NOSTR_SVG } from "../../assets/chains";
+import { WalletWithSigners } from "../../types";
+
+export function signerTypeToIcon(type: ccc.SignerType): string {
+  return {
+    [ccc.SignerType.BTC]: BTC_SVG,
+    [ccc.SignerType.EVM]: ETH_SVG,
+    [ccc.SignerType.CKB]: CKB_SVG,
+    [ccc.SignerType.Nostr]: NOSTR_SVG,
+  }[type];
+}
+
+export function generateSignersScene(
+  wallet: WalletWithSigners,
+  onSignerSelected: (
+    wallet: WalletWithSigners,
+    signer: ccc.SignerInfo,
+  ) => unknown,
+) {
+  return [
+    "Select a Chain",
+
+    html`
+      <img class="wallet-icon mt-1" src=${wallet.icon} alt=${wallet.name} />
+      <span class="mb-1">${wallet.name}</span>
+      ${repeat(
+        wallet.signers,
+        (signer) => signer.name,
+        (signer) => html`
+          <ccc-button
+            class="mt-1"
+            @click=${async () => {
+              onSignerSelected(wallet, signer);
+            }}
+          >
+            <img
+              src=${signerTypeToIcon(signer.signer.type)}
+              alt=${signer.signer.type}
+            />
+            ${signer.name}
+          </ccc-button>
+        `,
+      )}
+    `,
+  ];
+}

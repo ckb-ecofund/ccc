@@ -1,11 +1,11 @@
 import { ccc } from "@ckb-ccc/core";
 import { DappRequestType, buildJoyIDURL } from "@joyid/common";
-import { createPopup } from "../common";
+import { createPopup } from "../common/index.js";
 import {
   Connection,
   ConnectionsRepo,
   ConnectionsRepoLocalStorage,
-} from "../connectionsStorage";
+} from "../connectionsStorage/index.js";
 
 /**
  * Class representing an EVM signer that extends SignerEvm from @ckb-ccc/core.
@@ -31,17 +31,17 @@ export class EvmSigner extends ccc.SignerEvm {
 
   /**
    * Creates an instance of EvmSigner.
-   * @param {ccc.Client} client - The client instance.
-   * @param {string} name - The name of the signer.
-   * @param {string} icon - The icon URL of the signer.
-   * @param {string} [appUri="https://app.joy.id"] - The application URI.
-   * @param {ConnectionsRepo} [connectionsRepo=new ConnectionsRepoLocalStorage()] - The connections repository.
+   * @param client - The client instance.
+   * @param name - The name of the signer.
+   * @param icon - The icon URL of the signer.
+   * @param appUri - The application URI.
+   * @param connectionsRepo - The connections repository.
    */
   constructor(
     client: ccc.Client,
     private readonly name: string,
     private readonly icon: string,
-    private readonly appUri = "https://app.joy.id",
+    private readonly _appUri?: string,
     private readonly connectionsRepo: ConnectionsRepo = new ConnectionsRepoLocalStorage(),
   ) {
     super(client);
@@ -55,7 +55,10 @@ export class EvmSigner extends ccc.SignerEvm {
   private getConfig() {
     return {
       redirectURL: location.href,
-      joyidAppURL: this.appUri,
+      joyidAppURL:
+        this._appUri ?? this.client.addressPrefix === "ckb"
+          ? "https://app.joy.id"
+          : "https://testnet.joyid.dev",
       requestNetwork: `ethereum`,
       name: this.name,
       logo: this.icon,
@@ -64,10 +67,10 @@ export class EvmSigner extends ccc.SignerEvm {
 
   /**
    * Gets the EVM account address.
-   * @returns {Promise<string>} A promise that resolves to the EVM account address.
+   * @returns A promise that resolves to the EVM account address.
    */
-  async getEvmAccount(): Promise<string> {
-    return this.assertConnection().address;
+  async getEvmAccount(): Promise<ccc.Hex> {
+    return this.assertConnection().address as ccc.Hex;
   }
 
   /**
@@ -87,6 +90,13 @@ export class EvmSigner extends ccc.SignerEvm {
       publicKey: ccc.hexFrom(res.pubkey),
       keyType: res.keyType,
     };
+    await this.saveConnection();
+  }
+
+  async disconnect(): Promise<void> {
+    await super.disconnect();
+
+    this.connection = undefined;
     await this.saveConnection();
   }
 

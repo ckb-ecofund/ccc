@@ -1,6 +1,6 @@
-import { Address } from "../../address";
-import { Client } from "../../client";
-import { Signer, SignerSignType, SignerType } from "../signer";
+import { Address } from "../../address/index.js";
+import { Client } from "../../client/index.js";
+import { Signer, SignerSignType, SignerType } from "../signer/index.js";
 
 export abstract class SignerDummy extends Signer {
   get signType(): SignerSignType {

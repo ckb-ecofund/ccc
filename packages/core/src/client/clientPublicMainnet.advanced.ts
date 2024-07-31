@@ -1,5 +1,5 @@
-import { Script } from "../ckb";
-import { CellDepInfoLike, KnownScript } from "./client";
+import { Script } from "../ckb/index.js";
+import { CellDepInfoLike, KnownScript } from "./client.js";
 
 export const MAINNET_SCRIPTS: Record<
   KnownScript,
@@ -147,7 +147,78 @@ export const MAINNET_SCRIPTS: Record<
       },
     ],
   },
-  [KnownScript.NostrLock]: undefined,
-  [KnownScript.SingleUseLock]: undefined,
-  [KnownScript.OutputTypeProxyLock]: undefined,
+  [KnownScript.NostrLock]: {
+    codeHash:
+      "0x641a89ad2f77721b803cd50d01351c1f308444072d5fa20088567196c0574c68",
+    hashType: "type",
+    cellDeps: [
+      {
+        cellDep: {
+          outPoint: {
+            txHash:
+              "0x1911208b136957d5f7c1708a8835edfe8ae1d02700d5cb2c3a6aacf4d5906306",
+            index: 0,
+          },
+          depType: "code",
+        },
+        type: {
+          codeHash:
+            "0x00000000000000000000000000000000000000000000000000545950455f4944",
+          hashType: "type",
+          args: "0xfad8cb75eb0bb01718e2336002064568bc05887af107f74ed5dd501829e192f8",
+        },
+      },
+    ],
+  },
+  [KnownScript.UniqueType]: {
+    codeHash:
+      "0x2c8c11c985da60b0a330c61a85507416d6382c130ba67f0c47ab071e00aec628",
+    hashType: "data1",
+    cellDeps: [
+      {
+        cellDep: {
+          outPoint: {
+            txHash:
+              "0x67524c01c0cb5492e499c7c7e406f2f9d823e162d6b0cf432eacde0c9808c2ad",
+            index: 0,
+          },
+          depType: "code",
+        },
+      },
+    ],
+  },
+  [KnownScript.SingleUseLock]: {
+    codeHash:
+      "0x8290467a512e5b9a6b816469b0edabba1f4ac474e28ffdd604c2a7c76446bbaf",
+    hashType: "data1",
+    cellDeps: [
+      {
+        cellDep: {
+          outPoint: {
+            txHash:
+              "0x10d63a996157d32c01078058000052674ca58d15f921bec7f1dcdac2160eb66b",
+            index: 4,
+          },
+          depType: "code",
+        },
+      },
+    ],
+  },
+  [KnownScript.OutputTypeProxyLock]: {
+    codeHash:
+      "0x2df53b592db3ae3685b7787adcfef0332a611edb83ca3feca435809964c3aff2",
+    hashType: "data1",
+    cellDeps: [
+      {
+        cellDep: {
+          outPoint: {
+            txHash:
+              "0x10d63a996157d32c01078058000052674ca58d15f921bec7f1dcdac2160eb66b",
+            index: 2,
+          },
+          depType: "code",
+        },
+      },
+    ],
+  },
 };

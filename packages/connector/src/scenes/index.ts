@@ -1,3 +1,2 @@
-export * from "./connecting";
-export * from "./signers";
-export * from "./wallets";
+import "./connected";
+import "./selecting";
