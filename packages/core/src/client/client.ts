@@ -198,9 +198,9 @@ export abstract class Client {
     }
   }
 
-  findCellsByLockAndType(
+  findCellsByLock(
     lock: ScriptLike,
-    type: ScriptLike,
+    type?: ScriptLike | null,
     withData = true,
     order?: "asc" | "desc",
     limit = 10,
@@ -349,23 +349,23 @@ export abstract class Client {
     }
   }
 
-  findTransactionsByLockAndType(
+  findTransactionsByLock(
     lock: ScriptLike,
-    type: ScriptLike,
+    type: ScriptLike | undefined | null,
     groupByTransaction: true,
     order?: "asc" | "desc",
     limit?: number,
   ): AsyncGenerator<ClientFindTransactionsGroupedResponse["transactions"][0]>;
-  findTransactionsByLockAndType(
+  findTransactionsByLock(
     lock: ScriptLike,
-    type: ScriptLike,
+    type?: ScriptLike | null,
     groupByTransaction?: false | null,
     order?: "asc" | "desc",
     limit?: number,
   ): AsyncGenerator<ClientFindTransactionsResponse["transactions"][0]>;
-  findTransactionsByLockAndType(
+  findTransactionsByLock(
     lock: ScriptLike,
-    type: ScriptLike,
+    type?: ScriptLike | null,
     groupByTransaction?: boolean | null,
     order?: "asc" | "desc",
     limit?: number,
@@ -373,9 +373,9 @@ export abstract class Client {
     | ClientFindTransactionsResponse["transactions"][0]
     | ClientFindTransactionsGroupedResponse["transactions"][0]
   >;
-  findTransactionsByLockAndType(
+  findTransactionsByLock(
     lock: ScriptLike,
-    type: ScriptLike,
+    type?: ScriptLike | null,
     groupByTransaction?: boolean | null,
     order?: "asc" | "desc",
     limit = 10,

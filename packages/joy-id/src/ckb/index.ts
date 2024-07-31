@@ -229,7 +229,7 @@ export class CkbSigner extends ccc.Signer {
     witness.outputType = ccc.hexFrom(unlockEntry);
 
     const cotaDeps: ccc.CellDep[] = [];
-    for await (const cell of this.client.findCellsByLockAndType(
+    for await (const cell of this.client.findCellsByLock(
       lock,
       await ccc.Script.fromKnownScript(this.client, ccc.KnownScript.COTA, "0x"),
     )) {
