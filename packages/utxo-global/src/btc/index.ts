@@ -1,7 +1,9 @@
 import { ccc } from "@ckb-ccc/core";
-import { Provider } from "../advancedBarrel";
+import { Provider } from "../advancedBarrel.js";
 
 export class SignerBtc extends ccc.SignerBtc {
+  private accountCache: string | undefined;
+
   constructor(
     client: ccc.Client,
     public readonly provider: Provider,
@@ -11,7 +13,8 @@ export class SignerBtc extends ccc.SignerBtc {
 
   async getBtcAccount() {
     const accounts = await this.provider.getAccount();
-    return accounts[0];
+    this.accountCache = accounts[0];
+    return this.accountCache;
   }
 
   async getBtcPublicKey(): Promise<ccc.Hex> {
@@ -19,11 +22,11 @@ export class SignerBtc extends ccc.SignerBtc {
     const account = await this.getBtcAccount();
     const pubKey = pubKeys.find((p) => p.address === account);
 
-    if (pubKey) {
-      return ccc.hexFrom(pubKey.publicKey);
+    if (!pubKey) {
+      throw new Error("pubKey not found");
     }
 
-    throw new Error("pubKey not found");
+    return ccc.hexFrom(pubKey.publicKey);
   }
 
   async connect(): Promise<void> {
@@ -37,7 +40,9 @@ export class SignerBtc extends ccc.SignerBtc {
   async signMessageRaw(message: string | ccc.BytesLike): Promise<string> {
     const challenge =
       typeof message === "string" ? message : ccc.hexFrom(message).slice(2);
-    const account = await this.getBtcAccount();
-    return this.provider.signMessage(challenge, account);
+    return this.provider.signMessage(
+      challenge,
+      this.accountCache ?? (await this.getBtcAccount()),
+    );
   }
 }

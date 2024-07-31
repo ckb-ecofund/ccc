@@ -1,1 +1,1 @@
-export * as UtxoGlobalA from "./advancedBarrel";
+export * as UtxoGlobalA from "./advancedBarrel.js";

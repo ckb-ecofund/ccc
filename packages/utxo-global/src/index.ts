@@ -1,1 +1,1 @@
-export * as UtxoGlobal from "./barrel";
+export * as UtxoGlobal from "./barrel.js";

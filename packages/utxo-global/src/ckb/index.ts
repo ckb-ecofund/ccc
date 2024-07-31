@@ -1,7 +1,8 @@
 import { ccc } from "@ckb-ccc/core";
-import { Provider } from "../advancedBarrel";
+import { Provider } from "../advancedBarrel.js";
 
 export class SignerCkb extends ccc.Signer {
+  private accountCache: string | undefined;
   get type(): ccc.SignerType {
     return ccc.SignerType.CKB;
   }
@@ -26,27 +27,22 @@ export class SignerCkb extends ccc.Signer {
   }
 
   async getIdentity(): Promise<string> {
-    return await this.getPublicKey();
+    return this.getPublicKey();
   }
 
-  async getAddressObj(): Promise<ccc.Address | undefined> {
+  async getAddressObj(): Promise<ccc.Address> {
     const address = await this.getInternalAddress();
-    return await ccc.Address.fromString(address, this.client);
+    return ccc.Address.fromString(address, this.client);
   }
 
   async getAddressObjs(): Promise<ccc.Address[]> {
-    const address = await this.getAddressObj();
-
-    if (!!address) {
-      return [address];
-    }
-
-    throw new Error("address not found");
+    return [await this.getAddressObj()];
   }
 
   async getAccount() {
     const accounts = await this.provider.getAccount();
-    return accounts[0];
+    this.accountCache = accounts[0];
+    return this.accountCache;
   }
 
   async getPublicKey(): Promise<ccc.Hex> {
@@ -72,27 +68,31 @@ export class SignerCkb extends ccc.Signer {
   async signMessageRaw(message: string | ccc.BytesLike): Promise<string> {
     const challenge =
       typeof message === "string" ? message : ccc.hexFrom(message).slice(2);
-    const account = await this.getAccount();
-    return this.provider.signMessage(challenge, account);
+
+    return this.provider.signMessage(
+      challenge,
+      this.accountCache ?? (await this.getAccount()),
+    );
   }
 
   async signOnlyTransaction(
     txLike: ccc.TransactionLike,
   ): Promise<ccc.Transaction> {
     const txSigned = await this.provider.signTransaction(txLike);
-    return ccc.Transaction.from(JSON.parse(txSigned));
+    return ccc.Transaction.from(txSigned);
   }
 
   async prepareTransaction(
     txLike: ccc.TransactionLike,
   ): Promise<ccc.Transaction> {
     const tx = ccc.Transaction.from(txLike);
-    const addessObjs = await this.getAddressObjs();
+    const { script } = await this.getAddressObj();
+
     await tx.addCellDepsOfKnownScripts(
       this.client,
       ccc.KnownScript.Secp256k1Blake160,
     );
-    await tx.prepareSighashAllWitness(addessObjs[0].script, 65, this.client);
+    await tx.prepareSighashAllWitness(script, 65, this.client);
     return tx;
   }
 }

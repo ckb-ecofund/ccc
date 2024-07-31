@@ -1,3 +1,3 @@
-export * from "./btc";
-export * from "./ckb";
-export * from "./signersFactory";
+export * from "./btc/index.js";
+export * from "./ckb/index.js";
+export * from "./signersFactory.js";

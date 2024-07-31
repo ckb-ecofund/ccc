@@ -1,7 +1,7 @@
 import { ccc } from "@ckb-ccc/core";
-import { Provider } from "./advancedBarrel";
-import { SignerBtc } from "./btc";
-import { SignerCkb } from "./ckb";
+import { Provider } from "./advancedBarrel.js";
+import { SignerBtc } from "./btc/index.js";
+import { SignerCkb } from "./ckb/index.js";
 
 export function getUtxoGlobalSigners(client: ccc.Client): ccc.SignerInfo[] {
   const windowRef = window as {
