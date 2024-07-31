@@ -198,7 +198,7 @@ export class SignersController implements ReactiveController {
   hostConnected(): void {
     this.refresh();
     // Wait for plugins to be loaded
-    setTimeout(() => this.refresh(), 100);
+    setTimeout(() => this.refresh(), 500);
   }
   hostDisconnected(): void {}
 }
