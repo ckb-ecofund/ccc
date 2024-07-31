@@ -1,9 +1,11 @@
 import fetch from "cross-fetch";
+import { apply } from "../../barrel.js";
 import { TransactionLike } from "../../ckb/index.js";
 import { Hex, HexLike, hexFrom } from "../../hex/index.js";
 import { Num, NumLike, numFrom, numToHex } from "../../num/index.js";
 import { Client } from "../client.js";
 import {
+  ClientBlock,
   ClientFindCellsResponse,
   ClientIndexerSearchKeyLike,
   ClientTransactionResponse,
@@ -66,6 +68,44 @@ export abstract class ClientJsonRpc extends Client {
   }
 
   /**
+   * Get tip block number
+   *
+   * @returns Tip block number
+   */
+
+  getTip = this.buildSender(
+    "get_tip_block_number",
+    [],
+    numFrom,
+  ) as () => Promise<Num>;
+
+  /**
+   * Get block by block hash
+   *
+   * @param blockNumber - The block number.
+   * @param verbosity - result format which allows 0 and 2. (Optional, the default is 2.)
+   * @param with_cycles - whether the return cycles of block transactions. (Optional, default false.)
+   * @returns Block
+   */
+  getBlockByNumber = this.buildSender(
+    "get_block_by_number",
+    [(v: NumLike) => numToHex(numFrom(v))],
+    (b) => apply(JsonRpcTransformers.blockTo, b),
+  ) as () => Promise<ClientBlock | undefined>;
+
+  /**
+   * Get block by block hash
+   *
+   * @param blockHash - The block hash.
+   * @param verbosity - result format which allows 0 and 2. (Optional, the default is 2.)
+   * @param with_cycles - whether the return cycles of block transactions. (Optional, default false.)
+   * @returns Block
+   */
+  getBlockByHash = this.buildSender("get_block", [hexFrom], (b) =>
+    apply(JsonRpcTransformers.blockTo, b),
+  ) as () => Promise<ClientBlock | undefined>;
+
+  /**
    * Send a transaction to node.
    *
    * @param transaction - The transaction to send.
@@ -93,7 +133,7 @@ export abstract class ClientJsonRpc extends Client {
     "get_transaction",
     [hexFrom],
     JsonRpcTransformers.transactionResponseTo,
-  ) as (txHash: HexLike) => Promise<ClientTransactionResponse | null>;
+  ) as (txHash: HexLike) => Promise<ClientTransactionResponse | undefined>;
 
   /**
    * find cells from node.

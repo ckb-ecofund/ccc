@@ -47,6 +47,33 @@ export type JsonRpcTransaction = {
   witnesses: Hex[];
 };
 
+export type JsonRpcBlockHeader = {
+  compact_target: Hex;
+  dao: Hex;
+  epoch: Hex;
+  extra_hash: Hex;
+  hash: Hex;
+  nonce: Hex;
+  number: Hex;
+  parent_hash: Hex;
+  proposals_hash: Hex;
+  timestamp: Hex;
+  transactions_root: Hex;
+  version: Hex;
+};
+
+export type JsonRpcBlockUncle = {
+  header: JsonRpcBlockHeader;
+  proposals: Hex[];
+};
+
+export type JsonRpcBlock = {
+  header: JsonRpcBlockHeader;
+  proposals: Hex[];
+  transactions: JsonRpcTransaction[];
+  uncles: JsonRpcBlockUncle[];
+};
+
 export type JsonRpcIndexerSearchKeyFilter = {
   script?: JsonRpcScript;
   script_len_range?: [Hex, Hex];

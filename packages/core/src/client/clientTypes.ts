@@ -133,3 +133,30 @@ export type ClientFindTransactionsGroupedResponse = {
     }[];
   }[];
 };
+
+export type ClientBlockHeader = {
+  compactTarget: Num;
+  dao: Hex;
+  epoch: Num;
+  extraHash: Hex;
+  hash: Hex;
+  nonce: Num;
+  number: Num;
+  parentHash: Hex;
+  proposalsHash: Hex;
+  timestamp: Num;
+  transactionsRoot: Hex;
+  version: Num;
+};
+
+export type ClientBlockUncle = {
+  header: ClientBlockHeader;
+  proposals: Hex[];
+};
+
+export type ClientBlock = {
+  header: ClientBlockHeader;
+  proposals: Hex[];
+  transactions: Transaction[];
+  uncles: ClientBlockUncle[];
+};

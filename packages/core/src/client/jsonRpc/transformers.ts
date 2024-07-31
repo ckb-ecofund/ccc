@@ -23,6 +23,9 @@ import { Hex } from "../../hex/index.js";
 import { NumLike, numFrom, numToHex } from "../../num/index.js";
 import { apply } from "../../utils/index.js";
 import {
+  ClientBlock,
+  ClientBlockHeader,
+  ClientBlockUncle,
   ClientFindCellsResponse,
   ClientFindTransactionsGroupedResponse,
   ClientFindTransactionsResponse,
@@ -35,6 +38,9 @@ import {
   TransactionStatus,
 } from "../clientTypes.js";
 import {
+  JsonRpcBlock,
+  JsonRpcBlockHeader,
+  JsonRpcBlockUncle,
   JsonRpcCellDep,
   JsonRpcCellInput,
   JsonRpcCellOutput,
@@ -171,14 +177,46 @@ export class JsonRpcTransformers {
   }: {
     tx_status: { status: TransactionStatus };
     transaction: JsonRpcTransaction | null;
-  }): ClientTransactionResponse | null {
+  }): ClientTransactionResponse | undefined {
     if (transaction == null) {
-      return null;
+      return;
     }
 
     return {
       transaction: JsonRpcTransformers.transactionTo(transaction),
       status,
+    };
+  }
+  static blockHeaderTo(header: JsonRpcBlockHeader): ClientBlockHeader {
+    return {
+      compactTarget: numFrom(header.compact_target),
+      dao: header.dao,
+      epoch: numFrom(header.epoch),
+      extraHash: header.extra_hash,
+      hash: header.hash,
+      nonce: numFrom(header.nonce),
+      number: numFrom(header.number),
+      parentHash: header.parent_hash,
+      proposalsHash: header.proposals_hash,
+      timestamp: numFrom(header.timestamp),
+      transactionsRoot: header.transactions_root,
+      version: numFrom(header.version),
+    };
+  }
+  static blockUncleTo(block: JsonRpcBlockUncle): ClientBlockUncle {
+    return {
+      header: JsonRpcTransformers.blockHeaderTo(block.header),
+      proposals: block.proposals,
+    };
+  }
+  static blockTo(block: JsonRpcBlock): ClientBlock {
+    return {
+      header: JsonRpcTransformers.blockHeaderTo(block.header),
+      proposals: block.proposals,
+      transactions: block.transactions.map((t) =>
+        JsonRpcTransformers.transactionTo(t),
+      ),
+      uncles: block.uncles.map((u) => JsonRpcTransformers.blockUncleTo(u)),
     };
   }
   static rangeFrom([a, b]: [NumLike, NumLike]): [Hex, Hex] {

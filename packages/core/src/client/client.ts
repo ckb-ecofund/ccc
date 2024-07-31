@@ -17,6 +17,7 @@ import { apply, reduceAsync } from "../utils/index.js";
 import { filterCell } from "./client.advanced.js";
 import { ClientCollectableSearchKeyLike } from "./clientTypes.advanced.js";
 import {
+  ClientBlock,
   ClientFindCellsResponse,
   ClientFindTransactionsGroupedResponse,
   ClientFindTransactionsResponse,
@@ -76,6 +77,18 @@ export abstract class Client {
     Pick<Script, "codeHash" | "hashType"> & { cellDeps: CellDepInfo[] }
   >;
 
+  abstract getTip(): Promise<Num>;
+  abstract getBlockByNumber(
+    blockNumber: NumLike,
+    verbosity?: number | null,
+    withCycles?: boolean | null,
+  ): Promise<ClientBlock | undefined>;
+  abstract getBlockByHash(
+    blockHash: HexLike,
+    verbosity?: number | null,
+    withCycles?: boolean | null,
+  ): Promise<ClientBlock | undefined>;
+
   async markUsable(cellLike: CellLike): Promise<void> {
     const cell = Cell.from(cellLike).clone();
     this.usableCells.push(cell);
@@ -103,9 +116,9 @@ export abstract class Client {
   ): Promise<Hex>;
   abstract getTransactionNoCache(
     txHash: HexLike,
-  ): Promise<ClientTransactionResponse | null>;
+  ): Promise<ClientTransactionResponse | undefined>;
 
-  async getCell(outPointLike: OutPointLike): Promise<Cell | null> {
+  async getCell(outPointLike: OutPointLike): Promise<Cell | undefined> {
     const outPoint = OutPoint.from(outPointLike);
     const cached = this.knownCells.find((cell) => cell.outPoint.eq(outPoint));
 
@@ -115,12 +128,12 @@ export abstract class Client {
 
     const transaction = await this.getTransactionNoCache(outPoint.txHash);
     if (!transaction) {
-      return null;
+      return;
     }
 
     const index = Number(numFrom(outPoint.index));
     if (index >= transaction.transaction.outputs.length) {
-      return null;
+      return;
     }
 
     const cell = Cell.from({
@@ -491,7 +504,7 @@ export abstract class Client {
 
   async getTransaction(
     txHashLike: HexLike,
-  ): Promise<ClientTransactionResponse | null> {
+  ): Promise<ClientTransactionResponse | undefined> {
     const txHash = hexFrom(txHashLike);
     const res = await this.getTransactionNoCache(txHash);
     if (res !== null) {
@@ -500,7 +513,7 @@ export abstract class Client {
 
     const tx = this.cachedTransactions.find((t) => t.hash() === txHash);
     if (!tx) {
-      return null;
+      return;
     }
 
     return {
