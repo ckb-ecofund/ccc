@@ -32,10 +32,13 @@ export class SignersController implements ReactiveController {
   getConfig() {
     const name =
       this.host.name ??
-      (document.querySelector("head title") as HTMLTitleElement).text;
+      (document.querySelector("head title") as HTMLTitleElement | null)?.text ??
+      "Unknown";
     const icon =
       this.host.icon ??
-      (document.querySelector('link[rel="icon"]') as HTMLLinkElement).href;
+      (document.querySelector('link[rel="icon"]') as HTMLLinkElement | null)
+        ?.href ??
+      "https://fav.farm/%E2%9D%93";
     const preferredNetworks = [
       ...(this.host.preferredNetworks ?? []),
       {
