@@ -75,6 +75,25 @@ CCC exports everything on the `ccc` object:
 import { ccc } from "@ckb-ccc/<package-name>";
 ```
 
+## Build and Run
+Run the demo of CCC in two steps:
+
+1. Install packages and build the project
+
+```shell
+# Navigate to the project directory and run the following commands to install all necessary packages and build the project:
+pnpm install
+pnpm build
+```
+2. Run the demo in development mode
+
+```shell
+# Go to the demo directory and start the development server:
+cd packages/demo
+pnpm run dev
+```
+
+
 ## Who uses CCC?
 
 | [<img height="50" src="./assets/projects/utxoswap.svg" />](https://utxoswap.xyz/) | [<img height="50" src="./assets/projects/mobit.png" />](https://mobit.app/) | [<img height="50" src="./assets/projects/did.png" />](https://d.id/) | [<img height="50" src="./assets/projects/omiga.svg" />](https://omiga.io/) |
