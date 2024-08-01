@@ -201,6 +201,9 @@ importers:
       '@ckb-lumos/helpers':
         specifier: ^0.22.2
         version: 0.22.2(encoding@0.1.13)
+      '@joyid/ckb':
+        specifier: ^1.0.1
+        version: 1.0.1(encoding@0.1.13)(typescript@5.4.5)
       '@noble/ciphers':
         specifier: ^0.5.3
         version: 0.5.3
@@ -396,9 +399,6 @@ importers:
       '@ckb-ccc/core':
         specifier: workspace:*
         version: link:../core
-      '@nervosnetwork/ckb-sdk-utils':
-        specifier: 0.109.0
-        version: 0.109.0
       '@nestjs/common':
         specifier: ^10.0.0
         version: 10.3.10(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1)
@@ -1235,17 +1235,11 @@ packages:
     resolution: {integrity: sha512-Z7C/xXCiGWsg0KuKsHTKJxbWhpI3Vs5GwLfOean7MGyVFGqdRgBbAjOCh6u4bbjPc/8MJ2pZmK/0DLdCbivLDA==}
     engines: {node: '>=8'}
 
-  '@nervosnetwork/ckb-sdk-utils@0.109.0':
-    resolution: {integrity: sha512-/lqq9qU2COhQZx6chfTzASbB+v9dFxX5WfdKpvMNvRT6tOHRGTVRgjBBS++GXLKpmn1934EJOlYOc6Peeo7g6g==}
+  '@nervosnetwork/ckb-sdk-utils@0.109.3':
+    resolution: {integrity: sha512-sV3WXlZmd765qtFsXpwl0Bl3hOgGev15Og810acO6iC0cVHEVvv/Uiabd8a2xkqyfziRDI0tfWC0DewOJB28rg==}
 
-  '@nervosnetwork/ckb-sdk-utils@0.109.2':
-    resolution: {integrity: sha512-pXgQvQQA2TuXiAmKGvL9kWjXdCsX+qP8HqHSLt6kwrjFe846d4dZxZ5AunpP+xsQNst+L5V7xcvunaBOkTdD6g==}
-
-  '@nervosnetwork/ckb-types@0.109.0':
-    resolution: {integrity: sha512-ZB3zpotHP8KDTex9Jxv7vi3sxVEqWijQjDmNA9laIEk01aoKVMyBZ09ByKuU46/88qgjmDsu3Ob7HqGaoFVtKQ==}
-
-  '@nervosnetwork/ckb-types@0.109.2':
-    resolution: {integrity: sha512-NAQbUi+j6tWlUYijvHqWIUwrbawIeAeSlxUQm0wkqSKbtAEoiR4L6RZS7cgn7uH+SMsp78mciXP8gixrfH3rEQ==}
+  '@nervosnetwork/ckb-types@0.109.3':
+    resolution: {integrity: sha512-i9EVTXCT0bTLpAQXAoF5zHGLWYCXNE5AP4Zl0Niwl3ZplaVAZHNU6ygsh2O3EGmCFv5qlkoY2DuLmsjysEaNLA==}
 
   '@nestjs/cli@10.4.2':
     resolution: {integrity: sha512-fQexIfLHfp6GUgX+CO4fOg+AEwV5ox/LHotQhyZi9wXUQDyIqS0NTTbumr//62EcX35qV4nU0359nYnuEdzG+A==}
@@ -6685,7 +6679,7 @@ snapshots:
   '@joyid/ckb@1.0.1(encoding@0.1.13)(typescript@5.4.5)':
     dependencies:
       '@joyid/common': 0.2.0(typescript@5.4.5)
-      '@nervosnetwork/ckb-sdk-utils': 0.109.2
+      '@nervosnetwork/ckb-sdk-utils': 0.109.3
       cross-fetch: 4.0.0(encoding@0.1.13)
       uncrypto: 0.1.3
     transitivePeerDependencies:
@@ -6827,25 +6821,15 @@ snapshots:
 
   '@lukeed/csprng@1.1.0': {}
 
-  '@nervosnetwork/ckb-sdk-utils@0.109.0':
+  '@nervosnetwork/ckb-sdk-utils@0.109.3':
     dependencies:
-      '@nervosnetwork/ckb-types': 0.109.0
+      '@nervosnetwork/ckb-types': 0.109.3
       bech32: 2.0.0
       elliptic: 6.5.4
       jsbi: 3.1.3
       tslib: 2.3.1
 
-  '@nervosnetwork/ckb-sdk-utils@0.109.2':
-    dependencies:
-      '@nervosnetwork/ckb-types': 0.109.2
-      bech32: 2.0.0
-      elliptic: 6.5.4
-      jsbi: 3.1.3
-      tslib: 2.3.1
-
-  '@nervosnetwork/ckb-types@0.109.0': {}
-
-  '@nervosnetwork/ckb-types@0.109.2': {}
+  '@nervosnetwork/ckb-types@0.109.3': {}
 
   '@nestjs/cli@10.4.2':
     dependencies:

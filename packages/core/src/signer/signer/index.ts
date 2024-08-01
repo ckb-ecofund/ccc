@@ -6,6 +6,7 @@ import { Hex } from "../../hex/index.js";
 import { Num } from "../../num/index.js";
 import { verifyMessageBtcEcdsa } from "../btc/index.js";
 import { verifyMessageCkbSecp256k1 } from "../ckb/verifyCkbSecp256k1.js";
+import { verifyMessageJoyId } from "../ckb/verifyJoyId.js";
 import { verifyMessageEvmPersonal } from "../evm/verify.js";
 import { verifyMessageNostrEvent } from "../nostr/verify.js";
 
@@ -106,7 +107,11 @@ export abstract class Signer {
           signature.identity,
         );
       case SignerSignType.JoyId:
-        throw new Error("Not supported yet");
+        return verifyMessageJoyId(
+          message,
+          signature.signature,
+          signature.identity,
+        );
       case SignerSignType.NostrEvent:
         return verifyMessageNostrEvent(
           message,
