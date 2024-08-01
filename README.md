@@ -76,21 +76,22 @@ import { ccc } from "@ckb-ccc/<package-name>";
 ```
 
 ## Build and Run
-To run the demo of CCC, you need to install all packages and build the project at the root directory first
+Run the demo of CCC in two steps:
+
+1. Install packages and build the project
 
 ```shell
+# Navigate to the project directory and run the following commands to install all necessary packages and build the project:
 pnpm install
 pnpm build
 ```
-Then, go to the demo directory and run the dev mode
+2. Run the demo in development mode
 
 ```shell
-cd packages
-cd demo
+# Go to the demo directory and start the development server:
+cd packages/demo
 pnpm run dev
 ```
-Finally, you can check the CCC demo at localhost
-
 
 
 ## Who uses CCC?
