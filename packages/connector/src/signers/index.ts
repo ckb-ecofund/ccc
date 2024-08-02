@@ -76,7 +76,7 @@ export class SignersController implements ReactiveController {
 
     ccc.JoyId.getJoyIdSigners(client, name, icon, preferredNetworks).forEach(
       ({ signer, name }) => {
-        this.addSigner("JoyID", name, JOY_ID_SVG, signer);
+        this.addSigner("JoyID Passkey", name, JOY_ID_SVG, signer);
       },
     );
 
