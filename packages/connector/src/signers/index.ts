@@ -74,6 +74,10 @@ export class SignersController implements ReactiveController {
 
     const { client, name, icon, preferredNetworks } = this.getConfig();
 
+    ccc.UtxoGlobal.getUtxoGlobalSigners(client).forEach(({ signer, name }) => {
+      this.addSigner("UTXO Global Wallet", name, UTXO_GLOBAL_SVG, signer);
+    });
+
     ccc.JoyId.getJoyIdSigners(client, name, icon, preferredNetworks).forEach(
       ({ signer, name }) => {
         this.addSigner("JoyID Passkey", name, JOY_ID_SVG, signer);
@@ -93,10 +97,6 @@ export class SignersController implements ReactiveController {
     if (nip07Signer) {
       this.addSigner("Nostr", "Nostr", NOSTR_SVG, nip07Signer);
     }
-
-    ccc.UtxoGlobal.getUtxoGlobalSigners(client).forEach(({ signer, name }) => {
-      this.addSigner("UTXO Global Wallet", name, UTXO_GLOBAL_SVG, signer);
-    });
 
     const eip6963Manager = new ccc.Eip6963.SignerFactory(client);
     this.resetListeners.push(
