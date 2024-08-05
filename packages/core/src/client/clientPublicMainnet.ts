@@ -4,7 +4,11 @@ import { MAINNET_SCRIPTS } from "./clientPublicMainnet.advanced.js";
 import { ClientJsonRpc } from "./jsonRpc/index.js";
 
 export class ClientPublicMainnet extends ClientJsonRpc {
-  constructor(url = "https://mainnet.ckb.dev/", timeout?: number) {
+  constructor(
+    url = "https://mainnet.ckb.dev/",
+    timeout?: number,
+    private readonly scripts = MAINNET_SCRIPTS,
+  ) {
     super(url, timeout);
   }
 
@@ -17,7 +21,7 @@ export class ClientPublicMainnet extends ClientJsonRpc {
   ): Promise<
     Pick<Script, "codeHash" | "hashType"> & { cellDeps: CellDepInfo[] }
   > {
-    const found = MAINNET_SCRIPTS[script];
+    const found = this.scripts[script];
     if (!found) {
       throw new Error(
         `No script information was found for ${script} on ${this.addressPrefix}`,

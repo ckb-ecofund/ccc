@@ -4,7 +4,11 @@ import { TESTNET_SCRIPTS } from "./clientPublicTestnet.advanced.js";
 import { ClientJsonRpc } from "./jsonRpc/index.js";
 
 export class ClientPublicTestnet extends ClientJsonRpc {
-  constructor(url = "https://testnet.ckb.dev/", timeout?: number) {
+  constructor(
+    url = "https://testnet.ckb.dev/",
+    timeout?: number,
+    private readonly scripts = TESTNET_SCRIPTS,
+  ) {
     super(url, timeout);
   }
 
@@ -17,7 +21,7 @@ export class ClientPublicTestnet extends ClientJsonRpc {
   ): Promise<
     Pick<Script, "codeHash" | "hashType"> & { cellDeps: CellDepInfo[] }
   > {
-    const found = TESTNET_SCRIPTS[script];
+    const found = this.scripts[script];
     return {
       ...found,
       cellDeps: found.cellDeps.map((c) => CellDepInfo.from(c)),

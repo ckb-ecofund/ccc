@@ -4,7 +4,7 @@ import { CellDepInfoLike, KnownScript } from "./client.js";
 export const TESTNET_SCRIPTS: Record<
   KnownScript,
   Pick<Script, "codeHash" | "hashType"> & { cellDeps: CellDepInfoLike[] }
-> = {
+> = Object.freeze({
   [KnownScript.Secp256k1Blake160]: {
     codeHash:
       "0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8",
@@ -232,4 +232,4 @@ export const TESTNET_SCRIPTS: Record<
       },
     ],
   },
-};
+});
