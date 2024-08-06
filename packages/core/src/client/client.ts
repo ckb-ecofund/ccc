@@ -198,16 +198,26 @@ export abstract class Client {
     limit = 10,
   ): AsyncGenerator<Cell> {
     const key = ClientIndexerSearchKey.from(keyLike);
+    const foundedOutPoints = [];
+
     for (const cell of this.usableCells) {
-      if (filterCell(key, cell)) {
-        yield cell;
+      if (!filterCell(key, cell)) {
+        continue;
       }
+
+      foundedOutPoints.push(cell.outPoint);
+      yield cell;
     }
 
     for await (const cell of this.findCells(key, order, limit)) {
-      if (!this.unusableOutPoints.some((o) => o.eq(cell.outPoint))) {
-        yield cell;
+      if (
+        this.unusableOutPoints.some((o) => o.eq(cell.outPoint)) ||
+        foundedOutPoints.some((founded) => founded.eq(cell.outPoint))
+      ) {
+        continue;
       }
+
+      yield cell;
     }
   }
 
