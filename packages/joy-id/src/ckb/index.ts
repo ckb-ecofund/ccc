@@ -245,7 +245,7 @@ export class CkbSigner extends ccc.Signer {
       throw new Error("No COTA cells for sub key wallet");
     }
 
-    tx.addCellDeps(cotaDeps);
+    tx.addCellDepsAtStart(cotaDeps);
   }
 
   /**

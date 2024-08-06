@@ -1195,6 +1195,27 @@ export class Transaction {
   }
 
   /**
+   * Add cell deps at the start if they are not existed
+   *
+   * @param cellDepLikes - The cell deps to add
+   *
+   * @example
+   * ```typescript
+   * tx.addCellDepsAtBegin(cellDep);
+   * ```
+   */
+  addCellDepsAtStart(...cellDepsLike: (CellDepLike | CellDepLike[])[]): void {
+    cellDepsLike.flat().forEach((cellDepLike) => {
+      const cellDep = CellDep.from(cellDepLike);
+      if (this.cellDeps.some((c) => c.eq(cellDep))) {
+        return;
+      }
+
+      this.cellDeps.unshift(cellDep);
+    });
+  }
+
+  /**
    * Add cell dep from infos if they are not existed
    *
    * @param client - A client for searching cell deps
