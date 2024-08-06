@@ -213,8 +213,11 @@ export class CkbSigner extends ccc.Signer {
     tx: ccc.Transaction,
     witness: ccc.WitnessArgs,
   ) {
-    if (this.connection?.keyType !== "sub_key") {
-      return [];
+    if (
+      this.connection?.keyType !== "sub_key" ||
+      (witness.outputType ?? "0x") !== "0x"
+    ) {
+      return;
     }
 
     const pubkeyHash = ccc.hashCkb(this.connection.publicKey).substring(0, 42);
