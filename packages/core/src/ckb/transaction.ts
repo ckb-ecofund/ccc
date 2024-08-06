@@ -1593,10 +1593,10 @@ export class Transaction {
     let leastExtraCapacity = Zero;
 
     while (true) {
-      const prepared = await from.prepareTransaction(this.clone());
+      const tx = this.clone();
       const collected = await (async () => {
         try {
-          return await prepared.completeInputsByCapacity(
+          return await tx.completeInputsByCapacity(
             from,
             leastFee + leastExtraCapacity,
             filter,
@@ -1610,22 +1610,21 @@ export class Transaction {
         }
       })();
 
+      await from.prepareTransaction(tx);
       if (leastFee === Zero) {
         // The initial fee is calculated based on prepared transaction
-        leastFee = prepared.estimateFee(feeRate);
+        leastFee = tx.estimateFee(feeRate);
       }
       const extraCapacity =
-        (await prepared.getInputsCapacity(from.client)) -
-        prepared.getOutputsCapacity();
+        (await tx.getInputsCapacity(from.client)) - tx.getOutputsCapacity();
       // The extra capacity paid the fee without a change
       if (extraCapacity === leastFee) {
-        this.copy(prepared);
+        this.copy(tx);
         return [collected, false];
       }
 
-      let changed = prepared.clone();
       const needed = numFrom(
-        await Promise.resolve(change(changed, extraCapacity - leastFee)),
+        await Promise.resolve(change(tx, extraCapacity - leastFee)),
       );
       // No enough extra capacity to create new cells for change
       if (needed > Zero) {
@@ -1634,8 +1633,7 @@ export class Transaction {
       }
 
       if (
-        (await changed.getInputsCapacity(from.client)) -
-          changed.getOutputsCapacity() !==
+        (await tx.getInputsCapacity(from.client)) - tx.getOutputsCapacity() !==
         leastFee
       ) {
         throw new Error(
@@ -1644,14 +1642,14 @@ export class Transaction {
       }
 
       // New change cells created, update the fee
-      await from.prepareTransaction(changed);
-      const changedFee = changed.estimateFee(feeRate);
+      await from.prepareTransaction(tx);
+      const changedFee = tx.estimateFee(feeRate);
       if (leastFee > changedFee) {
         throw new Error("The change function removed existed transaction data");
       }
       // The fee has been paid
       if (leastFee === changedFee) {
-        this.copy(changed);
+        this.copy(tx);
         return [collected, true];
       }
 
