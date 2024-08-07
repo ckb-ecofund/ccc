@@ -73,7 +73,7 @@ export abstract class Signer {
   matchNetworkPreference(
     preferences: NetworkPreference[],
     currentNetwork: string,
-  ) {
+  ): NetworkPreference | undefined {
     if (
       preferences.some(({ signerType, addressPrefix, network }) => {
         signerType === this.type &&

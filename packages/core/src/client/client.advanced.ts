@@ -57,7 +57,7 @@ export function filterScript(
 export function filterNumByRange(
   lengthLike: NumLike,
   range: [NumLike, NumLike] | undefined,
-) {
+): boolean {
   if (!range) {
     return true;
   }

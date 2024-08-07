@@ -76,11 +76,11 @@ export function fixedPointFrom(val: FixedPointLike, decimals = 8): FixedPoint {
  * Represents the fixed point value of zero as a bigint.
  */
 
-export const Zero = 0n;
+export const Zero: FixedPoint = 0n;
 
 /**
  * Represents the fixed point value of one as a FixedPoint (bigint).
  * Equivalent to 1 in fixed-point representation with default decimals (8).
  */
 
-export const One = fixedPointFrom("1");
+export const One: FixedPoint = fixedPointFrom("1");

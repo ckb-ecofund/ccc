@@ -94,7 +94,7 @@ export class Address {
     client: Client,
     script: KnownScript,
     args: HexLike,
-  ) {
+  ): Promise<Address> {
     return Address.from({
       script: await Script.fromKnownScript(client, script, args),
       prefix: client.addressPrefix,

@@ -22,7 +22,25 @@ export async function keystoreEncrypt(
   privateKeyLike: BytesLike,
   chainCodeLike: BytesLike,
   password: string,
-) {
+): Promise<{
+  id: string;
+  crypto: {
+    ciphertext: string;
+    cipherparams: {
+      iv: string;
+    };
+    cipher: string;
+    kdf: string;
+    kdfparams: {
+      n: number;
+      r: number;
+      p: number;
+      dklen: number;
+      salt: string;
+    };
+    mac: string;
+  };
+}> {
   const salt = randomBytes(32);
   const iv = randomBytes(16);
   const kdfparams = {

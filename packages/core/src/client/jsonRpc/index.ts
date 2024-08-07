@@ -63,7 +63,7 @@ export abstract class ClientJsonRpc extends Client {
    * @returns The URL of the JSON-RPC server.
    */
 
-  get url() {
+  get url(): string {
     return this.url_;
   }
 
@@ -206,7 +206,7 @@ export abstract class ClientJsonRpc extends Client {
     rpcMethod: string,
     inTransformers: (((_: any) => unknown) | undefined)[],
     outTransformer?: (_: any) => unknown,
-  ) {
+  ): (...req: unknown[]) => Promise<unknown> {
     return async (...req: unknown[]) => {
       const payload = ClientJsonRpc.buildPayload(
         rpcMethod,
@@ -234,7 +234,7 @@ export abstract class ClientJsonRpc extends Client {
    * @throws Will throw an error if the response ID does not match the request ID, or if the response contains an error.
    */
 
-  async send(payload: JsonRpcPayload) {
+  async send(payload: JsonRpcPayload): Promise<unknown> {
     const aborter = new AbortController();
     const abortTimer = setTimeout(() => aborter.abort(), this.timeout);
 
