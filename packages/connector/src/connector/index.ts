@@ -93,7 +93,7 @@ export class WebComponentConnector extends LitElement {
     this.dispatchEvent(new Event("willUpdate"));
   }
 
-  async refreshSigner() {
+  refreshSigner() {
     const wallet = this.signersController.wallets.find(
       ({ name }) => name === this.walletName,
     );
