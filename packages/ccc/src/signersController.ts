@@ -19,33 +19,25 @@ export type WalletWithSigners = ccc.Wallet & {
 export class SignersController {
   private resetListeners: (() => void)[] = [];
 
-  constructor(
-    public client: ccc.Client,
-    public onUpdate: (wallets: WalletWithSigners[]) => void,
-    public configs?: {
-      signerFilter?: (
-        signerInfo: ccc.SignerInfo,
-        wallet: ccc.Wallet,
-      ) => Promise<boolean>;
-      preferredNetworks?: ccc.NetworkPreference[];
-      name?: string;
-      icon?: string;
-    },
-  ) {}
+  constructor() {}
 
-  getConfig() {
+  getConfig(configs?: {
+    preferredNetworks?: ccc.NetworkPreference[];
+    name?: string;
+    icon?: string;
+  }) {
     const name =
-      this.configs?.name ??
+      configs?.name ??
       (document.querySelector("head title") as HTMLTitleElement | null)?.text ??
       "Unknown";
     const icon =
-      this.configs?.icon ??
+      configs?.icon ??
       (document.querySelector('link[rel="icon"]') as HTMLLinkElement | null)
         ?.href ??
       "https://fav.farm/%E2%9D%93";
 
     const preferredNetworks = [
-      ...(this.configs?.preferredNetworks ?? []),
+      ...(configs?.preferredNetworks ?? []),
       {
         addressPrefix: "ckb",
         signerType: ccc.SignerType.BTC,
@@ -59,7 +51,6 @@ export class SignersController {
     ];
 
     return {
-      client: this.client,
       name,
       icon,
       preferredNetworks,
@@ -71,18 +62,32 @@ export class SignersController {
     this.resetListeners = [];
   }
 
-  async refresh() {
+  async refresh(
+    client: ccc.Client,
+    onUpdate: (wallets: WalletWithSigners[]) => void,
+    configs?: {
+      signerFilter?: (
+        signerInfo: ccc.SignerInfo,
+        wallet: ccc.Wallet,
+      ) => Promise<boolean>;
+      preferredNetworks?: ccc.NetworkPreference[];
+      name?: string;
+      icon?: string;
+    },
+  ) {
     this.disconnect();
 
     const wallets: WalletWithSigners[] = [];
 
-    const { client, name, icon, preferredNetworks } = this.getConfig();
+    const { name, icon, preferredNetworks } = this.getConfig(configs);
 
     await this.addSigners(
       wallets,
       "UTXO Global Wallet",
       UTXO_GLOBAL_SVG,
       UtxoGlobal.getUtxoGlobalSigners(client),
+      onUpdate,
+      configs,
     );
 
     await this.addSigners(
@@ -90,6 +95,8 @@ export class SignersController {
       "JoyID Passkey",
       JOY_ID_SVG,
       JoyId.getJoyIdSigners(client, name, icon, preferredNetworks),
+      onUpdate,
+      configs,
     );
 
     await this.addSigners(
@@ -97,6 +104,8 @@ export class SignersController {
       "UniSat",
       UNI_SAT_SVG,
       UniSat.getUniSatSigners(client, preferredNetworks),
+      onUpdate,
+      configs,
     );
 
     await this.addSigners(
@@ -104,6 +113,8 @@ export class SignersController {
       "OKX Wallet",
       OKX_SVG,
       Okx.getOKXSigners(client, preferredNetworks),
+      onUpdate,
+      configs,
     );
 
     await this.addSigner(
@@ -112,6 +123,8 @@ export class SignersController {
       NOSTR_SVG,
       "Nostr",
       Nip07.getNip07Signer(client),
+      onUpdate,
+      configs,
     );
 
     this.resetListeners.push(
@@ -122,6 +135,8 @@ export class SignersController {
           signer.detail.info.icon,
           "EVM",
           signer,
+          onUpdate,
+          configs,
         ),
       ),
     );
@@ -134,6 +149,8 @@ export class SignersController {
       client,
       [ccc.SignerType.EVM],
       `https://metamask.app.link/dapp/${window.location.href}`,
+      onUpdate,
+      configs,
     );
     await this.addLinkSigners(
       wallets,
@@ -146,6 +163,8 @@ export class SignersController {
           "okx://wallet/dapp/url?dappUrl=" +
             encodeURIComponent(window.location.href),
         ),
+      onUpdate,
+      configs,
     );
     await this.addLinkSigners(
       wallets,
@@ -154,6 +173,8 @@ export class SignersController {
       client,
       [ccc.SignerType.BTC],
       "https://unisat.io/download",
+      onUpdate,
+      configs,
     );
     await this.addLinkSigners(
       wallets,
@@ -162,6 +183,8 @@ export class SignersController {
       client,
       [ccc.SignerType.CKB, ccc.SignerType.BTC],
       "https://chromewebstore.google.com/detail/lnamkkidoonpeknminiadpgjiofpdmle",
+      onUpdate,
+      configs,
     );
     // ===
   }
@@ -173,6 +196,13 @@ export class SignersController {
     client: ccc.Client,
     signerTypes: ccc.SignerType[],
     link: string,
+    onUpdate: (wallets: WalletWithSigners[]) => void,
+    configs?: {
+      signerFilter?: (
+        signerInfo: ccc.SignerInfo,
+        wallet: ccc.Wallet,
+      ) => Promise<boolean>;
+    },
   ) {
     return this.addSigners(
       wallets,
@@ -182,6 +212,8 @@ export class SignersController {
         name: type,
         signer: new ccc.SignerOpenLink(client, type, link),
       })),
+      onUpdate,
+      configs,
     );
   }
 
@@ -190,10 +222,25 @@ export class SignersController {
     walletName: string,
     icon: string,
     signers: ccc.SignerInfo[],
+    onUpdate: (wallets: WalletWithSigners[]) => void,
+    configs?: {
+      signerFilter?: (
+        signerInfo: ccc.SignerInfo,
+        wallet: ccc.Wallet,
+      ) => Promise<boolean>;
+    },
   ) {
     return Promise.all(
       signers.map(({ signer, name }) =>
-        this.addSigner(wallets, walletName, icon, name, signer),
+        this.addSigner(
+          wallets,
+          walletName,
+          icon,
+          name,
+          signer,
+          onUpdate,
+          configs,
+        ),
       ),
     );
   }
@@ -204,13 +251,20 @@ export class SignersController {
     icon: string,
     signerName: string,
     signer: ccc.Signer | null | undefined,
+    onUpdate: (wallets: WalletWithSigners[]) => void,
+    configs?: {
+      signerFilter?: (
+        signerInfo: ccc.SignerInfo,
+        wallet: ccc.Wallet,
+      ) => Promise<boolean>;
+    },
   ): Promise<void> {
     if (!signer) {
       return;
     }
 
     const signerInfo = { name: signerName, signer };
-    const signerFilter = this.configs?.signerFilter;
+    const signerFilter = configs?.signerFilter;
 
     if (
       signerFilter &&
@@ -234,6 +288,6 @@ export class SignersController {
       wallet.signers = signers.length !== 0 ? signers : [signerInfo];
     }
 
-    this.onUpdate(wallets);
+    onUpdate(wallets);
   }
 }

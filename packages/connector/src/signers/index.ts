@@ -1,8 +1,10 @@
 import { ccc } from "@ckb-ccc/ccc";
 import { ReactiveControllerHost } from "lit";
 
-export class SignersController extends ccc.SignersController {
+export class SignersController {
   public wallets: ccc.WalletWithSigners[] = [];
+
+  private readonly controller = new ccc.SignersController();
 
   constructor(
     private readonly host: ReactiveControllerHost & {
@@ -17,15 +19,18 @@ export class SignersController extends ccc.SignersController {
       refreshSigner: () => void;
     },
   ) {
-    super(
-      host.client,
+    host.addController(this);
+  }
+
+  refresh() {
+    this.controller.refresh(
+      this.host.client,
       (wallets) => {
         this.wallets = [...wallets];
         this.update();
       },
-      host,
+      this.host,
     );
-    host.addController(this);
   }
 
   update() {
@@ -40,6 +45,6 @@ export class SignersController extends ccc.SignersController {
   }
 
   hostDisconnected(): void {
-    this.disconnect();
+    this.controller.disconnect();
   }
 }
