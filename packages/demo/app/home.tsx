@@ -22,6 +22,7 @@ import { TextInput } from "./components/Input";
 import { Hash } from "./tabs/Hash";
 import { Mnemonic } from "./tabs/Mnemonic";
 import { Keystore } from "./tabs/Keystore";
+import { MintSpore } from "./tabs/MintSpore";
 
 function WalletIcon({
   wallet,
@@ -141,6 +142,7 @@ export default function Home() {
             ["Transfer xUDT", TransferXUdt],
             ["Issue xUDT (SUS)", IssueXUdtSul],
             ["Issue xUDT (Type ID)", IssueXUdtTypeId],
+            ["Mint Spore NFT (DoB)", MintSpore],
             ["Hash", Hash],
             ["Mnemonic", Mnemonic],
             ["Keystore", Keystore],
