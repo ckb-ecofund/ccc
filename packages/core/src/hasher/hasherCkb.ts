@@ -7,7 +7,7 @@ import { CKB_BLAKE2B_PERSONAL } from "./advanced.js";
 import { Hasher } from "./hasher.js";
 
 export class HasherCkb implements Hasher {
-  private readonly hasher: ReturnType<typeof blake2b["create"]>;
+  private readonly hasher: ReturnType<(typeof blake2b)["create"]>;
 
   /**
    * Creates an instance of Hasher.
