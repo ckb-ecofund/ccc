@@ -7,7 +7,7 @@ import {
   fixedPointFrom,
   fixedPointToString,
 } from "../fixedPoint/index.js";
-import { Hasher, hashCkb } from "../hasher/index.js";
+import { Hasher, HasherCkb, hashCkb } from "../hasher/index.js";
 import { Hex, HexLike, hexFrom } from "../hex/index.js";
 import {
   Num,
@@ -1070,10 +1070,10 @@ export class Transaction {
   async getSignHashInfo(
     scriptLike: ScriptLike,
     client: Client,
+    hasher: Hasher = new HasherCkb(),
   ): Promise<{ message: Hex; position: number } | undefined> {
     const script = Script.from(scriptLike);
     let position = -1;
-    const hasher = new Hasher();
     hasher.update(this.hash());
 
     for (let i = 0; i < this.witnesses.length; i += 1) {
@@ -1109,6 +1109,40 @@ export class Transaction {
       message: hasher.digest(),
       position,
     };
+  }
+
+  /**
+   * Find the first occurrence of a input with the specified lock id
+   *
+   * @param scriptIdLike - The script associated with the transaction, represented as a ScriptLike object without args.
+   * @param client - The client for complete extra infos in the transaction.
+   * @returns A promise that resolves to the found index
+   *
+   * @example
+   * ```typescript
+   * const index = await tx.findInputIndexByLockId(scriptIdLike, client);
+   * ```
+   */
+  async findInputIndexByLockId(
+    scriptLike: Pick<ScriptLike, "codeHash" | "hashType">,
+    client: Client,
+  ): Promise<number | undefined> {
+    const script = Script.from({ ...scriptLike, args: "0x" });
+
+    for (let i = 0; i < this.inputs.length; i += 1) {
+      const input = this.inputs[i];
+      await input.completeExtraInfos(client);
+      if (!input.cellOutput) {
+        throw new Error("Unable to complete input");
+      }
+
+      if (
+        script.codeHash === input.cellOutput.lock.codeHash &&
+        script.hashType === input.cellOutput.lock.hashType
+      ) {
+        return i;
+      }
+    }
   }
 
   /**

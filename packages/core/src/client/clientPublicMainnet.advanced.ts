@@ -114,6 +114,29 @@ export const MAINNET_SCRIPTS: Record<
       },
     ],
   },
+  [KnownScript.PWLock]: {
+    codeHash:
+      "0xbf43c3602455798c1a61a596e0d95278864c552fafe231c063b3fabf97a8febc",
+    hashType: "type",
+    cellDeps: [
+      {
+        cellDep: {
+          outPoint: {
+            txHash:
+              "0x1d60cb8f4666e039f418ea94730b1a8c5aa0bf2f7781474406387462924d15d4",
+            index: 0,
+          },
+          depType: "code",
+        },
+        type: {
+          codeHash:
+            "0x00000000000000000000000000000000000000000000000000545950455f4944",
+          hashType: "type",
+          args: "0x42ade2f25eb938b5dbfd3d8f07b8b07aa593d848e7ff14bdfbbea5aeb6175261",
+        },
+      },
+    ],
+  },
   [KnownScript.OmniLock]: {
     codeHash:
       "0x9b819793a64463aed77c615d6cb226eea5487ccfc0783043a587254cda2b6f26",

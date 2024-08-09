@@ -36,6 +36,7 @@ export enum KnownScript {
   XUdt = "XUdt",
   JoyId = "JoyId",
   COTA = "COTA",
+  PWLock = "PWLock",
   OmniLock = "OmniLock",
   NostrLock = "NostrLock",
   UniqueType = "UniqueType",

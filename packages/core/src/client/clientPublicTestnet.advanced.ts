@@ -119,6 +119,29 @@ export const TESTNET_SCRIPTS: Record<
       },
     ],
   },
+  [KnownScript.PWLock]: {
+    codeHash:
+      "0x58c5f491aba6d61678b7cf7edf4910b1f5e00ec0cde2f42e0abb4fd9aff25a63",
+    hashType: "type",
+    cellDeps: [
+      {
+        cellDep: {
+          outPoint: {
+            txHash:
+              "0x57a62003daeab9d54aa29b944fc3b451213a5ebdf2e232216a3cfed0dde61b38",
+            index: 0,
+          },
+          depType: "code",
+        },
+        type: {
+          codeHash:
+            "0x00000000000000000000000000000000000000000000000000545950455f4944",
+          hashType: "type",
+          args: "0xf6d90bfe3041d0fd7e01c45770241697f5f837974bd6ae1672a7ec0f9f523268",
+        },
+      },
+    ],
+  },
   [KnownScript.OmniLock]: {
     codeHash:
       "0xf329effd1c475a2978453c8600e1eaf0bc2087ee093c3ee64cc96ec6847752cb",
