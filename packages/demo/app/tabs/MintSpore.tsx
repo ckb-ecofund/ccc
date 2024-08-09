@@ -11,11 +11,11 @@ import { bytes, number } from "@ckb-lumos/codec";
 type Pattern = {
   name: string;
   type: "string" | "number";
-  /// offset: number = pattern index
   /// len
-  // if pattern = options => len = 1
-  // if pattern = range, utf8, raw => len = bytes len
+  // if pattern = `options` => len = 1
+  // if pattern = `range` | `utf8` | `raw` => len = bytes len
   len: number;
+  /// offset: number = pattern index
   pattern: "options" | "range" | "utf8" | "raw";
   args?: (number | string)[];
 };
