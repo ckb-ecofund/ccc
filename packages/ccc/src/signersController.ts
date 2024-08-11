@@ -3,6 +3,7 @@ import { Eip6963 } from "@ckb-ccc/eip6963";
 import { JoyId } from "@ckb-ccc/joy-id";
 import { Nip07 } from "@ckb-ccc/nip07";
 import { Okx } from "@ckb-ccc/okx";
+import { Rei } from "@ckb-ccc/rei";
 import { UniSat } from "@ckb-ccc/uni-sat";
 import { UtxoGlobal } from "@ckb-ccc/utxo-global";
 import { ETH_SVG } from "./assets/eth.svg.js";
@@ -10,6 +11,7 @@ import { JOY_ID_SVG } from "./assets/joy-id.svg.js";
 import { METAMASK_SVG } from "./assets/metamask.svg.js";
 import { NOSTR_SVG } from "./assets/nostr.svg.js";
 import { OKX_SVG } from "./assets/okx.svg.js";
+import { REI_SVG } from "./assets/rei.svg.js";
 import { UNI_SAT_SVG } from "./assets/uni-sat.svg.js";
 import { UTXO_GLOBAL_SVG } from "./assets/utxo-global.svg.js";
 
@@ -93,6 +95,15 @@ export class SignersController {
       "UTXO Global Wallet",
       UTXO_GLOBAL_SVG,
       UtxoGlobal.getUtxoGlobalSigners(client),
+      onUpdate,
+      configs,
+    );
+
+    await this.addSigners(
+      wallets,
+      "Rei Wallet",
+      REI_SVG,
+      Rei.getReiSigners(client),
       onUpdate,
       configs,
     );
