@@ -4,5 +4,6 @@ export * from "@ckb-ccc/joy-id";
 export * from "@ckb-ccc/nip07";
 export * from "@ckb-ccc/okx";
 export * from "@ckb-ccc/uni-sat";
+export * from "@ckb-ccc/rei";
 export * from "@ckb-ccc/utxo-global";
 export * from "./signersController.js";

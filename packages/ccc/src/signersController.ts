@@ -1,11 +1,13 @@
 import { ccc } from "@ckb-ccc/core";
 import { Eip6963 } from "@ckb-ccc/eip6963";
+import { Rei } from "@ckb-ccc/rei";
 import { JoyId } from "@ckb-ccc/joy-id";
 import { Nip07 } from "@ckb-ccc/nip07";
 import { Okx } from "@ckb-ccc/okx";
 import { UniSat } from "@ckb-ccc/uni-sat";
 import { UtxoGlobal } from "@ckb-ccc/utxo-global";
 import { JOY_ID_SVG } from "./assets/joy-id.svg.js";
+import { REI_SVG } from "./assets/rei.svg.js";
 import { METAMASK_SVG } from "./assets/metamask.svg.js";
 import { NOSTR_SVG } from "./assets/nostr.svg.js";
 import { OKX_SVG } from "./assets/okx.svg.js";
@@ -90,6 +92,16 @@ export class SignersController {
       configs,
     );
 
+
+    await this.addSigners(
+        wallets,
+        "Rei Wallet",
+        REI_SVG,
+        Rei.getReiSigners(client),
+        onUpdate,
+        configs,
+    );
+
     await this.addSigners(
       wallets,
       "JoyID Passkey",
@@ -142,6 +154,19 @@ export class SignersController {
     );
 
     // === Dummy signers ===
+
+    await this.addLinkSigners(
+        wallets,
+        "Rei Wallet",
+        REI_SVG,
+        client,
+        [ccc.SignerType.CKB],
+        "https://reiwallet.io/",
+        onUpdate,
+        configs,
+    );
+
+
     await this.addLinkSigners(
       wallets,
       "MetaMask",
