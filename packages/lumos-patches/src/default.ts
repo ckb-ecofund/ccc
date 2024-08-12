@@ -214,15 +214,6 @@ export function generateScriptInfo(
   };
 }
 
-const NOSTR_TESTNET_TYPE_HASH =
-  "0x6ae5ee0cb887b2df5a9a18137315b9bdc55be8d52637b2de0624092d5f0c91d5";
-const NOSTR_TESTNET_TYPE: Script = {
-  codeHash:
-    "0x00000000000000000000000000000000000000000000000000545950455f4944",
-  hashType: "type",
-  args: "0x8dc56c6f35f0c535e23ded1629b1f20535477a1b43e59f14617d11e32c50e0aa",
-};
-
 /**
  * Generates default script information for CCC.
  * @returns {LockScriptInfo[]} An array of lock script information.
