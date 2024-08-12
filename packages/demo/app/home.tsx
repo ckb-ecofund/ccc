@@ -185,7 +185,7 @@ export default function Home() {
 
   return (
     <>
-      <header className="flex justify-center">
+      <header className="flex justify-center bg-white">
         <img
           src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/logo.svg"
           alt="CCC Logo"
