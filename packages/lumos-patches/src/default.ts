@@ -191,6 +191,23 @@ export function generateScriptInfo(
           }),
         );
 
+        const firstIndex = txSkeleton
+          .get("inputs")
+          .findIndex((input) =>
+            ccc.Script.from(input.cellOutput.lock).eq(
+              ccc.Script.from(fromScript),
+            ),
+          );
+        txSkeleton = txSkeleton.update("witnesses", (witnesses) => {
+          if (witnesses.get(firstIndex)) {
+            return witnesses;
+          }
+
+          return witnesses.merge(
+            Array.from(new Array(firstIndex + 1 - witnesses.size), () => "0x"),
+          );
+        });
+
         return txSkeleton;
       },
     },
