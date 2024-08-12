@@ -31,7 +31,13 @@ export class ConnectedScene extends LitElement {
   private balance?: ccc.Num;
 
   willUpdate(changedProperties: PropertyValues<this>): void {
-    if (changedProperties.has("signer") && this.signer) {
+    if (
+      (!this.recommendedAddress ||
+        !this.internalAddress ||
+        !this.balance ||
+        changedProperties.has("signer")) &&
+      this.signer
+    ) {
       this.signer
         .getRecommendedAddress()
         .then((v) => (this.recommendedAddress = v));
