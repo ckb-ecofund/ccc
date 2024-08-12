@@ -1,19 +1,47 @@
-import { LockScriptInfo } from "@ckb-lumos/common-scripts";
-
 import { ccc } from "@ckb-ccc/core";
 import { cccA } from "@ckb-ccc/core/advanced";
 import {
   Cell,
   CellCollector,
+  CellDep,
   CellProvider,
   QueryOptions,
   Script,
 } from "@ckb-lumos/base";
 import { bytes } from "@ckb-lumos/codec";
-import { FromInfo, parseFromInfo } from "@ckb-lumos/common-scripts";
-import { addCellDep } from "@ckb-lumos/common-scripts/lib/helper";
+import {
+  FromInfo,
+  LockScriptInfo,
+  parseFromInfo,
+} from "@ckb-lumos/common-scripts";
 import { Config, getConfig } from "@ckb-lumos/config-manager";
+import { TransactionSkeletonType } from "@ckb-lumos/helpers";
 import { asserts } from "./utils.js";
+
+function addCellDep(
+  txSkeleton: TransactionSkeletonType,
+  newCellDep: CellDep,
+): TransactionSkeletonType {
+  const cellDep = txSkeleton.get("cellDeps").find((cellDep) => {
+    return (
+      cellDep.depType === newCellDep.depType &&
+      ccc.OutPoint.from(cellDep.outPoint).eq(
+        ccc.OutPoint.from(newCellDep.outPoint),
+      )
+    );
+  });
+
+  if (!cellDep) {
+    txSkeleton = txSkeleton.update("cellDeps", (cellDeps) => {
+      return cellDeps.push({
+        outPoint: newCellDep.outPoint,
+        depType: newCellDep.depType,
+      });
+    });
+  }
+
+  return txSkeleton;
+}
 
 /**
  * Generates a class for collecting custom script cells.
