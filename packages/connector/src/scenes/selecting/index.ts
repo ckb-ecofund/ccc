@@ -1,7 +1,6 @@
 import { ccc } from "@ckb-ccc/ccc";
 import { css, html, LitElement } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
-import { WalletWithSigners } from "../../types";
 import { generateConnectingScene } from "./connecting";
 import { generateSignersScene } from "./signers";
 import { generateWalletsScene } from "./wallets";
@@ -18,10 +17,10 @@ export class ConnectedEvent extends Event {
 @customElement("ccc-selecting-scene")
 export class SelectingScene extends LitElement {
   @property()
-  public wallets?: WalletWithSigners[];
+  public wallets?: ccc.WalletWithSigners[];
 
   @state()
-  private selectedWallet?: WalletWithSigners;
+  private selectedWallet?: ccc.WalletWithSigners;
   @state()
   private selectedSigner?: ccc.SignerInfo;
   @state()
@@ -81,7 +80,7 @@ export class SelectingScene extends LitElement {
   }
 
   private signerSelectedHandler = (
-    wallet: WalletWithSigners,
+    wallet: ccc.WalletWithSigners,
     signerInfo: ccc.SignerInfo,
   ) => {
     this.connectingError = undefined;

@@ -1,5 +1,5 @@
 import { Address } from "../../address/index.js";
-import { BytesLike, bytesConcat, bytesFrom } from "../../bytes/index.js";
+import { Bytes, BytesLike, bytesConcat, bytesFrom } from "../../bytes/index.js";
 import {
   Script,
   Transaction,
@@ -7,7 +7,8 @@ import {
   WitnessArgs,
 } from "../../ckb/index.js";
 import { KnownScript } from "../../client/index.js";
-import { Hex, hexFrom } from "../../hex/index.js";
+import { Hasher, HasherKeecak256 } from "../../hasher/index.js";
+import { Hex, HexLike, hexFrom } from "../../hex/index.js";
 import { numToBytes } from "../../num/index.js";
 import { reduceAsync } from "../../utils/index.js";
 import { Signer, SignerSignType, SignerType } from "../signer/index.js";
@@ -48,13 +49,30 @@ export abstract class SignerEvm extends Signer {
    */
   async getAddressObjs(): Promise<Address[]> {
     const account = await this.getEvmAccount();
-    return [
-      await this._getOmniLockEvmAddressObj(account),
-      await this._getOmniLockOldEvmAddressObj(account),
-    ];
+    const addresses = await Promise.all([
+      this._getOmniLockAddresses(account),
+      this._getPWLockAddresses(account),
+    ]);
+
+    return addresses.flat();
   }
 
-  async _getOmniLockEvmAddressObj(account: string): Promise<Address> {
+  _getOmniLockAddresses(account: HexLike): Promise<Address[]> {
+    return Promise.all([
+      this._getOmniLockEvmAddressObj(account),
+      this._getOmniLockOldEvmAddressObj(account),
+    ]);
+  }
+
+  async _getPWLockAddresses(account: HexLike): Promise<Address[]> {
+    const addr = await this._getPWLockEvmAddressObj(account);
+    if (!addr) {
+      return [];
+    }
+    return [addr];
+  }
+
+  async _getOmniLockEvmAddressObj(account: HexLike): Promise<Address> {
     return Address.fromKnownScript(
       this.client,
       KnownScript.OmniLock,
@@ -62,12 +80,25 @@ export abstract class SignerEvm extends Signer {
     );
   }
 
-  async _getOmniLockOldEvmAddressObj(account: string): Promise<Address> {
+  async _getOmniLockOldEvmAddressObj(account: HexLike): Promise<Address> {
     return Address.fromKnownScript(
       this.client,
       KnownScript.OmniLock,
       hexFrom([0x1, ...bytesFrom(account), 0x00]),
     );
+  }
+
+  async _getPWLockEvmAddressObj(
+    account: HexLike,
+  ): Promise<Address | undefined> {
+    try {
+      return Address.fromKnownScript(
+        this.client,
+        KnownScript.PWLock,
+        hexFrom(bytesFrom(account)),
+      );
+    } catch {}
+    return;
   }
 
   /**
@@ -78,12 +109,39 @@ export abstract class SignerEvm extends Signer {
    */
   async prepareTransaction(txLike: TransactionLike): Promise<Transaction> {
     const tx = Transaction.from(txLike);
-    await tx.addCellDepsOfKnownScripts(this.client, KnownScript.OmniLock);
-    return reduceAsync(
-      await this.getAddressObjs(),
+    if (
+      (await tx.findInputIndexByLockId(
+        await this.client.getKnownScript(KnownScript.OmniLock),
+        this.client,
+      )) !== undefined
+    ) {
+      await tx.addCellDepsOfKnownScripts(this.client, KnownScript.OmniLock);
+    }
+    if (
+      (await tx.findInputIndexByLockId(
+        await this.client.getKnownScript(KnownScript.PWLock),
+        this.client,
+      )) !== undefined
+    ) {
+      await tx.addCellDepsOfKnownScripts(this.client, KnownScript.PWLock);
+    }
+
+    const account = await this.getEvmAccount();
+    const omniLockAddresses = await this._getOmniLockAddresses(account);
+    const pwLockAddresses = await this._getPWLockAddresses(account);
+
+    const omniTx = reduceAsync(
+      omniLockAddresses,
       (tx: Transaction, { script }) =>
         tx.prepareSighashAllWitness(script, 85, this.client),
       tx,
+    );
+
+    return reduceAsync(
+      pwLockAddresses,
+      (tx: Transaction, { script }) =>
+        tx.prepareSighashAllWitness(script, 65, this.client),
+      omniTx,
     );
   }
 
@@ -112,6 +170,15 @@ export abstract class SignerEvm extends Signer {
       (hash) => bytesFrom(hash),
     );
 
+    const pwAddress = await this._getPWLockEvmAddressObj(account);
+    if (pwAddress) {
+      tx = await this._signPWLockScriptForTransaction(
+        tx,
+        pwAddress.script,
+        (hash) => bytesFrom(hash),
+      );
+    }
+
     return tx;
   }
 
@@ -120,9 +187,63 @@ export abstract class SignerEvm extends Signer {
     script: Script,
     messageTransformer: (hash: string) => BytesLike,
   ): Promise<Transaction> {
-    const info = await tx.getSignHashInfo(script, this.client);
+    const info = await this._signPersonalEvmForTransaction(
+      tx,
+      script,
+      messageTransformer,
+    );
     if (!info) {
       return tx;
+    }
+
+    const witness = WitnessArgs.fromBytes(tx.witnesses[info.position]);
+    witness.lock = hexFrom(
+      bytesConcat(
+        numToBytes(5 * 4 + info.signature.length, 4),
+        numToBytes(4 * 4, 4),
+        numToBytes(5 * 4 + info.signature.length, 4),
+        numToBytes(5 * 4 + info.signature.length, 4),
+        numToBytes(info.signature.length, 4),
+        info.signature,
+      ),
+    );
+
+    tx.setWitnessArgsAt(info.position, witness);
+
+    return tx;
+  }
+
+  async _signPWLockScriptForTransaction(
+    tx: Transaction,
+    script: Script,
+    messageTransformer: (hash: string) => BytesLike,
+  ): Promise<Transaction> {
+    const info = await this._signPersonalEvmForTransaction(
+      tx,
+      script,
+      messageTransformer,
+      new HasherKeecak256(),
+    );
+    if (!info) {
+      return tx;
+    }
+
+    const witness = WitnessArgs.fromBytes(tx.witnesses[info.position]);
+    witness.lock = hexFrom(info.signature);
+    tx.setWitnessArgsAt(info.position, witness);
+
+    return tx;
+  }
+
+  async _signPersonalEvmForTransaction(
+    tx: Transaction,
+    script: Script,
+    messageTransformer: (hash: string) => BytesLike,
+    hasher?: Hasher,
+  ): Promise<{ signature: Bytes; position: number } | undefined> {
+    const info = await tx.getSignHashInfo(script, this.client, hasher);
+    if (!info) {
+      return;
     }
 
     const signature = bytesFrom(
@@ -132,20 +253,6 @@ export abstract class SignerEvm extends Signer {
       signature[signature.length - 1] -= 27;
     }
 
-    const witness = WitnessArgs.fromBytes(tx.witnesses[info.position]);
-    witness.lock = hexFrom(
-      bytesConcat(
-        numToBytes(5 * 4 + signature.length, 4),
-        numToBytes(4 * 4, 4),
-        numToBytes(5 * 4 + signature.length, 4),
-        numToBytes(5 * 4 + signature.length, 4),
-        numToBytes(signature.length, 4),
-        signature,
-      ),
-    );
-
-    tx.setWitnessArgsAt(info.position, witness);
-
-    return tx;
+    return { signature, position: info.position };
   }
 }

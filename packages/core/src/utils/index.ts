@@ -118,7 +118,7 @@ export async function reduceAsync<T, V>(
     i: number,
     values: V[],
   ) => Promise<T | undefined | null | void> | T | undefined | null | void,
-  init: T,
+  init: T | Promise<T>,
 ): Promise<T>;
 export async function reduceAsync<T, V>(
   values: (V | T)[],
@@ -128,7 +128,7 @@ export async function reduceAsync<T, V>(
     i: number,
     values: (V | T)[],
   ) => Promise<T | undefined | null | void> | T | undefined | null | void,
-  init?: T,
+  init?: T | Promise<T>,
 ): Promise<T> {
   if (init === undefined) {
     if (values.length === 0) {

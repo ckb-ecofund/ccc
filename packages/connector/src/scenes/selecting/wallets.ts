@@ -1,13 +1,12 @@
 import { ccc } from "@ckb-ccc/ccc";
 import { html } from "lit";
 import { repeat } from "lit/directives/repeat.js";
-import { WalletWithSigners } from "../../types";
 
 export function generateWalletsScene(
-  wallets: WalletWithSigners[],
-  onWalletSelected: (wallet: WalletWithSigners) => unknown,
+  wallets: ccc.WalletWithSigners[],
+  onWalletSelected: (wallet: ccc.WalletWithSigners) => unknown,
   onSignerSelected: (
-    wallet: WalletWithSigners,
+    wallet: ccc.WalletWithSigners,
     signer: ccc.SignerInfo,
   ) => unknown,
 ) {

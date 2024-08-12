@@ -5,6 +5,7 @@ import { Nip07 } from "@ckb-ccc/nip07";
 import { Okx } from "@ckb-ccc/okx";
 import { UniSat } from "@ckb-ccc/uni-sat";
 import { UtxoGlobal } from "@ckb-ccc/utxo-global";
+import { ETH_SVG } from "./assets/eth.svg.js";
 import { JOY_ID_SVG } from "./assets/joy-id.svg.js";
 import { METAMASK_SVG } from "./assets/metamask.svg.js";
 import { NOSTR_SVG } from "./assets/nostr.svg.js";
@@ -128,11 +129,11 @@ export class SignersController {
     );
 
     this.resetListeners.push(
-      new Eip6963.SignerFactory(client).subscribeSigners((signer) =>
+      new Eip6963.SignerFactory(client).subscribeSigners((signer, detail) =>
         this.addSigner(
           wallets,
-          `${signer.detail.info.name}`,
-          signer.detail.info.icon,
+          detail?.info.name ?? "EVM",
+          detail?.info.icon ?? ETH_SVG,
           "EVM",
           signer,
           onUpdate,
