@@ -123,6 +123,16 @@ export const MAINNET_SCRIPTS: Record<
         cellDep: {
           outPoint: {
             txHash:
+              "0x71a7ba8fc96349fea0ed3a5c47992e3b4084b031a42264a018e0072e8172e46c",
+            index: 0,
+          },
+          depType: "depGroup",
+        },
+      },
+      {
+        cellDep: {
+          outPoint: {
+            txHash:
               "0x1d60cb8f4666e039f418ea94730b1a8c5aa0bf2f7781474406387462924d15d4",
             index: 0,
           },
