@@ -165,8 +165,6 @@ export default function Home() {
 
   useEffect(() => {
     if (!signer) {
-      setInternalAddress("");
-      setAddress("");
       return;
     }
 
