@@ -542,6 +542,9 @@ importers:
 
   packages/lumos-patches:
     dependencies:
+      '@ckb-ccc/core':
+        specifier: workspace:*
+        version: link:../core
       '@ckb-lumos/base':
         specifier: ^0.24.0-next.1
         version: 0.24.0-next.1
