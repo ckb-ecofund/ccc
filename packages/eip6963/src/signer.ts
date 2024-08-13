@@ -1,5 +1,5 @@
 import { ccc } from "@ckb-ccc/core";
-import { ProviderDetail as EIP6963ProviderDetail } from "./eip6963.advanced.js";
+import { Provider } from "./eip1193.advanced.js";
 
 /**
  * Class representing an EVM signer that extends SignerEvm from @ckb-ccc/core.
@@ -16,7 +16,7 @@ export class Signer extends ccc.SignerEvm {
    */
   constructor(
     client: ccc.Client,
-    public readonly detail: EIP6963ProviderDetail,
+    public readonly provider: Provider,
   ) {
     super(client);
   }
@@ -27,7 +27,7 @@ export class Signer extends ccc.SignerEvm {
    */
   async getEvmAccount(): Promise<ccc.Hex> {
     this.accountCache = (
-      await this.detail.provider.request({ method: "eth_accounts" })
+      await this.provider.request({ method: "eth_accounts" })
     )[0];
     return this.accountCache;
   }
@@ -37,7 +37,7 @@ export class Signer extends ccc.SignerEvm {
    * @returns {Promise<void>} A promise that resolves when the connection is established.
    */
   async connect(): Promise<void> {
-    await this.detail.provider.request({ method: "eth_requestAccounts" });
+    await this.provider.request({ method: "eth_requestAccounts" });
   }
 
   onReplaced(listener: () => void): () => void {
@@ -47,12 +47,12 @@ export class Signer extends ccc.SignerEvm {
       stop[0]?.();
     };
     stop.push(() => {
-      this.detail.provider.removeListener("accountsChanged", replacer);
-      this.detail.provider.removeListener("disconnect", replacer);
+      this.provider.removeListener("accountsChanged", replacer);
+      this.provider.removeListener("disconnect", replacer);
     });
 
-    this.detail.provider.on("accountsChanged", replacer);
-    this.detail.provider.on("disconnect", replacer);
+    this.provider.on("accountsChanged", replacer);
+    this.provider.on("disconnect", replacer);
 
     return stop[0];
   }
@@ -63,8 +63,7 @@ export class Signer extends ccc.SignerEvm {
    */
   async isConnected(): Promise<boolean> {
     return (
-      (await this.detail.provider.request({ method: "eth_accounts" }))
-        .length !== 0
+      (await this.provider.request({ method: "eth_accounts" })).length !== 0
     );
   }
 
@@ -79,7 +78,7 @@ export class Signer extends ccc.SignerEvm {
 
     const account = this.accountCache ?? (await this.getEvmAccount());
 
-    return this.detail.provider.request({
+    return this.provider.request({
       method: "personal_sign",
       params: [ccc.hexFrom(challenge), account],
     });

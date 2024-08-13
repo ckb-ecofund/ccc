@@ -542,6 +542,9 @@ importers:
 
   packages/lumos-patches:
     dependencies:
+      '@ckb-ccc/core':
+        specifier: workspace:*
+        version: link:../core
       '@ckb-lumos/base':
         specifier: ^0.24.0-next.1
         version: 0.24.0-next.1
@@ -552,6 +555,9 @@ importers:
         specifier: ^0.24.0-next.1
         version: 0.24.0-next.1(encoding@0.1.13)
       '@ckb-lumos/config-manager':
+        specifier: ^0.24.0-next.1
+        version: 0.24.0-next.1(encoding@0.1.13)
+      '@ckb-lumos/helpers':
         specifier: ^0.24.0-next.1
         version: 0.24.0-next.1(encoding@0.1.13)
       '@joyid/ckb':

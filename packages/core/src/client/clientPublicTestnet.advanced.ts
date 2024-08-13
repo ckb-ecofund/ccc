@@ -128,6 +128,16 @@ export const TESTNET_SCRIPTS: Record<
         cellDep: {
           outPoint: {
             txHash:
+              "0xf8de3bb47d055cdf460d93a2a6e1b05f7432f9777c8c474abf4eec1d4aee5d37",
+            index: 0,
+          },
+          depType: "depGroup",
+        },
+      },
+      {
+        cellDep: {
+          outPoint: {
+            txHash:
               "0x57a62003daeab9d54aa29b944fc3b451213a5ebdf2e232216a3cfed0dde61b38",
             index: 0,
           },

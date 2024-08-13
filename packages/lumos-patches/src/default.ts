@@ -1,6 +1,5 @@
-import { LockScriptInfo } from "@ckb-lumos/common-scripts";
-import { getJoyIDCellDep, getJoyIDLockScript } from "@joyid/ckb";
-
+import { ccc } from "@ckb-ccc/core";
+import { cccA } from "@ckb-ccc/core/advanced";
 import {
   Cell,
   CellCollector,
@@ -10,10 +9,39 @@ import {
   Script,
 } from "@ckb-lumos/base";
 import { bytes } from "@ckb-lumos/codec";
-import { FromInfo, parseFromInfo } from "@ckb-lumos/common-scripts";
-import { addCellDep } from "@ckb-lumos/common-scripts/lib/helper";
+import {
+  FromInfo,
+  LockScriptInfo,
+  parseFromInfo,
+} from "@ckb-lumos/common-scripts";
 import { Config, getConfig } from "@ckb-lumos/config-manager";
+import { TransactionSkeletonType } from "@ckb-lumos/helpers";
 import { asserts } from "./utils.js";
+
+function addCellDep(
+  txSkeleton: TransactionSkeletonType,
+  newCellDep: CellDep,
+): TransactionSkeletonType {
+  const cellDep = txSkeleton.get("cellDeps").find((cellDep) => {
+    return (
+      cellDep.depType === newCellDep.depType &&
+      ccc.OutPoint.from(cellDep.outPoint).eq(
+        ccc.OutPoint.from(newCellDep.outPoint),
+      )
+    );
+  });
+
+  if (!cellDep) {
+    txSkeleton = txSkeleton.update("cellDeps", (cellDeps) => {
+      return cellDeps.push({
+        outPoint: newCellDep.outPoint,
+        depType: newCellDep.depType,
+      });
+    });
+  }
+
+  return txSkeleton;
+}
 
 /**
  * Generates a class for collecting custom script cells.
@@ -94,8 +122,7 @@ function generateCollectorClass(codeHash: string) {
  */
 export function generateScriptInfo(
   codeHash: string,
-  cellDeps: CellDep[],
-  cellDepTypes: Script[] = [],
+  cellDeps: ccc.CellDepInfoLike[],
 ): LockScriptInfo {
   return {
     codeHash: codeHash,
@@ -138,16 +165,13 @@ export function generateScriptInfo(
           });
         }
 
-        cellDeps.forEach((item) => {
-          txSkeleton = addCellDep(txSkeleton, item);
-        });
-
-        if (txSkeleton.cellProvider != null) {
-          await Promise.all(
-            cellDepTypes.map(async (type) => {
+        await Promise.all(
+          cellDeps.map(async (itemLike) => {
+            const item = ccc.CellDepInfo.from(itemLike);
+            if (item.type && txSkeleton.cellProvider != null) {
               for await (const cell of txSkeleton
                 .cellProvider!.collector({
-                  type,
+                  type: item.type,
                 })
                 .collect()) {
                 txSkeleton = addCellDep(txSkeleton, {
@@ -155,9 +179,34 @@ export function generateScriptInfo(
                   outPoint: cell.outPoint!,
                 });
               }
-            }),
+            } else {
+              txSkeleton = addCellDep(txSkeleton, {
+                ...item.cellDep,
+                outPoint: {
+                  txHash: item.cellDep.outPoint.txHash,
+                  index: ccc.numToHex(item.cellDep.outPoint.index),
+                },
+              });
+            }
+          }),
+        );
+
+        const firstIndex = txSkeleton
+          .get("inputs")
+          .findIndex((input) =>
+            ccc.Script.from(input.cellOutput.lock).eq(
+              ccc.Script.from(fromScript),
+            ),
           );
-        }
+        txSkeleton = txSkeleton.update("witnesses", (witnesses) => {
+          if (witnesses.get(firstIndex)) {
+            return witnesses;
+          }
+
+          return witnesses.merge(
+            Array.from(new Array(firstIndex + 1 - witnesses.size), () => "0x"),
+          );
+        });
 
         return txSkeleton;
       },
@@ -165,27 +214,22 @@ export function generateScriptInfo(
   };
 }
 
-const NOSTR_TESTNET_TYPE_HASH =
-  "0x6ae5ee0cb887b2df5a9a18137315b9bdc55be8d52637b2de0624092d5f0c91d5";
-const NOSTR_TESTNET_TYPE: Script = {
-  codeHash:
-    "0x00000000000000000000000000000000000000000000000000545950455f4944",
-  hashType: "type",
-  args: "0x8dc56c6f35f0c535e23ded1629b1f20535477a1b43e59f14617d11e32c50e0aa",
-};
-
 /**
  * Generates default script information for CCC.
  * @returns {LockScriptInfo[]} An array of lock script information.
  */
 export function generateDefaultScriptInfos(): LockScriptInfo[] {
+  const mainnet = cccA.MAINNET_SCRIPTS;
+  const testnet = cccA.TESTNET_SCRIPTS;
+
   return [
-    generateScriptInfo(getJoyIDLockScript(false).codeHash, [
-      getJoyIDCellDep(false),
-    ]),
-    generateScriptInfo(getJoyIDLockScript(true).codeHash, [
-      getJoyIDCellDep(true),
-    ]),
-    generateScriptInfo(NOSTR_TESTNET_TYPE_HASH, [], [NOSTR_TESTNET_TYPE]),
-  ];
+    ccc.KnownScript.JoyId,
+    ccc.KnownScript.NostrLock,
+    ccc.KnownScript.PWLock,
+  ]
+    .map((script) => [
+      generateScriptInfo(testnet[script]!.codeHash, testnet[script]!.cellDeps),
+      generateScriptInfo(mainnet[script]!.codeHash, mainnet[script]!.cellDeps),
+    ])
+    .flat();
 }

@@ -69,7 +69,6 @@ export class Dialog extends LitElement {
     .header-divider {
       padding-bottom: 1rem;
       border-bottom: 1px solid var(--divider);
-      margin-bottom: 0.3rem;
     }
 
     .close,
@@ -87,11 +86,13 @@ export class Dialog extends LitElement {
     }
 
     .body {
-      padding: 0 1.3rem 1rem;
+      padding: 0.3rem 1.3rem 1rem;
       min-width: 20rem;
       display: flex;
       flex-direction: column;
       align-items: center;
+      max-height: 80vh;
+      overflow-y: auto;
     }
   `;
 }

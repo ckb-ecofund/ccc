@@ -2,7 +2,6 @@ import { ccc } from "@ckb-ccc/ccc";
 import { html } from "lit";
 import { repeat } from "lit/directives/repeat.js";
 import { BTC_SVG, CKB_SVG, ETH_SVG, NOSTR_SVG } from "../../assets/chains";
-import { WalletWithSigners } from "../../types";
 
 export function signerTypeToIcon(type: ccc.SignerType): string {
   return {
@@ -14,9 +13,9 @@ export function signerTypeToIcon(type: ccc.SignerType): string {
 }
 
 export function generateSignersScene(
-  wallet: WalletWithSigners,
+  wallet: ccc.WalletWithSigners,
   onSignerSelected: (
-    wallet: WalletWithSigners,
+    wallet: ccc.WalletWithSigners,
     signer: ccc.SignerInfo,
   ) => unknown,
 ) {

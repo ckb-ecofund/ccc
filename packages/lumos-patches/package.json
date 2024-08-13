@@ -1,6 +1,6 @@
 {
   "name": "@ckb-ccc/lumos-patches",
-  "version": "0.0.10-alpha.7",
+  "version": "0.0.12-alpha.3",
   "description": "Patches for using Lumos with CCC",
   "author": "Hanssen0 <hanssen0@hanssen0.com>",
   "license": "MIT",
@@ -39,10 +39,12 @@
     "access": "public"
   },
   "dependencies": {
+    "@ckb-ccc/core": "workspace:*",
     "@ckb-lumos/base": "^0.24.0-next.1",
     "@ckb-lumos/codec": "^0.24.0-next.1",
     "@ckb-lumos/common-scripts": "^0.24.0-next.1",
     "@ckb-lumos/config-manager": "^0.24.0-next.1",
+    "@ckb-lumos/helpers": "^0.24.0-next.1",
     "@joyid/ckb": "^1.0.1"
   }
 }
