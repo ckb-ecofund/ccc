@@ -12,7 +12,7 @@ export class Signer extends ccc.SignerEvm {
   /**
    * Creates an instance of Signer.
    * @param {ccc.Client} client - The client instance.
-   * @param {EIP6963ProviderDetail} detail - The provider detail.
+   * @param {Provider} provider - The provider.
    */
   constructor(
     client: ccc.Client,
