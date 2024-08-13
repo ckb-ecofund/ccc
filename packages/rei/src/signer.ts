@@ -1,9 +1,5 @@
 import {
-  ccc,
-  KnownScript,
-  reduceAsync,
-  Transaction,
-  TransactionLike, WitnessArgs
+  ccc
 } from "@ckb-ccc/core";
 import { Provider } from "./advancedBarrel.js";
 import {addressPayloadFromString} from "@ckb-ccc/core/advanced";
@@ -65,7 +61,7 @@ export class ReiSigner extends ccc.Signer {
    * @returns {ccc.SignerSignType} The sign type.
    */
   get signType(): ccc.SignerSignType {
-    return ccc.SignerSignType.CkbSecp256k1;
+    return ccc.SignerSignType.REI;
   }
 
   /**
@@ -150,8 +146,7 @@ export class ReiSigner extends ccc.Signer {
    * @returns {Promise<ccc.Hex>} A promise that resolves to the signed message.
    */
   async signMessageRaw(message: string): Promise<ccc.Hex> {
-    let str = `Nervos Message:${message}`
-    return await this._signMessageRaw(str);
+    return await this._signMessageRaw(message);
 
   }
 
@@ -166,11 +161,11 @@ export class ReiSigner extends ccc.Signer {
   async prepareTransaction(
       txLike: ccc.TransactionLike,
   ): Promise<ccc.Transaction> {
-    const tx = Transaction.from(txLike);
-    await tx.addCellDepsOfKnownScripts(this.client, KnownScript.Secp256k1Blake160);
-    return reduceAsync(
+    const tx = ccc.Transaction.from(txLike);
+    await tx.addCellDepsOfKnownScripts(this.client, ccc.KnownScript.Secp256k1Blake160);
+    return ccc.reduceAsync(
         await this.getAddressObjs(),
-        (tx: Transaction, { script }) =>
+        (tx: ccc.Transaction, { script }) =>
             tx.prepareSighashAllWitness(script, 65, this.client),
         tx,
     );
@@ -191,8 +186,8 @@ export class ReiSigner extends ccc.Signer {
    * @returns A promise that resolves to the signed Transaction object.
    */
 
-  async signOnlyTransaction(txLike: TransactionLike): Promise<Transaction> {
-    const tx = Transaction.from(txLike);
+  async signOnlyTransaction(txLike: ccc.TransactionLike): Promise<ccc.Transaction> {
+    const tx = ccc.Transaction.from(txLike);
     const { script } = await this.getRecommendedAddressObj();
     const info = await tx.getSignHashInfo(script, this.client);
     if (!info) {
@@ -201,7 +196,7 @@ export class ReiSigner extends ccc.Signer {
 
     const signature = await this._signMessageRaw(info.message);
 
-    const witness = tx.getWitnessArgsAt(info.position) ?? WitnessArgs.from({});
+    const witness = tx.getWitnessArgsAt(info.position) ?? ccc.WitnessArgs.from({});
     witness.lock = signature;
     tx.setWitnessArgsAt(info.position, witness);
     return tx;

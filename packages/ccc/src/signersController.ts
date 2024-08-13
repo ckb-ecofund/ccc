@@ -156,16 +156,16 @@ export class SignersController {
 
     // === Dummy signers ===
 
-    await this.addLinkSigners(
-        wallets,
-        "Rei Wallet",
-        REI_SVG,
-        client,
-        [ccc.SignerType.CKB],
-        "https://reiwallet.io/",
-        onUpdate,
-        configs,
-    );
+    // await this.addLinkSigners(
+    //     wallets,
+    //     "Rei Wallet",
+    //     REI_SVG,
+    //     client,
+    //     [ccc.SignerType.CKB],
+    //     "https://reiwallet.io/",
+    //     onUpdate,
+    //     configs,
+    // );
 
 
     await this.addLinkSigners(

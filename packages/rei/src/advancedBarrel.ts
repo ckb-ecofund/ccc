@@ -1,4 +1,4 @@
-import {ccc, Hex} from "@ckb-ccc/core";
+import {ccc} from "@ckb-ccc/core";
 
 /**
  * Interface representing a provider for interacting with accounts and signing messages.
@@ -73,7 +73,7 @@ export interface RequestMethod {
    * @param request.data - The method parameters.
    * @returns A promise that resolves to the signed message.
    */
-  (request: { method: "ckb_signMessage"; data:{ message:string } }): Promise<Hex>;
+  (request: { method: "ckb_signMessage"; data:{ message:string } }): Promise<ccc.Hex>;
 
 
   /**

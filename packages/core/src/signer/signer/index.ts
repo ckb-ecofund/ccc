@@ -7,6 +7,7 @@ import { Num } from "../../num/index.js";
 import { verifyMessageBtcEcdsa } from "../btc/index.js";
 import { verifyMessageCkbSecp256k1 } from "../ckb/verifyCkbSecp256k1.js";
 import { verifyMessageJoyId } from "../ckb/verifyJoyId.js";
+import { verifyMessageREI } from "../ckb/verifyREI.js";
 import { verifyMessageEvmPersonal } from "../evm/verify.js";
 import { verifyMessageNostrEvent } from "../nostr/verify.js";
 
@@ -15,6 +16,7 @@ export enum SignerSignType {
   BtcEcdsa = "BtcEcdsa",
   EvmPersonal = "EvmPersonal",
   JoyId = "JoyId",
+  REI = "REI",
   NostrEvent = "NostrEvent",
   CkbSecp256k1 = "CkbSecp256k1",
 }
@@ -117,6 +119,13 @@ export abstract class Signer {
           message,
           signature.signature,
           signature.identity,
+        );
+
+      case SignerSignType.REI:
+        return verifyMessageREI(
+            message,
+            signature.signature,
+            signature.identity,
         );
       case SignerSignType.CkbSecp256k1:
         return verifyMessageCkbSecp256k1(
