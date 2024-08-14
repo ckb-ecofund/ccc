@@ -1,9 +1,9 @@
 import { ccc } from "@ckb-ccc/ccc";
 import { css, html, LitElement } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
-import { generateConnectingScene } from "./connecting";
-import { generateSignersScene } from "./signers";
-import { generateWalletsScene } from "./wallets";
+import { generateConnectingScene } from "./connecting.js";
+import { generateSignersScene } from "./signers.js";
+import { generateWalletsScene } from "./wallets.js";
 
 export class ConnectedEvent extends Event {
   constructor(

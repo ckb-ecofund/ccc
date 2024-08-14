@@ -1,4 +1,4 @@
-import "./button";
-import "./button-pill";
-import "./copy-button";
-import "./dialog";
+import "./button-pill.js";
+import "./button.js";
+import "./copy-button.js";
+import "./dialog.js";

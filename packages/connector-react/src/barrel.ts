@@ -1,3 +1,3 @@
 export * from "@ckb-ccc/connector/barrel";
-export * from "./components";
-export * from "./hooks";
+export * from "./components/index.js";
+export * from "./hooks/index.js";

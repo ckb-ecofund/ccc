@@ -1,4 +1,4 @@
-import { WebComponentConnector, ccc } from "@ckb-ccc/connector";
+import { ccc } from "@ckb-ccc/connector";
 import React, {
   createContext,
   useCallback,
@@ -6,7 +6,7 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import { Connector } from "../components";
+import { Connector } from "../components/index.js";
 
 const CCC_CONTEXT = createContext<
   | {
@@ -40,7 +40,7 @@ export function Provider({
   defaultClient?: ccc.Client;
   preferredNetworks?: ccc.NetworkPreference[];
 }) {
-  const [ref, setRef] = useState<WebComponentConnector | null>(null);
+  const [ref, setRef] = useState<ccc.WebComponentConnector | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [_, setFlag] = useState(0);
 

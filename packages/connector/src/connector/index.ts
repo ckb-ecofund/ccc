@@ -2,8 +2,8 @@ import { ccc } from "@ckb-ccc/ccc";
 import { LitElement, PropertyValues, css, html } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { Ref, createRef, ref } from "lit/directives/ref.js";
-import { ConnectedEvent } from "../scenes/selecting";
-import { SignersController } from "../signers";
+import { ConnectedEvent } from "../scenes/selecting/index.js";
+import { SignersController } from "../signers/index.js";
 
 @customElement("ccc-connector")
 export class WebComponentConnector extends LitElement {

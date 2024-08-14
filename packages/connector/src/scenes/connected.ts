@@ -1,9 +1,9 @@
 import { ccc } from "@ckb-ccc/ccc";
 import { css, html, LitElement, PropertyValues } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
-import { CKB_SVG } from "../assets/chains";
-import { DISCONNECT_SVG } from "../assets/diconnect.svg";
-import { signerTypeToIcon } from "./selecting/signers";
+import { CKB_SVG } from "../assets/chains/index.js";
+import { DISCONNECT_SVG } from "../assets/diconnect.svg.js";
+import { signerTypeToIcon } from "./selecting/signers.js";
 
 export function formatString(
   str: string | undefined,
