@@ -116,6 +116,7 @@ While we recommend using CCC for composing transactions, we also provide Lumos p
 
 - Support the JoyID Wallet.
 - Support the Nostr Wallet.
+- Support the Portal Wallet.
 
 See [lumos-patches](https://www.npmjs.com/package/@ckb-ccc/lumos-patches): `npm install @ckb-ccc/lumos-patches`
 
