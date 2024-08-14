@@ -1,8 +1,6 @@
-import {
-  ccc
-} from "@ckb-ccc/core";
+import { ccc } from "@ckb-ccc/core";
+import { addressPayloadFromString } from "@ckb-ccc/core/advanced";
 import { Provider } from "./advancedBarrel.js";
-import {addressPayloadFromString} from "@ckb-ccc/core/advanced";
 
 /**
  * Class representing a CKB signer that extends Signer from @ckb-ccc/core.
@@ -18,11 +16,9 @@ export class ReiSigner extends ccc.Signer {
   constructor(
     client: ccc.Client,
     public readonly provider: Provider,
-  )
-  {
+  ) {
     super(client);
   }
-
 
   /**
    * Register a listener to be called when this signer is replaced.
@@ -46,8 +42,6 @@ export class ReiSigner extends ccc.Signer {
     return stop[0];
   }
 
-
-
   /**
    * Gets the signer type.
    * @returns {ccc.SignerType} The type of the signer.
@@ -70,10 +64,10 @@ export class ReiSigner extends ccc.Signer {
    */
   async connect(): Promise<void> {
     const prefixClient = this.client.addressPrefix;
-    const netChange = await this._getNetworkChanged()
-    if(netChange){
-        const data =  prefixClient === "ckb" ? "mainnet" : "testnet";
-        await this.provider.request({ method: "ckb_switchNetwork",data })
+    const netChange = await this._getNetworkChanged();
+    if (netChange) {
+      const data = prefixClient === "ckb" ? "mainnet" : "testnet";
+      await this.provider.request({ method: "ckb_switchNetwork", data });
     }
   }
 
@@ -82,14 +76,12 @@ export class ReiSigner extends ccc.Signer {
    * @returns {Promise<boolean>} A promise that resolves to true if connected, false otherwise.
    */
   async isConnected(): Promise<boolean> {
-
     const connected = await this.provider.isConnected();
-    if ( !connected || await this._getNetworkChanged()) {
+    if (!connected || (await this._getNetworkChanged())) {
       return false;
     }
-    return connected
+    return connected;
   }
-
 
   async _getNetworkChanged(): Promise<boolean> {
     const prefixClient = this.client.addressPrefix;
@@ -98,7 +90,6 @@ export class ReiSigner extends ccc.Signer {
     const { prefix } = addressPayloadFromString(address);
     return prefixClient !== prefix;
   }
-
 
   /**
    * Gets the internal address.
@@ -114,11 +105,10 @@ export class ReiSigner extends ccc.Signer {
    */
   async getAddressObj(): Promise<ccc.Address> {
     return await ccc.Address.fromString(
-        await this.getInternalAddress(),
-        this.client,
+      await this.getInternalAddress(),
+      this.client,
     );
   }
-
 
   /**
    * Gets the address objects.
@@ -128,17 +118,15 @@ export class ReiSigner extends ccc.Signer {
     return [await this.getAddressObj()];
   }
 
-
   /**
    * Gets the identity of the signer.
    * @returns {Promise<string>} A promise that resolves to the identity.
    */
   async getIdentity(): Promise<string> {
     return await this.provider.request({
-      method: "ckb_getPublicKey"
+      method: "ckb_getPublicKey",
     });
   }
-
 
   /**
    * Signs a raw message with the personal account.
@@ -147,9 +135,7 @@ export class ReiSigner extends ccc.Signer {
    */
   async signMessageRaw(message: string): Promise<ccc.Hex> {
     return await this._signMessageRaw(message);
-
   }
-
 
   /**
    * prepare a transaction before signing.
@@ -159,25 +145,26 @@ export class ReiSigner extends ccc.Signer {
    */
 
   async prepareTransaction(
-      txLike: ccc.TransactionLike,
+    txLike: ccc.TransactionLike,
   ): Promise<ccc.Transaction> {
     const tx = ccc.Transaction.from(txLike);
-    await tx.addCellDepsOfKnownScripts(this.client, ccc.KnownScript.Secp256k1Blake160);
+    await tx.addCellDepsOfKnownScripts(
+      this.client,
+      ccc.KnownScript.Secp256k1Blake160,
+    );
     return ccc.reduceAsync(
-        await this.getAddressObjs(),
-        (tx: ccc.Transaction, { script }) =>
-            tx.prepareSighashAllWitness(script, 65, this.client),
-        tx,
+      await this.getAddressObjs(),
+      (tx: ccc.Transaction, { script }) =>
+        tx.prepareSighashAllWitness(script, 65, this.client),
+      tx,
     );
   }
-
 
   async _signMessageRaw(message: string): Promise<ccc.Hex> {
     return await this.provider.request({
       method: "ckb_signMessage",
-      data: {message:message},
+      data: { message: message },
     });
-
   }
   /**
    * Signs a transaction without preparing information for it.
@@ -186,7 +173,9 @@ export class ReiSigner extends ccc.Signer {
    * @returns A promise that resolves to the signed Transaction object.
    */
 
-  async signOnlyTransaction(txLike: ccc.TransactionLike): Promise<ccc.Transaction> {
+  async signOnlyTransaction(
+    txLike: ccc.TransactionLike,
+  ): Promise<ccc.Transaction> {
     const tx = ccc.Transaction.from(txLike);
     const { script } = await this.getRecommendedAddressObj();
     const info = await tx.getSignHashInfo(script, this.client);
@@ -196,10 +185,10 @@ export class ReiSigner extends ccc.Signer {
 
     const signature = await this._signMessageRaw(info.message);
 
-    const witness = tx.getWitnessArgsAt(info.position) ?? ccc.WitnessArgs.from({});
+    const witness =
+      tx.getWitnessArgsAt(info.position) ?? ccc.WitnessArgs.from({});
     witness.lock = signature;
     tx.setWitnessArgsAt(info.position, witness);
     return tx;
   }
-
 }

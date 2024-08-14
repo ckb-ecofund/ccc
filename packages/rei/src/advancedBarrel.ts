@@ -1,4 +1,4 @@
-import {ccc} from "@ckb-ccc/core";
+import { ccc } from "@ckb-ccc/core";
 
 /**
  * Interface representing a provider for interacting with accounts and signing messages.
@@ -17,7 +17,6 @@ export interface Provider {
    */
   on: OnMethod;
 
-
   /**
    * Checks if rei wallet is connected.
    * @returns A promise that resolves to true if connected, false otherwise.
@@ -30,10 +29,7 @@ export interface Provider {
    * @param {(...args: unknown[]) => unknown} listener - The listener function to remove.
    * @returns {Provider} The provider instance.
    */
-  off(
-      eventName: string,
-      listener: (...args: unknown[]) => unknown,
-  ): void;
+  off(eventName: string, listener: (...args: unknown[]) => unknown): void;
 }
 
 /**
@@ -50,9 +46,7 @@ export interface OnMethod {
   (eventName: string, listener: (...args: unknown[]) => unknown): void;
 }
 
-
 export interface RequestMethod {
-
   /**
    * Requests the accounts from the provider.
    * @param request - The request object.
@@ -65,7 +59,6 @@ export interface RequestMethod {
     data?: undefined;
   }): Promise<string>;
 
-
   /**
    * Signs a message with the personal account.
    * @param request - The request object.
@@ -73,8 +66,10 @@ export interface RequestMethod {
    * @param request.data - The method parameters.
    * @returns A promise that resolves to the signed message.
    */
-  (request: { method: "ckb_signMessage"; data:{ message:string } }): Promise<ccc.Hex>;
-
+  (request: {
+    method: "ckb_signMessage";
+    data: { message: string };
+  }): Promise<ccc.Hex>;
 
   /**
    * Gets the identity of the signer.
@@ -82,9 +77,7 @@ export interface RequestMethod {
    * @param request.method - The method name.
    * @returns A promise that resolves to the signed message.
    */
-  (request: { method: "ckb_getPublicKey"; }): Promise<string>;
-
-
+  (request: { method: "ckb_getPublicKey" }): Promise<string>;
 
   /**
    * Get network.
@@ -93,7 +86,8 @@ export interface RequestMethod {
    * @param request.data - The method parameters.
    * @returns A promise that resolves to the signed message.
    */
-  (request: { method: "ckb_switchNetwork"; data:string }): Promise<{type:string,network:string}>;
-
-
+  (request: {
+    method: "ckb_switchNetwork";
+    data: string;
+  }): Promise<{ type: string; network: string }>;
 }
