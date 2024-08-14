@@ -1,7 +1,7 @@
 import { css, html, LitElement } from "lit";
 import { customElement, property } from "lit/decorators.js";
-import { CLOSE_SVG } from "../assets/close.svg";
-import { LEFT_SVG } from "../assets/left.svg";
+import { CLOSE_SVG } from "../assets/close.svg.js";
+import { LEFT_SVG } from "../assets/left.svg.js";
 
 @customElement("ccc-dialog")
 export class Dialog extends LitElement {
