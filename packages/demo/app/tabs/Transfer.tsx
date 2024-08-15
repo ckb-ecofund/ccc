@@ -13,7 +13,7 @@ export function Transfer({ sendMessage, signer }: TabProps) {
 
   return (
     <div className="mb-1 flex flex-col items-center">
-      <div className="flex w-9/12 gap-1 flex-col items-center">
+      <div className="flex w-9/12 flex-col items-center gap-1">
         <Textarea
           label="Address"
           className="w-full"

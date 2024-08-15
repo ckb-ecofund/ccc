@@ -23,7 +23,14 @@ import { Hash } from "./tabs/Hash";
 import { Mnemonic } from "./tabs/Mnemonic";
 import { Keystore } from "./tabs/Keystore";
 import { formatString } from "../../connector/dist/scenes/connected";
-import { icons, Layers, LucideIcon, LucideProps, Signature, Wallet } from 'lucide-react';
+import {
+  icons,
+  Layers,
+  LucideIcon,
+  LucideProps,
+  Signature,
+  Wallet,
+} from "lucide-react";
 import Dropdown from "./components/Dropdown";
 import Message from "./components/message";
 import Notifications from "./components/Notifications";
@@ -136,27 +143,28 @@ export default function Home() {
   const [isTestnet, setIsTestnet] = useState(true);
   const [tab, setTab] = useState("Hash");
 
-  const tabs: [string, FunctionComponent<TabProps>, keyof typeof icons][] = useMemo(
-    () =>
-      signer
-        ? [
-            ["Sign", Sign, "Signature"],
-            ["Transfer", Transfer, "ArrowLeftRight"],
-            ["Transfer with Lumos", TransferLumos, "LampWallDown"],
-            ["Transfer xUDT", TransferXUdt, "BadgeCent"],
-            ["Issue xUDT (SUS)", IssueXUdtSul, "Rss"],
-            ["Issue xUDT (Type ID)", IssueXUdtTypeId, "PencilRuler"],
-            ["Hash", Hash, "Barcode"],
-            ["Mnemonic", Mnemonic, "SquareAsterisk"],
-            ["Keystore", Keystore, "Notebook"],
-          ]
-        : [
-            ["Hash", Hash, "Barcode"],
-            ["Mnemonic", Mnemonic, "SquareAsterisk"],
-            ["Keystore", Keystore, "Notebook"],
-          ],
-    [signer],
-  );
+  const tabs: [string, FunctionComponent<TabProps>, keyof typeof icons][] =
+    useMemo(
+      () =>
+        signer
+          ? [
+              ["Sign", Sign, "Signature"],
+              ["Transfer", Transfer, "ArrowLeftRight"],
+              ["Transfer with Lumos", TransferLumos, "LampWallDown"],
+              ["Transfer xUDT", TransferXUdt, "BadgeCent"],
+              ["Issue xUDT (SUS)", IssueXUdtSul, "Rss"],
+              ["Issue xUDT (Type ID)", IssueXUdtTypeId, "PencilRuler"],
+              ["Hash", Hash, "Barcode"],
+              ["Mnemonic", Mnemonic, "SquareAsterisk"],
+              ["Keystore", Keystore, "Notebook"],
+            ]
+          : [
+              ["Hash", Hash, "Barcode"],
+              ["Mnemonic", Mnemonic, "SquareAsterisk"],
+              ["Keystore", Keystore, "Notebook"],
+            ],
+      [signer],
+    );
 
   useEffect(() => setTab(tabs[0][0]), [tabs]);
 
@@ -199,12 +207,10 @@ export default function Home() {
         {signer ? (
           <>
             {!wallet && "Private Key mode"}
-            
+
             {cccSigner ? (
               <Button className="mt-2 flex gap-2" onClick={open}>
-                {
-                  wallet && <WalletIcon wallet={wallet} className="w-5 h-5" />
-                }
+                {wallet && <WalletIcon wallet={wallet} className="h-5 w-5" />}
                 {internalAddress.slice(0, 7)}...{internalAddress.slice(-5)}
               </Button>
             ) : (
