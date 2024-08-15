@@ -20,18 +20,21 @@ export function TransferLumos({ sendMessage, signer }: TabProps) {
   return (
     <>
       <div className="mb-1 flex flex-col items-center">
-        <div className="flex w-9/12 flex-col items-center">
+        <div className="flex w-9/12 flex-col items-center gap-1">
           <TextInput
+            label="Address"
             className="w-full"
             placeholder="Address to transfer to"
             state={[transferTo, setTransferTo]}
           />
           <TextInput
+            label="Amount"
             className="mt-1 w-full"
             placeholder="Amount to transfer"
             state={[amount, setAmount]}
           />
           <Textarea
+            label="Output Data(options)"
             className="mt-1 w-full"
             state={[data, setData]}
             placeholder="Data in the cell. Hex string will be parsed."

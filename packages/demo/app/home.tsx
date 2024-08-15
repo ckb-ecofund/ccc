@@ -22,6 +22,11 @@ import { TextInput } from "./components/Input";
 import { Hash } from "./tabs/Hash";
 import { Mnemonic } from "./tabs/Mnemonic";
 import { Keystore } from "./tabs/Keystore";
+import { formatString } from "../../connector/dist/scenes/connected";
+import { icons, Layers, LucideIcon, LucideProps, Signature, Wallet } from 'lucide-react';
+import Dropdown from "./components/Dropdown";
+import Message from "./components/message";
+import Notifications from "./components/Notifications";
 
 function WalletIcon({
   wallet,
@@ -131,24 +136,24 @@ export default function Home() {
   const [isTestnet, setIsTestnet] = useState(true);
   const [tab, setTab] = useState("Hash");
 
-  const tabs: [string, FunctionComponent<TabProps>][] = useMemo(
+  const tabs: [string, FunctionComponent<TabProps>, keyof typeof icons][] = useMemo(
     () =>
       signer
         ? [
-            ["Sign", Sign],
-            ["Transfer", Transfer],
-            ["Transfer with Lumos", TransferLumos],
-            ["Transfer xUDT", TransferXUdt],
-            ["Issue xUDT (SUS)", IssueXUdtSul],
-            ["Issue xUDT (Type ID)", IssueXUdtTypeId],
-            ["Hash", Hash],
-            ["Mnemonic", Mnemonic],
-            ["Keystore", Keystore],
+            ["Sign", Sign, "Signature"],
+            ["Transfer", Transfer, "ArrowLeftRight"],
+            ["Transfer with Lumos", TransferLumos, "LampWallDown"],
+            ["Transfer xUDT", TransferXUdt, "BadgeCent"],
+            ["Issue xUDT (SUS)", IssueXUdtSul, "Rss"],
+            ["Issue xUDT (Type ID)", IssueXUdtTypeId, "PencilRuler"],
+            ["Hash", Hash, "Barcode"],
+            ["Mnemonic", Mnemonic, "SquareAsterisk"],
+            ["Keystore", Keystore, "Notebook"],
           ]
         : [
-            ["Hash", Hash],
-            ["Mnemonic", Mnemonic],
-            ["Keystore", Keystore],
+            ["Hash", Hash, "Barcode"],
+            ["Mnemonic", Mnemonic, "SquareAsterisk"],
+            ["Keystore", Keystore, "Notebook"],
           ],
     [signer],
   );
@@ -193,27 +198,28 @@ export default function Home() {
       <main className="flex flex-col items-center bg-white px-6 md:px-24">
         {signer ? (
           <>
-            {wallet ? (
-              <WalletIcon wallet={wallet} className="mb-1" />
-            ) : (
-              "Private Key mode"
-            )}
-            <p className="mt-1 text-balance break-all text-center">
-              {internalAddress}
-            </p>
-            <p className="mt-1 text-balance break-all text-center">{address}</p>
-            <p className="mt-1">{ccc.fixedPointToString(balance)} CKB</p>
+            {!wallet && "Private Key mode"}
+            
             {cccSigner ? (
-              <Button className="mt-2" onClick={open}>
+              <Button className="mt-2 flex gap-2" onClick={open}>
+                {
+                  wallet && <WalletIcon wallet={wallet} className="w-5 h-5" />
+                }
                 {internalAddress.slice(0, 7)}...{internalAddress.slice(-5)}
               </Button>
             ) : (
-              <Button
-                className="mt-2"
-                onClick={() => setPrivateKeySigner(undefined)}
-              >
-                Disconnect
-              </Button>
+              <>
+                <p className="mt-1 text-balance break-all text-center">
+                  {formatString(internalAddress)}
+                </p>
+                <p className="mt-1">{ccc.fixedPointToString(balance)} CKB</p>
+                <Button
+                  className="mt-2"
+                  onClick={() => setPrivateKeySigner(undefined)}
+                >
+                  Disconnect
+                </Button>
+              </>
             )}
           </>
         ) : (
@@ -241,16 +247,13 @@ export default function Home() {
             </Button>
           </>
         )}
-        <div className="mb-2 mt-2 flex max-w-full overflow-x-auto pb-1">
-          {tabs.map(([name]) => (
-            <button
-              key={name}
-              className={`flex items-center border-b border-black px-5 py-2 text-lg ${tab === name ? "border-b-4" : ""} whitespace-nowrap`}
-              onClick={() => setTab(name)}
-            >
-              {name}
-            </button>
-          ))}
+        <div className="flex items-center gap-4">
+          <Layers />
+          <Dropdown
+            options={tabs.map(([name, , iconName]) => ({ name, iconName }))}
+            selected={tab}
+            onSelect={(option) => setTab(option)}
+          />
         </div>
         <div className="w-full">
           {ccc.apply(
@@ -270,14 +273,7 @@ export default function Home() {
           Switch to {isTestnet ? "Mainnet" : "Testnet"}
         </Button>
         <Links />
-        {messages.map(([level, msg], i) => (
-          <p
-            className={`break-all border-b border-gray-400 pb-1 text-center font-bold ${level === "info" ? "text-green-400" : "text-red-400"}`}
-            key={messages.length - i}
-          >
-            {messages.length - i}: {msg}
-          </p>
-        ))}
+        <Notifications messages={messages} />
       </main>
     </>
   );
