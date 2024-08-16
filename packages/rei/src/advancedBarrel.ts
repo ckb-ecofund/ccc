@@ -90,4 +90,14 @@ export interface RequestMethod {
     method: "ckb_switchNetwork";
     data: string;
   }): Promise<{ type: string; network: string }>;
+
+  /**
+   * Signs transaction .
+   * @param request - The request object.
+   * @param request.method - The method name.
+   * @param request.data - The method parameters.
+   * @returns A promise that resolves to the signed message.
+   */
+
+  (request: { method: "ckb_signRawTransaction"; data: any }): Promise<any>;
 }

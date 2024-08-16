@@ -1,5 +1,12 @@
-import { ccc } from "@ckb-ccc/core";
-import { addressPayloadFromString } from "@ckb-ccc/core/advanced";
+import { ccc, numToHex, OutPoint } from "@ckb-ccc/core";
+import {
+  addressPayloadFromString,
+  JsonRpcTransformers,
+} from "@ckb-ccc/core/advanced";
+import {
+  createTransactionSkeleton,
+  transactionSkeletonToObject,
+} from "@ckb-lumos/helpers";
 import { Provider } from "./advancedBarrel.js";
 
 /**
@@ -55,7 +62,7 @@ export class ReiSigner extends ccc.Signer {
    * @returns {ccc.SignerSignType} The sign type.
    */
   get signType(): ccc.SignerSignType {
-    return ccc.SignerSignType.REI;
+    return ccc.SignerSignType.CkbSecp256k1;
   }
 
   /**
@@ -166,6 +173,7 @@ export class ReiSigner extends ccc.Signer {
       data: { message: message },
     });
   }
+
   /**
    * Signs a transaction without preparing information for it.
    *
@@ -177,18 +185,31 @@ export class ReiSigner extends ccc.Signer {
     txLike: ccc.TransactionLike,
   ): Promise<ccc.Transaction> {
     const tx = ccc.Transaction.from(txLike);
-    const { script } = await this.getRecommendedAddressObj();
-    const info = await tx.getSignHashInfo(script, this.client);
-    if (!info) {
-      return tx;
-    }
+    let txFormat = JsonRpcTransformers.transactionFrom(tx);
+    let result = JsonRpcTransformers.transactionTo(txFormat);
+    const txString = result.stringify();
+    const unsigned = JSON.parse(txString);
 
-    const signature = await this._signMessageRaw(info.message);
+    const fetcher = async (outPoint: OutPoint) => {
+      const fRt = await this.client.getCell(outPoint);
+      const jsonStr = JSON.stringify(fRt, (_, value) => {
+        if (typeof value === "bigint") {
+          return numToHex(value);
+        }
+        return value;
+      });
+      return JSON.parse(jsonStr);
+    };
 
-    const witness =
-      tx.getWitnessArgsAt(info.position) ?? ccc.WitnessArgs.from({});
-    witness.lock = signature;
-    tx.setWitnessArgsAt(info.position, witness);
-    return tx;
+    const txSkeleton = await createTransactionSkeleton(
+      unsigned,
+      fetcher as any,
+    );
+    const txObj = transactionSkeletonToObject(txSkeleton);
+
+    return await this.provider.request({
+      method: "ckb_signRawTransaction",
+      data: { txSkeleton: txObj },
+    });
   }
 }

@@ -50,6 +50,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@ckb-ccc/core": "workspace:*"
+    "@ckb-ccc/core": "workspace:*",
+    "@ckb-lumos/helpers": "^0.24.0-next.1"
   }
 }
