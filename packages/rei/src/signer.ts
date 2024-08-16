@@ -141,7 +141,10 @@ export class ReiSigner extends ccc.Signer {
    * @returns {Promise<ccc.Hex>} A promise that resolves to the signed message.
    */
   async signMessageRaw(message: string): Promise<ccc.Hex> {
-    return await this._signMessageRaw(message);
+    return await this.provider.request({
+      method: "ckb_signMessage",
+      data: { message: message },
+    });
   }
 
   /**
@@ -167,12 +170,7 @@ export class ReiSigner extends ccc.Signer {
     );
   }
 
-  async _signMessageRaw(message: string): Promise<ccc.Hex> {
-    return await this.provider.request({
-      method: "ckb_signMessage",
-      data: { message: message },
-    });
-  }
+
 
   /**
    * Signs a transaction without preparing information for it.
