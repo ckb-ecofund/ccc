@@ -1,12 +1,9 @@
-import { ccc, numToHex, OutPoint } from "@ckb-ccc/core";
+import { ccc } from "@ckb-ccc/core";
 import {
   addressPayloadFromString,
   JsonRpcTransformers,
 } from "@ckb-ccc/core/advanced";
-import {
-  createTransactionSkeleton,
-  transactionSkeletonToObject,
-} from "@ckb-lumos/helpers";
+
 import { Provider } from "./advancedBarrel.js";
 
 /**
@@ -170,8 +167,6 @@ export class ReiSigner extends ccc.Signer {
     );
   }
 
-
-
   /**
    * Signs a transaction without preparing information for it.
    *
@@ -183,31 +178,12 @@ export class ReiSigner extends ccc.Signer {
     txLike: ccc.TransactionLike,
   ): Promise<ccc.Transaction> {
     const tx = ccc.Transaction.from(txLike);
+
     let txFormat = JsonRpcTransformers.transactionFrom(tx);
-    let result = JsonRpcTransformers.transactionTo(txFormat);
-    const txString = result.stringify();
-    const unsigned = JSON.parse(txString);
-
-    const fetcher = async (outPoint: OutPoint) => {
-      const fRt = await this.client.getCell(outPoint);
-      const jsonStr = JSON.stringify(fRt, (_, value) => {
-        if (typeof value === "bigint") {
-          return numToHex(value);
-        }
-        return value;
-      });
-      return JSON.parse(jsonStr);
-    };
-
-    const txSkeleton = await createTransactionSkeleton(
-      unsigned,
-      fetcher as any,
-    );
-    const txObj = transactionSkeletonToObject(txSkeleton);
 
     return await this.provider.request({
-      method: "ckb_signRawTransaction",
-      data: { txSkeleton: txObj },
+      method: "ckb_signTransaction",
+      data: { txSkeleton: txFormat },
     });
   }
 }

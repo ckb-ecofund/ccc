@@ -99,5 +99,5 @@ export interface RequestMethod {
    * @returns A promise that resolves to the signed message.
    */
 
-  (request: { method: "ckb_signRawTransaction"; data: any }): Promise<any>;
+  (request: { method: "ckb_signTransaction"; data: any }): Promise<any>;
 }
