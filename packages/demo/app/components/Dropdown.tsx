@@ -1,14 +1,24 @@
 import React, { useState } from "react";
-import Icon from "./Icon";
+import { Icon } from "./Icon";
 import { icons } from "lucide-react";
 
 interface DropdownProps {
-  options: { name: string; iconName: keyof typeof icons }[];
+  options: {
+    name: string;
+    displayName?: string;
+    iconName: keyof typeof icons;
+  }[];
   selected: string;
   onSelect: (option: string) => void;
+  className?: string;
 }
 
-const Dropdown: React.FC<DropdownProps> = ({ options, selected, onSelect }) => {
+export function Dropdown({
+  options,
+  selected,
+  onSelect,
+  className,
+}: DropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleToggle = () => {
@@ -20,17 +30,16 @@ const Dropdown: React.FC<DropdownProps> = ({ options, selected, onSelect }) => {
     setIsOpen(false);
   };
 
+  const selectedOption = options.find((option) => option.name === selected);
+
   return (
-    <div className="relative z-50 my-4 inline-block w-60 text-left">
+    <div className={`relative inline-block text-left ${className ?? ""}`}>
       <button
         onClick={handleToggle}
         className="inline-flex w-full items-center justify-between rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none"
       >
-        <Icon
-          name={options.find((option) => option.name === selected)?.iconName!!}
-          className="mr-2"
-        />
-        {selected}
+        <Icon name={selectedOption?.iconName ?? "X"} className="mr-2" />
+        {selectedOption?.displayName ?? selectedOption?.name}
         <svg
           className="-mr-1 ml-2 h-5 w-5"
           xmlns="http://www.w3.org/2000/svg"
@@ -45,10 +54,10 @@ const Dropdown: React.FC<DropdownProps> = ({ options, selected, onSelect }) => {
           />
         </svg>
       </button>
-      {isOpen && ( // 仅当 isOpen 为 true 时才显示下拉菜单
-        <div className="absolute right-0 mt-2 w-56 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5">
+      {isOpen && (
+        <div className="absolute right-0 z-10 mt-2 w-full rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5">
           <div className="py-1">
-            {options.map(({ name, iconName }) => (
+            {options.map(({ name, displayName, iconName }) => (
               <button
                 key={name}
                 className={`block flex w-full items-center px-4 py-2 text-left text-sm ${
@@ -59,7 +68,7 @@ const Dropdown: React.FC<DropdownProps> = ({ options, selected, onSelect }) => {
                 onClick={() => handleSelect(name)}
               >
                 <Icon name={iconName} className="mr-2" />
-                {name}
+                {displayName ?? name}
               </button>
             ))}
           </div>
@@ -67,6 +76,4 @@ const Dropdown: React.FC<DropdownProps> = ({ options, selected, onSelect }) => {
       )}
     </div>
   );
-};
-
-export default Dropdown;
+}

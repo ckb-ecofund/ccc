@@ -4,8 +4,7 @@ import { TextInput } from "../components/Input";
 import { Button } from "../components/Button";
 import { ccc } from "@ckb-ccc/connector-react";
 import { tokenInfoToBytes } from "../utils";
-import Message from "../components/message";
-import Hint from "../components/message";
+import { Message } from "../components/Message";
 
 export function IssueXUdtTypeId({ sendMessage, signer }: TabProps) {
   const [typeIdArgs, setTypeIdArgs] = useState<string>("");
@@ -16,46 +15,37 @@ export function IssueXUdtTypeId({ sendMessage, signer }: TabProps) {
 
   return (
     <>
-      <div className="mb-1 flex flex-col items-center">
-        <Message
-          title="Hint"
-          message="You will need to sign two or three transactions."
-          type="info"
+      <div className="mb-1 flex w-9/12 flex-col items-stretch gap-2">
+        <Message title="Hint" type="info">
+          You will need to sign two or three transactions.
+        </Message>
+        <TextInput
+          label="Type ID(options)"
+          placeholder="Type ID args, empty to create new"
+          state={[typeIdArgs, setTypeIdArgs]}
         />
-        <div className="flex w-9/12 flex-col items-center gap-1">
-          <TextInput
-            label="Type ID(options)"
-            className="mt-1 w-full"
-            placeholder="Type ID args, empty to create new"
-            state={[typeIdArgs, setTypeIdArgs]}
-          />
-          <TextInput
-            label="Amount"
-            className="mt-1 w-full"
-            placeholder="Amount to issue"
-            state={[amount, setAmount]}
-          />
-          <TextInput
-            label="Decimals"
-            className="mt-1 w-full"
-            placeholder="Decimals of the token"
-            state={[decimals, setDecimals]}
-          />
-          <TextInput
-            label="Symbol"
-            className="mt-1 w-full"
-            placeholder="Symbol of the token"
-            state={[symbol, setSymbol]}
-          />
-          <TextInput
-            label="Name (options)"
-            className="mt-1 w-full"
-            placeholder="Name of the token, same as symbol if empty"
-            state={[name, setName]}
-          />
-        </div>
+        <TextInput
+          label="Amount"
+          placeholder="Amount to issue"
+          state={[amount, setAmount]}
+        />
+        <TextInput
+          label="Decimals"
+          placeholder="Decimals of the token"
+          state={[decimals, setDecimals]}
+        />
+        <TextInput
+          label="Symbol"
+          placeholder="Symbol of the token"
+          state={[symbol, setSymbol]}
+        />
+        <TextInput
+          label="Name (options)"
+          placeholder="Name of the token, same as symbol if empty"
+          state={[name, setName]}
+        />
         <Button
-          className="mt-1"
+          className="self-center"
           onClick={async () => {
             if (!signer) {
               return;

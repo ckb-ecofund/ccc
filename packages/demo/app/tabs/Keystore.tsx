@@ -50,26 +50,23 @@ export function Keystore({ sendMessage }: TabProps) {
   }, [client, accounts]);
 
   return (
-    <div className="mb-1 flex w-full flex-col items-center gap-1">
+    <div className="mb-1 flex w-9/12 flex-col items-stretch gap-2">
       <Textarea
         label="keystore"
-        className="mb-1 w-9/12"
         placeholder="Keystore"
         state={[keystore, setKeystore]}
       />
       <TextInput
         label="Accounts count"
-        className="mb-1 w-9/12"
         placeholder="Accounts count"
         state={[countStr, setCountStr]}
       />
       <TextInput
         label="Password"
-        className="mb-1 w-9/12"
         placeholder="Password"
         state={[password, setPassword]}
       />
-      <div className="flex">
+      <div className="flex justify-center">
         <Button
           onClick={async () => {
             try {

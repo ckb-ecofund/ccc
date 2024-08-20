@@ -1,108 +1,82 @@
-import React, { useState, useEffect } from "react";
-import Message from "./message";
-import { History } from "lucide-react";
+import React, { useState, useEffect, ReactNode } from "react";
+import { Message } from "./Message";
+import { ChevronsRightLeft, History } from "lucide-react";
 
 interface NotificationProps {
-  messages: ["info" | "error", string][];
+  messages: ["info" | "error", string, ReactNode][];
 }
 
-const Notifications: React.FC<NotificationProps> = ({ messages }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
+export function Notifications({ messages }: NotificationProps) {
+  const [[msgCount, isExpanded], setMsgsState] = useState([0, false]);
 
   useEffect(() => {
-    if (messages.length > 0) {
-      setIsExpanded(true);
+    if (messages.length <= 0) {
+      return;
     }
+    if (!isExpanded) {
+      setMsgsState([1, true]);
+    }
+    if (isExpanded && msgCount !== 0) {
+      setMsgsState([msgCount + 1, true]);
+    }
+
+    setTimeout(
+      () =>
+        setMsgsState(([count, i]) => {
+          if (count === 1) {
+            return [count, false];
+          }
+          return [count - 1, i];
+        }),
+      3000,
+    );
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages]);
 
-  const messageCount = messages.length;
-
   const toggleExpand = () => {
-    setIsExpanded(!isExpanded);
+    if (!isExpanded) {
+      setMsgsState([0, true]);
+    } else {
+      setMsgsState([msgCount, false]);
+    }
   };
 
   return (
     <>
-      {/* PC 端右侧展示 */}
-      <div
-        className={`fixed right-0 top-16 z-50 w-[420px] transition-transform duration-300 ease-in-out ${isExpanded ? "translate-x-0" : "translate-x-full"} md:translate-x-0`}
-      >
-        {isExpanded ? (
-          <div className="relative overflow-hidden rounded-md bg-white shadow-lg md:max-h-96">
-            <div className="p-4">
-              {messages.map(([level, msg], i) => (
-                <Message
-                  key={messages.length - i}
-                  title={`${messages.length - i}`}
-                  message={msg}
-                  type={level === "info" ? "success" : "error"}
-                />
-              ))}
-            </div>
-            <div className="pb-4 pr-4 text-right">
-              <button
-                onClick={toggleExpand}
-                className="text-blue-500 underline"
-              >
-                Collapse
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div
-            className="fixed bottom-0 right-0 mb-4 mr-4 flex cursor-pointer items-center md:bottom-auto md:right-4 md:top-16"
-            onClick={toggleExpand}
-          >
-            <History className="h-8 w-8" />
-            {messageCount > 0 && (
-              <span className="ml-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white">
-                {messageCount}
-              </span>
-            )}
-          </div>
-        )}
-      </div>
-
-      {/* 移动端全屏展示 */}
-      {!isExpanded && (
+      {messages.length > 0 ? (
         <div
-          className="fixed right-4 top-4 z-50 md:hidden"
+          className="border-grey-500 fixed right-0 top-4 z-50 mb-4 flex cursor-pointer items-center rounded-l-full border bg-white px-3 py-2 shadow-md md:top-16"
           onClick={toggleExpand}
         >
-          <div className="relative cursor-pointer">
-            <History className="h-8 w-8 " />
-            {messageCount > 0 && (
-              <span className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white">
-                {messageCount}
-              </span>
-            )}
-          </div>
+          {isExpanded ? (
+            <ChevronsRightLeft className="h-8 w-8" />
+          ) : (
+            <History className="h-8 w-8" />
+          )}
+          <span className="mx-3 flex items-center justify-center rounded-full text-lg">
+            {messages.length}
+          </span>
         </div>
-      )}
+      ) : undefined}
 
-      {/* 移动端全屏展示 */}
-      {isExpanded && (
-        <div className="fixed inset-0 z-50 bg-white md:hidden">
-          <div className="flex items-center justify-between border-b p-4">
-            <h2 className="text-xl font-bold">Messages</h2>
-            <button onClick={toggleExpand} className="text-lg">
-              Close
-            </button>
-          </div>
-          <div className="h-full overflow-y-auto p-4">
-            {messages.map(([level, msg], i) => (
+      <div
+        className={`fixed right-0 top-0 z-40 max-h-full w-full md:top-32 md:max-h-96 md:w-7/12 lg:w-5/12 xl:w-4/12 ${isExpanded ? "" : "translate-x-full"} border-grey-500 flex flex-col overflow-y-auto overflow-x-hidden border bg-white bg-white duration-300 ease-in-out md:rounded-lg md:shadow-lg`}
+      >
+        <div className="p-4 pt-20 md:pt-4">
+          {messages
+            .slice(0, msgCount === 0 ? messages.length : msgCount)
+            .map(([level, title, msg], i) => (
               <Message
                 key={messages.length - i}
-                title={`${messages.length - i}`}
-                message={msg}
+                title={`${messages.length - i} ${title}`}
                 type={level === "info" ? "success" : "error"}
-              />
+              >
+                {msg}
+              </Message>
             ))}
-          </div>
         </div>
-      )}
+      </div>
     </>
   );
-};
-
-export default Notifications;
+}

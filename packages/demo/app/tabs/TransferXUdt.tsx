@@ -11,29 +11,24 @@ export function TransferXUdt({ sendMessage, signer }: TabProps) {
   const [amount, setAmount] = useState<string>("");
 
   return (
-    <div className="mb-1 flex flex-col items-center">
-      <div className="flex w-9/12 flex-col items-center">
-        <TextInput
-          label="Args"
-          className="w-full"
-          placeholder="xUdt args to transfer"
-          state={[xUdtArgs, setXUdtArgs]}
-        />
-        <Textarea
-          label="Address"
-          className="mt-1 w-full"
-          placeholder="Addresses to transfer to, separated by lines"
-          state={[transferTo, setTransferTo]}
-        />
-        <TextInput
-          label="amount"
-          className="mt-1 w-full"
-          placeholder="Amount to transfer for each"
-          state={[amount, setAmount]}
-        />
-      </div>
+    <div className="mb-1 flex w-9/12 flex-col items-stretch gap-2">
+      <TextInput
+        label="Args"
+        placeholder="xUdt args to transfer"
+        state={[xUdtArgs, setXUdtArgs]}
+      />
+      <Textarea
+        label="Address"
+        placeholder="Addresses to transfer to, separated by lines"
+        state={[transferTo, setTransferTo]}
+      />
+      <TextInput
+        label="amount"
+        placeholder="Amount to transfer for each"
+        state={[amount, setAmount]}
+      />
       <Button
-        className="mt-1"
+        className="self-center"
         onClick={async () => {
           if (!signer) {
             return;

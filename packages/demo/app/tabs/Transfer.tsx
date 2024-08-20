@@ -12,28 +12,23 @@ export function Transfer({ sendMessage, signer }: TabProps) {
   const [data, setData] = useState<string>("");
 
   return (
-    <div className="mb-1 flex flex-col items-center">
-      <div className="flex w-9/12 flex-col items-center gap-1">
-        <Textarea
-          label="Address"
-          className="w-full"
-          placeholder="Addresses to transfer to, separated by lines"
-          state={[transferTo, setTransferTo]}
-        />
-        <TextInput
-          label="Amount"
-          className="mt-1 w-full"
-          placeholder="Amount to transfer for each"
-          state={[amount, setAmount]}
-        />
-        <Textarea
-          label="Output Data(Options)"
-          className="mt-1 w-full"
-          state={[data, setData]}
-          placeholder="Leave empty if you don't know what this is. Data in the first output. Hex string will be parsed."
-        />
-      </div>
-      <div className="mt-1 flex">
+    <div className="mb-1 flex w-9/12 flex-col items-stretch gap-2">
+      <Textarea
+        label="Address"
+        placeholder="Addresses to transfer to, separated by lines"
+        state={[transferTo, setTransferTo]}
+      />
+      <TextInput
+        label="Amount"
+        placeholder="Amount to transfer for each"
+        state={[amount, setAmount]}
+      />
+      <Textarea
+        label="Output Data(Options)"
+        state={[data, setData]}
+        placeholder="Leave empty if you don't know what this is. Data in the first output. Hex string will be parsed."
+      />
+      <div className="flex justify-center">
         <Button
           onClick={async () => {
             if (!signer) {

@@ -3,21 +3,19 @@ import { TabProps } from "../types";
 import { useState } from "react";
 import { Button } from "../components/Button";
 import { TextInput } from "../components/Input";
-import Message from "../components/message";
 
 export function Sign({ sendMessage, signer }: TabProps) {
   const [messageToSign, setMessageToSign] = useState<string>("");
   const [signature, setSignature] = useState<string>("");
 
   return (
-    <div className="mb-1 flex flex-col items-center gap-1">
+    <div className="mb-1  flex w-9/12 flex-col items-stretch gap-2">
       <TextInput
         label="Message"
-        className="mb-1 w-9/12"
         placeholder="Message to sign and verify"
         state={[messageToSign, setMessageToSign]}
       />
-      <div className="flex">
+      <div className="flex justify-center">
         <Button
           onClick={async () => {
             if (!signer) {

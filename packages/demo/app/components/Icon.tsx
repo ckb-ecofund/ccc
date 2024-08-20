@@ -5,15 +5,13 @@ interface IconProps extends Omit<LucideProps, "name"> {
   name: keyof typeof icons;
 }
 
-const Icon: React.FC<IconProps> = ({ name, color, size, ...props }) => {
+export function Icon({ name, color, size, ...props }: IconProps) {
   const LucideIcon = icons[name];
 
-  // 如果图标名称无效，返回 null 或者可以返回一个占位图标
+  // Invalid name
   if (!LucideIcon) {
     return null;
   }
 
   return <LucideIcon color={color} size={size} {...props} />;
-};
-
-export default Icon;
+}

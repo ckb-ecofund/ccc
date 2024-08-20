@@ -5,6 +5,7 @@ import { ccc } from "@ckb-ccc/connector-react";
 import React, {
   createElement,
   FunctionComponent,
+  ReactNode,
   useEffect,
   useMemo,
   useState,
@@ -23,17 +24,9 @@ import { Hash } from "./tabs/Hash";
 import { Mnemonic } from "./tabs/Mnemonic";
 import { Keystore } from "./tabs/Keystore";
 import { formatString } from "../../connector/dist/scenes/connected";
-import {
-  icons,
-  Layers,
-  LucideIcon,
-  LucideProps,
-  Signature,
-  Wallet,
-} from "lucide-react";
-import Dropdown from "./components/Dropdown";
-import Message from "./components/message";
-import Notifications from "./components/Notifications";
+import { icons } from "lucide-react";
+import { Dropdown } from "./components/Dropdown";
+import { Notifications } from "./components/Notifications";
 
 function WalletIcon({
   wallet,
@@ -54,7 +47,7 @@ function WalletIcon({
 
 function Links() {
   return (
-    <div className="align-center mb-5 mt-10 flex justify-center gap-8">
+    <div className="align-center mb-5 flex justify-center gap-8">
       <Link href="https://github.com/ckb-ecofund/ccc" target="_blank">
         <svg
           className="h-6 w-6"
@@ -108,7 +101,10 @@ function Links() {
 }
 
 export default function Home() {
-  const [messages, setMessages] = useState<["error" | "info", string][]>([]);
+  const [messages, setMessages] = useState<
+    ["error" | "info", string, ReactNode][]
+  >([]);
+
   useEffect(() => {
     const handler = (event: PromiseRejectionEvent) => {
       const msg = (() => {
@@ -121,7 +117,7 @@ export default function Home() {
         }
         return JSON.stringify(event);
       })();
-      setMessages((messages) => [["error", msg], ...messages]);
+      setMessages((messages) => [["error", "Unknown error", msg], ...messages]);
     };
 
     window.addEventListener("unhandledrejection", handler);
@@ -138,7 +134,7 @@ export default function Home() {
   const signer = cccSigner ?? privateKeySigner;
 
   const [internalAddress, setInternalAddress] = useState("");
-  const [address, setAddress] = useState("");
+  const [addresses, setAddresses] = useState<string[]>([]);
   const [balance, setBalance] = useState(ccc.Zero);
   const [isTestnet, setIsTestnet] = useState(true);
   const [tab, setTab] = useState("Hash");
@@ -183,7 +179,7 @@ export default function Home() {
 
     (async () => {
       setInternalAddress(await signer.getInternalAddress());
-      setAddress(await signer.getRecommendedAddress());
+      setAddresses(await signer.getAddresses());
       setBalance(await signer.getBalance());
     })();
   }, [signer]);
@@ -196,36 +192,44 @@ export default function Home() {
 
   return (
     <>
-      <header className="flex justify-center bg-white">
+      <header className="flex flex-col items-center bg-white">
         <img
           src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/logo.svg"
           alt="CCC Logo"
-          className="my-8 h-32 w-32"
+          className="mt-8 mb-4 h-24 w-24"
         />
+        <Links />
       </header>
       <main className="flex flex-col items-center bg-white px-6 md:px-24">
         {signer ? (
           <>
-            {!wallet && "Private Key mode"}
+            <Dropdown
+              options={addresses.map((address, i) => ({
+                name: address,
+                displayName: formatString(address),
+                iconName: i === 0 ? "HandCoins" : "CircleDollarSign",
+              }))}
+              selected={addresses[0]}
+              onSelect={(address) => {
+                setMessages((messages) => [
+                  ["info", "Address copied", address],
+                  ...messages,
+                ]);
+
+                window.navigator.clipboard.writeText(address);
+              }}
+            />
+            <p className="font-bold my-2">{ccc.fixedPointToString(balance)} CKB</p>
 
             {cccSigner ? (
-              <Button className="mt-2 flex gap-2" onClick={open}>
+              <Button className="flex gap-2" onClick={open}>
                 {wallet && <WalletIcon wallet={wallet} className="h-5 w-5" />}
                 {internalAddress.slice(0, 7)}...{internalAddress.slice(-5)}
               </Button>
             ) : (
-              <>
-                <p className="mt-1 text-balance break-all text-center">
-                  {formatString(internalAddress)}
-                </p>
-                <p className="mt-1">{ccc.fixedPointToString(balance)} CKB</p>
-                <Button
-                  className="mt-2"
-                  onClick={() => setPrivateKeySigner(undefined)}
-                >
-                  Disconnect
-                </Button>
-              </>
+              <Button onClick={() => setPrivateKeySigner(undefined)}>
+                Disconnect
+              </Button>
             )}
           </>
         ) : (
@@ -253,21 +257,21 @@ export default function Home() {
             </Button>
           </>
         )}
-        <div className="flex items-center gap-4">
-          <Layers />
+        <div className="mt-2 flex items-center gap-4">
           <Dropdown
+            className="my-3 w-60"
             options={tabs.map(([name, , iconName]) => ({ name, iconName }))}
             selected={tab}
             onSelect={(option) => setTab(option)}
           />
         </div>
-        <div className="w-full">
+        <div className="align-center flex w-full justify-center">
           {ccc.apply(
             (e: FunctionComponent<TabProps>) =>
               createElement(e, {
-                sendMessage: (...msg: string[]) =>
+                sendMessage: (...msg: ReactNode[]) =>
                   setMessages((messages) => [
-                    ["info", `(${tab}) ${msg.join(" ")}`],
+                    ["info", tab, msg.join(" ")],
                     ...messages,
                   ]),
                 signer,
@@ -278,7 +282,6 @@ export default function Home() {
         <Button onClick={() => setIsTestnet(!isTestnet)} className="mt-4">
           Switch to {isTestnet ? "Mainnet" : "Testnet"}
         </Button>
-        <Links />
         <Notifications messages={messages} />
       </main>
     </>
