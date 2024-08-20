@@ -24,9 +24,10 @@ import { Hash } from "./tabs/Hash";
 import { Mnemonic } from "./tabs/Mnemonic";
 import { Keystore } from "./tabs/Keystore";
 import { formatString } from "../../connector/dist/scenes/connected";
-import { icons } from "lucide-react";
+import { icons, Search } from "lucide-react";
 import { Dropdown } from "./components/Dropdown";
 import { Notifications } from "./components/Notifications";
+import { useGetExplorerLink } from "./utils";
 
 function WalletIcon({
   wallet,
@@ -46,6 +47,8 @@ function WalletIcon({
 }
 
 function Links() {
+  const { index } = useGetExplorerLink();
+
   return (
     <div className="align-center mb-5 flex justify-center gap-8">
       <Link href="https://github.com/ckb-ecofund/ccc" target="_blank">
@@ -96,6 +99,9 @@ function Links() {
           <polygon points="154.525 0 154.525 112.422 113.781 112.422 207.676 206.318 207.676 0 154.525 0" />
         </svg>
       </Link>
+      <Link href={index} target="_blank">
+        <Search className="h-6 w-6" strokeWidth={4} />
+      </Link>
     </div>
   );
 }
@@ -138,6 +144,8 @@ export default function Home() {
   const [balance, setBalance] = useState(ccc.Zero);
   const [isTestnet, setIsTestnet] = useState(true);
   const [tab, setTab] = useState("Hash");
+
+  const { explorerAddress } = useGetExplorerLink();
 
   const tabs: [string, FunctionComponent<TabProps>, keyof typeof icons][] =
     useMemo(
@@ -196,7 +204,7 @@ export default function Home() {
         <img
           src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/logo.svg"
           alt="CCC Logo"
-          className="mt-8 mb-4 h-24 w-24"
+          className="mb-4 mt-8 h-24 w-24"
         />
         <Links />
       </header>
@@ -212,14 +220,16 @@ export default function Home() {
               selected={addresses[0]}
               onSelect={(address) => {
                 setMessages((messages) => [
-                  ["info", "Address copied", address],
+                  ["info", "Address copied", explorerAddress(address)],
                   ...messages,
                 ]);
 
                 window.navigator.clipboard.writeText(address);
               }}
             />
-            <p className="font-bold my-2">{ccc.fixedPointToString(balance)} CKB</p>
+            <p className="my-2 font-bold">
+              {ccc.fixedPointToString(balance)} CKB
+            </p>
 
             {cccSigner ? (
               <Button className="flex gap-2" onClick={open}>
@@ -271,7 +281,11 @@ export default function Home() {
               createElement(e, {
                 sendMessage: (...msg: ReactNode[]) =>
                   setMessages((messages) => [
-                    ["info", tab, msg.join(" ")],
+                    [
+                      "info",
+                      tab,
+                      <>{msg.map((msg, i) => (i === 0 ? msg : <> {msg}</>))}</>,
+                    ],
                     ...messages,
                   ]),
                 signer,

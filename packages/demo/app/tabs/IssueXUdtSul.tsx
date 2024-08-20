@@ -3,7 +3,7 @@ import { TabProps } from "../types";
 import { TextInput } from "../components/Input";
 import { Button } from "../components/Button";
 import { ccc } from "@ckb-ccc/connector-react";
-import { tokenInfoToBytes } from "../utils";
+import { tokenInfoToBytes, useGetExplorerLink } from "../utils";
 import { Message } from "../components/Message";
 
 export function IssueXUdtSul({ sendMessage, signer }: TabProps) {
@@ -11,6 +11,8 @@ export function IssueXUdtSul({ sendMessage, signer }: TabProps) {
   const [decimals, setDecimals] = useState<string>("");
   const [name, setName] = useState<string>("");
   const [symbol, setSymbol] = useState<string>("");
+
+  const { explorerTransaction } = useGetExplorerLink();
 
   return (
     <>
@@ -62,7 +64,7 @@ export function IssueXUdtSul({ sendMessage, signer }: TabProps) {
             await susTx.completeInputsByCapacity(signer);
             await susTx.completeFeeBy(signer, 1000);
             const susTxHash = await signer.sendTransaction(susTx);
-            sendMessage("Transaction sent:", susTxHash);
+            sendMessage("Transaction sent:", explorerTransaction(susTxHash));
             await signer.client.markUnusable({ txHash: susTxHash, index: 0 });
 
             const singleUseLock = await ccc.Script.fromKnownScript(
@@ -84,7 +86,7 @@ export function IssueXUdtSul({ sendMessage, signer }: TabProps) {
             await lockTx.completeInputsByCapacity(signer);
             await lockTx.completeFeeBy(signer, 1000);
             const lockTxHash = await signer.sendTransaction(lockTx);
-            sendMessage("Transaction sent:", lockTxHash);
+            sendMessage("Transaction sent:", explorerTransaction(lockTxHash));
 
             const mintTx = ccc.Transaction.from({
               inputs: [
@@ -144,7 +146,7 @@ export function IssueXUdtSul({ sendMessage, signer }: TabProps) {
             await mintTx.completeFeeBy(signer, 1000);
             sendMessage(
               "Transaction sent:",
-              await signer.sendTransaction(mintTx),
+              explorerTransaction(await signer.sendTransaction(mintTx)),
             );
           }}
         >

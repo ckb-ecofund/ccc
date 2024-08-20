@@ -23,6 +23,10 @@ export function Notifications({ messages }: NotificationProps) {
     setTimeout(
       () =>
         setMsgsState(([count, i]) => {
+          if (count === 0) {
+            return [count, i];
+          }
+
           if (count === 1) {
             return [count, false];
           }

@@ -3,7 +3,7 @@ import { TabProps } from "../types";
 import { TextInput } from "../components/Input";
 import { Button } from "../components/Button";
 import { ccc } from "@ckb-ccc/connector-react";
-import { tokenInfoToBytes } from "../utils";
+import { tokenInfoToBytes, useGetExplorerLink } from "../utils";
 import { Message } from "../components/Message";
 
 export function IssueXUdtTypeId({ sendMessage, signer }: TabProps) {
@@ -12,6 +12,8 @@ export function IssueXUdtTypeId({ sendMessage, signer }: TabProps) {
   const [decimals, setDecimals] = useState<string>("");
   const [name, setName] = useState<string>("");
   const [symbol, setSymbol] = useState<string>("");
+
+  const { explorerTransaction } = useGetExplorerLink();
 
   return (
     <>
@@ -86,7 +88,7 @@ export function IssueXUdtTypeId({ sendMessage, signer }: TabProps) {
               await typeIdTx.completeFeeBy(signer, 1000);
               sendMessage(
                 "Transaction sent:",
-                await signer.sendTransaction(typeIdTx),
+                explorerTransaction(await signer.sendTransaction(typeIdTx)),
               );
               sendMessage("Type ID created: ", typeIdTx.outputs[0].type.args);
               return typeIdTx.outputs[0].type;
@@ -108,7 +110,7 @@ export function IssueXUdtTypeId({ sendMessage, signer }: TabProps) {
             await lockTx.completeInputsByCapacity(signer);
             await lockTx.completeFeeBy(signer, 1000);
             const lockTxHash = await signer.sendTransaction(lockTx);
-            sendMessage("Transaction sent:", lockTxHash);
+            sendMessage("Transaction sent:", explorerTransaction(lockTxHash));
 
             const typeIdCell =
               await signer.client.findSingletonCellByType(typeId);
@@ -173,7 +175,7 @@ export function IssueXUdtTypeId({ sendMessage, signer }: TabProps) {
             await mintTx.completeFeeBy(signer, 1000);
             sendMessage(
               "Transaction sent:",
-              await signer.sendTransaction(mintTx),
+              explorerTransaction(await signer.sendTransaction(mintTx)),
             );
           }}
         >

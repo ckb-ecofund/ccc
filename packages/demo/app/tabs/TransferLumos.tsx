@@ -11,11 +11,14 @@ import { Indexer } from "@ckb-lumos/ckb-indexer";
 import { TransactionSkeleton } from "@ckb-lumos/helpers";
 import { predefined } from "@ckb-lumos/config-manager";
 import { Textarea } from "../components/Textarea";
+import { useGetExplorerLink } from "../utils";
 
 export function TransferLumos({ sendMessage, signer }: TabProps) {
   const [transferTo, setTransferTo] = useState<string>("");
   const [amount, setAmount] = useState<string>("");
   const [data, setData] = useState<string>("");
+
+  const { explorerTransaction } = useGetExplorerLink();
 
   return (
     <>
@@ -95,7 +98,10 @@ export function TransferLumos({ sendMessage, signer }: TabProps) {
             tx.outputsData[0] = ccc.hexFrom(dataBytes);
 
             // Sign and send the transaction
-            sendMessage("Transaction sent:", await signer.sendTransaction(tx));
+            sendMessage(
+              "Transaction sent:",
+              explorerTransaction(await signer.sendTransaction(tx)),
+            );
           }}
         >
           Transfer
