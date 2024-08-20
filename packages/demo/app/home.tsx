@@ -12,6 +12,7 @@ import React, {
 } from "react";
 import Link from "next/link";
 import { Button } from "./components/Button";
+import { Background } from "./components/Background";
 import { Transfer } from "./tabs/Transfer";
 import { TransferLumos } from "./tabs/TransferLumos";
 import { TransferXUdt } from "./tabs/TransferXUdt";
@@ -200,7 +201,8 @@ export default function Home() {
 
   return (
     <>
-      <header className="flex flex-col items-center bg-white">
+      <Background />
+      <header className="flex flex-col items-center">
         <img
           src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/logo.svg"
           alt="CCC Logo"
@@ -208,7 +210,7 @@ export default function Home() {
         />
         <Links />
       </header>
-      <main className="flex flex-col items-center bg-white px-6 md:px-24">
+      <main className="flex flex-col items-center px-6 md:px-24">
         {signer ? (
           <>
             <Dropdown
