@@ -9,13 +9,13 @@ export function Sign({ sendMessage, signer }: TabProps) {
   const [signature, setSignature] = useState<string>("");
 
   return (
-    <div className="mb-1 flex flex-col items-center">
+    <div className="mb-1  flex w-9/12 flex-col items-stretch gap-2">
       <TextInput
-        className="mb-1 w-9/12"
+        label="Message"
         placeholder="Message to sign and verify"
         state={[messageToSign, setMessageToSign]}
       />
-      <div className="flex">
+      <div className="flex justify-center">
         <Button
           onClick={async () => {
             if (!signer) {

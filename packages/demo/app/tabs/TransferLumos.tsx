@@ -11,34 +11,35 @@ import { Indexer } from "@ckb-lumos/ckb-indexer";
 import { TransactionSkeleton } from "@ckb-lumos/helpers";
 import { predefined } from "@ckb-lumos/config-manager";
 import { Textarea } from "../components/Textarea";
+import { useGetExplorerLink } from "../utils";
 
 export function TransferLumos({ sendMessage, signer }: TabProps) {
   const [transferTo, setTransferTo] = useState<string>("");
   const [amount, setAmount] = useState<string>("");
   const [data, setData] = useState<string>("");
 
+  const { explorerTransaction } = useGetExplorerLink();
+
   return (
     <>
-      <div className="mb-1 flex flex-col items-center">
-        <div className="flex w-9/12 flex-col items-center">
-          <TextInput
-            className="w-full"
-            placeholder="Address to transfer to"
-            state={[transferTo, setTransferTo]}
-          />
-          <TextInput
-            className="mt-1 w-full"
-            placeholder="Amount to transfer"
-            state={[amount, setAmount]}
-          />
-          <Textarea
-            className="mt-1 w-full"
-            state={[data, setData]}
-            placeholder="Data in the cell. Hex string will be parsed."
-          />
-        </div>
+      <div className="mb-1 flex w-9/12 flex-col items-stretch gap-2">
+        <TextInput
+          label="Address"
+          placeholder="Address to transfer to"
+          state={[transferTo, setTransferTo]}
+        />
+        <TextInput
+          label="Amount"
+          placeholder="Amount to transfer"
+          state={[amount, setAmount]}
+        />
+        <Textarea
+          label="Output Data(options)"
+          state={[data, setData]}
+          placeholder="Data in the cell. Hex string will be parsed."
+        />
         <Button
-          className="mt-1"
+          className="self-center"
           onClick={async () => {
             if (!signer) {
               return;
@@ -97,7 +98,10 @@ export function TransferLumos({ sendMessage, signer }: TabProps) {
             tx.outputsData[0] = ccc.hexFrom(dataBytes);
 
             // Sign and send the transaction
-            sendMessage("Transaction sent:", await signer.sendTransaction(tx));
+            sendMessage(
+              "Transaction sent:",
+              explorerTransaction(await signer.sendTransaction(tx)),
+            );
           }}
         >
           Transfer

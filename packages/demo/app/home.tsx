@@ -5,6 +5,7 @@ import { ccc } from "@ckb-ccc/connector-react";
 import React, {
   createElement,
   FunctionComponent,
+  ReactNode,
   useEffect,
   useMemo,
   useState,
@@ -22,6 +23,11 @@ import { TextInput } from "./components/Input";
 import { Hash } from "./tabs/Hash";
 import { Mnemonic } from "./tabs/Mnemonic";
 import { Keystore } from "./tabs/Keystore";
+import { formatString } from "../../connector/dist/scenes/connected";
+import { icons, Search } from "lucide-react";
+import { Dropdown } from "./components/Dropdown";
+import { Notifications } from "./components/Notifications";
+import { useGetExplorerLink } from "./utils";
 
 function WalletIcon({
   wallet,
@@ -41,8 +47,10 @@ function WalletIcon({
 }
 
 function Links() {
+  const { index } = useGetExplorerLink();
+
   return (
-    <div className="align-center mb-5 mt-10 flex justify-center gap-8">
+    <div className="align-center mb-5 flex justify-center gap-8">
       <Link href="https://github.com/ckb-ecofund/ccc" target="_blank">
         <svg
           className="h-6 w-6"
@@ -91,12 +99,18 @@ function Links() {
           <polygon points="154.525 0 154.525 112.422 113.781 112.422 207.676 206.318 207.676 0 154.525 0" />
         </svg>
       </Link>
+      <Link href={index} target="_blank">
+        <Search className="h-6 w-6" strokeWidth={4} />
+      </Link>
     </div>
   );
 }
 
 export default function Home() {
-  const [messages, setMessages] = useState<["error" | "info", string][]>([]);
+  const [messages, setMessages] = useState<
+    ["error" | "info", string, ReactNode][]
+  >([]);
+
   useEffect(() => {
     const handler = (event: PromiseRejectionEvent) => {
       const msg = (() => {
@@ -109,7 +123,7 @@ export default function Home() {
         }
         return JSON.stringify(event);
       })();
-      setMessages((messages) => [["error", msg], ...messages]);
+      setMessages((messages) => [["error", "Unknown error", msg], ...messages]);
     };
 
     window.addEventListener("unhandledrejection", handler);
@@ -126,32 +140,35 @@ export default function Home() {
   const signer = cccSigner ?? privateKeySigner;
 
   const [internalAddress, setInternalAddress] = useState("");
-  const [address, setAddress] = useState("");
+  const [addresses, setAddresses] = useState<string[]>([]);
   const [balance, setBalance] = useState(ccc.Zero);
   const [isTestnet, setIsTestnet] = useState(true);
   const [tab, setTab] = useState("Hash");
 
-  const tabs: [string, FunctionComponent<TabProps>][] = useMemo(
-    () =>
-      signer
-        ? [
-            ["Sign", Sign],
-            ["Transfer", Transfer],
-            ["Transfer with Lumos", TransferLumos],
-            ["Transfer xUDT", TransferXUdt],
-            ["Issue xUDT (SUS)", IssueXUdtSul],
-            ["Issue xUDT (Type ID)", IssueXUdtTypeId],
-            ["Hash", Hash],
-            ["Mnemonic", Mnemonic],
-            ["Keystore", Keystore],
-          ]
-        : [
-            ["Hash", Hash],
-            ["Mnemonic", Mnemonic],
-            ["Keystore", Keystore],
-          ],
-    [signer],
-  );
+  const { explorerAddress } = useGetExplorerLink();
+
+  const tabs: [string, FunctionComponent<TabProps>, keyof typeof icons][] =
+    useMemo(
+      () =>
+        signer
+          ? [
+              ["Sign", Sign, "Signature"],
+              ["Transfer", Transfer, "ArrowLeftRight"],
+              ["Transfer with Lumos", TransferLumos, "LampWallDown"],
+              ["Transfer xUDT", TransferXUdt, "BadgeCent"],
+              ["Issue xUDT (SUS)", IssueXUdtSul, "Rss"],
+              ["Issue xUDT (Type ID)", IssueXUdtTypeId, "PencilRuler"],
+              ["Hash", Hash, "Barcode"],
+              ["Mnemonic", Mnemonic, "SquareAsterisk"],
+              ["Keystore", Keystore, "Notebook"],
+            ]
+          : [
+              ["Hash", Hash, "Barcode"],
+              ["Mnemonic", Mnemonic, "SquareAsterisk"],
+              ["Keystore", Keystore, "Notebook"],
+            ],
+      [signer],
+    );
 
   useEffect(() => setTab(tabs[0][0]), [tabs]);
 
@@ -170,7 +187,7 @@ export default function Home() {
 
     (async () => {
       setInternalAddress(await signer.getInternalAddress());
-      setAddress(await signer.getRecommendedAddress());
+      setAddresses(await signer.getAddresses());
       setBalance(await signer.getBalance());
     })();
   }, [signer]);
@@ -183,35 +200,44 @@ export default function Home() {
 
   return (
     <>
-      <header className="flex justify-center bg-white">
+      <header className="flex flex-col items-center bg-white">
         <img
           src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/logo.svg"
           alt="CCC Logo"
-          className="my-8 h-32 w-32"
+          className="mb-4 mt-8 h-24 w-24"
         />
+        <Links />
       </header>
       <main className="flex flex-col items-center bg-white px-6 md:px-24">
         {signer ? (
           <>
-            {wallet ? (
-              <WalletIcon wallet={wallet} className="mb-1" />
-            ) : (
-              "Private Key mode"
-            )}
-            <p className="mt-1 text-balance break-all text-center">
-              {internalAddress}
+            <Dropdown
+              options={addresses.map((address, i) => ({
+                name: address,
+                displayName: formatString(address),
+                iconName: i === 0 ? "HandCoins" : "CircleDollarSign",
+              }))}
+              selected={addresses[0]}
+              onSelect={(address) => {
+                setMessages((messages) => [
+                  ["info", "Address copied", explorerAddress(address)],
+                  ...messages,
+                ]);
+
+                window.navigator.clipboard.writeText(address);
+              }}
+            />
+            <p className="my-2 font-bold">
+              {ccc.fixedPointToString(balance)} CKB
             </p>
-            <p className="mt-1 text-balance break-all text-center">{address}</p>
-            <p className="mt-1">{ccc.fixedPointToString(balance)} CKB</p>
+
             {cccSigner ? (
-              <Button className="mt-2" onClick={open}>
+              <Button className="flex gap-2" onClick={open}>
+                {wallet && <WalletIcon wallet={wallet} className="h-5 w-5" />}
                 {internalAddress.slice(0, 7)}...{internalAddress.slice(-5)}
               </Button>
             ) : (
-              <Button
-                className="mt-2"
-                onClick={() => setPrivateKeySigner(undefined)}
-              >
+              <Button onClick={() => setPrivateKeySigner(undefined)}>
                 Disconnect
               </Button>
             )}
@@ -241,24 +267,25 @@ export default function Home() {
             </Button>
           </>
         )}
-        <div className="mb-2 mt-2 flex max-w-full overflow-x-auto pb-1">
-          {tabs.map(([name]) => (
-            <button
-              key={name}
-              className={`flex items-center border-b border-black px-5 py-2 text-lg ${tab === name ? "border-b-4" : ""} whitespace-nowrap`}
-              onClick={() => setTab(name)}
-            >
-              {name}
-            </button>
-          ))}
+        <div className="mt-2 flex items-center gap-4">
+          <Dropdown
+            className="my-3 w-60"
+            options={tabs.map(([name, , iconName]) => ({ name, iconName }))}
+            selected={tab}
+            onSelect={(option) => setTab(option)}
+          />
         </div>
-        <div className="w-full">
+        <div className="align-center flex w-full justify-center">
           {ccc.apply(
             (e: FunctionComponent<TabProps>) =>
               createElement(e, {
-                sendMessage: (...msg: string[]) =>
+                sendMessage: (...msg: ReactNode[]) =>
                   setMessages((messages) => [
-                    ["info", `(${tab}) ${msg.join(" ")}`],
+                    [
+                      "info",
+                      tab,
+                      <>{msg.map((msg, i) => (i === 0 ? msg : <> {msg}</>))}</>,
+                    ],
                     ...messages,
                   ]),
                 signer,
@@ -269,15 +296,7 @@ export default function Home() {
         <Button onClick={() => setIsTestnet(!isTestnet)} className="mt-4">
           Switch to {isTestnet ? "Mainnet" : "Testnet"}
         </Button>
-        <Links />
-        {messages.map(([level, msg], i) => (
-          <p
-            className={`break-all border-b border-gray-400 pb-1 text-center font-bold ${level === "info" ? "text-green-400" : "text-red-400"}`}
-            key={messages.length - i}
-          >
-            {messages.length - i}: {msg}
-          </p>
-        ))}
+        <Notifications messages={messages} />
       </main>
     </>
   );

@@ -3,7 +3,8 @@ import { TabProps } from "../types";
 import { TextInput } from "../components/Input";
 import { Button } from "../components/Button";
 import { ccc } from "@ckb-ccc/connector-react";
-import { tokenInfoToBytes } from "../utils";
+import { tokenInfoToBytes, useGetExplorerLink } from "../utils";
+import { Message } from "../components/Message";
 
 export function IssueXUdtSul({ sendMessage, signer }: TabProps) {
   const [amount, setAmount] = useState<string>("");
@@ -11,34 +12,38 @@ export function IssueXUdtSul({ sendMessage, signer }: TabProps) {
   const [name, setName] = useState<string>("");
   const [symbol, setSymbol] = useState<string>("");
 
+  const { explorerTransaction } = useGetExplorerLink();
+
   return (
     <>
-      <div className="mb-1 flex flex-col items-center">
-        <div className="flex w-9/12 flex-col items-center">
-          You will need to sign three transactions.
-          <TextInput
-            className="mt-1 w-full"
-            placeholder="Amount to issue"
-            state={[amount, setAmount]}
-          />
-          <TextInput
-            className="mt-1 w-full"
-            placeholder="Decimals of the token"
-            state={[decimals, setDecimals]}
-          />
-          <TextInput
-            className="mt-1 w-full"
-            placeholder="Symbol of the token"
-            state={[symbol, setSymbol]}
-          />
-          <TextInput
-            className="mt-1 w-full"
-            placeholder="Name of the token, same as symbol if empty"
-            state={[name, setName]}
-          />
-        </div>
+      <div className="mb-1 flex w-9/12 flex-col items-stretch gap-2">
+        <Message title="Hint" type="info">
+          You will need to sign two or three transactions.
+        </Message>
+
+        <TextInput
+          label="Amount"
+          placeholder="Amount to issue"
+          state={[amount, setAmount]}
+        />
+        <TextInput
+          label="Decimals"
+          placeholder="Decimals of the token"
+          state={[decimals, setDecimals]}
+        />
+        <TextInput
+          label="Symbol"
+          placeholder="Symbol of the token"
+          state={[symbol, setSymbol]}
+        />
+        <TextInput
+          label="Name"
+          placeholder="Name of the token, same as symbol if empty"
+          state={[name, setName]}
+        />
+
         <Button
-          className="mt-1"
+          className="self-center"
           onClick={async () => {
             if (!signer) {
               return;
@@ -59,7 +64,7 @@ export function IssueXUdtSul({ sendMessage, signer }: TabProps) {
             await susTx.completeInputsByCapacity(signer);
             await susTx.completeFeeBy(signer, 1000);
             const susTxHash = await signer.sendTransaction(susTx);
-            sendMessage("Transaction sent:", susTxHash);
+            sendMessage("Transaction sent:", explorerTransaction(susTxHash));
             await signer.client.markUnusable({ txHash: susTxHash, index: 0 });
 
             const singleUseLock = await ccc.Script.fromKnownScript(
@@ -81,7 +86,7 @@ export function IssueXUdtSul({ sendMessage, signer }: TabProps) {
             await lockTx.completeInputsByCapacity(signer);
             await lockTx.completeFeeBy(signer, 1000);
             const lockTxHash = await signer.sendTransaction(lockTx);
-            sendMessage("Transaction sent:", lockTxHash);
+            sendMessage("Transaction sent:", explorerTransaction(lockTxHash));
 
             const mintTx = ccc.Transaction.from({
               inputs: [
@@ -141,7 +146,7 @@ export function IssueXUdtSul({ sendMessage, signer }: TabProps) {
             await mintTx.completeFeeBy(signer, 1000);
             sendMessage(
               "Transaction sent:",
-              await signer.sendTransaction(mintTx),
+              explorerTransaction(await signer.sendTransaction(mintTx)),
             );
           }}
         >

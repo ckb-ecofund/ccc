@@ -51,23 +51,23 @@ export function Mnemonic({ sendMessage }: TabProps) {
   }, [client, accounts]);
 
   return (
-    <div className="mb-1 flex w-full flex-col items-center">
+    <div className="mb-1 flex w-9/12 flex-col items-stretch gap-2">
       <TextInput
-        className="mb-1 w-9/12"
+        label="Mnemonic"
         placeholder="Mnemonic"
         state={[mnemonic, setMnemonic]}
       />
       <TextInput
-        className="mb-1 w-9/12"
+        label="Accounts count"
         placeholder="Accounts count"
         state={[countStr, setCountStr]}
       />
       <TextInput
-        className="mb-1 w-9/12"
+        label="Password"
         placeholder="Password"
         state={[password, setPassword]}
       />
-      <div className="flex">
+      <div className="flex justify-center">
         <Button
           onClick={() => {
             setMnemonic(bip39.generateMnemonic(wordlist));

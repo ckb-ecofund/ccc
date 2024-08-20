@@ -8,9 +8,10 @@ export function Hash({ sendMessage }: TabProps) {
   const [messageToHash, setMessageToHash] = useState<string>("");
 
   return (
-    <div className="mb-1 flex flex-col items-center">
+    <div className="mb-1 flex flex-col items-center gap-2">
       <TextInput
-        className="mb-1 w-9/12"
+        label="Message"
+        className="w-9/12"
         placeholder="Message to hash"
         state={[messageToHash, setMessageToHash]}
       />
