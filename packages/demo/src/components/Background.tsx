@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 
-import { Pause, Play } from "lucide-react";
+import { Camera, CameraOff, Pause, Play } from "lucide-react";
 import {
   Component,
   createRef,
@@ -92,6 +92,7 @@ export class Background extends Component {
 
   state = {
     stopped: false,
+    lifted: false,
   };
 
   handler = (e: MouseEvent) => {
@@ -126,14 +127,14 @@ export class Background extends Component {
   }
 
   render(): ReactNode {
-    const { stopped } = this.state;
+    const { stopped, lifted } = this.state;
 
     return (
       <>
         <div
           className="fixed left-0 top-0 h-full w-full bg-white"
           ref={this.refBg}
-          style={{ zIndex: -100 }}
+          style={{ zIndex: lifted ? 40 : -100 }}
         >
           <div className="absolute left-1/2 top-1/2 translate-x-[-50%] translate-y-[-50%]">
             <RandomWalk
@@ -190,19 +191,32 @@ export class Background extends Component {
               </div>
             </RandomWalk>
           </div>
-          <div className="absolute left-0 top-0 h-full w-full bg-white opacity-70"></div>
+          {this.state.lifted ? undefined : (
+            <div className="absolute left-0 top-0 h-full w-full bg-white opacity-70"></div>
+          )}
         </div>
         {this.state.stopped ? (
           <Play
             fill="black"
-            className="fixed bottom-4 left-4 z-10 h-8 w-8 cursor-pointer"
+            className="fixed bottom-4 left-4 z-50 h-8 w-8 cursor-pointer"
             onClick={() => this.setState({ stopped: false })}
           />
         ) : (
           <Pause
             fill="black"
-            className="fixed bottom-4 left-4 z-10 h-8 w-8 cursor-pointer"
+            className="fixed bottom-4 left-4 z-50 h-8 w-8 cursor-pointer"
             onClick={() => this.setState({ stopped: true })}
+          />
+        )}
+        {this.state.lifted ? (
+          <CameraOff
+            className="fixed bottom-4 left-16 z-50 h-8 w-8 cursor-pointer"
+            onClick={() => this.setState({ lifted: false })}
+          />
+        ) : (
+          <Camera
+            className="fixed bottom-4 left-16 z-50 h-8 w-8 cursor-pointer"
+            onClick={() => this.setState({ lifted: true })}
           />
         )}
       </>
