@@ -28,22 +28,20 @@ export default function Home() {
   return (
     <>
       <div className="my-4 flex grow flex-col items-center justify-center gap-8 md:flex-row md:gap-32">
-        <BigButton className="shadow-md" onClick={open}>
-          <Wallet className="mb-4 h-16 w-16 md:h-20 md:w-20" />
-          Connect Wallet
+        <BigButton onClick={open} iconName="Wallet" className="text-cyan-500">
+          Wallet
         </BigButton>
         <BigButton
-          className="shadow-md"
           onClick={() => router.push("/connectPrivateKey")}
+          iconName="Key"
+          className="text-emerald-500"
         >
-          <Key className="mb-4 h-16 w-16 md:h-20 md:w-20" />
-          Connect
-          <br className="md:hidden" /> Private Key
+          Private Key
         </BigButton>
       </div>
       <Link
         href="/utils"
-        className="mb-4 rounded rounded-full bg-white px-4 py-2 shadow"
+        className="mb-4 rounded rounded-full bg-white px-4 py-2 no-underline shadow"
         prefetch={true}
       >
         Skip Connecting

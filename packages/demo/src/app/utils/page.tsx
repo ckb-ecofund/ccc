@@ -5,11 +5,12 @@ import { Dropdown } from "@/src/components/Dropdown";
 import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { icons } from "lucide-react";
+import { BigButton } from "@/src/components/BigButton";
 
-const TABS: [string, string, keyof typeof icons][] = [
-  ["Hash", "/utils/Hash", "Barcode"],
-  ["Mnemonic", "/utils/Mnemonic", "SquareAsterisk"],
-  ["Keystore", "/utils/Keystore", "Notebook"],
+const TABS: [string, string, keyof typeof icons, string][] = [
+  ["Hash", "/utils/Hash", "Barcode", "text-violet-500"],
+  ["Mnemonic", "/utils/Mnemonic", "SquareAsterisk", "text-fuchsia-500"],
+  ["Keystore", "/utils/Keystore", "Notebook", "text-rose-500"],
 ];
 
 export default function Page() {
@@ -27,16 +28,18 @@ export default function Page() {
   }, [router]);
 
   return (
-    <Dropdown
-      className="my-3 w-60"
-      options={TABS.map(([displayName, name, iconName]) => ({
-        name,
-        displayName,
-        iconName,
-      }))}
-      selected="Select a Tool"
-      defaultIcon="PocketKnife"
-      onSelect={(name) => router.push(name)}
-    />
+    <div className="flex flex-wrap justify-center gap-4 px-4 lg:px-16">
+      {TABS.map(([name, link, iconName, classes]) => (
+        <BigButton
+          key={link}
+          size="sm"
+          iconName={iconName}
+          onClick={() => router.push(link)}
+          className={classes}
+        >
+          {name}
+        </BigButton>
+      ))}
+    </div>
   );
 }

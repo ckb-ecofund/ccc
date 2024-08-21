@@ -4,18 +4,30 @@
 import { ccc } from "@ckb-ccc/connector-react";
 import { ReactNode, useEffect, useState } from "react";
 import { Background } from "@/src/components/Background";
-import { useGetExplorerLink } from "@/src/utils";
-import { FlaskConical, FlaskConicalOff, Home, Search } from "lucide-react";
+import { formatString, useGetExplorerLink } from "@/src/utils";
+import {
+  Camera,
+  CameraOff,
+  FlaskConical,
+  FlaskConicalOff,
+  Pause,
+  Play,
+  Search,
+  X,
+} from "lucide-react";
 import Link from "next/link";
 import { AppProvider, useApp } from "@/src/context";
-import { usePathname } from "next/navigation";
-import { Button } from "../components/Button";
+import { Button } from "@/src/components/Button";
+import { Dropdown } from "@/src/components/Dropdown";
 
-function Links() {
+function Links(props: React.ComponentPropsWithoutRef<"div">) {
   const { index } = useGetExplorerLink();
 
   return (
-    <div className="align-center absolute left-1/2 top-12 flex grow translate-x-[-50%] justify-center gap-8 lg:top-0">
+    <div
+      {...props}
+      className={`flex items-center justify-center gap-8 ${props.className ?? ""}`}
+    >
       <Link href="/" className="h-6 w-6">
         <img
           src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/logo.svg"
@@ -88,7 +100,10 @@ function ClientSwitcher() {
   }, [isTestnet, setClient]);
 
   return (
-    <button onClick={() => setIsTestnet(!isTestnet)} className="flex gap-2">
+    <button
+      onClick={() => setIsTestnet(!isTestnet)}
+      className="mr-4 flex gap-2"
+    >
       {isTestnet ? (
         <FlaskConical className="h-6 w-6" />
       ) : (
@@ -100,7 +115,7 @@ function ClientSwitcher() {
 }
 
 function WalletInfo() {
-  const { signer, openAction, openSigner } = useApp();
+  const { signer, openAction, openSigner, disconnect } = useApp();
 
   const [balance, setBalance] = useState(ccc.Zero);
   useEffect(() => {
@@ -115,7 +130,7 @@ function WalletInfo() {
     return (
       <Button
         disabled
-        className="mx-3 h-7 py-0 text-sm"
+        className="h-7 py-0 text-sm"
         style={{ paddingLeft: "0.5rem", paddingRight: "0.5rem" }}
       >
         Not Connected
@@ -130,18 +145,90 @@ function WalletInfo() {
       </p>
       <Button
         onClick={openSigner}
-        className="mx-3 h-7 py-0 text-sm"
+        className="ml-3 h-7 py-0 text-sm"
         style={{ paddingLeft: "0.5rem", paddingRight: "0.5rem" }}
       >
         {openAction}
+      </Button>
+      <Button
+        className="ml-1 h-7 w-7"
+        onClick={disconnect}
+        style={{ padding: 0 }}
+      >
+        <X size={16} />
       </Button>
     </div>
   );
 }
 
-export function LayoutProvider({ children }: { children: ReactNode }) {
-  const pathname = usePathname();
+function AnimateControl() {
+  const { enabledAnimate, backgroundLifted, setAnimate, setBackgroundLifted } =
+    useApp();
 
+  return (
+    <div className="ml-4 flex gap-2">
+      {enabledAnimate ? (
+        <Pause
+          fill="black"
+          className="z-50 h-8 w-8 cursor-pointer"
+          onClick={() => setAnimate(false)}
+        />
+      ) : (
+        <Play
+          fill="black"
+          className="z-50 h-8 w-8 cursor-pointer"
+          onClick={() => setAnimate(true)}
+        />
+      )}
+      {backgroundLifted ? (
+        <CameraOff
+          className="z-50 h-8 w-8 cursor-pointer"
+          onClick={() => setBackgroundLifted(false)}
+        />
+      ) : (
+        <Camera
+          className="z-50 h-8 w-8 cursor-pointer"
+          onClick={() => setBackgroundLifted(true)}
+        />
+      )}
+    </div>
+  );
+}
+
+function Addresses() {
+  const { signer, sendMessage } = useApp();
+  const { explorerAddress } = useGetExplorerLink();
+
+  const [addresses, setAddresses] = useState<string[]>([]);
+  useEffect(() => {
+    if (!signer) {
+      return;
+    }
+
+    signer.getAddresses().then((v) => setAddresses(v));
+  }, [signer]);
+
+  if (addresses.length === 0 || !signer) {
+    return undefined;
+  }
+
+  return (
+    <Dropdown
+      options={addresses.map((address, i) => ({
+        name: address,
+        displayName: formatString(address, 5, 4),
+        iconName: i === 0 ? "HandCoins" : "CircleDollarSign",
+      }))}
+      selected={addresses[0]}
+      onSelect={(address) => {
+        sendMessage("info", "Address Copied", [explorerAddress(address)]);
+        window.navigator.clipboard.writeText(address);
+      }}
+    />
+  );
+}
+
+export function LayoutProvider({ children }: { children: ReactNode }) {
   return (
     <ccc.Provider
     /*
@@ -160,23 +247,20 @@ export function LayoutProvider({ children }: { children: ReactNode }) {
     */
     >
       <AppProvider>
-        <div className="flex grow flex-col">
+        <div className="flex h-dvh flex-col">
           <Background />
-          <header className="relative my-4 flex items-center justify-between pb-10 lg:pb-0">
-            {["/connected", "/"].includes(pathname) ? (
-              <div className="h-6 w-6"></div>
-            ) : (
-              <Link href="/" prefetch={true}>
-                <Home className="ml-4 h-6 w-6" />
-              </Link>
-            )}
-            <WalletInfo />
+          <header className="flex w-full flex-col items-center justify-between gap-4 border-b bg-white px-8 py-3 md:flex-row">
             <Links />
+            <WalletInfo />
           </header>
-          <main className="flex grow flex-col items-center justify-center px-6 md:px-24">
-            {children}
+          <main className="relative flex grow flex-col items-center justify-around overflow-y-scroll pb-4 pt-8">
+            <div className="flex w-full grow flex-col items-center justify-center">
+              {children}
+            </div>
           </main>
-          <footer className="my-4 flex flex-col items-center">
+          <footer className="flex w-full items-center justify-between border-t bg-white py-2">
+            <AnimateControl />
+            <Addresses />
             <ClientSwitcher />
           </footer>
         </div>

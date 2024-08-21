@@ -7,6 +7,7 @@ import { Textarea } from "@/src/components/Textarea";
 import { ccc } from "@ckb-ccc/connector-react";
 import { bytesFromAnyString, useGetExplorerLink } from "@/src/utils";
 import { useApp } from "@/src/context";
+import { ButtonsPanel } from "@/src/components/ButtonsPanel";
 
 export default function Transfer() {
   const { signer, createSender } = useApp();
@@ -19,7 +20,7 @@ export default function Transfer() {
   const [data, setData] = useState<string>("");
 
   return (
-    <div className="mb-1 flex w-9/12 flex-col items-stretch gap-2">
+    <div className="flex w-full flex-col items-stretch">
       <Textarea
         label="Address"
         placeholder="Addresses to transfer to, separated by lines"
@@ -35,7 +36,7 @@ export default function Transfer() {
         state={[data, setData]}
         placeholder="Leave empty if you don't know what this is. Data in the first output. Hex string will be parsed."
       />
-      <div className="flex justify-center">
+      <ButtonsPanel>
         <Button
           onClick={async () => {
             if (!signer) {
@@ -110,7 +111,7 @@ export default function Transfer() {
         >
           Transfer
         </Button>
-      </div>
+      </ButtonsPanel>
     </div>
   );
 }

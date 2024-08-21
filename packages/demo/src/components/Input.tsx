@@ -1,17 +1,17 @@
-import { ReactNode } from "react";
-
 export function TextInput(
-  props: React.InputHTMLAttributes<HTMLInputElement> & {
+  props: React.ComponentPropsWithoutRef<"input"> & {
     state: [string, (v: string) => void];
-    label?: ReactNode;
+    label?: string;
   },
 ) {
   return (
-    <div className={`flex flex-col gap-1 ${props.className ?? ""}`}>
-      {props.label ? <label>{props.label}</label> : undefined}
+    <div className={`relative bg-white/75 p-4 ${props.className ?? ""}`}>
+      {props.label ? (
+        <label className="text-sm">{props.label}</label>
+      ) : undefined}
       <input
         {...props}
-        className="w-full rounded-md border border-gray-300 px-3 py-2 text-gray-700 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className={`w-full border-b-2 border-gray-300 bg-transparent px-4 py-2 text-gray-700 focus:border-solid focus:outline-none ${props.state[0].length !== 0 ? "border-solid" : "border-dashed"}`}
         type="text"
         value={props.state[0]}
         onInput={(e) => props.state[1](e.currentTarget.value)}

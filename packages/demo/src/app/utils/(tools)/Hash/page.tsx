@@ -5,6 +5,7 @@ import React, { useState } from "react";
 import { Button } from "@/src/components/Button";
 import { TextInput } from "@/src/components/Input";
 import { useApp } from "@/src/context";
+import { ButtonsPanel } from "@/src/components/ButtonsPanel";
 
 export default function Hash() {
   const { createSender } = useApp();
@@ -13,14 +14,13 @@ export default function Hash() {
   const [messageToHash, setMessageToHash] = useState<string>("");
 
   return (
-    <div className="mb-1 flex flex-col items-center gap-2">
+    <div className="flex w-full flex-col items-stretch">
       <TextInput
         label="Message"
-        className="w-9/12"
         placeholder="Message to hash"
         state={[messageToHash, setMessageToHash]}
       />
-      <div className="flex">
+      <ButtonsPanel>
         <Button
           onClick={async () => {
             log("Hash:", ccc.hashCkb(ccc.bytesFrom(messageToHash, "utf8")));
@@ -36,7 +36,7 @@ export default function Hash() {
         >
           Hash as hex
         </Button>
-      </div>
+      </ButtonsPanel>
     </div>
   );
 }

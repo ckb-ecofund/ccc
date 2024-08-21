@@ -5,6 +5,7 @@ import React, { useState } from "react";
 import { Button } from "@/src/components/Button";
 import { TextInput } from "@/src/components/Input";
 import { useApp } from "@/src/context";
+import { ButtonsPanel } from "@/src/components/ButtonsPanel";
 
 export default function Sign() {
   const { signer, createSender } = useApp();
@@ -14,13 +15,13 @@ export default function Sign() {
   const [signature, setSignature] = useState<string>("");
 
   return (
-    <div className="mb-1  flex w-9/12 flex-col items-stretch gap-2">
+    <div className="flex w-full flex-col items-stretch">
       <TextInput
         label="Message"
         placeholder="Message to sign and verify"
         state={[messageToSign, setMessageToSign]}
       />
-      <div className="flex justify-center">
+      <ButtonsPanel>
         <Button
           onClick={async () => {
             if (!signer) {
@@ -50,7 +51,7 @@ export default function Sign() {
         >
           Verify
         </Button>
-      </div>
+      </ButtonsPanel>
     </div>
   );
 }

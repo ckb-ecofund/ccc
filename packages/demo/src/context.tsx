@@ -3,7 +3,7 @@
 import React, { createContext, ReactNode, useEffect, useState } from "react";
 import { ccc } from "@ckb-ccc/connector-react";
 import { Notifications } from "./components/Notifications";
-import { formatString } from "./utils";
+import { formatString, useGetExplorerLink } from "./utils";
 import { Key } from "lucide-react";
 
 function WalletIcon({
@@ -24,14 +24,21 @@ function WalletIcon({
   );
 }
 
-const APP_CONTEXT = createContext<
+export const APP_CONTEXT = createContext<
   | {
+      enabledAnimate: boolean;
+      backgroundLifted: boolean;
+      setAnimate: (v: boolean) => void;
+      setBackgroundLifted: (v: boolean) => void;
+
       signer?: ccc.Signer;
       setPrivateKeySigner: (
         signer: ccc.SignerCkbPrivateKey | undefined,
       ) => void;
       openSigner: () => void;
+      disconnect: () => void;
       openAction: ReactNode;
+
       sendMessage: (
         level: "error" | "info",
         title: string,
@@ -51,8 +58,19 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   >(undefined);
   const [address, setAddress] = useState<string>("");
 
-  const { wallet, signerInfo: cccSigner, open, client } = ccc.useCcc();
+  const [enabledAnimate, setAnimate] = useState(true);
+  const [backgroundLifted, setBackgroundLifted] = useState(false);
+
+  const {
+    wallet,
+    signerInfo: cccSigner,
+    open,
+    client,
+    disconnect,
+  } = ccc.useCcc();
   const signer = privateKeySigner ?? cccSigner?.signer;
+
+  const { explorerAddress } = useGetExplorerLink();
 
   useEffect(() => {
     if (
@@ -111,11 +129,24 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   return (
     <APP_CONTEXT.Provider
       value={{
+        enabledAnimate,
+        backgroundLifted,
+        setAnimate,
+        setBackgroundLifted,
+
         signer,
         setPrivateKeySigner,
         openSigner: () => {
           if (cccSigner) {
             open();
+          } else {
+            sendMessage("info", "Address Copied", [explorerAddress(address)]);
+            window.navigator.clipboard.writeText(address);
+          }
+        },
+        disconnect: () => {
+          if (cccSigner) {
+            disconnect();
           } else {
             setPrivateKeySigner(undefined);
           }
@@ -131,6 +162,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             {formatString(address, 5, 4)}
           </>
         ),
+
         sendMessage,
         createSender: (title) => ({
           log: (...msgs) => sendMessage("info", title, msgs),

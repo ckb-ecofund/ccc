@@ -6,6 +6,7 @@ import { useState } from "react";
 import { TextInput } from "@/src/components/Input";
 import { ccc } from "@ckb-ccc/connector-react";
 import { useRouter } from "next/navigation";
+import { ButtonsPanel } from "@/src/components/ButtonsPanel";
 
 export default function Page() {
   const router = useRouter();
@@ -16,11 +17,11 @@ export default function Page() {
   return (
     <div className="flex w-9/12 flex-col items-center items-stretch gap-2">
       <TextInput
-        label={<span className="font-bold">Private Key</span>}
+        label="Private Key"
         state={[privateKey, setPrivateKey]}
         placeholder="0x0123456789..."
       />
-      <div className="flex justify-center">
+      <ButtonsPanel>
         <Button onClick={() => router.push("/")}>Back</Button>
         <Button
           className="ml-2"
@@ -38,7 +39,7 @@ export default function Page() {
         >
           Connect
         </Button>
-      </div>
+      </ButtonsPanel>
     </div>
   );
 }

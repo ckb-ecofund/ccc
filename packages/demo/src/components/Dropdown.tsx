@@ -39,12 +39,12 @@ export function Dropdown({
     <div className={`relative inline-block text-left ${className ?? ""}`}>
       <button
         onClick={handleToggle}
-        className="inline-flex w-full items-center justify-between rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none"
+        className="inline-flex w-full items-center justify-between rounded-full border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none"
       >
-        {icon ? <Icon name={icon} className="mr-2" /> : undefined}
+        {icon ? <Icon name={icon} className="mr-2" size={20} /> : undefined}
         {selectedOption?.displayName ?? selectedOption?.name ?? selected}
         <svg
-          className="-mr-1 ml-2 h-5 w-5"
+          className="-mr-1 ml-1 h-5 w-5"
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 20 20"
           fill="currentColor"
@@ -58,16 +58,12 @@ export function Dropdown({
         </svg>
       </button>
       {isOpen && (
-        <div className="absolute right-0 z-10 mt-2 w-full rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5">
+        <div className="absolute bottom-12 right-0 z-10 mt-2 w-full rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5">
           <div className="py-1">
             {options.map(({ name, displayName, iconName }) => (
               <button
                 key={name}
-                className={`block flex w-full items-center px-4 py-2 text-left text-sm ${
-                  name === selected
-                    ? "bg-gray-100 text-gray-900"
-                    : "text-gray-700"
-                } hover:bg-gray-100 hover:text-gray-900`}
+                className={`block flex w-full items-center px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900`}
                 onClick={() => handleSelect(name)}
               >
                 <Icon name={iconName} className="mr-2" />

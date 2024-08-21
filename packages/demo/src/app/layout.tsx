@@ -18,6 +18,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="flex min-h-full flex-col">
+      <head>
+        <meta
+          name="viewport"
+          content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi"
+        />
+      </head>
       <body className={`flex grow flex-col ${inter.className}`}>
         <LayoutProvider>{children}</LayoutProvider>
       </body>

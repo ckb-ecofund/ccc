@@ -1,20 +1,20 @@
 "use client";
 
 import { ccc } from "@ckb-ccc/connector-react";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/src/components/Button";
 import { TextInput } from "@/src/components/Input";
-import * as bip39 from "@scure/bip39";
-import { wordlist } from "@scure/bip39/wordlists/english";
 import { HDKey } from "@scure/bip32";
+import { Textarea } from "@/src/components/Textarea";
 import { useApp } from "@/src/context";
+import { ButtonsPanel } from "@/src/components/ButtonsPanel";
 
-export default function Mnemonic() {
+export default function Keystore() {
   const { client } = ccc.useCcc();
   const { createSender } = useApp();
-  const { log } = createSender("Mnemonic");
+  const { log, error } = createSender("Keystore");
 
-  const [mnemonic, setMnemonic] = useState<string>("");
+  const [keystore, setKeystore] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [countStr, setCountStr] = useState<string>("10");
   const [accounts, setAccount] = useState<
@@ -25,12 +25,12 @@ export default function Mnemonic() {
       path: string;
     }[]
   >([]);
-  const isValid = useMemo(
-    () => bip39.validateMnemonic(mnemonic, wordlist),
-    [mnemonic],
-  );
+  const [hdKey, setHdKey] = useState<HDKey | undefined>(undefined);
 
-  useEffect(() => setAccount([]), [mnemonic]);
+  useEffect(() => {
+    setAccount([]);
+    setHdKey(undefined);
+  }, [keystore, password]);
 
   useEffect(() => {
     (async () => {
@@ -55,11 +55,11 @@ export default function Mnemonic() {
   }, [client, accounts]);
 
   return (
-    <div className="mb-1 flex w-9/12 flex-col items-stretch gap-2">
-      <TextInput
-        label="Mnemonic"
-        placeholder="Mnemonic"
-        state={[mnemonic, setMnemonic]}
+    <div className="flex w-full flex-col items-stretch">
+      <Textarea
+        label="keystore"
+        placeholder="Keystore"
+        state={[keystore, setKeystore]}
       />
       <TextInput
         label="Accounts count"
@@ -71,20 +71,41 @@ export default function Mnemonic() {
         placeholder="Password"
         state={[password, setPassword]}
       />
-      <div className="flex justify-center">
+      {accounts.length !== 0 ? (
+        <div className="mt-1 w-full overflow-scroll whitespace-nowrap">
+          <p>path, address, private key</p>
+          {accounts.map(({ privateKey, address, path }) => (
+            <p key={path}>
+              {path}, {address}, {privateKey}
+            </p>
+          ))}
+        </div>
+      ) : undefined}
+      <ButtonsPanel>
         <Button
-          onClick={() => {
-            setMnemonic(bip39.generateMnemonic(wordlist));
+          onClick={async () => {
+            try {
+              const { privateKey, chainCode } = await ccc.keystoreDecrypt(
+                JSON.parse(keystore),
+                password,
+              );
+              setHdKey(new HDKey({ privateKey, chainCode }));
+            } catch (err) {
+              error("Invalid");
+              throw err;
+            }
+            log("Valid");
           }}
         >
-          Random Mnemonic
+          Verify Keystore
         </Button>
         <Button
           className="ml-2"
           onClick={async () => {
+            if (!hdKey) {
+              return;
+            }
             const count = parseInt(countStr, 10);
-            const seed = await bip39.mnemonicToSeed(mnemonic);
-            const hdKey = HDKey.fromMasterSeed(seed);
             setAccount([
               ...accounts,
               ...Array.from(new Array(count), (_, i) => {
@@ -99,34 +120,14 @@ export default function Mnemonic() {
               }),
             ]);
           }}
-          disabled={!isValid || Number.isNaN(parseInt(countStr, 10))}
+          disabled={!hdKey || Number.isNaN(parseInt(countStr, 10))}
         >
           More accounts
         </Button>
-        <Button
-          className="ml-2"
-          onClick={async () => {
-            const seed = await bip39.mnemonicToSeed(mnemonic);
-            const hdKey = HDKey.fromMasterSeed(seed);
-            log(
-              JSON.stringify(
-                await ccc.keystoreEncrypt(
-                  hdKey.privateKey!,
-                  hdKey.chainCode!,
-                  password,
-                ),
-              ),
-            );
-          }}
-          disabled={!isValid}
-        >
-          To Keystore
-        </Button>
-      </div>
-      {accounts.length !== 0 ? (
-        <>
-          <a
-            className="mt-2 flex items-center self-center rounded-full bg-black px-5 py-3 text-white"
+        {accounts.length !== 0 ? (
+          <Button
+            as="a"
+            className="mt-2"
             href={`data:application/octet-stream,path%2C%20address%2C%20private%20key%0A${accounts
               .map(({ privateKey, address, path }) =>
                 encodeURIComponent(`${path}, ${address}, ${privateKey}`),
@@ -135,17 +136,9 @@ export default function Mnemonic() {
             download={`ckb_accounts_${Date.now()}.csv`}
           >
             Save as CSV
-          </a>
-          <div className="mt-1 w-full overflow-scroll whitespace-nowrap bg-white">
-            <p>path, address, private key</p>
-            {accounts.map(({ privateKey, address, path }) => (
-              <p key={path}>
-                {path}, {address}, {privateKey}
-              </p>
-            ))}
-          </div>
-        </>
-      ) : undefined}
+          </Button>
+        ) : undefined}
+      </ButtonsPanel>
     </div>
   );
 }
