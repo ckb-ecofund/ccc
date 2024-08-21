@@ -1,13 +1,17 @@
-import { ccc, useCcc } from "@ckb-ccc/connector-react";
-import { useEffect, useState } from "react";
-import { Button } from "../components/Button";
-import { TextInput } from "../components/Input";
-import { HDKey } from "@scure/bip32";
-import { TabProps } from "../types";
-import { Textarea } from "../components/Textarea";
+"use client";
 
-export function Keystore({ sendMessage }: TabProps) {
-  const { client } = useCcc();
+import { ccc } from "@ckb-ccc/connector-react";
+import React, { useEffect, useState } from "react";
+import { Button } from "@/src/components/Button";
+import { TextInput } from "@/src/components/Input";
+import { HDKey } from "@scure/bip32";
+import { Textarea } from "@/src/components/Textarea";
+import { useApp } from "@/src/context";
+
+export default function Keystore() {
+  const { client } = ccc.useCcc();
+  const { createSender } = useApp();
+  const { log, error } = createSender("Keystore");
 
   const [keystore, setKeystore] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -74,13 +78,12 @@ export function Keystore({ sendMessage }: TabProps) {
                 JSON.parse(keystore),
                 password,
               );
-              console.log(privateKey, chainCode);
               setHdKey(new HDKey({ privateKey, chainCode }));
             } catch (err) {
-              console.log(err);
-              throw "Invalid";
+              error("Invalid");
+              throw err;
             }
-            sendMessage("Valid");
+            log("Valid");
           }}
         >
           Verify Keystore

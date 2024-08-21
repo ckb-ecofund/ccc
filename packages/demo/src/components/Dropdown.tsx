@@ -11,6 +11,7 @@ interface DropdownProps {
   selected: string;
   onSelect: (option: string) => void;
   className?: string;
+  defaultIcon?: keyof typeof icons;
 }
 
 export function Dropdown({
@@ -18,6 +19,7 @@ export function Dropdown({
   selected,
   onSelect,
   className,
+  defaultIcon,
 }: DropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -31,6 +33,7 @@ export function Dropdown({
   };
 
   const selectedOption = options.find((option) => option.name === selected);
+  const icon = selectedOption?.iconName ?? defaultIcon;
 
   return (
     <div className={`relative inline-block text-left ${className ?? ""}`}>
@@ -38,8 +41,8 @@ export function Dropdown({
         onClick={handleToggle}
         className="inline-flex w-full items-center justify-between rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none"
       >
-        <Icon name={selectedOption?.iconName ?? "X"} className="mr-2" />
-        {selectedOption?.displayName ?? selectedOption?.name}
+        {icon ? <Icon name={icon} className="mr-2" /> : undefined}
+        {selectedOption?.displayName ?? selectedOption?.name ?? selected}
         <svg
           className="-mr-1 ml-2 h-5 w-5"
           xmlns="http://www.w3.org/2000/svg"

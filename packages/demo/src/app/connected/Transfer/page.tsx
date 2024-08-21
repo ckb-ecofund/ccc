@@ -1,16 +1,22 @@
-import { useState } from "react";
-import { TabProps } from "../types";
-import { TextInput } from "../components/Input";
-import { Button } from "../components/Button";
-import { Textarea } from "../components/Textarea";
-import { ccc } from "@ckb-ccc/connector-react";
-import { bytesFromAnyString, useGetExplorerLink } from "../utils";
+"use client";
 
-export function Transfer({ sendMessage, signer }: TabProps) {
+import React, { useState } from "react";
+import { TextInput } from "@/src/components/Input";
+import { Button } from "@/src/components/Button";
+import { Textarea } from "@/src/components/Textarea";
+import { ccc } from "@ckb-ccc/connector-react";
+import { bytesFromAnyString, useGetExplorerLink } from "@/src/utils";
+import { useApp } from "@/src/context";
+
+export default function Transfer() {
+  const { signer, createSender } = useApp();
+  const { log, error } = createSender("Transfer");
+
+  const { explorerTransaction } = useGetExplorerLink();
+
   const [transferTo, setTransferTo] = useState<string>("");
   const [amount, setAmount] = useState<string>("");
   const [data, setData] = useState<string>("");
-  const { explorerTransaction } = useGetExplorerLink();
 
   return (
     <div className="mb-1 flex w-9/12 flex-col items-stretch gap-2">
@@ -36,10 +42,11 @@ export function Transfer({ sendMessage, signer }: TabProps) {
               return;
             }
             if (transferTo.split("\n").length !== 1) {
-              throw new Error("Only one destination is allowed for max amount");
+              error("Only one destination is allowed for max amount");
+              return;
             }
 
-            sendMessage("Calculating the max amount...");
+            log("Calculating the max amount...");
             // Verify destination address
             const { script: toLock } = await ccc.Address.fromString(
               transferTo,
@@ -57,7 +64,7 @@ export function Transfer({ sendMessage, signer }: TabProps) {
             // Change all balance to the first output
             await tx.completeFeeChangeToOutput(signer, 0, 1000);
             const amount = ccc.fixedPointToString(tx.outputs[0].capacity);
-            sendMessage("You can transfer at most", amount, "CKB");
+            log("You can transfer at most", amount, "CKB");
             setAmount(amount);
           }}
         >
@@ -84,9 +91,8 @@ export function Transfer({ sendMessage, signer }: TabProps) {
             // CCC transactions are easy to be edited
             tx.outputs.forEach((output, i) => {
               if (output.capacity > ccc.fixedPointFrom(amount)) {
-                throw new Error(
-                  `Insufficient capacity at output ${i} to store data`,
-                );
+                error(`Insufficient capacity at output ${i} to store data`);
+                return;
               }
               output.capacity = ccc.fixedPointFrom(amount);
             });
@@ -96,7 +102,7 @@ export function Transfer({ sendMessage, signer }: TabProps) {
             await tx.completeFeeBy(signer, 1000);
 
             // Sign and send the transaction
-            sendMessage(
+            log(
               "Transaction sent:",
               explorerTransaction(await signer.sendTransaction(tx)),
             );

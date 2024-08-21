@@ -1,17 +1,22 @@
-import { useState } from "react";
-import { TabProps } from "../types";
-import { TextInput } from "../components/Input";
-import { Button } from "../components/Button";
-import { ccc } from "@ckb-ccc/connector-react";
-import { Textarea } from "../components/Textarea";
-import { useGetExplorerLink } from "../utils";
+"use client";
 
-export function TransferXUdt({ sendMessage, signer }: TabProps) {
+import React, { useState } from "react";
+import { TextInput } from "@/src/components/Input";
+import { Button } from "@/src/components/Button";
+import { ccc } from "@ckb-ccc/connector-react";
+import { Textarea } from "@/src/components/Textarea";
+import { useGetExplorerLink } from "@/src/utils";
+import { useApp } from "@/src/context";
+
+export default function TransferXUdt() {
+  const { signer, createSender } = useApp();
+  const { log } = createSender("Transfer with Lumos");
+
+  const { explorerTransaction } = useGetExplorerLink();
+
   const [xUdtArgs, setXUdtArgs] = useState<string>("");
   const [transferTo, setTransferTo] = useState<string>("");
   const [amount, setAmount] = useState<string>("");
-
-  const { explorerTransaction } = useGetExplorerLink();
 
   return (
     <div className="mb-1 flex w-9/12 flex-col items-stretch gap-2">
@@ -79,7 +84,7 @@ export function TransferXUdt({ sendMessage, signer }: TabProps) {
           await tx.completeFeeBy(signer, 1000);
 
           // Sign and send the transaction
-          sendMessage(
+          log(
             "Transaction sent:",
             explorerTransaction(await signer.sendTransaction(tx)),
           );

@@ -1,11 +1,13 @@
+import { ReactNode } from "react";
+
 export function TextInput(
   props: React.InputHTMLAttributes<HTMLInputElement> & {
     state: [string, (v: string) => void];
-    label?: string;
+    label?: ReactNode;
   },
 ) {
   return (
-    <div className={`flex flex-col gap-1  ${props.className ?? ""}`}>
+    <div className={`flex flex-col gap-1 ${props.className ?? ""}`}>
       {props.label ? <label>{props.label}</label> : undefined}
       <input
         {...props}

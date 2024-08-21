@@ -1,18 +1,24 @@
-import { useState } from "react";
-import { TabProps } from "../types";
-import { TextInput } from "../components/Input";
-import { Button } from "../components/Button";
-import { ccc } from "@ckb-ccc/connector-react";
-import { tokenInfoToBytes, useGetExplorerLink } from "../utils";
-import { Message } from "../components/Message";
+"use client";
 
-export function IssueXUdtSul({ sendMessage, signer }: TabProps) {
+import { useState } from "react";
+import { TextInput } from "@/src/components/Input";
+import { Button } from "@/src/components/Button";
+import { ccc } from "@ckb-ccc/connector-react";
+import { tokenInfoToBytes, useGetExplorerLink } from "@/src/utils";
+import { Message } from "@/src/components/Message";
+import React from "react";
+import { useApp } from "@/src/context";
+
+export default function IssueXUdtSul() {
+  const { signer, createSender } = useApp();
+  const { log, error } = createSender("Issue xUDT (SUS)");
+
+  const { explorerTransaction } = useGetExplorerLink();
+
   const [amount, setAmount] = useState<string>("");
   const [decimals, setDecimals] = useState<string>("");
   const [name, setName] = useState<string>("");
   const [symbol, setSymbol] = useState<string>("");
-
-  const { explorerTransaction } = useGetExplorerLink();
 
   return (
     <>
@@ -49,7 +55,8 @@ export function IssueXUdtSul({ sendMessage, signer }: TabProps) {
               return;
             }
             if (decimals === "" || symbol === "") {
-              throw new Error("Invalid token info");
+              error("Invalid token info");
+              return;
             }
 
             const { script } = await signer.getRecommendedAddressObj();
@@ -64,7 +71,7 @@ export function IssueXUdtSul({ sendMessage, signer }: TabProps) {
             await susTx.completeInputsByCapacity(signer);
             await susTx.completeFeeBy(signer, 1000);
             const susTxHash = await signer.sendTransaction(susTx);
-            sendMessage("Transaction sent:", explorerTransaction(susTxHash));
+            log("Transaction sent:", explorerTransaction(susTxHash));
             await signer.client.markUnusable({ txHash: susTxHash, index: 0 });
 
             const singleUseLock = await ccc.Script.fromKnownScript(
@@ -86,7 +93,7 @@ export function IssueXUdtSul({ sendMessage, signer }: TabProps) {
             await lockTx.completeInputsByCapacity(signer);
             await lockTx.completeFeeBy(signer, 1000);
             const lockTxHash = await signer.sendTransaction(lockTx);
-            sendMessage("Transaction sent:", explorerTransaction(lockTxHash));
+            log("Transaction sent:", explorerTransaction(lockTxHash));
 
             const mintTx = ccc.Transaction.from({
               inputs: [
@@ -138,13 +145,14 @@ export function IssueXUdtSul({ sendMessage, signer }: TabProps) {
             );
             await mintTx.completeInputsByCapacity(signer);
             if (!mintTx.outputs[1].type) {
-              throw new Error("Unexpected disappeared output");
+              error("Unexpected disappeared output");
+              return;
             }
             mintTx.outputs[1].type!.args = ccc.hexFrom(
               ccc.bytesFrom(ccc.hashTypeId(mintTx.inputs[0], 1)).slice(0, 20),
             );
             await mintTx.completeFeeBy(signer, 1000);
-            sendMessage(
+            log(
               "Transaction sent:",
               explorerTransaction(await signer.sendTransaction(mintTx)),
             );

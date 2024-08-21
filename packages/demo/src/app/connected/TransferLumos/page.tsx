@@ -1,7 +1,8 @@
-import { useState } from "react";
-import { TabProps } from "../types";
-import { TextInput } from "../components/Input";
-import { Button } from "../components/Button";
+"use client";
+
+import React, { useState } from "react";
+import { TextInput } from "@/src/components/Input";
+import { Button } from "@/src/components/Button";
 import { ccc } from "@ckb-ccc/connector-react";
 import common, {
   registerCustomLockScriptInfos,
@@ -10,15 +11,19 @@ import { generateDefaultScriptInfos } from "@ckb-ccc/lumos-patches";
 import { Indexer } from "@ckb-lumos/ckb-indexer";
 import { TransactionSkeleton } from "@ckb-lumos/helpers";
 import { predefined } from "@ckb-lumos/config-manager";
-import { Textarea } from "../components/Textarea";
-import { useGetExplorerLink } from "../utils";
+import { Textarea } from "@/src/components/Textarea";
+import { useGetExplorerLink } from "@/src/utils";
+import { useApp } from "@/src/context";
 
-export function TransferLumos({ sendMessage, signer }: TabProps) {
+export default function TransferLumos() {
+  const { signer, createSender } = useApp();
+  const { log, error } = createSender("Transfer with Lumos");
+
+  const { explorerTransaction } = useGetExplorerLink();
+
   const [transferTo, setTransferTo] = useState<string>("");
   const [amount, setAmount] = useState<string>("");
   const [data, setData] = useState<string>("");
-
-  const { explorerTransaction } = useGetExplorerLink();
 
   return (
     <>
@@ -93,12 +98,13 @@ export function TransferLumos({ sendMessage, signer }: TabProps) {
               return ccc.bytesFrom(data, "utf8");
             })();
             if (tx.outputs[0].capacity < ccc.fixedPointFrom(dataBytes.length)) {
-              throw new Error("Insufficient capacity to store data");
+              error("Insufficient capacity to store data");
+              return;
             }
             tx.outputsData[0] = ccc.hexFrom(dataBytes);
 
             // Sign and send the transaction
-            sendMessage(
+            log(
               "Transaction sent:",
               explorerTransaction(await signer.sendTransaction(tx)),
             );

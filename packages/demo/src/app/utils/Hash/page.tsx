@@ -1,10 +1,15 @@
-import { ccc } from "@ckb-ccc/connector-react";
-import { TabProps } from "../types";
-import { useState } from "react";
-import { Button } from "../components/Button";
-import { TextInput } from "../components/Input";
+"use client";
 
-export function Hash({ sendMessage }: TabProps) {
+import { ccc } from "@ckb-ccc/connector-react";
+import React, { useState } from "react";
+import { Button } from "@/src/components/Button";
+import { TextInput } from "@/src/components/Input";
+import { useApp } from "@/src/context";
+
+export default function Hash() {
+  const { createSender } = useApp();
+  const { log } = createSender("Hash");
+
   const [messageToHash, setMessageToHash] = useState<string>("");
 
   return (
@@ -18,10 +23,7 @@ export function Hash({ sendMessage }: TabProps) {
       <div className="flex">
         <Button
           onClick={async () => {
-            sendMessage(
-              "Hash:",
-              ccc.hashCkb(ccc.bytesFrom(messageToHash, "utf8")),
-            );
+            log("Hash:", ccc.hashCkb(ccc.bytesFrom(messageToHash, "utf8")));
           }}
         >
           Hash as UTF-8
@@ -29,7 +31,7 @@ export function Hash({ sendMessage }: TabProps) {
         <Button
           className="ml-2"
           onClick={async () => {
-            sendMessage("Hash:", ccc.hashCkb(messageToHash));
+            log("Hash:", ccc.hashCkb(messageToHash));
           }}
         >
           Hash as hex

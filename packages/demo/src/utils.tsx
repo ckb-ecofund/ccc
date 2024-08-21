@@ -1,4 +1,5 @@
 import { ccc } from "@ckb-ccc/connector-react";
+import Link from "next/link";
 
 export function tokenInfoToBytes(
   decimals: ccc.NumLike,
@@ -24,6 +25,17 @@ export function bytesFromAnyString(str: string): ccc.Bytes {
   return ccc.bytesFrom(str, "utf8");
 }
 
+export function formatString(
+  str: string | undefined,
+  l = 9,
+  r = 6,
+): string | undefined {
+  if (str && str.length > l + r + 3) {
+    return `${str.slice(0, l)}...${str.slice(-r)}`;
+  }
+  return str;
+}
+
 export function useGetExplorerLink() {
   const { client } = ccc.useCcc();
 
@@ -36,16 +48,24 @@ export function useGetExplorerLink() {
     index: prefix,
     explorerAddress: (addr: string, display?: string) => {
       return (
-        <a className="underline" href={`${prefix}/address/${addr}`}>
+        <Link
+          className="underline"
+          href={`${prefix}/address/${addr}`}
+          target="_blank"
+        >
           {display ?? addr}
-        </a>
+        </Link>
       );
     },
     explorerTransaction: (txHash: string, display?: string) => {
       return (
-        <a className="underline" href={`${prefix}/transaction/${txHash}`}>
+        <Link
+          className="underline"
+          href={`${prefix}/transaction/${txHash}`}
+          target="_blank"
+        >
           {display ?? txHash}
-        </a>
+        </Link>
       );
     },
   };

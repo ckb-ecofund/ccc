@@ -1,14 +1,18 @@
-import { ccc, useCcc } from "@ckb-ccc/connector-react";
-import { useEffect, useMemo, useState } from "react";
-import { Button } from "../components/Button";
-import { TextInput } from "../components/Input";
+"use client";
+
+import { ccc } from "@ckb-ccc/connector-react";
+import React, { useEffect, useMemo, useState } from "react";
+import { Button } from "@/src/components/Button";
+import { TextInput } from "@/src/components/Input";
 import * as bip39 from "@scure/bip39";
 import { wordlist } from "@scure/bip39/wordlists/english";
 import { HDKey } from "@scure/bip32";
-import { TabProps } from "../types";
+import { useApp } from "@/src/context";
 
-export function Mnemonic({ sendMessage }: TabProps) {
-  const { client } = useCcc();
+export default function Mnemonic() {
+  const { client } = ccc.useCcc();
+  const { createSender } = useApp();
+  const { log } = createSender("Mnemonic");
 
   const [mnemonic, setMnemonic] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -104,7 +108,7 @@ export function Mnemonic({ sendMessage }: TabProps) {
           onClick={async () => {
             const seed = await bip39.mnemonicToSeed(mnemonic);
             const hdKey = HDKey.fromMasterSeed(seed);
-            sendMessage(
+            log(
               JSON.stringify(
                 await ccc.keystoreEncrypt(
                   hdKey.privateKey!,
@@ -122,7 +126,7 @@ export function Mnemonic({ sendMessage }: TabProps) {
       {accounts.length !== 0 ? (
         <>
           <a
-            className="mt-2 flex items-center rounded-full bg-black px-5 py-3 text-white"
+            className="mt-2 flex items-center self-center rounded-full bg-black px-5 py-3 text-white"
             href={`data:application/octet-stream,path%2C%20address%2C%20private%20key%0A${accounts
               .map(({ privateKey, address, path }) =>
                 encodeURIComponent(`${path}, ${address}, ${privateKey}`),
@@ -132,7 +136,7 @@ export function Mnemonic({ sendMessage }: TabProps) {
           >
             Save as CSV
           </a>
-          <div className="mt-1 w-full overflow-scroll whitespace-nowrap">
+          <div className="mt-1 w-full overflow-scroll whitespace-nowrap bg-white">
             <p>path, address, private key</p>
             {accounts.map(({ privateKey, address, path }) => (
               <p key={path}>

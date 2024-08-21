@@ -12,7 +12,7 @@ import {
 export type RandomWalkProps = HTMLAttributes<HTMLDivElement> & {
   x?: number;
   y?: number;
-  stopped?: boolean;
+  stopped: boolean;
 };
 
 export class RandomWalk extends Component<RandomWalkProps> {
@@ -77,7 +77,7 @@ export class RandomWalk extends Component<RandomWalkProps> {
 
   render(): ReactNode {
     return (
-      <div {...this.props} ref={this.ref}>
+      <div {...{ ...this.props, stopped: undefined }} ref={this.ref}>
         {this.props.children}
       </div>
     );
@@ -129,81 +129,83 @@ export class Background extends Component {
     const { stopped } = this.state;
 
     return (
-      <div
-        className="fixed left-0 top-0 h-full w-full bg-white"
-        ref={this.refBg}
-        style={{ zIndex: -100 }}
-      >
-        <div className="absolute left-1/2 top-1/2 translate-x-[-50%] translate-y-[-50%]">
-          <RandomWalk
-            ref={this.ref0}
-            className="flex flex-col items-center"
-            stopped={stopped}
-          >
-            <div className="relative">
-              <img
-                style={{
-                  width: "min(60vw, 60vh)",
-                  maxWidth: "none",
-                }}
-                src="./background/0.svg"
-                alt=""
-              />
-              <div className="absolute left-1/2 top-1/2 translate-x-[-50%] translate-y-[-50%]">
-                <RandomWalk ref={this.ref1} stopped={stopped}>
-                  <img
-                    style={{
-                      width: "min(60vw, 60vh)",
-                      maxWidth: "none",
-                    }}
-                    src="./background/1.svg"
-                    alt=""
-                  />
-                  <div className="absolute left-1/2 top-1/2 translate-x-[-50%] translate-y-[-50%]">
-                    <RandomWalk ref={this.ref2} stopped={stopped}>
-                      <img
-                        style={{
-                          width: "min(60vw, 60vh)",
-                          maxWidth: "none",
-                        }}
-                        src="./background/2.svg"
-                        alt=""
-                      />
-                    </RandomWalk>
-                  </div>
-                </RandomWalk>
+      <>
+        <div
+          className="fixed left-0 top-0 h-full w-full bg-white"
+          ref={this.refBg}
+          style={{ zIndex: -100 }}
+        >
+          <div className="absolute left-1/2 top-1/2 translate-x-[-50%] translate-y-[-50%]">
+            <RandomWalk
+              ref={this.ref0}
+              className="flex flex-col items-center"
+              stopped={stopped}
+            >
+              <div className="relative">
+                <img
+                  style={{
+                    width: "min(60vw, 60vh)",
+                    maxWidth: "none",
+                  }}
+                  src="./background/0.svg"
+                  alt=""
+                />
+                <div className="absolute left-1/2 top-1/2 translate-x-[-50%] translate-y-[-50%]">
+                  <RandomWalk ref={this.ref1} stopped={stopped}>
+                    <img
+                      style={{
+                        width: "min(60vw, 60vh)",
+                        maxWidth: "none",
+                      }}
+                      src="./background/1.svg"
+                      alt=""
+                    />
+                    <div className="absolute left-1/2 top-1/2 translate-x-[-50%] translate-y-[-50%]">
+                      <RandomWalk ref={this.ref2} stopped={stopped}>
+                        <img
+                          style={{
+                            width: "min(60vw, 60vh)",
+                            maxWidth: "none",
+                          }}
+                          src="./background/2.svg"
+                          alt=""
+                        />
+                      </RandomWalk>
+                    </div>
+                  </RandomWalk>
+                </div>
               </div>
-            </div>
-            <div className="flex">
-              {"CCC".split("").map((c, i) => (
-                <RandomWalk
-                  x={0}
-                  y={0}
-                  className="mx-2 mt-6 text-7xl font-bold"
-                  stopped={stopped}
-                  key={i}
-                >
-                  {c}
-                </RandomWalk>
-              ))}
-            </div>
-          </RandomWalk>
+              <div className="flex">
+                {"CCC".split("").map((c, i) => (
+                  <RandomWalk
+                    x={0}
+                    y={0}
+                    className="mx-2 mt-6 text-7xl font-bold"
+                    stopped={stopped}
+                    key={i}
+                  >
+                    {c}
+                  </RandomWalk>
+                ))}
+              </div>
+            </RandomWalk>
+          </div>
+          <div className="absolute left-0 top-0 h-full w-full bg-white opacity-70"></div>
         </div>
-        <div className="absolute left-0 top-0 h-full w-full bg-white opacity-70"></div>
         {this.state.stopped ? (
           <Play
             fill="black"
-            className="absolute bottom-4 left-4 h-8 w-8 cursor-pointer"
+            className="fixed bottom-4 left-4 z-10 h-8 w-8 cursor-pointer"
             onClick={() => this.setState({ stopped: false })}
           />
         ) : (
           <Pause
             fill="black"
-            className="absolute bottom-4 left-4 h-8 w-8 cursor-pointer"
+            className="fixed bottom-4 left-4 z-10 h-8 w-8 cursor-pointer"
             onClick={() => this.setState({ stopped: true })}
           />
         )}
-      </div>
+      </>
     );
   }
 }

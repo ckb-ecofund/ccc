@@ -6,4 +6,6 @@ coverage
 
 packages/*/dist*
 
+.vscode
+
 *.DS_Store

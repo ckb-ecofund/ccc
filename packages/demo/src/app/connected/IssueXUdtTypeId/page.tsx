@@ -1,19 +1,24 @@
-import { useState } from "react";
-import { TabProps } from "../types";
-import { TextInput } from "../components/Input";
-import { Button } from "../components/Button";
-import { ccc } from "@ckb-ccc/connector-react";
-import { tokenInfoToBytes, useGetExplorerLink } from "../utils";
-import { Message } from "../components/Message";
+"use client";
 
-export function IssueXUdtTypeId({ sendMessage, signer }: TabProps) {
+import React, { useState } from "react";
+import { TextInput } from "@/src/components/Input";
+import { Button } from "@/src/components/Button";
+import { ccc } from "@ckb-ccc/connector-react";
+import { tokenInfoToBytes, useGetExplorerLink } from "@/src/utils";
+import { Message } from "@/src/components/Message";
+import { useApp } from "@/src/context";
+
+export default function IssueXUdtTypeId() {
+  const { signer, createSender } = useApp();
+  const { log, error } = createSender("Issue xUDT (Type ID)");
+
+  const { explorerTransaction } = useGetExplorerLink();
+
   const [typeIdArgs, setTypeIdArgs] = useState<string>("");
   const [amount, setAmount] = useState<string>("");
   const [decimals, setDecimals] = useState<string>("");
   const [name, setName] = useState<string>("");
   const [symbol, setSymbol] = useState<string>("");
-
-  const { explorerTransaction } = useGetExplorerLink();
 
   return (
     <>
@@ -54,7 +59,8 @@ export function IssueXUdtTypeId({ sendMessage, signer }: TabProps) {
             }
             const { script } = await signer.getRecommendedAddressObj();
             if (decimals === "" || symbol === "") {
-              throw new Error("Invalid token info");
+              error("Invalid token info");
+              return;
             }
 
             const typeId = await (async () => {
@@ -79,20 +85,24 @@ export function IssueXUdtTypeId({ sendMessage, signer }: TabProps) {
               });
               await typeIdTx.completeInputsByCapacity(signer);
               if (!typeIdTx.outputs[0].type) {
-                throw new Error("Unexpected disappeared output");
+                error("Unexpected disappeared output");
+                return;
               }
               typeIdTx.outputs[0].type.args = ccc.hashTypeId(
                 typeIdTx.inputs[0],
                 0,
               );
               await typeIdTx.completeFeeBy(signer, 1000);
-              sendMessage(
+              log(
                 "Transaction sent:",
                 explorerTransaction(await signer.sendTransaction(typeIdTx)),
               );
-              sendMessage("Type ID created: ", typeIdTx.outputs[0].type.args);
+              log("Type ID created: ", typeIdTx.outputs[0].type.args);
               return typeIdTx.outputs[0].type;
             })();
+            if (!typeId) {
+              return;
+            }
 
             const outputTypeLock = await ccc.Script.fromKnownScript(
               signer.client,
@@ -110,12 +120,13 @@ export function IssueXUdtTypeId({ sendMessage, signer }: TabProps) {
             await lockTx.completeInputsByCapacity(signer);
             await lockTx.completeFeeBy(signer, 1000);
             const lockTxHash = await signer.sendTransaction(lockTx);
-            sendMessage("Transaction sent:", explorerTransaction(lockTxHash));
+            log("Transaction sent:", explorerTransaction(lockTxHash));
 
             const typeIdCell =
               await signer.client.findSingletonCellByType(typeId);
             if (!typeIdCell) {
-              throw new Error("Type ID cell not found");
+              error("Type ID cell not found");
+              return;
             }
             const mintTx = ccc.Transaction.from({
               inputs: [
@@ -173,7 +184,7 @@ export function IssueXUdtTypeId({ sendMessage, signer }: TabProps) {
               ccc.bytesFrom(ccc.hashTypeId(mintTx.inputs[0], 2)).slice(0, 20),
             );
             await mintTx.completeFeeBy(signer, 1000);
-            sendMessage(
+            log(
               "Transaction sent:",
               explorerTransaction(await signer.sendTransaction(mintTx)),
             );

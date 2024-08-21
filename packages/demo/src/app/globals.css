@@ -11,3 +11,7 @@
   border-radius: 3px;
   background-color: #ddd;
 }
+
+a {
+  text-decoration: underline;
+}

@@ -1,10 +1,15 @@
-import { ccc } from "@ckb-ccc/connector-react";
-import { TabProps } from "../types";
-import { useState } from "react";
-import { Button } from "../components/Button";
-import { TextInput } from "../components/Input";
+"use client";
 
-export function Sign({ sendMessage, signer }: TabProps) {
+import { ccc } from "@ckb-ccc/connector-react";
+import React, { useState } from "react";
+import { Button } from "@/src/components/Button";
+import { TextInput } from "@/src/components/Input";
+import { useApp } from "@/src/context";
+
+export default function Sign() {
+  const { signer, createSender } = useApp();
+  const { log, error } = createSender("Sign");
+
   const [messageToSign, setMessageToSign] = useState<string>("");
   const [signature, setSignature] = useState<string>("");
 
@@ -23,7 +28,7 @@ export function Sign({ sendMessage, signer }: TabProps) {
             }
             const sig = JSON.stringify(await signer.signMessage(messageToSign));
             setSignature(sig);
-            sendMessage("Signature:", sig);
+            log("Signature:", sig);
           }}
         >
           Sign
@@ -32,15 +37,15 @@ export function Sign({ sendMessage, signer }: TabProps) {
           className="ml-2"
           onClick={async () => {
             if (
-              await ccc.Signer.verifyMessage(
+              !(await ccc.Signer.verifyMessage(
                 messageToSign,
                 JSON.parse(signature),
-              )
+              ))
             ) {
-              sendMessage("Valid");
+              error("Invalid");
               return;
             }
-            throw "Invalid";
+            log("Valid");
           }}
         >
           Verify
