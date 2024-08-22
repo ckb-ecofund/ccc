@@ -123,6 +123,7 @@ function generateCollectorClass(codeHash: string) {
 export function generateScriptInfo(
   codeHash: string,
   cellDeps: ccc.CellDepInfoLike[],
+  dummyLockLength: number,
 ): LockScriptInfo {
   return {
     codeHash: codeHash,
@@ -200,11 +201,21 @@ export function generateScriptInfo(
           );
         txSkeleton = txSkeleton.update("witnesses", (witnesses) => {
           if (witnesses.get(firstIndex)) {
-            return witnesses;
+            witnesses = witnesses.merge(
+              Array.from(
+                new Array(firstIndex + 1 - witnesses.size),
+                () => "0x",
+              ),
+            );
           }
 
-          return witnesses.merge(
-            Array.from(new Array(firstIndex + 1 - witnesses.size), () => "0x"),
+          return witnesses.set(
+            firstIndex,
+            ccc.hexFrom(
+              ccc.WitnessArgs.from({
+                lock: Array.from(new Array(dummyLockLength), () => 0),
+              }).toBytes(),
+            ),
           );
         });
 
@@ -222,14 +233,24 @@ export function generateDefaultScriptInfos(): LockScriptInfo[] {
   const mainnet = cccA.MAINNET_SCRIPTS;
   const testnet = cccA.TESTNET_SCRIPTS;
 
-  return [
-    ccc.KnownScript.JoyId,
-    ccc.KnownScript.NostrLock,
-    ccc.KnownScript.PWLock,
-  ]
-    .map((script) => [
-      generateScriptInfo(testnet[script]!.codeHash, testnet[script]!.cellDeps),
-      generateScriptInfo(mainnet[script]!.codeHash, mainnet[script]!.cellDeps),
+  return (
+    [
+      [ccc.KnownScript.JoyId, 1000],
+      [ccc.KnownScript.NostrLock, 572],
+      [ccc.KnownScript.PWLock, 65],
+    ] as [ccc.KnownScript, number][]
+  )
+    .map(([script, dummyLockLength]) => [
+      generateScriptInfo(
+        testnet[script]!.codeHash,
+        testnet[script]!.cellDeps,
+        dummyLockLength,
+      ),
+      generateScriptInfo(
+        mainnet[script]!.codeHash,
+        mainnet[script]!.cellDeps,
+        dummyLockLength,
+      ),
     ])
     .flat();
 }
