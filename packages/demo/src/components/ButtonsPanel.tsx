@@ -3,7 +3,7 @@ export function ButtonsPanel(props: React.ComponentPropsWithoutRef<"div">) {
     <>
       <div
         {...props}
-        className={`flex w-full justify-center py-3 opacity-0 ${props.className ?? ""}`}
+        className={`-z-50 flex w-full select-none justify-center py-3 opacity-0 ${props.className ?? ""}`}
       ></div>
       <div
         {...props}

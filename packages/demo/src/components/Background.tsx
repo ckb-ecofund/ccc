@@ -49,7 +49,7 @@ export class Background extends Component {
     return (
       <>
         <div
-          className="fixed left-0 top-0 h-full w-full bg-white"
+          className="fixed left-0 top-0 h-full w-full select-none bg-white"
           ref={this.refBg}
           style={{ zIndex: this.context?.backgroundLifted ? 40 : -100 }}
         >
