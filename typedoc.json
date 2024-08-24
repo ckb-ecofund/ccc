@@ -1,5 +1,6 @@
 {
   "$schema": "https://typedoc.org/schema.json",
+  "name": "CCC Docs",
   "entryPoints": [
     "packages/core",
     "packages/ccc",
@@ -20,6 +21,7 @@
     "App": "https://app.ckbccc.com",
   },
   "hostedBaseUrl": "https://docs.example.com",
+  "customCss": "./assets/typedoc.css",
   "plugin": [
     "typedoc-material-theme",
     "typedoc-plugin-extras"
