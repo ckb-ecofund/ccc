@@ -6,7 +6,10 @@ import { SignerCkb } from "./ckb/index.js";
 /**
  * @public
  */
-export function getUtxoGlobalSigners(client: ccc.Client): ccc.SignerInfo[] {
+export function getUtxoGlobalSigners(
+  client: ccc.Client,
+  preferredNetworks?: ccc.NetworkPreference[],
+): ccc.SignerInfo[] {
   const windowRef = window as {
     utxoGlobal?: {
       bitcoinSigner: Provider;
@@ -25,7 +28,11 @@ export function getUtxoGlobalSigners(client: ccc.Client): ccc.SignerInfo[] {
     },
     {
       name: "BTC",
-      signer: new SignerBtc(client, windowRef.utxoGlobal.bitcoinSigner),
+      signer: new SignerBtc(
+        client,
+        windowRef.utxoGlobal.bitcoinSigner,
+        preferredNetworks,
+      ),
     },
   ];
 }
