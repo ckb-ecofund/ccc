@@ -8,16 +8,20 @@ interface NotificationProps {
 
 export function Notifications({ messages }: NotificationProps) {
   const [[msgCount, isExpanded], setMsgsState] = useState([0, false]);
+  const [shownMsgCount, setShownMsgCount] = useState(0);
 
   useEffect(() => {
-    if (messages.length <= 0) {
+    setShownMsgCount(messages.length);
+    const newMsgCount = messages.length - shownMsgCount;
+    if (newMsgCount <= 0) {
       return;
     }
+
     if (!isExpanded) {
-      setMsgsState([1, true]);
+      setMsgsState([newMsgCount, true]);
     }
     if (isExpanded && msgCount !== 0) {
-      setMsgsState([msgCount + 1, true]);
+      setMsgsState([msgCount + newMsgCount, true]);
     }
 
     setTimeout(
@@ -27,10 +31,10 @@ export function Notifications({ messages }: NotificationProps) {
             return [count, i];
           }
 
-          if (count === 1) {
+          if (count === newMsgCount) {
             return [count, false];
           }
-          return [count - 1, i];
+          return [count - newMsgCount, i];
         }),
       3000,
     );
