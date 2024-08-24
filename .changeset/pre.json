@@ -1,0 +1,23 @@
+{
+  "mode": "pre",
+  "tag": "alpha",
+  "initialVersions": {
+    "@ckb-ccc/ccc": "0.0.12-alpha.6",
+    "ckb-ccc": "0.0.12-alpha.6",
+    "@ckb-ccc/connector": "0.0.12-alpha.6",
+    "@ckb-ccc/connector-react": "0.0.12-alpha.6",
+    "@ckb-ccc/core": "0.0.12-alpha.1",
+    "@ckb-ccc/eip6963": "0.0.12-alpha.4",
+    "@ckb-ccc/joy-id": "0.0.12-alpha.1",
+    "@ckb-ccc/lumos-patches": "0.0.12-alpha.6",
+    "@ckb-ccc/nip07": "0.0.12-alpha.1",
+    "@ckb-ccc/okx": "0.0.12-alpha.6",
+    "@ckb-ccc/uni-sat": "0.0.12-alpha.1",
+    "@ckb-ccc/utxo-global": "0.0.12-alpha.1",
+    "@ckb-ccc/ccc-demo": "0.0.1",
+    "@ckb-ccc/faucet": "0.0.1"
+  },
+  "changesets": [
+    "moody-geese-think"
+  ]
+}

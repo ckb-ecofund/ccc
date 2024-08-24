@@ -6,16 +6,18 @@
   "scripts": {
     "test": "jest",
     "test:cov": "jest --coverage",
-    "build": "lerna run --no-private build",
-    "lint": "lerna run lint",
-    "format": "lerna run format",
-    "sync:config": "lerna exec --no-private cp ../../config/* . && lerna exec --no-private cp ../../config/.* .",
-    "publish": "lerna publish --no-private"
+    "build": "pnpm -r --filter !./packages/demo --filter !./packages/faucet run build",
+    "lint": "pnpm -r run lint",
+    "format": "pnpm -r run format",
+    "sync:config": "pnpm -r --filter !./packages/demo --filter !./packages/faucet -c exec \"cp ../../config/* . && cp ../../config/.* .\"",
+    "change": "pnpm changeset",
+    "version": "pnpm changeset version",
+    "publish": "pnpm publish -r"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.27.7",
     "@types/jest": "^29.5.12",
     "jest": "^29.7.0",
-    "lerna": "^8.1.7",
     "ts-jest": "^29.1.4",
     "typescript": "^5.4.5"
   }
