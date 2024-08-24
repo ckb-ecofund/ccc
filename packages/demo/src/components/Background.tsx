@@ -61,7 +61,7 @@ export class Background extends Component {
                     width: "min(60vw, 60vh)",
                     maxWidth: "none",
                   }}
-                  src="./background/0.svg"
+                  src="/background/0.svg"
                   alt=""
                 />
                 <div className="absolute left-1/2 top-1/2 translate-x-[-50%] translate-y-[-50%]">
@@ -71,7 +71,7 @@ export class Background extends Component {
                         width: "min(60vw, 60vh)",
                         maxWidth: "none",
                       }}
-                      src="./background/1.svg"
+                      src="/background/1.svg"
                       alt=""
                     />
                     <div className="absolute left-1/2 top-1/2 translate-x-[-50%] translate-y-[-50%]">
@@ -81,7 +81,7 @@ export class Background extends Component {
                             width: "min(60vw, 60vh)",
                             maxWidth: "none",
                           }}
-                          src="./background/2.svg"
+                          src="/background/2.svg"
                           alt=""
                         />
                       </RandomWalk>
