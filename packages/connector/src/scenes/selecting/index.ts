@@ -90,6 +90,11 @@ export class SelectingScene extends LitElement {
       const { signer } = signerInfo;
       try {
         await signer.connect();
+
+        if (!(await signer.isConnected())) {
+          this.connectingError = "Unknown connection status";
+          return;
+        }
       } catch (error) {
         if (typeof error !== "object" || error === null) {
           this.connectingError = JSON.stringify(error);
@@ -108,8 +113,6 @@ export class SelectingScene extends LitElement {
         }
 
         this.connectingError = JSON.stringify(message);
-      }
-      if (!(await signer.isConnected())) {
         return;
       }
 

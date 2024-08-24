@@ -13,7 +13,10 @@ export class Signer extends ccc.SignerNostr {
 
   async getNostrPublicKey(): Promise<ccc.Hex> {
     if (!this.publicKeyCache) {
-      this.publicKeyCache = this.provider.getPublicKey();
+      this.publicKeyCache = this.provider.getPublicKey().catch((e) => {
+        this.publicKeyCache = undefined;
+        throw e;
+      });
     }
 
     return ccc.hexFrom(await this.publicKeyCache);
@@ -29,7 +32,7 @@ export class Signer extends ccc.SignerNostr {
   }
 
   async connect(): Promise<void> {
-    return;
+    await this.getNostrPublicKey();
   }
 
   async isConnected(): Promise<boolean> {
