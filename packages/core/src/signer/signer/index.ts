@@ -46,7 +46,8 @@ export type NetworkPreference = {
    * BTC: // They made a mess...
    *   btc
    *   btcTestnet
-   *   btcSignet // OKX
+   *   btcTestnet4 // UTXO Global
+   *   btcSignet // OKX & UTXO Global
    *   fractalBtc // UniSat
    */
   network: string;
@@ -82,9 +83,10 @@ export abstract class Signer {
   // undefined otherwise
   matchNetworkPreference(
     preferences: NetworkPreference[],
-    currentNetwork: string,
+    currentNetwork: string | undefined,
   ): NetworkPreference | undefined {
     if (
+      currentNetwork !== undefined &&
       preferences.some(({ signerType, addressPrefix, network }) => {
         signerType === this.type &&
           addressPrefix === this.client.addressPrefix &&
