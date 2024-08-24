@@ -41,5 +41,5 @@
 This project is still under active development, and we are looking forward to your feedback. [Try its demo now here](https://app.ckbccc.com/). It showcases how to use CCC for some basic scenarios in CKB.
 
 <h3 align="center">
-  Read more about CCC on its <a href="https://github.com/ckb-ecofund/ccc">GitHub Repo</a>.
+  Read more about CCC on <a href="https://docs.ckbccc.com">our website</a> or <a href="https://github.com/ckb-ecofund/ccc">GitHub Repo</a>.
 </h3>

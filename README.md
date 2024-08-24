@@ -58,7 +58,7 @@ await tx.completeFeeBy(signer, 1000); // Transaction fee rate
 const txHash = await signer.sendTransaction(tx);
 ```
 
-We have done everything! Check [the demo source code](https://github.com/ckb-ecofund/ccc/tree/master/packages/demo) for complete examples.
+We have done everything!
 
 ## Installing
 
@@ -74,6 +74,29 @@ CCC exports everything on the `ccc` object:
 ```typescript
 import { ccc } from "@ckb-ccc/<package-name>";
 ```
+
+For advanced developers, we provided the `cccA` object to fulfil all your needs. You should notice that these interfaces are not stable:
+
+```typescript
+import { cccA } from "@ckb-ccc/<package-name>/advanced";
+```
+
+## Documents
+
+Check our [full documents for all detailed APIs](https://docs.ckbccc.com).
+
+[The demo source code](https://github.com/ckb-ecofund/ccc/tree/master/packages/demo) contains some basic examples:
+
+- [Sign and verify any message.](<https://github.com/ckb-ecofund/ccc/tree/master/packages/demo/src/app/connected/(tools)/Sign/page.tsx>)
+- [Transfer native CKB token.](<https://github.com/ckb-ecofund/ccc/tree/master/packages/demo/src/app/connected/(tools)/Transfer/page.tsx>)
+- [Transfer xUDT token.](<https://github.com/ckb-ecofund/ccc/tree/master/packages/demo/src/app/connected/(tools)/TransferXUdt/page.tsx>)
+- See [Misc: Single-Use-Seals](https://talk.nervos.org/t/en-cn-misc-single-use-seals/8279) to learn how token issuing works in the cell model.
+  - [Issue xUDT token with the Single-Use Lock.](<https://github.com/ckb-ecofund/ccc/tree/master/packages/demo/src/app/connected/(tools)/IssueXUdtSus/page.tsx>)
+  - [Issue xUDT token controlled by a Type ID cell.](<https://github.com/ckb-ecofund/ccc/tree/master/packages/demo/src/app/connected/(tools)/IssueXUdtTypeId/page.tsx>)
+- [Calculate the CKB hash of any messages.](<https://github.com/ckb-ecofund/ccc/tree/master/packages/demo/src/app/utils/(tools)/Hash/page.tsx>)
+- [Generate mnemonic and keypairs. Encrypt to a keystore.](<https://github.com/ckb-ecofund/ccc/tree/master/packages/demo/src/app/utils/(tools)/Mnemonic/page.tsx>)
+- [Decrypt a keystore.](<https://github.com/ckb-ecofund/ccc/tree/master/packages/demo/src/app/utils/(tools)/Keystore/page.tsx>)
+- [Transfer the native CKB token with the old Lumos SDK.](<https://github.com/ckb-ecofund/ccc/tree/master/packages/demo/src/app/connected/(tools)/TransferLumos/page.tsx>)
 
 ## Build and Run
 
