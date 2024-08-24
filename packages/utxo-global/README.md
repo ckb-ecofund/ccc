@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://ckbccc-demo.vercel.app/">
+  <a href="https://app.ckbccc.com/">
     <img alt="Logo" src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/logo.svg" width="20%" />
   </a>
 </p>
@@ -15,7 +15,7 @@
   <img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/m/ckb-ecofund/ccc" />
   <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/ckb-ecofund/ccc/master" />
   <img alt="GitHub deployments" src="https://img.shields.io/github/deployments/ckb-ecofund/ccc/production" />
-  <a href="https://ckbccc-demo.vercel.app/"><img
+  <a href="https://app.ckbccc.com/"><img
     alt="Demo" src="https://img.shields.io/website?url=https%3A%2F%2Fckbccc-demo.vercel.app%2F&label=Demo"
   /></a>
 </p>
@@ -33,12 +33,12 @@
 ## Preview
 
 <p align="center">
-  <a href="https://ckbccc-demo.vercel.app/">
+  <a href="https://app.ckbccc.com/">
     <img src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/preview.png" width="30%" />
   </a>
 </p>
 
-This project is still under active development, and we are looking forward to your feedback. [Try its demo now here](https://ckbccc-demo.vercel.app/).
+This project is still under active development, and we are looking forward to your feedback. [Try its demo now here](https://app.ckbccc.com/).
 
 <h3 align="center">
   Read more about CCC on its <a href="https://github.com/ckb-ecofund/ccc">GitHub Repo</a>.
