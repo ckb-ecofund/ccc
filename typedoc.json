@@ -7,6 +7,7 @@
     "packages/connector",
     "packages/connector-react",
     "packages/utxo-global",
+    "packages/rei",
     "packages/joy-id",
     "packages/okx",
     "packages/uni-sat",
