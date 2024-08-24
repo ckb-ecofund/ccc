@@ -35,7 +35,7 @@ export type DepType = "depGroup" | "code";
 /**
  * Converts a DepTypeLike value to a DepType.
  * @public
- * 
+ *
  * @param val - The value to convert, which can be a string, number, or bigint.
  * @returns The corresponding DepType.
  *

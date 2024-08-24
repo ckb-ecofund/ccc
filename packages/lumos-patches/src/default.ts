@@ -116,7 +116,7 @@ function generateCollectorClass(codeHash: string) {
 /**
  * Generates custom lock script information.
  * @public
- * 
+ *
  * @param codeHash - The code hash of the custom script.
  * @param cellDeps - The cell dependencies for the custom script.
  * @returns The lock script information.

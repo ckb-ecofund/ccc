@@ -6,7 +6,7 @@ import { NostrSigner } from "./nostr/index.js";
 /**
  * Retrieves the OKX Bitcoin signer if available.
  * @public
- * 
+ *
  * @param client - The client instance.
  * @returns The BitcoinSigner instance if the OKX wallet is available, otherwise undefined.
  */

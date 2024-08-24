@@ -5,7 +5,7 @@ import { Signer } from "./signer.js";
 /**
  * Retrieves the UniSat signer if available.
  * @public
- * 
+ *
  * @param client - The client instance.
  * @returns The Signer instance if the UniSat provider is available, otherwise undefined.
  */

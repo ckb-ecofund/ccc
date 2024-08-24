@@ -10,7 +10,7 @@ import { NostrSigner } from "../nostr/index.js";
  * If the browser is standalone or a webview, returns SignerAlwaysError instances.
  * Otherwise, returns instances of CkbSigner, BitcoinSigner, and EvmSigner.
  * @public
- * 
+ *
  * @param client - The client instance.
  * @param name - The name of the signer.
  * @param icon - The icon URL of the signer.
