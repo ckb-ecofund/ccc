@@ -5,8 +5,10 @@ import { NostrSigner } from "./nostr/index.js";
 
 /**
  * Retrieves the OKX Bitcoin signer if available.
- * @param {ccc.Client} client - The client instance.
- * @returns {BitcoinSigner | undefined} The BitcoinSigner instance if the OKX wallet is available, otherwise undefined.
+ * @public
+ * 
+ * @param client - The client instance.
+ * @returns The BitcoinSigner instance if the OKX wallet is available, otherwise undefined.
  */
 export function getOKXSigners(
   client: ccc.Client,

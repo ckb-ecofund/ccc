@@ -1,6 +1,9 @@
 import { ccc } from "@ckb-ccc/core";
 import { Provider } from "../advancedBarrel.js";
 
+/**
+ * @public
+ */
 export class SignerCkb extends ccc.Signer {
   private accountCache: string | undefined;
   get type(): ccc.SignerType {
@@ -9,7 +12,7 @@ export class SignerCkb extends ccc.Signer {
 
   /**
    * Gets the sign type.
-   * @returns {ccc.SignerSignType} The sign type.
+   * @returns The sign type.
    */
   get signType(): ccc.SignerSignType {
     return ccc.SignerSignType.CkbSecp256k1;

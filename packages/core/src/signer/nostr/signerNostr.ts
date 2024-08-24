@@ -8,6 +8,9 @@ import { Hex, hexFrom } from "../../hex/index.js";
 import { Signer, SignerSignType, SignerType } from "../signer/index.js";
 import { buildNostrEventFromMessage } from "./verify.js";
 
+/**
+ * @public
+ */
 export interface NostrEvent {
   id?: string;
   pubkey?: string;
@@ -18,6 +21,9 @@ export interface NostrEvent {
   content: string;
 }
 
+/**
+ * @public
+ */
 export abstract class SignerNostr extends Signer {
   static CKB_SIG_HASH_ALL_TAG = "ckb_sighash_all";
   static CKB_UNLOCK_EVENT_KIND = 23334;

@@ -23,12 +23,19 @@ import * as mol from "./molecule.advanced/index.js";
 import { Script, ScriptLike } from "./script.js";
 import { DEP_TYPE_TO_NUM, NUM_TO_DEP_TYPE } from "./transaction.advanced.js";
 
+/**
+ * @public
+ */
 export type DepTypeLike = string | number | bigint;
+/**
+ * @public
+ */
 export type DepType = "depGroup" | "code";
 
 /**
  * Converts a DepTypeLike value to a DepType.
- *
+ * @public
+ * 
  * @param val - The value to convert, which can be a string, number, or bigint.
  * @returns The corresponding DepType.
  *
@@ -61,6 +68,7 @@ export function depTypeFrom(val: DepTypeLike): DepType {
 
 /**
  * Converts a DepTypeLike value to its corresponding byte representation.
+ * @public
  *
  * @param depType - The dep type value to convert.
  * @returns A Uint8Array containing the byte representation of the dep type.
@@ -77,6 +85,7 @@ export function depTypeToBytes(depType: DepTypeLike): Bytes {
 
 /**
  * Converts a byte-like value to a DepType.
+ * @public
  *
  * @param bytes - The byte-like value to convert.
  * @returns The corresponding DepType.
@@ -93,10 +102,16 @@ export function depTypeFromBytes(bytes: BytesLike): DepType {
   return NUM_TO_DEP_TYPE[bytesFrom(bytes)[0]];
 }
 
+/**
+ * @public
+ */
 export type OutPointLike = {
   txHash: HexLike;
   index: NumLike;
 };
+/**
+ * @public
+ */
 export class OutPoint {
   /**
    * Creates an instance of OutPoint.
@@ -211,11 +226,17 @@ export class OutPoint {
   }
 }
 
+/**
+ * @public
+ */
 export type CellOutputLike = {
   capacity: NumLike;
   lock: ScriptLike;
   type?: ScriptLike | null;
 };
+/**
+ * @public
+ */
 export class CellOutput {
   /**
    * Creates an instance of CellOutput.
@@ -331,11 +352,17 @@ export class CellOutput {
   }
 }
 
+/**
+ * @public
+ */
 export type CellLike = {
   outPoint: OutPointLike;
   cellOutput: CellOutputLike;
   outputData: HexLike;
 };
+/**
+ * @public
+ */
 export class Cell {
   /**
    * Creates an instance of Cell.
@@ -389,12 +416,18 @@ export class Cell {
   }
 }
 
+/**
+ * @public
+ */
 export type CellInputLike = {
   previousOutput: OutPointLike;
   since?: NumLike | null;
   cellOutput?: CellOutputLike | null;
   outputData?: HexLike | null;
 };
+/**
+ * @public
+ */
 export class CellInput {
   /**
    * Creates an instance of CellInput.
@@ -535,10 +568,16 @@ export class CellInput {
   }
 }
 
+/**
+ * @public
+ */
 export type CellDepLike = {
   outPoint: OutPointLike;
   depType: DepTypeLike;
 };
+/**
+ * @public
+ */
 export class CellDep {
   /**
    * Creates an instance of CellDep.
@@ -662,11 +701,17 @@ export class CellDep {
   }
 }
 
+/**
+ * @public
+ */
 export type WitnessArgsLike = {
   lock?: HexLike | null;
   inputType?: HexLike | null;
   outputType?: HexLike | null;
 };
+/**
+ * @public
+ */
 export class WitnessArgs {
   /**
    * Creates an instance of WitnessArgs.
@@ -765,6 +810,9 @@ export class WitnessArgs {
   }
 }
 
+/**
+ * @public
+ */
 export function udtBalanceFrom(dataLike: BytesLike): Num {
   const data = bytesFrom(dataLike).slice(0, 16);
   if (data.length !== 16) {
@@ -774,6 +822,9 @@ export function udtBalanceFrom(dataLike: BytesLike): Num {
   return numFromBytes(data);
 }
 
+/**
+ * @public
+ */
 export type TransactionLike = {
   version?: NumLike | null;
   cellDeps?: CellDepLike[] | null;
@@ -786,6 +837,9 @@ export type TransactionLike = {
   outputsData?: HexLike[] | null;
   witnesses?: HexLike[] | null;
 };
+/**
+ * @public
+ */
 export class Transaction {
   /**
    * Creates an instance of Transaction.
@@ -1124,10 +1178,10 @@ export class Transaction {
    * ```
    */
   async findInputIndexByLockId(
-    scriptLike: Pick<ScriptLike, "codeHash" | "hashType">,
+    scriptIdLike: Pick<ScriptLike, "codeHash" | "hashType">,
     client: Client,
   ): Promise<number | undefined> {
-    const script = Script.from({ ...scriptLike, args: "0x" });
+    const script = Script.from({ ...scriptIdLike, args: "0x" });
 
     for (let i = 0; i < this.inputs.length; i += 1) {
       const input = this.inputs[i];
@@ -1217,8 +1271,8 @@ export class Transaction {
    * tx.addCellDeps(cellDep);
    * ```
    */
-  addCellDeps(...cellDepsLike: (CellDepLike | CellDepLike[])[]): void {
-    cellDepsLike.flat().forEach((cellDepLike) => {
+  addCellDeps(...cellDepLikes: (CellDepLike | CellDepLike[])[]): void {
+    cellDepLikes.flat().forEach((cellDepLike) => {
       const cellDep = CellDep.from(cellDepLike);
       if (this.cellDeps.some((c) => c.eq(cellDep))) {
         return;
@@ -1238,8 +1292,8 @@ export class Transaction {
    * tx.addCellDepsAtBegin(cellDep);
    * ```
    */
-  addCellDepsAtStart(...cellDepsLike: (CellDepLike | CellDepLike[])[]): void {
-    cellDepsLike.flat().forEach((cellDepLike) => {
+  addCellDepsAtStart(...cellDepLikes: (CellDepLike | CellDepLike[])[]): void {
+    cellDepLikes.flat().forEach((cellDepLike) => {
       const cellDep = CellDep.from(cellDepLike);
       if (this.cellDeps.some((c) => c.eq(cellDep))) {
         return;
@@ -1253,7 +1307,7 @@ export class Transaction {
    * Add cell dep from infos if they are not existed
    *
    * @param client - A client for searching cell deps
-   * @param cellDepLikes - The cell dep infos to add
+   * @param cellDepInfoLikes - The cell dep infos to add
    *
    * @example
    * ```typescript
@@ -1262,9 +1316,9 @@ export class Transaction {
    */
   async addCellDepInfos(
     client: Client,
-    ...cellDepInfosLike: (CellDepInfoLike | CellDepInfoLike[])[]
+    ...cellDepInfoLikes: (CellDepInfoLike | CellDepInfoLike[])[]
   ): Promise<void> {
-    this.addCellDeps(await client.getCellDeps(...cellDepInfosLike));
+    this.addCellDeps(await client.getCellDeps(...cellDepInfoLikes));
   }
 
   /**
@@ -1302,10 +1356,10 @@ export class Transaction {
    *
    * @example
    * ```typescript
-   * await tx.setOutputData(0, "0x00");
+   * await tx.setOutputDataAt(0, "0x00");
    * ```
    */
-  setOutputDataAt(index: number, data: HexLike): void {
+  setOutputDataAt(index: number, witness: HexLike): void {
     if (this.outputsData.length < index) {
       this.outputsData.push(
         ...Array.from(
@@ -1315,14 +1369,14 @@ export class Transaction {
       );
     }
 
-    this.outputsData[index] = hexFrom(data);
+    this.outputsData[index] = hexFrom(witness);
   }
 
   /**
    * Add output
    *
-   * @param output - The cell output to add
-   * @param data - optional output data
+   * @param outputLike - The cell output to add
+   * @param outputData - optional output data
    *
    * @example
    * ```typescript

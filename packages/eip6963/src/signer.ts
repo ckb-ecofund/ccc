@@ -2,17 +2,16 @@ import { ccc } from "@ckb-ccc/core";
 import { Provider } from "./eip1193.advanced.js";
 
 /**
- * Class representing an EVM signer that extends SignerEvm from @ckb-ccc/core.
- * @class
- * @extends {ccc.SignerEvm}
+ * Class representing an EVM signer that extends SignerEvm
+ * @public
  */
 export class Signer extends ccc.SignerEvm {
   private accountCache?: ccc.Hex = undefined;
 
   /**
    * Creates an instance of Signer.
-   * @param {ccc.Client} client - The client instance.
-   * @param {Provider} provider - The provider.
+   * @param client - The client instance.
+   * @param provider - The provider.
    */
   constructor(
     client: ccc.Client,
@@ -34,7 +33,7 @@ export class Signer extends ccc.SignerEvm {
 
   /**
    * Connects to the provider by requesting accounts.
-   * @returns {Promise<void>} A promise that resolves when the connection is established.
+   * @returns A promise that resolves when the connection is established.
    */
   async connect(): Promise<void> {
     await this.provider.request({ method: "eth_requestAccounts" });
@@ -59,7 +58,7 @@ export class Signer extends ccc.SignerEvm {
 
   /**
    * Checks if the provider is connected.
-   * @returns {Promise<boolean>} A promise that resolves to true if connected, false otherwise.
+   * @returns A promise that resolves to true if connected, false otherwise.
    */
   async isConnected(): Promise<boolean> {
     return (
@@ -69,8 +68,8 @@ export class Signer extends ccc.SignerEvm {
 
   /**
    * Signs a raw message with the personal account.
-   * @param {string | ccc.BytesLike} message - The message to sign.
-   * @returns {Promise<ccc.Hex>} A promise that resolves to the signed message.
+   * @param message - The message to sign.
+   * @returns A promise that resolves to the signed message.
    */
   async signMessageRaw(message: string | ccc.BytesLike): Promise<ccc.Hex> {
     const challenge =

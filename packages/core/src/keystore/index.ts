@@ -18,6 +18,9 @@ function mac(derivedKey: Bytes, cipherText: Bytes) {
   ).slice(2);
 }
 
+/**
+ * @public
+ */
 export async function keystoreEncrypt(
   privateKeyLike: BytesLike,
   chainCodeLike: BytesLike,
@@ -79,6 +82,9 @@ export async function keystoreEncrypt(
   };
 }
 
+/**
+ * @public
+ */
 export async function keystoreDecrypt(
   keystore: unknown,
   password: string,

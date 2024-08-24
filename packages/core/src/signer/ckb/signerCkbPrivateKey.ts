@@ -7,6 +7,9 @@ import { numBeToBytes } from "../../num/index.js";
 import { SignerCkbPublicKey } from "./signerCkbPublicKey.js";
 import { messageHashCkbSecp256k1 } from "./verifyCkbSecp256k1.js";
 
+/**
+ * @public
+ */
 export class SignerCkbPrivateKey extends SignerCkbPublicKey {
   public readonly privateKey: Hex;
 

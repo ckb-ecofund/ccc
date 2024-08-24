@@ -6,6 +6,9 @@ import { NumLike, numLeToBytes } from "../num/index.js";
 import { CKB_BLAKE2B_PERSONAL } from "./advanced.js";
 import { Hasher } from "./hasher.js";
 
+/**
+ * @public
+ */
 export class HasherCkb implements Hasher {
   private readonly hasher: ReturnType<(typeof blake2b)["create"]>;
 
@@ -62,6 +65,7 @@ export class HasherCkb implements Hasher {
 
 /**
  * Computes the CKB hash of the given data using the Blake2b algorithm.
+ * @public
  *
  * @param data - The data to hash.
  * @returns The hexadecimal string representation of the hash.
@@ -80,8 +84,9 @@ export function hashCkb(...data: BytesLike[]): Hex {
 
 /**
  * Computes the Type ID hash of the given data.
+ * @public
  *
- * @param cellInput - The first cell input of the transaction.
+ * @param cellInputLike - The first cell input of the transaction.
  * @param outputIndex - The output index of the Type ID cell.
  * @returns The hexadecimal string representation of the hash.
  *

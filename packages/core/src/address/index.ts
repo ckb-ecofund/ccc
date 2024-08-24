@@ -10,6 +10,9 @@ import {
   addressPayloadFromString,
 } from "./address.advanced.js";
 
+/**
+ * @public
+ */
 export type AddressLike = {
   script: ScriptLike;
   prefix: string;
@@ -17,8 +20,8 @@ export type AddressLike = {
 
 /**
  * Represents a ckb address with associated script and prefix.
+ * @public
  */
-
 export class Address {
   /**
    * Creates an instance of Address.

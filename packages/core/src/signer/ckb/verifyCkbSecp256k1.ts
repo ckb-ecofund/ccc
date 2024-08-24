@@ -4,12 +4,18 @@ import { hashCkb } from "../../hasher/index.js";
 import { Hex, hexFrom } from "../../hex/index.js";
 import { numFrom } from "../../num/index.js";
 
+/**
+ * @public
+ */
 export function messageHashCkbSecp256k1(message: string | BytesLike): Hex {
   const msg = typeof message === "string" ? message : hexFrom(message);
   const buffer = bytesFrom(`Nervos Message:${msg}`, "utf8");
   return hashCkb(buffer);
 }
 
+/**
+ * @public
+ */
 export function verifyMessageCkbSecp256k1(
   message: string | BytesLike,
   signature: string,

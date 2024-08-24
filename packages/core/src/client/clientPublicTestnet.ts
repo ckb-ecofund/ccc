@@ -3,6 +3,9 @@ import { CellDepInfo, KnownScript } from "./client.js";
 import { TESTNET_SCRIPTS } from "./clientPublicTestnet.advanced.js";
 import { ClientJsonRpc } from "./jsonRpc/index.js";
 
+/**
+ * @public
+ */
 export class ClientPublicTestnet extends ClientJsonRpc {
   constructor(
     url = "https://testnet.ckb.dev/",

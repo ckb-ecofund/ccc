@@ -2,6 +2,9 @@ import { Client } from "../../client/index.js";
 import { SignerType } from "../signer/index.js";
 import { SignerDummy } from "./dummy.js";
 
+/**
+ * @public
+ */
 export class SignerAlwaysError extends SignerDummy {
   constructor(
     client: Client,

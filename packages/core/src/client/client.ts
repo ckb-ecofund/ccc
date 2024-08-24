@@ -28,6 +28,9 @@ import {
   OutputsValidator,
 } from "./clientTypes.js";
 
+/**
+ * @public
+ */
 export enum KnownScript {
   Secp256k1Blake160 = "Secp256k1Blake160",
   Secp256k1Multisig = "Secp256k1Multisig",
@@ -44,11 +47,17 @@ export enum KnownScript {
   OutputTypeProxyLock = "OutputTypeProxyLock",
 }
 
+/**
+ * @public
+ */
 export type CellDepInfoLike = {
   cellDep: CellDepLike;
   type?: ScriptLike | null;
 };
 
+/**
+ * @public
+ */
 export class CellDepInfo {
   constructor(
     public cellDep: CellDep,
@@ -63,6 +72,9 @@ export class CellDepInfo {
   }
 }
 
+/**
+ * @public
+ */
 export abstract class Client {
   private readonly cachedTransactions: Transaction[] = [];
   private readonly unusableOutPoints: OutPoint[] = [];
@@ -190,7 +202,7 @@ export abstract class Client {
   /**
    * Find cells by search key designed for collectable cells.
    *
-   * @param key - The search key.
+   * @param keyLike - The search key.
    * @returns A async generator for yielding cells.
    */
   async *findCellsByCollectableSearchKey(

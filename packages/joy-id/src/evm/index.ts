@@ -8,18 +8,16 @@ import {
 } from "../connectionsStorage/index.js";
 
 /**
- * Class representing an EVM signer that extends SignerEvm from @ckb-ccc/core.
- * @class
- * @extends {ccc.SignerEvm}
+ * Class representing an EVM signer that extends SignerEvm
+ * @public
  */
 export class EvmSigner extends ccc.SignerEvm {
   private connection?: Connection;
 
   /**
    * Ensures that the signer is connected and returns the connection.
-   * @private
    * @throws Will throw an error if not connected.
-   * @returns {Connection} The current connection.
+   * @returns The current connection.
    */
   private assertConnection(): Connection {
     if (!this.isConnected() || !this.connection) {
@@ -34,7 +32,7 @@ export class EvmSigner extends ccc.SignerEvm {
    * @param client - The client instance.
    * @param name - The name of the signer.
    * @param icon - The icon URL of the signer.
-   * @param appUri - The application URI.
+   * @param _appUri - The application URI.
    * @param connectionsRepo - The connections repository.
    */
   constructor(
@@ -49,8 +47,7 @@ export class EvmSigner extends ccc.SignerEvm {
 
   /**
    * Gets the configuration for JoyID.
-   * @private
-   * @returns {object} The configuration object.
+   * @returns The configuration object.
    */
   private getConfig() {
     return {
@@ -75,7 +72,7 @@ export class EvmSigner extends ccc.SignerEvm {
 
   /**
    * Connects to the provider by requesting authentication.
-   * @returns {Promise<void>} A promise that resolves when the connection is established.
+   * @returns A promise that resolves when the connection is established.
    */
   async connect(): Promise<void> {
     const config = this.getConfig();
@@ -102,7 +99,7 @@ export class EvmSigner extends ccc.SignerEvm {
 
   /**
    * Checks if the signer is connected.
-   * @returns {Promise<boolean>} A promise that resolves to true if connected, false otherwise.
+   * @returns A promise that resolves to true if connected, false otherwise.
    */
   async isConnected(): Promise<boolean> {
     if (this.connection) {
@@ -114,8 +111,8 @@ export class EvmSigner extends ccc.SignerEvm {
 
   /**
    * Signs a raw message with the EVM account.
-   * @param {string | ccc.BytesLike} message - The message to sign.
-   * @returns {Promise<ccc.Hex>} A promise that resolves to the signed message.
+   * @param message - The message to sign.
+   * @returns A promise that resolves to the signed message.
    */
   async signMessageRaw(message: string | ccc.BytesLike): Promise<ccc.Hex> {
     const { address } = this.assertConnection();
@@ -142,8 +139,7 @@ export class EvmSigner extends ccc.SignerEvm {
 
   /**
    * Saves the current connection.
-   * @private
-   * @returns {Promise<void>}
+   * @returns
    */
   private async saveConnection(): Promise<void> {
     return this.connectionsRepo.set(
@@ -157,8 +153,7 @@ export class EvmSigner extends ccc.SignerEvm {
 
   /**
    * Restores the previous connection.
-   * @private
-   * @returns {Promise<void>}
+   * @returns
    */
   private async restoreConnection(): Promise<void> {
     this.connection = await this.connectionsRepo.get({

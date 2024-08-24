@@ -39,7 +39,6 @@ export interface NostrProvider extends Nip07A.Provider {
 
 /**
  * Interface representing a method to add event listeners to the provider.
- * @interface
  */
 export interface NostrOnMethod {
   /**

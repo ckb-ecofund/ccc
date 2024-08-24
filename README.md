@@ -58,7 +58,7 @@ await tx.completeFeeBy(signer, 1000); // Transaction fee rate
 const txHash = await signer.sendTransaction(tx);
 ```
 
-We have done everything! Check [the demo source code](./packages/demo) for complete examples.
+We have done everything! Check [the demo source code](https://github.com/ckb-ecofund/ccc/tree/master/packages/demo) for complete examples.
 
 ## Installing
 
@@ -76,6 +76,7 @@ import { ccc } from "@ckb-ccc/<package-name>";
 ```
 
 ## Build and Run
+
 Run the demo of CCC in two steps:
 
 1. Install packages and build the project
@@ -85,6 +86,7 @@ Run the demo of CCC in two steps:
 pnpm install
 pnpm build
 ```
+
 2. Run the demo in development mode
 
 ```shell
@@ -93,14 +95,13 @@ cd packages/demo
 pnpm run dev
 ```
 
-
 ## Who uses CCC?
 
-| [<img height="50" src="./assets/projects/utxoswap.svg" />](https://utxoswap.xyz/) | [<img height="50" src="./assets/projects/mobit.svg" />](https://mobit.app/) | [<img height="50" src="./assets/projects/did.svg" />](https://d.id/) | [<img height="50" src="./assets/projects/omiga.svg" />](https://omiga.io/) |
-| --------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | -------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| [<img height="50" src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/projects/utxoswap.svg" />](https://utxoswap.xyz/) | [<img height="50" src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/projects/mobit.svg" />](https://mobit.app/) | [<img height="50" src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/projects/did.svg" />](https://d.id/) | [<img height="50" src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/projects/omiga.svg" />](https://omiga.io/) |
+| ---------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
 
-| [<img height="50" src="./assets/projects/nervape.svg" />](https://www.nervape.com/) | [<img height="50" src="./assets/projects/utxoglobal.svg" />](https://utxo.global/) | [<img height="50" src="./assets/projects/boolnetwork.svg" />](https://bool.network/) | [<img height="50" src="./assets/projects/joydao.svg" />](https://joydao.cc/) | [<img height="50" src="./assets/projects/world3.svg" />](https://world3.ai/) |
-| ----------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| [<img height="50" src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/projects/nervape.svg" />](https://www.nervape.com/) | [<img height="50" src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/projects/utxoglobal.svg" />](https://utxo.global/) | [<img height="50" src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/projects/boolnetwork.svg" />](https://bool.network/) | [<img height="50" src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/projects/joydao.svg" />](https://joydao.cc/) | [<img height="50" src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/projects/world3.svg" />](https://world3.ai/) |
+| ------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
 
 ## FAQs
 

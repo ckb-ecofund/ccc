@@ -3,6 +3,9 @@ import { CellDepInfo, KnownScript } from "./client.js";
 import { MAINNET_SCRIPTS } from "./clientPublicMainnet.advanced.js";
 import { ClientJsonRpc } from "./jsonRpc/index.js";
 
+/**
+ * @public
+ */
 export class ClientPublicMainnet extends ClientJsonRpc {
   constructor(
     url = "https://mainnet.ckb.dev/",

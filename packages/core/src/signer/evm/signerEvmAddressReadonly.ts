@@ -5,6 +5,7 @@ import { SignerEvm } from "./signerEvm.js";
 /**
  * A class extending SignerEvm that provides read-only access to an EVM address.
  * This class does not support signing operations.
+ * @public
  */
 export class SignerEvmAddressReadonly extends SignerEvm {
   private readonly address: Hex;

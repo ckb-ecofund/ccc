@@ -9,11 +9,18 @@ import {
   NUM_TO_HASH_TYPE,
 } from "./script.advanced.js";
 
+/**
+ * @public
+ */
 export type HashTypeLike = string | number | bigint;
+/**
+ * @public
+ */
 export type HashType = "type" | "data" | "data1" | "data2";
 
 /**
  * Converts a HashTypeLike value to a HashType.
+ * @public
  *
  * @param val - The value to convert, which can be a string, number, or bigint.
  * @returns The corresponding HashType.
@@ -50,6 +57,7 @@ export function hashTypeFrom(val: HashTypeLike): HashType {
 
 /**
  * Converts a HashTypeLike value to its corresponding byte representation.
+ * @public
  *
  * @param hashType - The hash type value to convert.
  * @returns A Uint8Array containing the byte representation of the hash type.
@@ -66,6 +74,7 @@ export function hashTypeToBytes(hashType: HashTypeLike): Bytes {
 
 /**
  * Converts a byte-like value to a HashType.
+ * @public
  *
  * @param bytes - The byte-like value to convert.
  * @returns The corresponding HashType.
@@ -82,11 +91,17 @@ export function hashTypeFromBytes(bytes: BytesLike): HashType {
   return NUM_TO_HASH_TYPE[bytesFrom(bytes)[0]];
 }
 
+/**
+ * @public
+ */
 export type ScriptLike = {
   codeHash: BytesLike;
   hashType: HashTypeLike;
   args: BytesLike;
 };
+/**
+ * @public
+ */
 export class Script {
   /**
    * Creates an instance of Script.

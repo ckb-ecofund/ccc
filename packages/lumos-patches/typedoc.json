@@ -1,0 +1,10 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": [
+    "./src/index.ts"
+  ],
+  "extends": [
+    "../../typedoc.base.json"
+  ],
+  "name": "@ckb-ccc lumos-patches"
+}

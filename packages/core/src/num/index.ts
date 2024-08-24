@@ -3,17 +3,20 @@ import { Hex, HexLike, hexFrom } from "../hex/index.js";
 
 /**
  * Represents a numeric value as a bigint.
+ * @public
  */
 export type Num = bigint;
 
 /**
  * Represents a value that can be converted to a numeric value.
  * It can be a string, number, bigint, or HexLike.
+ * @public
  */
 export type NumLike = string | number | bigint | HexLike;
 
 /**
  * Get the max among all numbers.
+ * @public
  *
  * @param numbers - numbers.
  * @returns The max numbers among them.
@@ -36,6 +39,7 @@ export function numMax(a: NumLike, ...numbers: NumLike[]): Num {
 
 /**
  * Converts a NumLike value to a Num (bigint).
+ * @public
  *
  * @param val - The value to convert, which can be a string, number, bigint, or HexLike.
  * @returns A Num (bigint) representing the value.
@@ -60,6 +64,7 @@ export function numFrom(val: NumLike): Num {
 
 /**
  * Converts a NumLike value to a hexadecimal string.
+ * @public
  *
  * @param val - The value to convert, which can be a string, number, bigint, or HexLike.
  * @returns A Hex string representing the numeric value.
@@ -75,6 +80,7 @@ export function numToHex(val: NumLike): Hex {
 
 /**
  * Converts a NumLike value to a byte array in little-endian order.
+ * @public
  *
  * @param val - The value to convert, which can be a string, number, bigint, or HexLike.
  * @param bytes - The number of bytes to use for the representation. If not provided, the exact number of bytes needed is used.
@@ -92,6 +98,7 @@ export function numToBytes(val: NumLike, bytes?: number): Bytes {
 
 /**
  * Converts a NumLike value to a byte array in little-endian order.
+ * @public
  *
  * @param val - The value to convert, which can be a string, number, bigint, or HexLike.
  * @param bytes - The number of bytes to use for the representation. If not provided, the exact number of bytes needed is used.
@@ -108,6 +115,7 @@ export function numLeToBytes(val: NumLike, bytes?: number): Bytes {
 
 /**
  * Converts a NumLike value to a byte array in big-endian order.
+ * @public
  *
  * @param val - The value to convert, which can be a string, number, bigint, or HexLike.
  * @param bytes - The number of bytes to use for the representation. If not provided, the exact number of bytes needed is used.
@@ -132,6 +140,7 @@ export function numBeToBytes(val: NumLike, bytes?: number): Bytes {
 
 /**
  * Converts a byte array to a Num (bigint) assuming little-endian order.
+ * @public
  *
  * @param val - The byte array to convert.
  * @returns A Num (bigint) representing the numeric value.
@@ -147,6 +156,7 @@ export function numFromBytes(val: BytesLike): Num {
 
 /**
  * Converts a byte array to a Num (bigint) assuming little-endian order.
+ * @public
  *
  * @param val - The byte array to convert.
  * @returns A Num (bigint) representing the numeric value.
@@ -162,6 +172,7 @@ export function numLeFromBytes(val: BytesLike): Num {
 
 /**
  * Converts a byte array to a Num (bigint) assuming big-endian order.
+ * @public
  *
  * @param val - The byte array to convert.
  * @returns A Num (bigint) representing the numeric value.

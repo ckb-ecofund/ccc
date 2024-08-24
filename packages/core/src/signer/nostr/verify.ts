@@ -5,6 +5,9 @@ import { BytesLike, bytesFrom } from "../../bytes/index.js";
 import { hexFrom } from "../../hex/index.js";
 import { NostrEvent } from "./signerNostr.js";
 
+/**
+ * @public
+ */
 export function buildNostrEventFromMessage(
   message: string | BytesLike,
 ): NostrEvent {

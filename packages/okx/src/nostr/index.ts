@@ -2,9 +2,8 @@ import { ccc } from "@ckb-ccc/core";
 import { NostrProvider } from "../advancedBarrel.js";
 
 /**
- * Class representing a Bitcoin signer that extends SignerBtc from @ckb-ccc/core.
- * @class
- * @extends {ccc.SignerBtc}
+ * Class representing a Bitcoin signer that extends SignerBtc
+ * @public
  */
 export class NostrSigner extends ccc.SignerNostr {
   private publicKeyCache?: Promise<string> = undefined;

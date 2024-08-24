@@ -12,6 +12,7 @@ import { Signer, SignerSignType, SignerType } from "../signer/index.js";
  * An abstract class extending the Signer class for Bitcoin-like signing operations.
  * This class provides methods to get Bitcoin account, public key, and internal address,
  * as well as signing transactions.
+ * @public
  */
 export abstract class SignerBtc extends Signer {
   get type(): SignerType {

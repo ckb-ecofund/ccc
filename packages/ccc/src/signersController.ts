@@ -13,10 +13,16 @@ import { OKX_SVG } from "./assets/okx.svg.js";
 import { UNI_SAT_SVG } from "./assets/uni-sat.svg.js";
 import { UTXO_GLOBAL_SVG } from "./assets/utxo-global.svg.js";
 
+/**
+ * @public
+ */
 export type WalletWithSigners = ccc.Wallet & {
   signers: ccc.SignerInfo[];
 };
 
+/**
+ * @public
+ */
 export class SignersController {
   private resetListeners: (() => void)[] = [];
 

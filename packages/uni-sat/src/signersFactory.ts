@@ -4,8 +4,10 @@ import { Signer } from "./signer.js";
 
 /**
  * Retrieves the UniSat signer if available.
- * @param {ccc.Client} client - The client instance.
- * @returns {Signer | undefined} The Signer instance if the UniSat provider is available, otherwise undefined.
+ * @public
+ * 
+ * @param client - The client instance.
+ * @returns The Signer instance if the UniSat provider is available, otherwise undefined.
  */
 export function getUniSatSigners(
   client: ccc.Client,

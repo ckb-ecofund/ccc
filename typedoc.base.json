@@ -1,0 +1,15 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "sourceLinkTemplate": "https://github.com/ckb-ecofund/ccc/blob/master/{path}#L{line}",
+  "excludeReferences": true,
+  "excludeExternals": true,
+  "externalPattern": [
+    "**/dist/**",
+    "./node_modules/**"
+  ],
+  "sort": [
+    "source-order",
+    "alphabetical",
+    "kind"
+  ]
+}

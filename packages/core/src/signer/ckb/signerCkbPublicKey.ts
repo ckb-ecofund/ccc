@@ -6,6 +6,9 @@ import { hashCkb } from "../../hasher/index.js";
 import { Hex, HexLike, hexFrom } from "../../hex/index.js";
 import { Signer, SignerSignType, SignerType } from "../signer/index.js";
 
+/**
+ * @public
+ */
 export class SignerCkbPublicKey extends Signer {
   get type(): SignerType {
     return SignerType.CKB;

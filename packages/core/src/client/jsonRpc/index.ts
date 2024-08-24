@@ -46,7 +46,7 @@ export abstract class ClientJsonRpc extends Client {
   /**
    * Creates an instance of ClientJsonRpc.
    *
-   * @param url - The URL of the JSON-RPC server.
+   * @param url_ - The URL of the JSON-RPC server.
    * @param timeout - The timeout for requests in milliseconds, default is 30000.
    */
 
@@ -84,26 +84,26 @@ export abstract class ClientJsonRpc extends Client {
    *
    * @param blockNumber - The block number.
    * @param verbosity - result format which allows 0 and 2. (Optional, the default is 2.)
-   * @param with_cycles - whether the return cycles of block transactions. (Optional, default false.)
+   * @param withCycles - whether the return cycles of block transactions. (Optional, default false.)
    * @returns Block
    */
   getBlockByNumber = this.buildSender(
     "get_block_by_number",
     [(v: NumLike) => numToHex(numFrom(v))],
     (b) => apply(JsonRpcTransformers.blockTo, b),
-  ) as () => Promise<ClientBlock | undefined>;
+  ) as Client["getBlockByNumber"];
 
   /**
    * Get block by block hash
    *
    * @param blockHash - The block hash.
    * @param verbosity - result format which allows 0 and 2. (Optional, the default is 2.)
-   * @param with_cycles - whether the return cycles of block transactions. (Optional, default false.)
+   * @param withCycles - whether the return cycles of block transactions. (Optional, default false.)
    * @returns Block
    */
   getBlockByHash = this.buildSender("get_block", [hexFrom], (b) =>
     apply(JsonRpcTransformers.blockTo, b),
-  ) as () => Promise<ClientBlock | undefined>;
+  ) as Client["getBlockByHash"];
 
   /**
    * Send a transaction to node.

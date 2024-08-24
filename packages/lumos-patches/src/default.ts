@@ -45,13 +45,12 @@ function addCellDep(
 
 /**
  * Generates a class for collecting custom script cells.
- * @param {string} codeHash - The code hash of the custom script.
- * @returns {typeof JoyIDCellCollector} The CustomCellCollector class.
+ * @param codeHash - The code hash of the custom script.
+ * @returns The CustomCellCollector class.
  */
 function generateCollectorClass(codeHash: string) {
   /**
    * Class representing a collector for custom script cells.
-   * @class
    */
   return class CustomCellCollector {
     readonly fromScript: Script;
@@ -59,11 +58,11 @@ function generateCollectorClass(codeHash: string) {
 
     /**
      * Creates an instance of CustomCollector.
-     * @param {FromInfo} fromInfo - The information about the address to collect cells from.
-     * @param {CellProvider} cellProvider - The provider to collect cells from.
-     * @param {Object} options - The options for the collector.
-     * @param {QueryOptions} [options.queryOptions={}] - The query options for collecting cells.
-     * @param {Config} [options.config=getConfig()] - The Lumos configuration.
+     * @param fromInfo - The information about the address to collect cells from.
+     * @param cellProvider - The provider to collect cells from.
+     * @param options - The options for the collector.
+     * @param] - The query options for collecting cells.
+     * @param [options.config=getConfig()] - The Lumos configuration.
      * @throws {Error} If cellProvider is not provided or fromInfo is not a string.
      */
     constructor(
@@ -116,9 +115,11 @@ function generateCollectorClass(codeHash: string) {
 
 /**
  * Generates custom lock script information.
- * @param {string} codeHash - The code hash of the custom script.
- * @param {CellDep[]} cellDeps - The cell dependencies for the custom script.
- * @returns {LockScriptInfo} The lock script information.
+ * @public
+ * 
+ * @param codeHash - The code hash of the custom script.
+ * @param cellDeps - The cell dependencies for the custom script.
+ * @returns The lock script information.
  */
 export function generateScriptInfo(
   codeHash: string,
@@ -227,7 +228,7 @@ export function generateScriptInfo(
 
 /**
  * Generates default script information for CCC.
- * @returns {LockScriptInfo[]} An array of lock script information.
+ * @returns An array of lock script information.
  */
 export function generateDefaultScriptInfos(): LockScriptInfo[] {
   const mainnet = cccA.MAINNET_SCRIPTS;

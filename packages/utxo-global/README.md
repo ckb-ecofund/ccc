@@ -4,7 +4,7 @@
   </a>
 </p>
 
-<h1 align="center" style="font-size: 64px;">
+<h1 align="center" style="font-size: 32px;">
   UTXO Global Wallet for Nervos - A New Horizon for Your Crypto Adventures!
 </h1>
 
