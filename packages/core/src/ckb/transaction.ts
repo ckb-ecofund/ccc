@@ -1,4 +1,3 @@
-import type { TransactionSkeletonType } from "@ckb-lumos/helpers";
 import { ClientCollectableSearchKeyFilterLike } from "../advancedBarrel.js";
 import { Bytes, BytesLike, bytesFrom } from "../bytes/index.js";
 import { CellDepInfoLike, Client, KnownScript } from "../client/index.js";
@@ -22,6 +21,7 @@ import { apply, reduceAsync } from "../utils/index.js";
 import * as mol from "./molecule.advanced/index.js";
 import { Script, ScriptLike } from "./script.js";
 import { DEP_TYPE_TO_NUM, NUM_TO_DEP_TYPE } from "./transaction.advanced.js";
+import { LumosTransactionSkeletonType } from "./transactionLumos.js";
 
 /**
  * @public
@@ -990,7 +990,9 @@ export class Transaction {
    * ```
    */
 
-  static fromLumosSkeleton(skeleton: TransactionSkeletonType): Transaction {
+  static fromLumosSkeleton(
+    skeleton: LumosTransactionSkeletonType,
+  ): Transaction {
     return Transaction.from({
       version: 0n,
       cellDeps: skeleton.cellDeps.toArray(),
