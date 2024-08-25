@@ -14,9 +14,12 @@
   /></a>
   <img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/m/ckb-ecofund/ccc" />
   <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/ckb-ecofund/ccc/master" />
-  <img alt="GitHub deployments" src="https://img.shields.io/github/deployments/ckb-ecofund/ccc/production" />
+  <img alt="GitHub branch check runs" src="https://img.shields.io/github/check-runs/ckb-ecofund/ccc/master" />
   <a href="https://app.ckbccc.com/"><img
-    alt="Demo" src="https://img.shields.io/website?url=https%3A%2F%2Fckbccc-demo.vercel.app%2F&label=Demo"
+    alt="App" src="https://img.shields.io/website?url=https%3A%2F%2Fapp.ckbccc.com%2F&label=App"
+  /></a>
+  <a href="https://docs.ckbccc.com/"><img
+    alt="Docs" src="https://img.shields.io/website?url=https%3A%2F%2Fdocs.ckbccc.com%2F&label=Docs"
   /></a>
 </p>
 
