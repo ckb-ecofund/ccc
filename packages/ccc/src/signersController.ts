@@ -25,6 +25,18 @@ export type WalletWithSigners = ccc.Wallet & {
 /**
  * @public
  */
+export interface SignersControllerRefreshContext {
+  client: ccc.Client;
+  appName: string;
+  appIcon: string;
+  preferredNetworks: ccc.NetworkPreference[];
+  onUpdate: (wallets: WalletWithSigners[]) => void;
+  wallets: WalletWithSigners[];
+}
+
+/**
+ * @public
+ */
 export class SignersController {
   private resetListeners: (() => void)[] = [];
 
@@ -35,11 +47,11 @@ export class SignersController {
     name?: string;
     icon?: string;
   }) {
-    const name =
+    const appName =
       configs?.name ??
       (document.querySelector("head title") as HTMLTitleElement | null)?.text ??
       "Unknown";
-    const icon =
+    const appIcon =
       configs?.icon ??
       (document.querySelector('link[rel="icon"]') as HTMLLinkElement | null)
         ?.href ??
@@ -60,8 +72,8 @@ export class SignersController {
     ];
 
     return {
-      name,
-      icon,
+      appName,
+      appIcon,
       preferredNetworks,
     };
   }
@@ -75,10 +87,6 @@ export class SignersController {
     client: ccc.Client,
     onUpdate: (wallets: WalletWithSigners[]) => void,
     configs?: {
-      signerFilter?: (
-        signerInfo: ccc.SignerInfo,
-        wallet: ccc.Wallet,
-      ) => Promise<boolean>;
       preferredNetworks?: ccc.NetworkPreference[];
       name?: string;
       icon?: string;
@@ -86,211 +94,158 @@ export class SignersController {
   ) {
     this.disconnect();
 
-    const wallets: WalletWithSigners[] = [];
+    const { appName, appIcon, preferredNetworks } = this.getConfig(configs);
 
-    const { name, icon, preferredNetworks } = this.getConfig(configs);
+    const context: SignersControllerRefreshContext = {
+      client,
+      appName,
+      appIcon,
+      preferredNetworks,
+      onUpdate,
+      wallets: [],
+    };
 
+    await this.addRealSigners(context);
+    await this.addDummySigners(context);
+  }
+
+  async addRealSigners(context: SignersControllerRefreshContext) {
+    const { appName, appIcon, client, preferredNetworks } = context;
     await this.addSigners(
-      wallets,
       "UTXO Global Wallet",
       UTXO_GLOBAL_SVG,
       UtxoGlobal.getUtxoGlobalSigners(client),
-      onUpdate,
-      configs,
+      context,
     );
 
     await this.addSigners(
-      wallets,
       "Rei Wallet",
       REI_SVG,
       Rei.getReiSigners(client),
-      onUpdate,
-      configs,
+      context,
     );
 
     await this.addSigners(
-      wallets,
       "JoyID Passkey",
       JOY_ID_SVG,
-      JoyId.getJoyIdSigners(client, name, icon, preferredNetworks),
-      onUpdate,
-      configs,
+      JoyId.getJoyIdSigners(client, appName, appIcon, preferredNetworks),
+      context,
     );
 
     await this.addSigners(
-      wallets,
       "UniSat",
       UNI_SAT_SVG,
       UniSat.getUniSatSigners(client, preferredNetworks),
-      onUpdate,
-      configs,
+      context,
     );
 
     await this.addSigners(
-      wallets,
       "OKX Wallet",
       OKX_SVG,
       Okx.getOKXSigners(client, preferredNetworks),
-      onUpdate,
-      configs,
+      context,
     );
 
-    await this.addSigner(
-      wallets,
-      "Nostr",
-      NOSTR_SVG,
-      "Nostr",
-      Nip07.getNip07Signer(client),
-      onUpdate,
-      configs,
-    );
+    const nostrSigner = Nip07.getNip07Signer(client);
+    if (nostrSigner) {
+      await this.addSigner(
+        "Nostr",
+        NOSTR_SVG,
+        {
+          name: "Nostr",
+          signer: nostrSigner,
+        },
+        context,
+      );
+    }
 
     this.resetListeners.push(
       new Eip6963.SignerFactory(client).subscribeSigners((signer, detail) =>
         this.addSigner(
-          wallets,
           detail?.info.name ?? "EVM",
           detail?.info.icon ?? ETH_SVG,
-          "EVM",
-          signer,
-          onUpdate,
-          configs,
+          {
+            name: "EVM",
+            signer,
+          },
+          context,
         ),
       ),
     );
+  }
 
-    // === Dummy signers ===
+  async addDummySigners(context: SignersControllerRefreshContext) {
     await this.addLinkSigners(
-      wallets,
       "MetaMask",
       METAMASK_SVG,
-      client,
       [ccc.SignerType.EVM],
       `https://metamask.app.link/dapp/${window.location.href}`,
-      onUpdate,
-      configs,
+      context,
     );
     await this.addLinkSigners(
-      wallets,
       "OKX Wallet",
       OKX_SVG,
-      client,
       [ccc.SignerType.EVM, ccc.SignerType.BTC],
       "https://www.okx.com/download?deeplink=" +
         encodeURIComponent(
           "okx://wallet/dapp/url?dappUrl=" +
             encodeURIComponent(window.location.href),
         ),
-      onUpdate,
-      configs,
+      context,
     );
     await this.addLinkSigners(
-      wallets,
       "UniSat",
       UNI_SAT_SVG,
-      client,
       [ccc.SignerType.BTC],
       "https://unisat.io/download",
-      onUpdate,
-      configs,
+      context,
     );
     await this.addLinkSigners(
-      wallets,
       "UTXO Global Wallet",
       UTXO_GLOBAL_SVG,
-      client,
       [ccc.SignerType.CKB, ccc.SignerType.BTC],
       "https://chromewebstore.google.com/detail/lnamkkidoonpeknminiadpgjiofpdmle",
-      onUpdate,
-      configs,
+      context,
     );
-    // ===
   }
 
-  private async addLinkSigners(
-    wallets: WalletWithSigners[],
+  async addLinkSigners(
     walletName: string,
     icon: string,
-    client: ccc.Client,
     signerTypes: ccc.SignerType[],
     link: string,
-    onUpdate: (wallets: WalletWithSigners[]) => void,
-    configs?: {
-      signerFilter?: (
-        signerInfo: ccc.SignerInfo,
-        wallet: ccc.Wallet,
-      ) => Promise<boolean>;
-    },
+    context: SignersControllerRefreshContext,
   ) {
     return this.addSigners(
-      wallets,
       walletName,
       icon,
       signerTypes.map((type) => ({
         name: type,
-        signer: new ccc.SignerOpenLink(client, type, link),
+        signer: new ccc.SignerOpenLink(context.client, type, link),
       })),
-      onUpdate,
-      configs,
+      context,
     );
   }
 
-  private async addSigners(
-    wallets: WalletWithSigners[],
+  async addSigners(
     walletName: string,
     icon: string,
     signers: ccc.SignerInfo[],
-    onUpdate: (wallets: WalletWithSigners[]) => void,
-    configs?: {
-      signerFilter?: (
-        signerInfo: ccc.SignerInfo,
-        wallet: ccc.Wallet,
-      ) => Promise<boolean>;
-    },
+    context: SignersControllerRefreshContext,
   ) {
     return Promise.all(
-      signers.map(({ signer, name }) =>
-        this.addSigner(
-          wallets,
-          walletName,
-          icon,
-          name,
-          signer,
-          onUpdate,
-          configs,
-        ),
+      signers.map((signerInfo) =>
+        this.addSigner(walletName, icon, signerInfo, context),
       ),
     );
   }
 
-  private async addSigner(
-    wallets: WalletWithSigners[],
+  protected async addSigner(
     walletName: string,
     icon: string,
-    signerName: string,
-    signer: ccc.Signer | null | undefined,
-    onUpdate: (wallets: WalletWithSigners[]) => void,
-    configs?: {
-      signerFilter?: (
-        signerInfo: ccc.SignerInfo,
-        wallet: ccc.Wallet,
-      ) => Promise<boolean>;
-    },
+    signerInfo: ccc.SignerInfo,
+    { wallets, onUpdate }: SignersControllerRefreshContext,
   ): Promise<void> {
-    if (!signer) {
-      return;
-    }
-
-    const signerInfo = { name: signerName, signer };
-    const signerFilter = configs?.signerFilter;
-
-    if (
-      signerFilter &&
-      !(await signerFilter(signerInfo, { name: walletName, icon }))
-    ) {
-      return;
-    }
-
     const wallet = wallets.find((w) => w.name === walletName);
 
     if (!wallet) {

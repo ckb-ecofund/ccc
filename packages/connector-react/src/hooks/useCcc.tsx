@@ -4,6 +4,7 @@ import React, {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import { Connector } from "../components/index.js";
@@ -20,12 +21,37 @@ const CCC_CONTEXT = createContext<
   | undefined
 >(undefined);
 
+class SignersControllerWithFilter extends ccc.SignersController {
+  constructor(
+    public filter?: (
+      signerInfo: ccc.SignerInfo,
+      wallet: ccc.Wallet,
+    ) => Promise<boolean>,
+  ) {
+    super();
+  }
+
+  async addSigner(
+    walletName: string,
+    icon: string,
+    signerInfo: ccc.SignerInfo,
+    context: ccc.SignersControllerRefreshContext,
+  ) {
+    if (!(await this.filter?.(signerInfo, { name: walletName, icon }))) {
+      return;
+    }
+
+    return super.addSigner(walletName, icon, signerInfo, context);
+  }
+}
+
 export function Provider({
   children,
   connectorProps,
   name,
   icon,
   signerFilter,
+  signersController,
   defaultClient,
   preferredNetworks,
 }: {
@@ -37,12 +63,16 @@ export function Provider({
     signerInfo: ccc.SignerInfo,
     wallet: ccc.Wallet,
   ) => Promise<boolean>;
+  signersController?: ccc.SignersController;
   defaultClient?: ccc.Client;
   preferredNetworks?: ccc.NetworkPreference[];
 }) {
   const [ref, setRef] = useState<ccc.WebComponentConnector | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [_, setFlag] = useState(0);
+  const defautlSignersController = useRef<
+    SignersControllerWithFilter | undefined
+  >(undefined);
 
   const client = useMemo(
     () => ref?.client ?? new ccc.ClientPublicTestnet(),
@@ -66,6 +96,15 @@ export function Provider({
       setClient(defaultClient);
     }
   }, [setClient]);
+  useEffect(() => {
+    if (!defautlSignersController.current) {
+      defautlSignersController.current = new SignersControllerWithFilter(
+        signerFilter,
+      );
+    } else {
+      defautlSignersController.current.filter = signerFilter;
+    }
+  }, [signerFilter]);
 
   return (
     <CCC_CONTEXT.Provider
@@ -82,7 +121,9 @@ export function Provider({
       <Connector
         name={name}
         icon={icon}
-        signerFilter={signerFilter}
+        signersController={
+          signersController ?? defautlSignersController.current
+        }
         ref={setRef}
         onWillUpdate={() => setFlag((f) => f + 1)}
         onClose={() => setIsOpen(false)}

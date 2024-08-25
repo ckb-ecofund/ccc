@@ -14,10 +14,7 @@ export class WebComponentConnector extends LitElement {
   @property()
   public preferredNetworks?: ccc.NetworkPreference[];
   @property()
-  public signerFilter?: (
-    signerInfo: ccc.SignerInfo,
-    wallet: ccc.Wallet,
-  ) => Promise<boolean>;
+  public signersController?: ccc.SignersController;
 
   @state()
   public client: ccc.Client = new ccc.ClientPublicTestnet();
@@ -25,7 +22,7 @@ export class WebComponentConnector extends LitElement {
     this.client = client;
   }
 
-  private signersController = new SignersController(this);
+  private signersControllerInner = new SignersController(this);
 
   @state()
   private walletName?: string;
@@ -81,7 +78,7 @@ export class WebComponentConnector extends LitElement {
       changedProperties.has("signerFilter") ||
       changedProperties.has("preferredNetworks")
     ) {
-      this.signersController.refresh();
+      this.signersControllerInner.refresh();
     }
     if (
       changedProperties.has("walletName") ||
@@ -94,7 +91,7 @@ export class WebComponentConnector extends LitElement {
   }
 
   refreshSigner() {
-    const wallet = this.signersController.wallets.find(
+    const wallet = this.signersControllerInner.wallets.find(
       ({ name }) => name === this.walletName,
     );
     const signer = wallet?.signers.find(({ name }) => name === this.signerName);
@@ -117,7 +114,7 @@ export class WebComponentConnector extends LitElement {
       this.signer = signerInfo;
       (this.unregisterSignerReplacer as unknown as () => void)?.();
       this.unregisterSignerReplacer = signerInfo.signer.onReplaced(() => {
-        this.signersController.refresh();
+        this.signersControllerInner.refresh();
       });
     } else {
       this.wallet = undefined;
@@ -154,7 +151,7 @@ export class WebComponentConnector extends LitElement {
             `
           : html`
               <ccc-selecting-scene
-                .wallets=${this.signersController.wallets}
+                .wallets=${this.signersControllerInner.wallets}
                 @connected=${({ walletName, signerName }: ConnectedEvent) => {
                   this.walletName = walletName;
                   this.signerName = signerName;

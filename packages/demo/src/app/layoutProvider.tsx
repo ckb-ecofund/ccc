@@ -237,6 +237,9 @@ export function LayoutProvider({ children }: { children: ReactNode }) {
       name="Custom name" // Custom name for your application, default to website title
       icon="https://custom.icon" // Custom icon for your application, default to website icon
       signerFilter={async (signerInfo, wallet) => true} // Filter out signers that you don't want
+      signersController={new ccc.SignersController()}
+        // Custom signers controller, see SignersController from @ckb-ccc/ccc
+        // Overrides signerFilter
       preferredNetworks={[
         {
           addressPrefix: "ckt",
