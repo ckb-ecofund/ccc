@@ -1,5 +1,16 @@
 # @ckb-ccc/okx
 
+## 0.0.12
+
+### Patch Changes
+
+- [`6bee006`](https://github.com/ckb-ecofund/ccc/commit/6bee006fbcb96986c65ca4d2d896fca21db2503b) Thanks [@Hanssen0](https://github.com/Hanssen0)! - fix(connector): catch connecting error
+
+- Updated dependencies [[`6bee006`](https://github.com/ckb-ecofund/ccc/commit/6bee006fbcb96986c65ca4d2d896fca21db2503b)]:
+  - @ckb-ccc/nip07@0.0.12
+  - @ckb-ccc/core@0.0.12
+  - @ckb-ccc/uni-sat@0.0.12
+
 ## 0.0.12-alpha.7
 
 ### Patch Changes
