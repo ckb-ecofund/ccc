@@ -530,7 +530,7 @@ export abstract class Client {
   ): Promise<ClientTransactionResponse | undefined> {
     const txHash = hexFrom(txHashLike);
     const res = await this.getTransactionNoCache(txHash);
-    if (res !== null) {
+    if (res?.transaction) {
       return res;
     }
 
@@ -539,9 +539,16 @@ export abstract class Client {
       return;
     }
 
+    if (!res) {
+      return {
+        transaction: tx,
+        status: "sent",
+      };
+    }
+
     return {
+      ...res,
       transaction: tx,
-      status: "proposed",
     };
   }
 }
