@@ -1,5 +1,19 @@
 # @ckb-ccc/ccc
 
+## 0.0.13-alpha.2
+
+### Patch Changes
+
+- Updated dependencies [[`96dbb61`](https://github.com/ckb-ecofund/ccc/commit/96dbb6107d2071b9383350ddd578557746227054)]:
+  - @ckb-ccc/core@0.0.13-alpha.2
+  - @ckb-ccc/eip6963@0.0.13-alpha.2
+  - @ckb-ccc/joy-id@0.0.13-alpha.2
+  - @ckb-ccc/nip07@0.0.13-alpha.2
+  - @ckb-ccc/okx@0.0.13-alpha.2
+  - @ckb-ccc/rei@0.0.13-alpha.2
+  - @ckb-ccc/uni-sat@0.0.13-alpha.2
+  - @ckb-ccc/utxo-global@0.0.13-alpha.2
+
 ## 0.0.13-alpha.1
 
 ### Patch Changes
