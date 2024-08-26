@@ -28,6 +28,11 @@ export type TransactionStatus =
 export type ClientTransactionResponse = {
   transaction: Transaction;
   status: TransactionStatus;
+  cycles?: Num;
+  blockHash?: Hex;
+  blockNumber?: Num;
+  txIndex?: Num;
+  reason?: string;
 };
 
 /**
