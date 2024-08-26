@@ -1,5 +1,11 @@
 # @ckb-ccc/core
 
+## 0.0.13-alpha.3
+
+### Patch Changes
+
+- [`1f999f8`](https://github.com/ckb-ecofund/ccc/commit/1f999f854beb255b3cd9dbbc5a7268e75442b3db) Thanks [@Hanssen0](https://github.com/Hanssen0)! - feat(core): ClientCache.markTransactions
+
 ## 0.0.13-alpha.2
 
 ### Patch Changes

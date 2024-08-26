@@ -1,5 +1,12 @@
 # @ckb-ccc/lumos-patches
 
+## 0.0.13-alpha.3
+
+### Patch Changes
+
+- Updated dependencies [[`1f999f8`](https://github.com/ckb-ecofund/ccc/commit/1f999f854beb255b3cd9dbbc5a7268e75442b3db)]:
+  - @ckb-ccc/core@0.0.13-alpha.3
+
 ## 0.0.13-alpha.2
 
 ### Patch Changes
