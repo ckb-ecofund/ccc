@@ -1,12 +1,5 @@
 import { Hex } from "../../hex/index.js";
 
-export type JsonRpcPayload = {
-  id: number;
-  jsonrpc: "2.0";
-  method: string;
-  params: unknown[] | Record<string, unknown>;
-};
-
 export type JsonRpcHashType = "type" | "data" | "data1" | "data2";
 export type JsonRpcDepType = "dep_group" | "code";
 

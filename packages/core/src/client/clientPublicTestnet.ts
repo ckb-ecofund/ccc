@@ -8,11 +8,17 @@ import { ClientJsonRpc } from "./jsonRpc/index.js";
  */
 export class ClientPublicTestnet extends ClientJsonRpc {
   constructor(
-    url = "https://testnet.ckb.dev/",
+    url?: string,
     timeout?: number,
     private readonly scripts = TESTNET_SCRIPTS,
   ) {
-    super(url, timeout);
+    super(
+      url ??
+        (typeof WebSocket !== "undefined"
+          ? "wss://testnet.ckb.dev/ws"
+          : "https://testnet.ckb.dev/"),
+      timeout,
+    );
   }
 
   get addressPrefix(): string {

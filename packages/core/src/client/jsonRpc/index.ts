@@ -1,4 +1,3 @@
-import fetch from "cross-fetch";
 import { apply } from "../../barrel.js";
 import { TransactionLike } from "../../ckb/index.js";
 import { Hex, HexLike, hexFrom } from "../../hex/index.js";
@@ -10,7 +9,12 @@ import {
   ClientTransactionResponse,
   OutputsValidator,
 } from "../clientTypes.js";
-import { JsonRpcPayload, JsonRpcTransformers } from "./advanced.js";
+import {
+  JsonRpcPayload,
+  Transport,
+  transportFromUri,
+} from "../transports/advanced.js";
+import { JsonRpcTransformers } from "./advanced.js";
 
 /**
  * Applies a transformation function to a value if the transformer is provided.
@@ -42,18 +46,22 @@ async function transform(
  */
 
 export abstract class ClientJsonRpc extends Client {
+  private readonly transport: Transport;
+
   /**
    * Creates an instance of ClientJsonRpc.
    *
    * @param url_ - The URL of the JSON-RPC server.
-   * @param timeout - The timeout for requests in milliseconds, default is 30000.
+   * @param timeout - The timeout for requests in milliseconds
    */
 
   constructor(
     private readonly url_: string,
-    private readonly timeout = 30000,
+    private readonly timeout?: number,
   ) {
     super();
+
+    this.transport = transportFromUri(url_);
   }
 
   /**
@@ -232,22 +240,8 @@ export abstract class ClientJsonRpc extends Client {
    *
    * @throws Will throw an error if the response ID does not match the request ID, or if the response contains an error.
    */
-
   async send(payload: JsonRpcPayload): Promise<unknown> {
-    const aborter = new AbortController();
-    const abortTimer = setTimeout(() => aborter.abort(), this.timeout);
-
-    const raw = await fetch(this.url, {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-      },
-      body: JSON.stringify(payload),
-      signal: aborter.signal,
-    });
-    clearTimeout(abortTimer);
-
-    const res = (await raw.json()) as {
+    const res = (await this.transport.request(payload)) as {
       id: number;
       error: unknown;
       result: unknown;

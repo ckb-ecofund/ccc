@@ -8,11 +8,17 @@ import { ClientJsonRpc } from "./jsonRpc/index.js";
  */
 export class ClientPublicMainnet extends ClientJsonRpc {
   constructor(
-    url = "https://mainnet.ckb.dev/",
+    url?: string,
     timeout?: number,
     private readonly scripts = MAINNET_SCRIPTS,
   ) {
-    super(url, timeout);
+    super(
+      url ??
+        (typeof WebSocket !== "undefined"
+          ? "wss://mainnet.ckb.dev/ws"
+          : "https://mainnet.ckb.dev/"),
+      timeout,
+    );
   }
 
   get addressPrefix(): string {
