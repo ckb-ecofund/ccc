@@ -72,9 +72,10 @@ export class CkbSigner extends ccc.Signer {
     return {
       redirectURL: location.href,
       joyidAppURL:
-        this._appUri ?? this.client.addressPrefix === "ckb"
+        this._appUri ??
+        (this.client.addressPrefix === "ckb"
           ? "https://app.joy.id"
-          : "https://testnet.joyid.dev",
+          : "https://testnet.joyid.dev"),
       name: this.name,
       logo: this.icon,
     };
@@ -85,13 +86,12 @@ export class CkbSigner extends ccc.Signer {
    * @returns The aggregator URI.
    */
   private getAggregatorUri(): string {
-    if (this._aggregatorUri) {
-      return this._aggregatorUri;
-    }
-
-    return this.client.addressPrefix === "ckb"
-      ? "https://cota.nervina.dev/mainnet-aggregator"
-      : "https://cota.nervina.dev/aggregator";
+    return (
+      this._aggregatorUri ??
+      (this.client.addressPrefix === "ckb"
+        ? "https://cota.nervina.dev/mainnet-aggregator"
+        : "https://cota.nervina.dev/aggregator")
+    );
   }
 
   /**
