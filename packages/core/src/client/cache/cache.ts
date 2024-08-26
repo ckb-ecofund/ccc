@@ -9,8 +9,13 @@ import { HexLike } from "../../hex/index.js";
 import { ClientCollectableSearchKeyLike } from "../clientTypes.advanced.js";
 
 export interface ClientCache {
-  markUsable(cellLike: CellLike): Promise<void>;
-  markUnusable(outPointLike: OutPointLike): Promise<void>;
+  markUsable(...cellLikes: (CellLike | CellLike[])[]): Promise<void>;
+  markUnusable(
+    ...outPointLike: (OutPointLike | OutPointLike[])[]
+  ): Promise<void>;
+  markTransactions(
+    ...transactionLike: (TransactionLike | TransactionLike[])[]
+  ): Promise<void>;
 
   isUnusable(outPointLike: OutPointLike): Promise<boolean>;
 

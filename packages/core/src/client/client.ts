@@ -479,21 +479,8 @@ export abstract class Client {
     const txHash = await this.sendTransactionNoCache(tx, validator);
 
     await this.cache.recordTransactions(tx);
-    await Promise.all(
-      tx.inputs.map((i) => this.cache.markUnusable(i.previousOutput)),
-    );
-    await Promise.all(
-      tx.outputs.map((o, i) =>
-        this.cache.markUsable({
-          cellOutput: o,
-          outputData: tx.outputsData[i],
-          outPoint: {
-            txHash,
-            index: i,
-          },
-        }),
-      ),
-    );
+    await this.cache.markTransactions(tx);
+
     return txHash;
   }
 

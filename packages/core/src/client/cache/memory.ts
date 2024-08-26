@@ -17,25 +17,60 @@ export class ClientCacheMemory implements ClientCache {
   private readonly usableCells: Cell[] = [];
   private readonly knownCells: Cell[] = [];
 
-  async markUsable(cellLike: CellLike): Promise<void> {
-    const cell = Cell.from(cellLike).clone();
-    this.usableCells.push(cell);
-    this.knownCells.push(cell);
+  async markUsable(...cellLikes: (CellLike | CellLike[])[]): Promise<void> {
+    cellLikes.flat().forEach((cellLike) => {
+      const cell = Cell.from(cellLike).clone();
+      this.usableCells.push(cell);
+      this.knownCells.push(cell);
 
-    const index = this.unusableOutPoints.findIndex((o) => cell.outPoint.eq(o));
-    if (index !== -1) {
-      this.unusableOutPoints.splice(index, 1);
-    }
+      const index = this.unusableOutPoints.findIndex((o) =>
+        cell.outPoint.eq(o),
+      );
+      if (index !== -1) {
+        this.unusableOutPoints.splice(index, 1);
+      }
+    });
   }
 
-  async markUnusable(outPointLike: OutPointLike): Promise<void> {
-    const outPoint = OutPoint.from(outPointLike);
-    this.unusableOutPoints.push(outPoint.clone());
+  async markUnusable(
+    ...outPointLikes: (OutPointLike | OutPointLike[])[]
+  ): Promise<void> {
+    outPointLikes.flat().forEach((outPointLike) => {
+      const outPoint = OutPoint.from(outPointLike);
+      this.unusableOutPoints.push(outPoint.clone());
 
-    const index = this.usableCells.findIndex((c) => c.outPoint.eq(outPoint));
-    if (index !== -1) {
-      this.usableCells.splice(index, 1);
-    }
+      const index = this.usableCells.findIndex((c) => c.outPoint.eq(outPoint));
+      if (index !== -1) {
+        this.usableCells.splice(index, 1);
+      }
+    });
+  }
+
+  async markTransactions(
+    ...transactionLike: (TransactionLike | TransactionLike[])[]
+  ): Promise<void> {
+    await Promise.all(
+      transactionLike.flat().map(async (transactionLike) => {
+        const tx = Transaction.from(transactionLike);
+        const txHash = tx.hash();
+
+        await Promise.all(
+          tx.inputs.map((i) => this.markUnusable(i.previousOutput)),
+        );
+        await Promise.all(
+          tx.outputs.map((o, i) =>
+            this.markUsable({
+              cellOutput: o,
+              outputData: tx.outputsData[i],
+              outPoint: {
+                txHash,
+                index: i,
+              },
+            }),
+          ),
+        );
+      }),
+    );
   }
 
   async isUnusable(outPointLike: OutPointLike): Promise<boolean> {
