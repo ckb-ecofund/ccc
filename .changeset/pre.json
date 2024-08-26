@@ -18,5 +18,7 @@
     "@ckb-ccc/uni-sat": "0.0.12",
     "@ckb-ccc/utxo-global": "0.0.12"
   },
-  "changesets": []
+  "changesets": [
+    "hip-plums-warn"
+  ]
 }
