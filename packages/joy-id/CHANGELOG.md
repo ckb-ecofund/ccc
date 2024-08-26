@@ -1,5 +1,14 @@
 # @ckb-ccc/joy-id
 
+## 0.0.13-alpha.1
+
+### Patch Changes
+
+- [`588db84`](https://github.com/ckb-ecofund/ccc/commit/588db8434d76a5a9ea6dd1d4c5b03f356ec1fb7d) Thanks [@Hanssen0](https://github.com/Hanssen0)! - fix: joyid CkbSigner appUri
+
+- Updated dependencies [[`3378e85`](https://github.com/ckb-ecofund/ccc/commit/3378e85b32797f5cdc1943b9ecaca1fd1d9fad5e), [`a69a9dc`](https://github.com/ckb-ecofund/ccc/commit/a69a9dc0c722f7b4cfa36b2ae8ecba4dcde0db90)]:
+  - @ckb-ccc/core@0.0.13-alpha.1
+
 ## 0.0.13-alpha.0
 
 ### Patch Changes
