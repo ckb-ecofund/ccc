@@ -1,12 +1,12 @@
-import { bytesFrom } from "../bytes/index.js";
-import { Cell, CellLike, Script, ScriptLike } from "../ckb/index.js";
-import { HexLike, hexFrom } from "../hex/index.js";
-import { NumLike, numFrom } from "../num/index.js";
+import { bytesFrom } from "../../bytes/index.js";
+import { Cell, CellLike, Script, ScriptLike } from "../../ckb/index.js";
+import { HexLike, hexFrom } from "../../hex/index.js";
+import { NumLike, numFrom } from "../../num/index.js";
 import {
   ClientCollectableSearchKeyLike,
   clientSearchKeyRangeFrom,
-} from "./clientTypes.advanced.js";
-import { ClientIndexerSearchKey } from "./clientTypes.js";
+} from "../clientTypes.advanced.js";
+import { ClientIndexerSearchKey } from "../clientTypes.js";
 
 export function filterData(
   dataLike: HexLike,

@@ -74,7 +74,7 @@ export default function IssueXUdtSul() {
               await susTx.completeFeeBy(signer, 1000);
               const susTxHash = await signer.sendTransaction(susTx);
               log("Transaction sent:", explorerTransaction(susTxHash));
-              await signer.client.markUnusable({ txHash: susTxHash, index: 0 });
+              await signer.client.cache.markUnusable({ txHash: susTxHash, index: 0 });
 
               const singleUseLock = await ccc.Script.fromKnownScript(
                 signer.client,
