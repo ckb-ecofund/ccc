@@ -76,7 +76,11 @@ export class CellDepInfo {
  * @public
  */
 export abstract class Client {
-  constructor(public cache: ClientCache = new ClientCacheMemory()) {}
+  public cache: ClientCache;
+
+  constructor(config?: { cache?: ClientCache }) {
+    this.cache = config?.cache ?? new ClientCacheMemory();
+  }
 
   abstract get url(): string;
   abstract get addressPrefix(): string;

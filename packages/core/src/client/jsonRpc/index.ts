@@ -1,7 +1,8 @@
-import { apply } from "../../barrel.js";
 import { TransactionLike } from "../../ckb/index.js";
 import { Hex, HexLike, hexFrom } from "../../hex/index.js";
 import { Num, NumLike, numFrom, numToHex } from "../../num/index.js";
+import { apply } from "../../utils/index.js";
+import { ClientCache } from "../cache/index.js";
 import { Client } from "../client.js";
 import {
   ClientFindCellsResponse,
@@ -57,11 +58,11 @@ export abstract class ClientJsonRpc extends Client {
 
   constructor(
     private readonly url_: string,
-    private readonly timeout?: number,
+    config?: { timeout?: number; cache?: ClientCache },
   ) {
-    super();
+    super(config);
 
-    this.transport = transportFromUri(url_);
+    this.transport = transportFromUri(url_, config);
   }
 
   /**
