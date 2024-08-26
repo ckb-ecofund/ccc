@@ -102,7 +102,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       [
         level,
         title,
-        <>{msgs.map((msg, i) => (i === 0 ? msg : <> {msg}</>))}</>,
+        msgs.map((msg, i) => (
+          <React.Fragment key={i}>
+            {i === 0 ? " " : ""}
+            {msg}
+          </React.Fragment>
+        )),
       ],
       ...messages,
     ]);

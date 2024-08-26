@@ -61,9 +61,9 @@ export function Message({
         style={
           isExpanded
             ? {}
-            : ({
-                "-webkit-line-clamp": `${lines ?? 2}`,
-              } as any)
+            : {
+                WebkitLineClamp: `${lines ?? 2}`,
+              }
         }
       >
         <p className={`whitespace-pre-wrap break-all text-sm ${colorClass}`}>

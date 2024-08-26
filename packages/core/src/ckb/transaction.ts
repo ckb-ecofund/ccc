@@ -1538,8 +1538,9 @@ export class Transaction {
   }> {
     const scripts = (await from.getAddressObjs()).map(({ script }) => script);
     const collectedCells = [];
-    let acc: T = init;
 
+    let acc: T = init;
+    let fulfilled = false;
     for (const script of scripts) {
       for await (const cell of from.client.findCellsByCollectableSearchKey({
         script,
@@ -1556,26 +1557,33 @@ export class Transaction {
           continue;
         }
         const i = collectedCells.push(cell);
-        const next: T | undefined = await Promise.resolve(
+        const next = await Promise.resolve(
           accumulator(acc, cell, i - 1, collectedCells),
         );
         if (next === undefined) {
-          this.inputs.push(
-            ...collectedCells.map(({ outPoint, outputData, cellOutput }) =>
-              CellInput.from({
-                previousOutput: outPoint,
-                since: 0,
-                outputData,
-                cellOutput,
-              }),
-            ),
-          );
-          return {
-            addedCount: collectedCells.length,
-          };
+          fulfilled = true;
+          break;
         }
-        acc = next;
       }
+      if (fulfilled) {
+        break;
+      }
+    }
+
+    this.inputs.push(
+      ...collectedCells.map(({ outPoint, outputData, cellOutput }) =>
+        CellInput.from({
+          previousOutput: outPoint,
+          since: 0,
+          outputData,
+          cellOutput,
+        }),
+      ),
+    );
+    if (fulfilled) {
+      return {
+        addedCount: collectedCells.length,
+      };
     }
 
     return {
