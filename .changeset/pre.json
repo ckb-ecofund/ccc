@@ -19,6 +19,9 @@
     "@ckb-ccc/utxo-global": "0.0.12"
   },
   "changesets": [
-    "hip-plums-warn"
+    "fast-panthers-suffer",
+    "hip-plums-warn",
+    "shaggy-mugs-heal",
+    "thick-doors-lick"
   ]
 }
