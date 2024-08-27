@@ -10,6 +10,9 @@ import { verifyMessageJoyId } from "../ckb/verifyJoyId.js";
 import { verifyMessageEvmPersonal } from "../evm/verify.js";
 import { verifyMessageNostrEvent } from "../nostr/verify.js";
 
+/**
+ * @public
+ */
 export enum SignerSignType {
   Unknown = "Unknown",
   BtcEcdsa = "BtcEcdsa",
@@ -21,6 +24,7 @@ export enum SignerSignType {
 
 /**
  * An enumeration of signer display types in wallet.
+ * @public
  */
 export enum SignerType {
   EVM = "EVM",
@@ -29,23 +33,28 @@ export enum SignerType {
   Nostr = "Nostr",
 }
 
+/**
+ * @public
+ */
 export type NetworkPreference = {
   addressPrefix: string;
   signerType: SignerType;
+  /**
+   * Wallet signers should check if the wallet is using preferred networks.
+   * If not, try to switch to the first preferred network.
+   * If non preferred, let users choose what they want.
+   * BTC: // They made a mess...
+   *   btc
+   *   btcTestnet
+   *   btcSignet // OKX
+   *   fractalBtc // UniSat
+   */
   network: string;
-  /*
-    Wallet signers should check if the wallet is using preferred networks.
-    If not, try to switch to the first preferred network.
-    If non preferred, let users choose what they want.
-
-    BTC: // They made a mess...
-      btc
-      btcTestnet
-      btcSignet // OKX
-      fractalBtc // UniSat
-  */
 };
 
+/**
+ * @public
+ */
 export class Signature {
   constructor(
     public signature: string,
@@ -57,6 +66,7 @@ export class Signature {
 /**
  * An abstract class representing a generic signer.
  * This class provides methods to connect, get addresses, and sign transactions.
+ * @public
  */
 export abstract class Signer {
   constructor(protected client_: Client) {}
@@ -227,7 +237,7 @@ export abstract class Signer {
   /**
    * Signs a message.
    *
-   * @param _ - The message to sign, as a string or BytesLike object.
+   * @param message - The message to sign, as a string or BytesLike object.
    * @returns A promise that resolves to the signature info.
    * @throws Will throw an error if not implemented.
    */
@@ -253,8 +263,8 @@ export abstract class Signer {
   /**
    * Verify a signature.
    *
-   * @param _ - The original message.
-   * @param _ - The signature to verify.
+   * @param message - The original message.
+   * @param signature - The signature to verify.
    * @returns A promise that resolves to the verification result.
    * @throws Will throw an error if not implemented.
    */
@@ -326,6 +336,7 @@ export abstract class Signer {
 
 /**
  * A class representing information about a signer, including its type and the signer instance.
+ * @public
  */
 export class SignerInfo {
   constructor(
@@ -336,6 +347,7 @@ export class SignerInfo {
 
 /**
  * Represents a wallet with a name, icon, and an array of signer information.
+ * @public
  */
 export type Wallet = {
   name: string;

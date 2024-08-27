@@ -5,6 +5,7 @@ import { SignerBtc } from "./signerBtc.js";
 /**
  * A class extending SignerBtc that provides read-only access to a Bitcoin public key and account.
  * This class does not support signing operations.
+ * @public
  */
 export class SignerBtcPublicKeyReadonly extends SignerBtc {
   private readonly publicKey: Hex;

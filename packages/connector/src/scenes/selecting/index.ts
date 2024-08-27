@@ -1,9 +1,9 @@
 import { ccc } from "@ckb-ccc/ccc";
 import { css, html, LitElement } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
-import { generateConnectingScene } from "./connecting";
-import { generateSignersScene } from "./signers";
-import { generateWalletsScene } from "./wallets";
+import { generateConnectingScene } from "./connecting.js";
+import { generateSignersScene } from "./signers.js";
+import { generateWalletsScene } from "./wallets.js";
 
 export class ConnectedEvent extends Event {
   constructor(
@@ -90,6 +90,11 @@ export class SelectingScene extends LitElement {
       const { signer } = signerInfo;
       try {
         await signer.connect();
+
+        if (!(await signer.isConnected())) {
+          this.connectingError = "Unknown connection status";
+          return;
+        }
       } catch (error) {
         if (typeof error !== "object" || error === null) {
           this.connectingError = JSON.stringify(error);
@@ -108,8 +113,6 @@ export class SelectingScene extends LitElement {
         }
 
         this.connectingError = JSON.stringify(message);
-      }
-      if (!(await signer.isConnected())) {
         return;
       }
 

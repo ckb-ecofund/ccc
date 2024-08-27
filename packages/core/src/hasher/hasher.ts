@@ -1,6 +1,9 @@
 import { BytesLike } from "../bytes/index.js";
 import { Hex } from "../hex/index.js";
 
+/**
+ * @public
+ */
 export interface Hasher {
   /**
    * Updates the hash with the given data.

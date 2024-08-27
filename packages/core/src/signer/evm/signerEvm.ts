@@ -16,6 +16,7 @@ import { Signer, SignerSignType, SignerType } from "../signer/index.js";
 /**
  * An abstract class extending Signer for Ethereum Virtual Machine (EVM) based signing operations.
  * This class provides methods to get EVM account, internal address, and signing transactions.
+ * @public
  */
 export abstract class SignerEvm extends Signer {
   get type(): SignerType {

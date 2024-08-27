@@ -3,8 +3,11 @@ import { ReactiveControllerHost } from "lit";
 
 export class SignersController {
   public wallets: ccc.WalletWithSigners[] = [];
+  private readonly defaultController = new ccc.SignersController();
 
-  private readonly controller = new ccc.SignersController();
+  get controller() {
+    return this.host.signersController ?? this.defaultController;
+  }
 
   constructor(
     private readonly host: ReactiveControllerHost & {
@@ -17,6 +20,7 @@ export class SignersController {
       name?: string;
       icon?: string;
       refreshSigner: () => void;
+      signersController?: ccc.SignersController;
     },
   ) {
     host.addController(this);

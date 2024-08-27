@@ -1,11 +1,18 @@
 import { Buffer } from "buffer/index.js";
 import { BytesFromEncoding } from "./advanced.js";
 
+/**
+ * @public
+ */
 export type Bytes = Uint8Array;
+/**
+ * @public
+ */
 export type BytesLike = string | Uint8Array | ArrayBuffer | number[];
 
 /**
  * Concatenates multiple byte-like arrays into a single byte array.
+ * @public
  *
  * @param args - The byte-like arrays to concatenate.
  * @returns A Uint8Array containing the concatenated bytes.
@@ -33,6 +40,7 @@ export function bytesConcat(...args: BytesLike[]): Bytes {
 
 /**
  * Converts a byte-like value to a string using the specified encoding.
+ * @public
  *
  * @param val - The byte-like value to convert.
  * @param encoding - The encoding to use for the conversion, as defined by the BytesFromEncoding type.
@@ -54,6 +62,7 @@ export function bytesTo(val: BytesLike, encoding: BytesFromEncoding): string {
 
 /**
  * Converts various types of byte-like values to a Uint8Array.
+ * @public
  *
  * @param bytes - The byte-like value to convert. It can be a string, Uint8Array, ArrayBuffer, or number array.
  * @param encoding - Optional encoding to use if the input is a string. Defaults to hexadecimal if not specified.

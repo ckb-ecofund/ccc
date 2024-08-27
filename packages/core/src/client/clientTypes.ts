@@ -8,23 +8,44 @@ import {
   clientSearchKeyRangeFrom,
 } from "./clientTypes.advanced.js";
 
+/**
+ * @public
+ */
 export type OutputsValidator = "passthrough" | "well_known_scripts_only";
 
+/**
+ * @public
+ */
 export type TransactionStatus =
+  | "sent"
   | "pending"
   | "proposed"
   | "committed"
   | "unknown"
   | "rejected";
+/**
+ * @public
+ */
 export type ClientTransactionResponse = {
   transaction: Transaction;
   status: TransactionStatus;
+  cycles?: Num;
+  blockHash?: Hex;
+  blockNumber?: Num;
+  txIndex?: Num;
+  reason?: string;
 };
 
+/**
+ * @public
+ */
 export type ClientIndexerSearchKeyFilterLike =
   ClientCollectableSearchKeyFilterLike & {
     blockRange?: [NumLike, NumLike] | null;
   };
+/**
+ * @public
+ */
 export class ClientIndexerSearchKeyFilter {
   constructor(
     public script: Script | undefined,
@@ -51,10 +72,16 @@ export class ClientIndexerSearchKeyFilter {
   }
 }
 
+/**
+ * @public
+ */
 export type ClientIndexerSearchKeyLike = ClientCollectableSearchKeyLike & {
   filter?: ClientIndexerSearchKeyFilterLike | null;
 };
 
+/**
+ * @public
+ */
 export class ClientIndexerSearchKey {
   constructor(
     public script: Script,
@@ -75,11 +102,17 @@ export class ClientIndexerSearchKey {
   }
 }
 
+/**
+ * @public
+ */
 export type ClientFindCellsResponse = {
   lastCursor: string;
   cells: Cell[];
 };
 
+/**
+ * @public
+ */
 export type ClientIndexerSearchKeyTransactionLike = Omit<
   ClientCollectableSearchKeyLike,
   "withData"
@@ -88,6 +121,9 @@ export type ClientIndexerSearchKeyTransactionLike = Omit<
   groupByTransaction?: boolean | null;
 };
 
+/**
+ * @public
+ */
 export class ClientIndexerSearchKeyTransaction {
   constructor(
     public script: Script,
@@ -110,6 +146,9 @@ export class ClientIndexerSearchKeyTransaction {
   }
 }
 
+/**
+ * @public
+ */
 export type ClientFindTransactionsResponse = {
   lastCursor: string;
   transactions: {
@@ -121,6 +160,9 @@ export type ClientFindTransactionsResponse = {
   }[];
 };
 
+/**
+ * @public
+ */
 export type ClientFindTransactionsGroupedResponse = {
   lastCursor: string;
   transactions: {
@@ -134,6 +176,9 @@ export type ClientFindTransactionsGroupedResponse = {
   }[];
 };
 
+/**
+ * @public
+ */
 export type ClientBlockHeader = {
   compactTarget: Num;
   dao: Hex;
@@ -149,11 +194,17 @@ export type ClientBlockHeader = {
   version: Num;
 };
 
+/**
+ * @public
+ */
 export type ClientBlockUncle = {
   header: ClientBlockHeader;
   proposals: Hex[];
 };
 
+/**
+ * @public
+ */
 export type ClientBlock = {
   header: ClientBlockHeader;
   proposals: Hex[];

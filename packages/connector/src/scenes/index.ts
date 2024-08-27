@@ -1,2 +1,2 @@
-import "./connected";
-import "./selecting";
+import "./connected.js";
+import "./selecting/index.js";

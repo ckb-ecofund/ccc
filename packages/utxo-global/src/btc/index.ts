@@ -1,6 +1,9 @@
 import { ccc } from "@ckb-ccc/core";
 import { Provider } from "../advancedBarrel.js";
 
+/**
+ * @public
+ */
 export class SignerBtc extends ccc.SignerBtc {
   private accountCache: string | undefined;
 

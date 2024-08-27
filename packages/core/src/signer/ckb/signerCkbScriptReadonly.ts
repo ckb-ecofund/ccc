@@ -6,6 +6,7 @@ import { Signer, SignerSignType, SignerType } from "../signer/index.js";
 /**
  * A class extending Signer that provides read-only access to a CKB script.
  * This class does not support signing operations.
+ * @public
  */
 export class SignerCkbScriptReadonly extends Signer {
   get type(): SignerType {

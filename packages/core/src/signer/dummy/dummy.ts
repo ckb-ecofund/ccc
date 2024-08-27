@@ -2,6 +2,9 @@ import { Address } from "../../address/index.js";
 import { Client } from "../../client/index.js";
 import { Signer, SignerSignType, SignerType } from "../signer/index.js";
 
+/**
+ * @public
+ */
 export abstract class SignerDummy extends Signer {
   get signType(): SignerSignType {
     return SignerSignType.Unknown;

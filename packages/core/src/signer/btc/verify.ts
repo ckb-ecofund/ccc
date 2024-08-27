@@ -3,6 +3,9 @@ import { magicHash } from "bitcoinjs-message";
 import { BytesLike, bytesFrom } from "../../bytes/index.js";
 import { hexFrom } from "../../hex/index.js";
 
+/**
+ * @public
+ */
 export function verifyMessageBtcEcdsa(
   message: string | BytesLike,
   signature: string,

@@ -1,0 +1,34 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "name": "CCC Docs",
+  "entryPoints": [
+    "packages/core",
+    "packages/ccc",
+    "packages/connector",
+    "packages/connector-react",
+    "packages/utxo-global",
+    "packages/rei",
+    "packages/joy-id",
+    "packages/okx",
+    "packages/uni-sat",
+    "packages/nip07",
+    "packages/eip6963",
+    "packages/lumos-patches"
+  ],
+  "entryPointStrategy": "packages",
+  "githubPages": true,
+  "navigationLinks": {
+    "GitHub": "https://github.com/ckb-ecofund/ccc",
+    "App": "https://app.ckbccc.com",
+  },
+  "hostedBaseUrl": "https://docs.example.com",
+  "customCss": "./assets/typedoc.css",
+  "plugin": [
+    "typedoc-material-theme",
+    "typedoc-plugin-extras"
+  ],
+  "themeColor": "#434343",
+  "favicon": "assets/logo.svg",
+  "customDescription": "Docs for CCC",
+  "footerLastModified": true
+}

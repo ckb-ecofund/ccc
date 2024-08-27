@@ -8,14 +8,14 @@ import { Signer } from "./signer.js";
 
 /**
  * Class representing a factory for creating and managing Signer instances.
- * @class
+ * @public
  */
 export class SignerFactory {
   private readonly existedUuids: string[] = [];
 
   /**
    * Creates an instance of SignerFactory.
-   * @param {ccc.Client} client - The client instance.
+   * @param client - The client instance.
    */
   constructor(private readonly client: ccc.Client) {}
 

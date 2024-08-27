@@ -1,3 +1,4 @@
+export * from "./cache/index.js";
 export * from "./client.js";
 export * from "./clientPublicMainnet.js";
 export * from "./clientPublicTestnet.js";

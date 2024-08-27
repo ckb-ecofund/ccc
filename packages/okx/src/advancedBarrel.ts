@@ -1,7 +1,9 @@
 import { Nip07A } from "@ckb-ccc/nip07/advanced";
 import { UniSatA } from "@ckb-ccc/uni-sat/advanced";
 
-export interface BitcoinProvider extends UniSatA.Provider {
+export interface BitcoinProvider
+  extends Pick<UniSatA.Provider, "on" | "removeListener" | "signMessage">,
+    Partial<Omit<UniSatA.Provider, "on" | "removeListener" | "signMessage">> {
   connect?(): Promise<{
     address: string;
     publicKey: string;
@@ -37,7 +39,6 @@ export interface NostrProvider extends Nip07A.Provider {
 
 /**
  * Interface representing a method to add event listeners to the provider.
- * @interface
  */
 export interface NostrOnMethod {
   /**

@@ -3,6 +3,9 @@ import { BytesLike, bytesFrom } from "../bytes/index.js";
 import { Hex, hexFrom } from "../hex/index.js";
 import { Hasher } from "./hasher.js";
 
+/**
+ * @public
+ */
 export class HasherKeecak256 implements Hasher {
   private readonly hasher: ReturnType<(typeof keccak_256)["create"]>;
 

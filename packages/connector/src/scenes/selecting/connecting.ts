@@ -1,6 +1,6 @@
 import { ccc } from "@ckb-ccc/ccc";
 import { html } from "lit";
-import { RETRY_SVG } from "../../assets/retry.svg";
+import { RETRY_SVG } from "../../assets/retry.svg.js";
 
 export function generateConnectingScene(
   wallet: ccc.WalletWithSigners,

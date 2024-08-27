@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://ckbccc-demo.vercel.app/">
+  <a href="https://app.ckbccc.com/">
     <img alt="Logo" src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/logo.svg" width="20%" />
   </a>
 </p>
@@ -14,9 +14,12 @@
   /></a>
   <img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/m/ckb-ecofund/ccc" />
   <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/ckb-ecofund/ccc/master" />
-  <img alt="GitHub deployments" src="https://img.shields.io/github/deployments/ckb-ecofund/ccc/production" />
-  <a href="https://ckbccc-demo.vercel.app/"><img
-    alt="Demo" src="https://img.shields.io/website?url=https%3A%2F%2Fckbccc-demo.vercel.app%2F&label=Demo"
+  <img alt="GitHub branch check runs" src="https://img.shields.io/github/check-runs/ckb-ecofund/ccc/master" />
+  <a href="https://app.ckbccc.com/"><img
+    alt="App" src="https://img.shields.io/website?url=https%3A%2F%2Fapp.ckbccc.com%2F&label=App"
+  /></a>
+  <a href="https://docs.ckbccc.com/"><img
+    alt="Docs" src="https://img.shields.io/website?url=https%3A%2F%2Fdocs.ckbccc.com%2F&label=Docs"
   /></a>
 </p>
 
@@ -33,12 +36,12 @@
 ## Preview
 
 <p align="center">
-  <a href="https://ckbccc-demo.vercel.app/">
+  <a href="https://app.ckbccc.com/">
     <img src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/preview.png" width="30%" />
   </a>
 </p>
 
-This project is still under active development, and we are looking forward to your feedback. [Try its demo now here](https://ckbccc-demo.vercel.app/). It showcases how to use CCC for some basic scenarios in CKB.
+This project is still under active development, and we are looking forward to your feedback. [Try its demo now here](https://app.ckbccc.com/). It showcases how to use CCC for some basic scenarios in CKB.
 
 ## Transaction Composing
 
@@ -58,7 +61,7 @@ await tx.completeFeeBy(signer, 1000); // Transaction fee rate
 const txHash = await signer.sendTransaction(tx);
 ```
 
-We have done everything! Check [the demo source code](./packages/demo) for complete examples.
+We have done everything!
 
 ## Installing
 
@@ -75,7 +78,31 @@ CCC exports everything on the `ccc` object:
 import { ccc } from "@ckb-ccc/<package-name>";
 ```
 
+For advanced developers, we provided the `cccA` object to fulfil all your needs. You should notice that these interfaces are not stable:
+
+```typescript
+import { cccA } from "@ckb-ccc/<package-name>/advanced";
+```
+
+## Documents
+
+Check our [full documents for all detailed APIs](https://docs.ckbccc.com).
+
+[The demo source code](https://github.com/ckb-ecofund/ccc/tree/master/packages/demo) contains some basic examples:
+
+- [Sign and verify any message.](<https://github.com/ckb-ecofund/ccc/tree/master/packages/demo/src/app/connected/(tools)/Sign/page.tsx>)
+- [Transfer native CKB token.](<https://github.com/ckb-ecofund/ccc/tree/master/packages/demo/src/app/connected/(tools)/Transfer/page.tsx>)
+- [Transfer xUDT token.](<https://github.com/ckb-ecofund/ccc/tree/master/packages/demo/src/app/connected/(tools)/TransferXUdt/page.tsx>)
+- See [Misc: Single-Use-Seals](https://talk.nervos.org/t/en-cn-misc-single-use-seals/8279) to learn how token issuing works in the cell model.
+  - [Issue xUDT token with the Single-Use Lock.](<https://github.com/ckb-ecofund/ccc/tree/master/packages/demo/src/app/connected/(tools)/IssueXUdtSus/page.tsx>)
+  - [Issue xUDT token controlled by a Type ID cell.](<https://github.com/ckb-ecofund/ccc/tree/master/packages/demo/src/app/connected/(tools)/IssueXUdtTypeId/page.tsx>)
+- [Calculate the CKB hash of any messages.](<https://github.com/ckb-ecofund/ccc/tree/master/packages/demo/src/app/utils/(tools)/Hash/page.tsx>)
+- [Generate mnemonic and keypairs. Encrypt to a keystore.](<https://github.com/ckb-ecofund/ccc/tree/master/packages/demo/src/app/utils/(tools)/Mnemonic/page.tsx>)
+- [Decrypt a keystore.](<https://github.com/ckb-ecofund/ccc/tree/master/packages/demo/src/app/utils/(tools)/Keystore/page.tsx>)
+- [Transfer the native CKB token with the old Lumos SDK.](<https://github.com/ckb-ecofund/ccc/tree/master/packages/demo/src/app/connected/(tools)/TransferLumos/page.tsx>)
+
 ## Build and Run
+
 Run the demo of CCC in two steps:
 
 1. Install packages and build the project
@@ -85,6 +112,7 @@ Run the demo of CCC in two steps:
 pnpm install
 pnpm build
 ```
+
 2. Run the demo in development mode
 
 ```shell
@@ -93,14 +121,13 @@ cd packages/demo
 pnpm run dev
 ```
 
-
 ## Who uses CCC?
 
-| [<img height="50" src="./assets/projects/utxoswap.svg" />](https://utxoswap.xyz/) | [<img height="50" src="./assets/projects/mobit.png" />](https://mobit.app/) | [<img height="50" src="./assets/projects/did.png" />](https://d.id/) | [<img height="50" src="./assets/projects/omiga.svg" />](https://omiga.io/) |
-| --------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | -------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| [<img height="50" src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/projects/utxoswap.svg" />](https://utxoswap.xyz/) | [<img height="50" src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/projects/mobit.svg" />](https://mobit.app/) | [<img height="50" src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/projects/did.svg" />](https://d.id/) | [<img height="50" src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/projects/omiga.svg" />](https://omiga.io/) |
+| ---------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
 
-| [<img height="50" src="./assets/projects/nervape.svg" />](https://www.nervape.com/) | [<img height="50" src="./assets/projects/utxoglobal.svg" />](https://utxo.global/) | [<img height="50" src="./assets/projects/boolnetwork.svg" />](https://bool.network/) | [<img height="50" src="./assets/projects/joydao.svg" />](https://joydao.cc/) | [<img height="50" src="./assets/projects/world3.svg" />](https://world3.ai/) |
-| ----------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| [<img height="50" src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/projects/nervape.svg" />](https://www.nervape.com/) | [<img height="50" src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/projects/utxoglobal.svg" />](https://utxo.global/) | [<img height="50" src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/projects/boolnetwork.svg" />](https://bool.network/) | [<img height="50" src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/projects/joydao.svg" />](https://joydao.cc/) | [<img height="50" src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/projects/world3.svg" />](https://world3.ai/) |
+| ------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
 
 ## FAQs
 
@@ -116,6 +143,7 @@ While we recommend using CCC for composing transactions, we also provide Lumos p
 
 - Support the JoyID Wallet.
 - Support the Nostr Wallet.
+- Support the Portal Wallet.
 
 See [lumos-patches](https://www.npmjs.com/package/@ckb-ccc/lumos-patches): `npm install @ckb-ccc/lumos-patches`
 

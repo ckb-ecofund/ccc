@@ -1,5 +1,6 @@
 /**
  * Represents the possible encoding formats for converting bytes.
+ * @public
  */
 export type BytesFromEncoding =
   | "utf8" // UTF-8 encoding

@@ -2,7 +2,6 @@ import {
   Cell,
   CellDep,
   CellDepLike,
-  CellLike,
   OutPoint,
   OutPointLike,
   Script,
@@ -14,7 +13,8 @@ import { Zero } from "../fixedPoint/index.js";
 import { Hex, HexLike, hexFrom } from "../hex/index.js";
 import { Num, NumLike, numFrom } from "../num/index.js";
 import { apply, reduceAsync } from "../utils/index.js";
-import { filterCell } from "./client.advanced.js";
+import { ClientCache } from "./cache/index.js";
+import { ClientCacheMemory } from "./cache/memory.js";
 import { ClientCollectableSearchKeyLike } from "./clientTypes.advanced.js";
 import {
   ClientBlock,
@@ -28,6 +28,9 @@ import {
   OutputsValidator,
 } from "./clientTypes.js";
 
+/**
+ * @public
+ */
 export enum KnownScript {
   Secp256k1Blake160 = "Secp256k1Blake160",
   Secp256k1Multisig = "Secp256k1Multisig",
@@ -44,11 +47,17 @@ export enum KnownScript {
   OutputTypeProxyLock = "OutputTypeProxyLock",
 }
 
+/**
+ * @public
+ */
 export type CellDepInfoLike = {
   cellDep: CellDepLike;
   type?: ScriptLike | null;
 };
 
+/**
+ * @public
+ */
 export class CellDepInfo {
   constructor(
     public cellDep: CellDep,
@@ -63,11 +72,15 @@ export class CellDepInfo {
   }
 }
 
+/**
+ * @public
+ */
 export abstract class Client {
-  private readonly cachedTransactions: Transaction[] = [];
-  private readonly unusableOutPoints: OutPoint[] = [];
-  private readonly usableCells: Cell[] = [];
-  private readonly knownCells: Cell[] = [];
+  public cache: ClientCache;
+
+  constructor(config?: { cache?: ClientCache }) {
+    this.cache = config?.cache ?? new ClientCacheMemory();
+  }
 
   abstract get url(): string;
   abstract get addressPrefix(): string;
@@ -90,27 +103,6 @@ export abstract class Client {
     withCycles?: boolean | null,
   ): Promise<ClientBlock | undefined>;
 
-  async markUsable(cellLike: CellLike): Promise<void> {
-    const cell = Cell.from(cellLike).clone();
-    this.usableCells.push(cell);
-    this.knownCells.push(cell);
-
-    const index = this.unusableOutPoints.findIndex((o) => cell.outPoint.eq(o));
-    if (index !== -1) {
-      this.unusableOutPoints.splice(index, 1);
-    }
-  }
-
-  async markUnusable(outPointLike: OutPointLike): Promise<void> {
-    const outPoint = OutPoint.from(outPointLike);
-    this.unusableOutPoints.push(outPoint.clone());
-
-    const index = this.usableCells.findIndex((c) => c.outPoint.eq(outPoint));
-    if (index !== -1) {
-      this.usableCells.splice(index, 1);
-    }
-  }
-
   abstract sendTransactionNoCache(
     transaction: TransactionLike,
     validator?: OutputsValidator,
@@ -121,10 +113,10 @@ export abstract class Client {
 
   async getCell(outPointLike: OutPointLike): Promise<Cell | undefined> {
     const outPoint = OutPoint.from(outPointLike);
-    const cached = this.knownCells.find((cell) => cell.outPoint.eq(outPoint));
+    const cached = await this.cache.getCell(outPoint);
 
     if (cached) {
-      return cached.clone();
+      return cached;
     }
 
     const transaction = await this.getTransactionNoCache(outPoint.txHash);
@@ -142,8 +134,8 @@ export abstract class Client {
       cellOutput: transaction.transaction.outputs[index],
       outputData: transaction.transaction.outputsData[index] ?? "0x",
     });
-    this.knownCells.push(cell);
-    return cell.clone();
+    await this.cache.recordCells(cell);
+    return cell;
   }
 
   abstract findCellsPagedNoCache(
@@ -159,7 +151,7 @@ export abstract class Client {
     after?: string,
   ): Promise<ClientFindCellsResponse> {
     const res = await this.findCellsPagedNoCache(key, order, limit, after);
-    this.knownCells.push(...res.cells);
+    await this.cache.recordCells(res.cells);
     return res;
   }
 
@@ -190,7 +182,7 @@ export abstract class Client {
   /**
    * Find cells by search key designed for collectable cells.
    *
-   * @param key - The search key.
+   * @param keyLike - The search key.
    * @returns A async generator for yielding cells.
    */
   async *findCellsByCollectableSearchKey(
@@ -201,18 +193,14 @@ export abstract class Client {
     const key = ClientIndexerSearchKey.from(keyLike);
     const foundedOutPoints = [];
 
-    for (const cell of this.usableCells) {
-      if (!filterCell(key, cell)) {
-        continue;
-      }
-
+    for await (const cell of this.cache.findCells(key)) {
       foundedOutPoints.push(cell.outPoint);
       yield cell;
     }
 
     for await (const cell of this.findCells(key, order, limit)) {
       if (
-        this.unusableOutPoints.some((o) => o.eq(cell.outPoint)) ||
+        (await this.cache.isUnusable(cell.outPoint)) ||
         foundedOutPoints.some((founded) => founded.eq(cell.outPoint))
       ) {
         continue;
@@ -494,22 +482,9 @@ export abstract class Client {
 
     const txHash = await this.sendTransactionNoCache(tx, validator);
 
-    this.cachedTransactions.push(tx.clone());
-    await Promise.all(
-      tx.inputs.map((i) => this.markUnusable(i.previousOutput)),
-    );
-    await Promise.all(
-      tx.outputs.map((o, i) =>
-        this.markUsable({
-          cellOutput: o,
-          outputData: tx.outputsData[i],
-          outPoint: {
-            txHash,
-            index: i,
-          },
-        }),
-      ),
-    );
+    await this.cache.recordTransactions(tx);
+    await this.cache.markTransactions(tx);
+
     return txHash;
   }
 
@@ -518,18 +493,25 @@ export abstract class Client {
   ): Promise<ClientTransactionResponse | undefined> {
     const txHash = hexFrom(txHashLike);
     const res = await this.getTransactionNoCache(txHash);
-    if (res !== null) {
+    if (res?.transaction) {
       return res;
     }
 
-    const tx = this.cachedTransactions.find((t) => t.hash() === txHash);
+    const tx = await this.cache.getTransaction(txHash);
     if (!tx) {
       return;
     }
 
+    if (!res) {
+      return {
+        transaction: tx,
+        status: "sent",
+      };
+    }
+
     return {
+      ...res,
       transaction: tx,
-      status: "proposed",
     };
   }
 }

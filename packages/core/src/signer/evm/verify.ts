@@ -1,6 +1,9 @@
 import { verifyMessage } from "ethers";
 import { BytesLike, bytesFrom } from "../../bytes/index.js";
 
+/**
+ * @public
+ */
 export function verifyMessageEvmPersonal(
   message: string | BytesLike,
   signature: string,

@@ -1,7 +1,7 @@
 import { css, html, LitElement } from "lit";
 import { customElement, property } from "lit/decorators.js";
-import { CLOSE_SVG } from "../assets/close.svg";
-import { LEFT_SVG } from "../assets/left.svg";
+import { CLOSE_SVG } from "../assets/close.svg.js";
+import { LEFT_SVG } from "../assets/left.svg.js";
 
 @customElement("ccc-dialog")
 export class Dialog extends LitElement {
@@ -69,7 +69,6 @@ export class Dialog extends LitElement {
     .header-divider {
       padding-bottom: 1rem;
       border-bottom: 1px solid var(--divider);
-      margin-bottom: 0.3rem;
     }
 
     .close,
@@ -87,11 +86,13 @@ export class Dialog extends LitElement {
     }
 
     .body {
-      padding: 0 1.3rem 1rem;
+      padding: 0.3rem 1.3rem 1rem;
       min-width: 20rem;
       display: flex;
       flex-direction: column;
       align-items: center;
+      max-height: 80vh;
+      overflow-y: auto;
     }
   `;
 }

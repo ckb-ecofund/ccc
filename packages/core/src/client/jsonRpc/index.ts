@@ -1,17 +1,21 @@
-import fetch from "cross-fetch";
-import { apply } from "../../barrel.js";
 import { TransactionLike } from "../../ckb/index.js";
 import { Hex, HexLike, hexFrom } from "../../hex/index.js";
 import { Num, NumLike, numFrom, numToHex } from "../../num/index.js";
+import { apply } from "../../utils/index.js";
+import { ClientCache } from "../cache/index.js";
 import { Client } from "../client.js";
 import {
-  ClientBlock,
   ClientFindCellsResponse,
   ClientIndexerSearchKeyLike,
   ClientTransactionResponse,
   OutputsValidator,
 } from "../clientTypes.js";
-import { JsonRpcPayload, JsonRpcTransformers } from "./advanced.js";
+import {
+  JsonRpcPayload,
+  Transport,
+  transportFromUri,
+} from "../transports/advanced.js";
+import { JsonRpcTransformers } from "./advanced.js";
 
 /**
  * Applies a transformation function to a value if the transformer is provided.
@@ -43,18 +47,22 @@ async function transform(
  */
 
 export abstract class ClientJsonRpc extends Client {
+  private readonly transport: Transport;
+
   /**
    * Creates an instance of ClientJsonRpc.
    *
-   * @param url - The URL of the JSON-RPC server.
-   * @param timeout - The timeout for requests in milliseconds, default is 30000.
+   * @param url_ - The URL of the JSON-RPC server.
+   * @param timeout - The timeout for requests in milliseconds
    */
 
   constructor(
     private readonly url_: string,
-    private readonly timeout = 30000,
+    config?: { timeout?: number; cache?: ClientCache },
   ) {
-    super();
+    super(config);
+
+    this.transport = transportFromUri(url_, config);
   }
 
   /**
@@ -84,26 +92,26 @@ export abstract class ClientJsonRpc extends Client {
    *
    * @param blockNumber - The block number.
    * @param verbosity - result format which allows 0 and 2. (Optional, the default is 2.)
-   * @param with_cycles - whether the return cycles of block transactions. (Optional, default false.)
+   * @param withCycles - whether the return cycles of block transactions. (Optional, default false.)
    * @returns Block
    */
   getBlockByNumber = this.buildSender(
     "get_block_by_number",
     [(v: NumLike) => numToHex(numFrom(v))],
     (b) => apply(JsonRpcTransformers.blockTo, b),
-  ) as () => Promise<ClientBlock | undefined>;
+  ) as Client["getBlockByNumber"];
 
   /**
    * Get block by block hash
    *
    * @param blockHash - The block hash.
    * @param verbosity - result format which allows 0 and 2. (Optional, the default is 2.)
-   * @param with_cycles - whether the return cycles of block transactions. (Optional, default false.)
+   * @param withCycles - whether the return cycles of block transactions. (Optional, default false.)
    * @returns Block
    */
   getBlockByHash = this.buildSender("get_block", [hexFrom], (b) =>
     apply(JsonRpcTransformers.blockTo, b),
-  ) as () => Promise<ClientBlock | undefined>;
+  ) as Client["getBlockByHash"];
 
   /**
    * Send a transaction to node.
@@ -233,22 +241,8 @@ export abstract class ClientJsonRpc extends Client {
    *
    * @throws Will throw an error if the response ID does not match the request ID, or if the response contains an error.
    */
-
   async send(payload: JsonRpcPayload): Promise<unknown> {
-    const aborter = new AbortController();
-    const abortTimer = setTimeout(() => aborter.abort(), this.timeout);
-
-    const raw = await fetch(this.url, {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-      },
-      body: JSON.stringify(payload),
-      signal: aborter.signal,
-    });
-    clearTimeout(abortTimer);
-
-    const res = (await raw.json()) as {
+    const res = (await this.transport.request(payload)) as {
       id: number;
       error: unknown;
       result: unknown;

@@ -19,7 +19,7 @@ import {
   depTypeFrom,
   hashTypeFrom,
 } from "../../ckb/index.js";
-import { Hex } from "../../hex/index.js";
+import { Hex, HexLike, hexFrom } from "../../hex/index.js";
 import { NumLike, numFrom, numToHex } from "../../num/index.js";
 import { apply } from "../../utils/index.js";
 import {
@@ -172,10 +172,18 @@ export class JsonRpcTransformers {
     });
   }
   static transactionResponseTo({
-    tx_status: { status },
+    cycles,
+    tx_status: { status, block_number, block_hash, tx_index, reason },
     transaction,
   }: {
-    tx_status: { status: TransactionStatus };
+    cycles?: NumLike;
+    tx_status: {
+      status: TransactionStatus;
+      block_hash?: HexLike;
+      tx_index?: NumLike;
+      block_number?: NumLike;
+      reason?: string;
+    };
     transaction: JsonRpcTransaction | null;
   }): ClientTransactionResponse | undefined {
     if (transaction == null) {
@@ -185,6 +193,11 @@ export class JsonRpcTransformers {
     return {
       transaction: JsonRpcTransformers.transactionTo(transaction),
       status,
+      cycles: apply(numFrom, cycles),
+      blockHash: apply(hexFrom, block_hash),
+      blockNumber: apply(numFrom, block_number),
+      txIndex: apply(numFrom, tx_index),
+      reason,
     };
   }
   static blockHeaderTo(header: JsonRpcBlockHeader): ClientBlockHeader {

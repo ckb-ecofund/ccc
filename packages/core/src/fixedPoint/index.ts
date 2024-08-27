@@ -1,5 +1,6 @@
 /**
  * Represents a fixed point value as a bigint.
+ * @public
  */
 
 export type FixedPoint = bigint;
@@ -7,12 +8,14 @@ export type FixedPoint = bigint;
 /**
  * Represents a value that can be converted to a fixed point value.
  * It can be a bigint, string, or number.
+ * @public
  */
 
 export type FixedPointLike = bigint | string | number;
 
 /**
  * Converts a FixedPointLike value to its string representation with fixed-point decimals.
+ * @public
  *
  * @param val - The value to convert, which can be a bigint, string, or number.
  * @param decimals - The number of decimal places for the fixed-point representation. Default is 8.
@@ -43,6 +46,7 @@ export function fixedPointToString(val: FixedPointLike, decimals = 8): string {
 
 /**
  * Converts a FixedPointLike value to a FixedPoint (bigint) with fixed-point decimals.
+ * @public
  *
  * @param val - The value to convert, which can be a bigint, string, or number.
  * @param decimals - The number of decimal places for the fixed-point representation. Default is 8.
@@ -74,6 +78,7 @@ export function fixedPointFrom(val: FixedPointLike, decimals = 8): FixedPoint {
 
 /**
  * Represents the fixed point value of zero as a bigint.
+ * @public
  */
 
 export const Zero: FixedPoint = 0n;
@@ -81,6 +86,7 @@ export const Zero: FixedPoint = 0n;
 /**
  * Represents the fixed point value of one as a FixedPoint (bigint).
  * Equivalent to 1 in fixed-point representation with default decimals (8).
+ * @public
  */
 
 export const One: FixedPoint = fixedPointFrom("1");

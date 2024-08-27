@@ -1,5 +1,6 @@
 /**
  * A type safe way to apply a transformer on a value if it's not empty.
+ * @public
  *
  * @param transformer - The transformer.
  * @param value - The value to be transformed.
@@ -11,6 +12,7 @@ export function apply<T, R>(
 ): undefined;
 /**
  * A type safe way to apply a transformer on a value if it's not empty.
+ * @public
  *
  * @param transformer - The transformer.
  * @param value - The value to be transformed.
@@ -19,6 +21,7 @@ export function apply<T, R>(
 export function apply<T, R>(transformer: (val: T) => R, value: null): undefined;
 /**
  * A type safe way to apply a transformer on a value if it's not empty.
+ * @public
  *
  * @param transformer - The transformer.
  * @param value - The value to be transformed.
@@ -27,6 +30,7 @@ export function apply<T, R>(transformer: (val: T) => R, value: null): undefined;
 export function apply<T, R>(transformer: (val: T) => R, value: T): R;
 /**
  * A type safe way to apply a transformer on a value if it's not empty.
+ * @public
  *
  * @param transformer - The transformer.
  * @param value - The value to be transformed.
@@ -38,6 +42,7 @@ export function apply<T, R>(
 ): R | undefined;
 /**
  * A type safe way to apply a transformer on a value if it's not empty.
+ * @public
  *
  * @param transformer - The transformer.
  * @param value - The value to be transformed.
@@ -49,6 +54,7 @@ export function apply<T, R>(
 ): R | undefined;
 /**
  * A type safe way to apply a transformer on a value if it's not empty.
+ * @public
  *
  * @param transformer - The transformer.
  * @param value - The value to be transformed.
@@ -61,6 +67,7 @@ export function apply<T, R>(
 /**
 /**
  * A type safe way to apply a transformer on a value if it's not empty.
+ * @public
  *
  * @param transformer - The transformer.
  * @param value - The value to be transformed.
@@ -72,6 +79,7 @@ export function apply<T, R>(
 ): R | undefined;
 /**
  * A type safe way to apply a transformer on a value if it's not empty.
+ * @public
  *
  * @param transformer - The transformer.
  * @param value - The value to be transformed.
@@ -90,6 +98,7 @@ export function apply<T, R>(
 
 /**
  * Similar to Array.reduce, but the accumulator can returns Promise.
+ * @public
  *
  * @param values - The array to be reduced.
  * @param accumulator - A callback to be called for each value. If it returns null, the previous result will be kept.
@@ -104,6 +113,7 @@ export async function reduceAsync<T, V>(
 ): Promise<T>;
 /**
  * Similar to Array.reduce, but the accumulator can returns Promise.
+ * @public
  *
  * @param values - The array to be reduced.
  * @param accumulator - A callback to be called for each value. If it returns null, the previous result will be kept.
@@ -120,6 +130,15 @@ export async function reduceAsync<T, V>(
   ) => Promise<T | undefined | null | void> | T | undefined | null | void,
   init: T | Promise<T>,
 ): Promise<T>;
+/**
+ * Similar to Array.reduce, but the accumulator can returns Promise.
+ * @public
+ *
+ * @param values - The array to be reduced.
+ * @param accumulator - A callback to be called for each value. If it returns null, the previous result will be kept.
+ * @param init - The initial value.
+ * @returns The accumulated result.
+ */
 export async function reduceAsync<T, V>(
   values: (V | T)[],
   accumulator: (
@@ -147,6 +166,9 @@ export async function reduceAsync<T, V>(
   );
 }
 
+/**
+ * @public
+ */
 export function isWebview(userAgent: string): boolean {
   return /webview|wv|ip((?!.*Safari)|(?=.*like Safari))/i.test(userAgent);
 }
