@@ -1,5 +1,14 @@
 # @ckb-ccc/connector
 
+## 0.0.13-alpha.4
+
+### Patch Changes
+
+- [`3658797`](https://github.com/ckb-ecofund/ccc/commit/3658797e67c42c56b20fa66481d0455ed019e69f) Thanks [@Hanssen0](https://github.com/Hanssen0)! - feat(core): node.js websocket
+
+- Updated dependencies [[`3658797`](https://github.com/ckb-ecofund/ccc/commit/3658797e67c42c56b20fa66481d0455ed019e69f)]:
+  - @ckb-ccc/ccc@0.0.13-alpha.4
+
 ## 0.0.13-alpha.3
 
 ### Patch Changes
