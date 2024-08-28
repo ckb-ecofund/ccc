@@ -66,6 +66,8 @@
     "bitcoinjs-message": "^2.2.0",
     "buffer": "^6.0.3",
     "cross-fetch": "^4.0.0",
-    "ethers": "^6.13.1"
+    "ethers": "^6.13.1",
+    "isomorphic-ws": "^5.0.0",
+    "ws": "^8.18.0"
   }
 }

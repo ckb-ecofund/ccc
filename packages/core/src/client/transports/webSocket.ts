@@ -1,3 +1,4 @@
+import WebSocket from "isomorphic-ws";
 import { JsonRpcPayload, Transport } from "./transport.js";
 
 export class TransportWebSocket implements Transport {

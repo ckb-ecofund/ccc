@@ -1,3 +1,4 @@
+import WebSocket from "isomorphic-ws";
 import { Script } from "../ckb/index.js";
 import { ClientCache } from "./cache/index.js";
 import { CellDepInfo, KnownScript } from "./client.js";
