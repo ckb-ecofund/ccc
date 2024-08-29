@@ -1564,6 +1564,7 @@ export class Transaction {
           fulfilled = true;
           break;
         }
+        acc = next;
       }
       if (fulfilled) {
         break;
