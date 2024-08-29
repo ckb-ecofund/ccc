@@ -57,7 +57,12 @@ export default function TransferLumos() {
               const fromAddresses = await signer.getAddresses();
               // === Composing transaction with Lumos ===
               registerCustomLockScriptInfos(generateDefaultScriptInfos());
-              const indexer = new Indexer(signer.client.url);
+              const indexer = new Indexer(
+                signer.client.url
+                  .replace("wss://", "https://")
+                  .replace("ws://", "http://")
+                  .replace(new RegExp("/ws/?$"), "/"),
+              );
               let txSkeleton = new TransactionSkeleton({
                 cellProvider: indexer,
               });
