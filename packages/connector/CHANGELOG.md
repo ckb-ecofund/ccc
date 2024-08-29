@@ -1,5 +1,16 @@
 # @ckb-ccc/connector
 
+## 0.0.13-alpha.7
+
+### Patch Changes
+
+- [`079e20e`](https://github.com/ckb-ecofund/ccc/commit/079e20ef14cf9a7c06bbaddf3e92cbfbb005da11) Thanks [@Hanssen0](https://github.com/Hanssen0)! - feat(core): more APIs. Since parsing.
+
+- [`ed154d1`](https://github.com/ckb-ecofund/ccc/commit/ed154d189e239907ad686ec51ac8133b6d5eb895) Thanks [@Hanssen0](https://github.com/Hanssen0)! - feat(core): Signer.findCells
+
+- Updated dependencies [[`079e20e`](https://github.com/ckb-ecofund/ccc/commit/079e20ef14cf9a7c06bbaddf3e92cbfbb005da11), [`ed154d1`](https://github.com/ckb-ecofund/ccc/commit/ed154d189e239907ad686ec51ac8133b6d5eb895)]:
+  - @ckb-ccc/ccc@0.0.13-alpha.7
+
 ## 0.0.13-alpha.6
 
 ### Patch Changes
