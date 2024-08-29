@@ -104,7 +104,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         title,
         msgs.map((msg, i) => (
           <React.Fragment key={i}>
-            {i === 0 ? " " : ""}
+            {i === 0 ? "" : " "}
             {msg}
           </React.Fragment>
         )),

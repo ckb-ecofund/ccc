@@ -12,9 +12,9 @@ import { ClientCache } from "./cache.js";
 import { filterCell } from "./memory.advanced.js";
 
 export class ClientCacheMemory implements ClientCache {
-  private readonly cachedTransactions: Transaction[] = [];
   private readonly unusableOutPoints: OutPoint[] = [];
   private readonly usableCells: Cell[] = [];
+  private readonly knownTransactions: Transaction[] = [];
   private readonly knownCells: Cell[] = [];
 
   async markUsable(...cellLikes: (CellLike | CellLike[])[]): Promise<void> {
@@ -73,29 +73,6 @@ export class ClientCacheMemory implements ClientCache {
     );
   }
 
-  async isUnusable(outPointLike: OutPointLike): Promise<boolean> {
-    const outPoint = OutPoint.from(outPointLike);
-    return this.unusableOutPoints.find((o) => o.eq(outPoint)) !== undefined;
-  }
-
-  async recordTransactions(
-    ...transactions: (TransactionLike | TransactionLike[])[]
-  ): Promise<void> {
-    this.cachedTransactions.push(...transactions.flat().map(Transaction.from));
-  }
-  async getTransaction(txHashLike: HexLike): Promise<Transaction | undefined> {
-    const txHash = hexFrom(txHashLike);
-    return this.cachedTransactions.find((tx) => tx.hash() === txHash);
-  }
-
-  async recordCells(...cells: (CellLike | CellLike[])[]): Promise<void> {
-    this.usableCells.push(...cells.flat().map(Cell.from));
-  }
-  async getCell(outPointLike: OutPointLike): Promise<Cell | undefined> {
-    const outPoint = OutPoint.from(outPointLike);
-    return this.usableCells.find((cell) => cell.outPoint.eq(outPoint));
-  }
-
   async *findCells(
     keyLike: ClientCollectableSearchKeyLike,
   ): AsyncGenerator<Cell> {
@@ -106,5 +83,28 @@ export class ClientCacheMemory implements ClientCache {
 
       yield cell;
     }
+  }
+
+  async isUnusable(outPointLike: OutPointLike): Promise<boolean> {
+    const outPoint = OutPoint.from(outPointLike);
+    return this.unusableOutPoints.find((o) => o.eq(outPoint)) !== undefined;
+  }
+
+  async recordTransactions(
+    ...transactions: (TransactionLike | TransactionLike[])[]
+  ): Promise<void> {
+    this.knownTransactions.push(...transactions.flat().map(Transaction.from));
+  }
+  async getTransaction(txHashLike: HexLike): Promise<Transaction | undefined> {
+    const txHash = hexFrom(txHashLike);
+    return this.knownTransactions.find((tx) => tx.hash() === txHash);
+  }
+
+  async recordCells(...cells: (CellLike | CellLike[])[]): Promise<void> {
+    this.knownCells.push(...cells.flat().map(Cell.from));
+  }
+  async getCell(outPointLike: OutPointLike): Promise<Cell | undefined> {
+    const outPoint = OutPoint.from(outPointLike);
+    return this.knownCells.find((cell) => cell.outPoint.eq(outPoint));
   }
 }
