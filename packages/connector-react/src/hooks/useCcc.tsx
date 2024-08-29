@@ -37,7 +37,10 @@ class SignersControllerWithFilter extends ccc.SignersController {
     signerInfo: ccc.SignerInfo,
     context: ccc.SignersControllerRefreshContext,
   ) {
-    if (!(await this.filter?.(signerInfo, { name: walletName, icon }))) {
+    if (
+      this.filter &&
+      !(await this.filter(signerInfo, { name: walletName, icon }))
+    ) {
       return;
     }
 
