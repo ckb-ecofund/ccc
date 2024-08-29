@@ -1689,39 +1689,27 @@ export class Transaction {
     addedCount: number;
     accumulated?: T;
   }> {
-    const scripts = (await from.getAddressObjs()).map(({ script }) => script);
     const collectedCells = [];
 
     let acc: T = init;
     let fulfilled = false;
-    for (const script of scripts) {
-      for await (const cell of from.client.findCellsByCollectableSearchKey({
-        script,
-        scriptType: "lock",
-        filter,
-        scriptSearchMode: "exact",
-        withData: true,
-      })) {
-        if (
-          this.inputs.some(({ previousOutput }) =>
-            previousOutput.eq(cell.outPoint),
-          )
-        ) {
-          continue;
-        }
-        const i = collectedCells.push(cell);
-        const next = await Promise.resolve(
-          accumulator(acc, cell, i - 1, collectedCells),
-        );
-        if (next === undefined) {
-          fulfilled = true;
-          break;
-        }
-        acc = next;
+    for await (const cell of from.findCells(filter, true)) {
+      if (
+        this.inputs.some(({ previousOutput }) =>
+          previousOutput.eq(cell.outPoint),
+        )
+      ) {
+        continue;
       }
-      if (fulfilled) {
+      const i = collectedCells.push(cell);
+      const next = await Promise.resolve(
+        accumulator(acc, cell, i - 1, collectedCells),
+      );
+      if (next === undefined) {
+        fulfilled = true;
         break;
       }
+      acc = next;
     }
 
     this.inputs.push(

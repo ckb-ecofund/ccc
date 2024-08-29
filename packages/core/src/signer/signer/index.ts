@@ -1,6 +1,7 @@
 import { Address } from "../../address/index.js";
+import { ClientCollectableSearchKeyFilterLike } from "../../advancedBarrel.js";
 import { BytesLike } from "../../bytes/index.js";
-import { Transaction, TransactionLike } from "../../ckb/index.js";
+import { Cell, Transaction, TransactionLike } from "../../ckb/index.js";
 import { Client } from "../../client/index.js";
 import { Hex } from "../../hex/index.js";
 import { Num } from "../../num/index.js";
@@ -223,6 +224,24 @@ export abstract class Signer {
     return this.getAddressObjs().then((addresses) =>
       addresses.map((address) => address.toString()),
     );
+  }
+
+  async *findCells(
+    filter: ClientCollectableSearchKeyFilterLike,
+    withData?: boolean | null,
+  ): AsyncGenerator<Cell> {
+    const scripts = await this.getAddressObjs();
+    for (const { script } of scripts) {
+      for await (const cell of this.client.findCells({
+        script,
+        scriptType: "lock",
+        filter,
+        scriptSearchMode: "exact",
+        withData,
+      })) {
+        yield cell;
+      }
+    }
   }
 
   /**

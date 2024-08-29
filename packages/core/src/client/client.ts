@@ -172,7 +172,7 @@ export abstract class Client {
     return res;
   }
 
-  async *findCells(
+  async *findCellsOnChin(
     key: ClientIndexerSearchKeyLike,
     order?: "asc" | "desc",
     limit = 10,
@@ -202,7 +202,7 @@ export abstract class Client {
    * @param keyLike - The search key.
    * @returns A async generator for yielding cells.
    */
-  async *findCellsByCollectableSearchKey(
+  async *findCells(
     keyLike: ClientCollectableSearchKeyLike,
     order?: "asc" | "desc",
     limit = 10,
@@ -215,7 +215,7 @@ export abstract class Client {
       yield cell;
     }
 
-    for await (const cell of this.findCells(key, order, limit)) {
+    for await (const cell of this.findCellsOnChin(key, order, limit)) {
       if (
         (await this.cache.isUnusable(cell.outPoint)) ||
         foundedOutPoints.some((founded) => founded.eq(cell.outPoint))
@@ -234,7 +234,7 @@ export abstract class Client {
     order?: "asc" | "desc",
     limit = 10,
   ): AsyncGenerator<Cell> {
-    return this.findCellsByCollectableSearchKey(
+    return this.findCells(
       {
         script: lock,
         scriptType: "lock",
@@ -255,7 +255,7 @@ export abstract class Client {
     order?: "asc" | "desc",
     limit = 10,
   ): AsyncGenerator<Cell> {
-    return this.findCellsByCollectableSearchKey(
+    return this.findCells(
       {
         script: type,
         scriptType: "type",

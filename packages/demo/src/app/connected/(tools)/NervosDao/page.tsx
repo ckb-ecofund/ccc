@@ -9,6 +9,14 @@ import { useApp } from "@/src/context";
 import { ButtonsPanel } from "@/src/components/ButtonsPanel";
 import { BigButton } from "@/src/components/BigButton";
 
+function parseEpoch(epoch: ccc.Epoch): ccc.FixedPoint {
+  return (
+    ccc.fixedPointFrom(epoch[0].toString()) +
+    (ccc.fixedPointFrom(epoch[1].toString()) * ccc.fixedPointFrom(1)) /
+      ccc.fixedPointFrom(epoch[2].toString())
+  );
+}
+
 function getProfit(
   dao: ccc.Cell,
   depositHeader: ccc.ClientBlockHeader,
@@ -204,7 +212,7 @@ function DaoButton({ dao }: { dao: ccc.Cell }) {
               ],
               outputs: [
                 {
-                  lock: dao.cellOutput.lock,
+                  lock: (await signer.getRecommendedAddressObj()).script,
                 },
               ],
               witnesses: [
@@ -250,12 +258,14 @@ function DaoButton({ dao }: { dao: ccc.Cell }) {
         ) : undefined}
       </div>
       <div className="flex flex-col text-sm">
-        {infos ? (
+        {infos && tip ? (
           <div className="flex whitespace-nowrap">
-            {(
-              getClaimEpoch(infos[2], infos[3][1])[0] -
-              (tip?.epoch[0] ?? ccc.numFrom(0))
-            ).toString()}{" "}
+            {ccc.fixedPointToString(
+              ((parseEpoch(getClaimEpoch(infos[2], infos[3][1])) -
+                parseEpoch(tip.epoch)) /
+                ccc.fixedPointFrom("0.001")) *
+                ccc.fixedPointFrom("0.001"),
+            )}{" "}
             epoch
           </div>
         ) : undefined}
@@ -280,14 +290,9 @@ export default function Transfer() {
     }
 
     (async () => {
-      const { script } = await signer.getRecommendedAddressObj();
-
       const daos = [];
-      for await (const cell of signer.client.findCellsByCollectableSearchKey({
-        script,
-        scriptType: "lock",
-        scriptSearchMode: "exact",
-        filter: {
+      for await (const cell of signer.findCells(
+        {
           script: await ccc.Script.fromKnownScript(
             signer.client,
             ccc.KnownScript.NervosDao,
@@ -296,12 +301,11 @@ export default function Transfer() {
           scriptLenRange: [33, 34],
           outputDataLenRange: [8, 9],
         },
-        withData: true,
-      })) {
+        true,
+      )) {
         daos.push(cell);
+        setDaos(daos);
       }
-
-      setDaos(daos);
     })();
   }, [signer]);
 
