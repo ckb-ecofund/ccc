@@ -96,6 +96,7 @@ Check our [full documents for all detailed APIs](https://docs.ckbccc.com).
 - See [Misc: Single-Use-Seals](https://talk.nervos.org/t/en-cn-misc-single-use-seals/8279) to learn how token issuing works in the cell model.
   - [Issue xUDT token with the Single-Use Lock.](<https://github.com/ckb-ecofund/ccc/tree/master/packages/demo/src/app/connected/(tools)/IssueXUdtSus/page.tsx>)
   - [Issue xUDT token controlled by a Type ID cell.](<https://github.com/ckb-ecofund/ccc/tree/master/packages/demo/src/app/connected/(tools)/IssueXUdtTypeId/page.tsx>)
+- [Manage Nervos DAO.](<https://github.com/ckb-ecofund/ccc/tree/master/packages/demo/src/app/connected/(tools)/NervosDao/page.tsx>)
 - [Calculate the CKB hash of any messages.](<https://github.com/ckb-ecofund/ccc/tree/master/packages/demo/src/app/utils/(tools)/Hash/page.tsx>)
 - [Generate mnemonic and keypairs. Encrypt to a keystore.](<https://github.com/ckb-ecofund/ccc/tree/master/packages/demo/src/app/utils/(tools)/Mnemonic/page.tsx>)
 - [Decrypt a keystore.](<https://github.com/ckb-ecofund/ccc/tree/master/packages/demo/src/app/utils/(tools)/Keystore/page.tsx>)
