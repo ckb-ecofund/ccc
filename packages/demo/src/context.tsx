@@ -131,6 +131,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener("unhandledrejection", handler);
   }, [setMessages]);
 
+  useEffect(() => {
+    const handler = signer?.onReplaced(() => {
+      window.location.reload();
+    });
+    return () => handler?.();
+  }, [signer]);
+
   return (
     <APP_CONTEXT.Provider
       value={{

@@ -78,11 +78,15 @@ export abstract class Signer {
     return this.client_;
   }
 
+  set client(client: Client) {
+    this.client_ = client;
+  }
+
   // Returns the preference if we need to switch network
   // undefined otherwise
   matchNetworkPreference(
     preferences: NetworkPreference[],
-    currentNetwork: string,
+    currentNetwork: string | undefined,
   ): NetworkPreference | undefined {
     if (
       preferences.some(({ signerType, addressPrefix, network }) => {
