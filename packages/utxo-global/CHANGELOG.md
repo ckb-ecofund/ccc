@@ -1,5 +1,14 @@
 # @ckb-ccc/utxo-global
 
+## 0.0.13-alpha.5
+
+### Patch Changes
+
+- [`6d62032`](https://github.com/ckb-ecofund/ccc/commit/6d620326f42f8c48eff9deb95578cf28d7bf5c97) Thanks [@Hanssen0](https://github.com/Hanssen0)! - fix(core): recordCells should not add usableCells
+
+- Updated dependencies [[`6d62032`](https://github.com/ckb-ecofund/ccc/commit/6d620326f42f8c48eff9deb95578cf28d7bf5c97)]:
+  - @ckb-ccc/core@0.0.13-alpha.5
+
 ## 0.0.13-alpha.4
 
 ### Patch Changes
