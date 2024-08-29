@@ -1,4 +1,4 @@
-import { Cell, Script, Transaction } from "../ckb/index.js";
+import { Cell, Epoch, Script, Transaction } from "../ckb/index.js";
 import { Hex, hexFrom } from "../hex/index.js";
 import { Num, NumLike } from "../num/index.js";
 import { apply } from "../utils/index.js";
@@ -181,8 +181,28 @@ export type ClientFindTransactionsGroupedResponse = {
  */
 export type ClientBlockHeader = {
   compactTarget: Num;
-  dao: Hex;
-  epoch: Num;
+  dao: {
+    /**
+     * C_i: the total issuance up to and including block i.
+     */
+    c: Num;
+    /**
+     * AR_i: the current accumulated rate at block i.
+     * AR_j / AR_i reflects the CKByte amount if one deposit 1 CKB to Nervos DAO at block i, and withdraw at block j.
+     */
+    ar: Num;
+    /**
+     * S_i: the total unissued secondary issuance up to and including block i,
+     * including unclaimed Nervos DAO compensation and treasury funds.
+     */
+    s: Num;
+    /**
+     * U_i: the total occupied capacities currently in the blockchain up to and including block i.
+     * Occupied capacity is the sum of capacities used to store all cells.
+     */
+    u: Num;
+  };
+  epoch: Epoch;
   extraHash: Hex;
   hash: Hex;
   nonce: Num;

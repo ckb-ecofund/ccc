@@ -18,6 +18,7 @@ import { ClientCacheMemory } from "./cache/memory.js";
 import { ClientCollectableSearchKeyLike } from "./clientTypes.advanced.js";
 import {
   ClientBlock,
+  ClientBlockHeader,
   ClientFindCellsResponse,
   ClientFindTransactionsGroupedResponse,
   ClientFindTransactionsResponse,
@@ -93,6 +94,7 @@ export abstract class Client {
   >;
 
   abstract getTip(): Promise<Num>;
+  abstract getTipHeader(verbosity?: number | null): Promise<ClientBlockHeader>;
   abstract getBlockByNumber(
     blockNumber: NumLike,
     verbosity?: number | null,
@@ -103,6 +105,20 @@ export abstract class Client {
     verbosity?: number | null,
     withCycles?: boolean | null,
   ): Promise<ClientBlock | undefined>;
+  abstract getHeaderByNumber(
+    blockNumber: NumLike,
+    verbosity?: number | null,
+  ): Promise<ClientBlockHeader | undefined>;
+  abstract getHeaderByHash(
+    blockHash: HexLike,
+    verbosity?: number | null,
+  ): Promise<ClientBlockHeader | undefined>;
+
+  abstract estimateCycles(transaction: TransactionLike): Promise<Num>;
+  abstract sendTransactionDry(
+    transaction: TransactionLike,
+    validator?: OutputsValidator,
+  ): Promise<Num>;
 
   abstract sendTransactionNoCache(
     transaction: TransactionLike,

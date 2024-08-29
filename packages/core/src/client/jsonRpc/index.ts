@@ -88,7 +88,17 @@ export abstract class ClientJsonRpc extends Client {
   ) as () => Promise<Num>;
 
   /**
-   * Get block by block hash
+   * Get tip block header
+   *
+   * @param verbosity - result format which allows 0 and 1. (Optional, the default is 1.)
+   * @returns BlockHeader
+   */
+  getTipHeader = this.buildSender("get_tip_header", [], (b) =>
+    apply(JsonRpcTransformers.blockHeaderTo, b),
+  ) as Client["getTipHeader"];
+
+  /**
+   * Get block by block number
    *
    * @param blockNumber - The block number.
    * @param verbosity - result format which allows 0 and 2. (Optional, the default is 2.)
@@ -112,6 +122,56 @@ export abstract class ClientJsonRpc extends Client {
   getBlockByHash = this.buildSender("get_block", [hexFrom], (b) =>
     apply(JsonRpcTransformers.blockTo, b),
   ) as Client["getBlockByHash"];
+
+  /**
+   * Get header by block number
+   *
+   * @param blockNumber - The block number.
+   * @param verbosity - result format which allows 0 and 1. (Optional, the default is 1.)
+   * @returns BlockHeader
+   */
+  getHeaderByNumber = this.buildSender(
+    "get_header_by_number",
+    [(v: NumLike) => numToHex(numFrom(v))],
+    (b) => apply(JsonRpcTransformers.blockHeaderTo, b),
+  ) as Client["getHeaderByNumber"];
+
+  /**
+   * Get header by block hash
+   *
+   * @param blockHash - The block hash.
+   * @param verbosity - result format which allows 0 and 1. (Optional, the default is 1.)
+   * @returns BlockHeader
+   */
+  getHeaderByHash = this.buildSender("get_header", [hexFrom], (b) =>
+    apply(JsonRpcTransformers.blockHeaderTo, b),
+  ) as Client["getHeaderByHash"];
+
+  /**
+   * Estimate cycles of a transaction.
+   *
+   * @param transaction - The transaction to estimate.
+   * @returns Consumed cycles
+   */
+  estimateCycles = this.buildSender(
+    "estimate_cycles",
+    [JsonRpcTransformers.transactionFrom],
+    ({ cycles }: { cycles: NumLike }) => numFrom(cycles),
+  ) as Client["estimateCycles"];
+
+  /**
+   * Test a transaction.
+   *
+   * @param transaction - The transaction to test.
+   * @param validator - "passthrough": Disable validation. "well_known_scripts_only": Only accept well known scripts in the transaction.
+   * @returns Consumed cycles
+   */
+
+  sendTransactionDry = this.buildSender(
+    "test_tx_pool_accept",
+    [JsonRpcTransformers.transactionFrom],
+    ({ cycles }: { cycles: NumLike }) => numFrom(cycles),
+  ) as Client["sendTransactionDry"];
 
   /**
    * Send a transaction to node.

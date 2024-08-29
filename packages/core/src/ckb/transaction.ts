@@ -1,5 +1,5 @@
 import { ClientCollectableSearchKeyFilterLike } from "../advancedBarrel.js";
-import { Bytes, BytesLike, bytesFrom } from "../bytes/index.js";
+import { Bytes, BytesLike, bytesConcat, bytesFrom } from "../bytes/index.js";
 import { CellDepInfoLike, Client, KnownScript } from "../client/index.js";
 import {
   Zero,
@@ -11,8 +11,11 @@ import { Hex, HexLike, hexFrom } from "../hex/index.js";
 import {
   Num,
   NumLike,
+  numBeToBytes,
   numFrom,
   numFromBytes,
+  numLeFromBytes,
+  numLeToBytes,
   numToBytes,
   numToHex,
 } from "../num/index.js";
@@ -419,9 +422,159 @@ export class Cell {
 /**
  * @public
  */
+export type EpochLike = [NumLike, NumLike, NumLike];
+/**
+ * @public
+ */
+export type Epoch = [Num, Num, Num];
+/**
+ * @public
+ */
+export function epochFrom(epochLike: EpochLike): Epoch {
+  return [numFrom(epochLike[0]), numFrom(epochLike[1]), numFrom(epochLike[2])];
+}
+/**
+ * @public
+ */
+export function epochFromHex(hex: HexLike): Epoch {
+  const bytes = bytesFrom(hexFrom(hex));
+
+  return [
+    numFrom(bytes.slice(4, 7)),
+    numFrom(bytes.slice(2, 4)),
+    numFrom(bytes.slice(0, 2)),
+  ];
+}
+/**
+ * @public
+ */
+export function epochToHex(epochLike: EpochLike): Hex {
+  const epoch = epochFrom(epochLike);
+
+  return hexFrom(
+    bytesConcat(
+      numBeToBytes(epoch[2], 2),
+      numBeToBytes(epoch[1], 2),
+      numBeToBytes(epoch[0], 3),
+    ),
+  );
+}
+
+/**
+ * @public
+ */
+export type SinceLike =
+  | {
+      relative: "absolute" | "relative";
+      metric: "blockNumber" | "epoch" | "timestamp";
+      value: NumLike;
+    }
+  | NumLike;
+/**
+ * @public
+ */
+export class Since {
+  /**
+   * Creates an instance of Since.
+   *
+   * @param relative - Absolute or relative
+   * @param metric - The metric of since
+   * @param value - The value of since
+   */
+
+  constructor(
+    public relative: "absolute" | "relative",
+    public metric: "blockNumber" | "epoch" | "timestamp",
+    public value: Num,
+  ) {}
+
+  /**
+   * Clone a Since.
+   *
+   * @returns A cloned Since instance.
+   *
+   * @example
+   * ```typescript
+   * const since1 = since0.clone();
+   * ```
+   */
+  clone(): Since {
+    return new Since(this.relative, this.metric, this.value);
+  }
+
+  /**
+   * Creates a Since instance from a SinceLike object.
+   *
+   * @param since - A SinceLike object or an instance of Since.
+   * @returns A Since instance.
+   *
+   * @example
+   * ```typescript
+   * const since = Since.from("0x1234567812345678");
+   * ```
+   */
+  static from(since: SinceLike): Since {
+    if (since instanceof Since) {
+      return since;
+    }
+
+    if (typeof since === "object" && "relative" in since) {
+      return new Since(since.relative, since.metric, numFrom(since.value));
+    }
+
+    return Since.fromNum(since);
+  }
+
+  /**
+   * Converts the Since instance to num.
+   *
+   * @returns A num
+   *
+   * @example
+   * ```typescript
+   * const num = since.toNum();
+   * ```
+   */
+
+  toNum(): Num {
+    const flag =
+      ((this.relative === "absolute" ? 0 : 1) << 7) |
+      ({ blockNumber: 0, epoch: 1, timestamp: 2 }[this.metric] << 5);
+
+    return numFrom(bytesConcat([flag], numLeToBytes(this.value, 7)));
+  }
+
+  /**
+   * Creates a Since instance from a num-like value.
+   *
+   * @param numLike - The num-like value to convert.
+   * @returns A Since instance.
+   *
+   * @example
+   * ```typescript
+   * const since = Since.fromNum("0x0");
+   * ```
+   */
+
+  static fromNum(numLike: NumLike): Since {
+    const bytes = numBeToBytes(numLike, 8);
+
+    const relative = bytes[0] >> 7 === 0 ? "absolute" : "relative";
+    const metric = (["blockNumber", "epoch", "timestamp"] as Since["metric"][])[
+      (bytes[0] >> 5) & 3
+    ];
+    const value = numLeFromBytes(bytes.slice(1, 8));
+
+    return new Since(relative, metric, value);
+  }
+}
+
+/**
+ * @public
+ */
 export type CellInputLike = {
   previousOutput: OutPointLike;
-  since?: NumLike | null;
+  since?: SinceLike | NumLike | null;
   cellOutput?: CellOutputLike | null;
   outputData?: HexLike | null;
 };
@@ -485,7 +638,7 @@ export class CellInput {
 
     return new CellInput(
       OutPoint.from(cellInput.previousOutput),
-      numFrom(cellInput.since ?? 0),
+      Since.from(cellInput.since ?? 0).toNum(),
       apply(CellOutput.from, cellInput.cellOutput),
       apply(hexFrom, cellInput.outputData),
     );
@@ -1575,7 +1728,6 @@ export class Transaction {
       ...collectedCells.map(({ outPoint, outputData, cellOutput }) =>
         CellInput.from({
           previousOutput: outPoint,
-          since: 0,
           outputData,
           cellOutput,
         }),

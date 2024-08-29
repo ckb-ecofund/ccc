@@ -1,3 +1,4 @@
+import { bytesFrom } from "../../bytes/index.js";
 import {
   Cell,
   CellDep,
@@ -17,10 +18,11 @@ import {
   Transaction,
   TransactionLike,
   depTypeFrom,
+  epochFromHex,
   hashTypeFrom,
 } from "../../ckb/index.js";
 import { Hex, HexLike, hexFrom } from "../../hex/index.js";
-import { NumLike, numFrom, numToHex } from "../../num/index.js";
+import { NumLike, numFrom, numLeFromBytes, numToHex } from "../../num/index.js";
 import { apply } from "../../utils/index.js";
 import {
   ClientBlock,
@@ -201,10 +203,16 @@ export class JsonRpcTransformers {
     };
   }
   static blockHeaderTo(header: JsonRpcBlockHeader): ClientBlockHeader {
+    const dao = bytesFrom(header.dao);
     return {
       compactTarget: numFrom(header.compact_target),
-      dao: header.dao,
-      epoch: numFrom(header.epoch),
+      dao: {
+        c: numLeFromBytes(dao.slice(0, 8)),
+        ar: numLeFromBytes(dao.slice(8, 16)),
+        s: numLeFromBytes(dao.slice(16, 24)),
+        u: numLeFromBytes(dao.slice(24, 32)),
+      },
+      epoch: epochFromHex(header.epoch),
       extraHash: header.extra_hash,
       hash: header.hash,
       nonce: numFrom(header.nonce),
