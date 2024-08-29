@@ -1,5 +1,14 @@
 # @ckb-ccc/nip07
 
+## 0.0.13-alpha.6
+
+### Patch Changes
+
+- [`44c7fee`](https://github.com/ckb-ecofund/ccc/commit/44c7feed37369836268fba21884418682f15254b) Thanks [@Hanssen0](https://github.com/Hanssen0)! - fix(core): completeInputs
+
+- Updated dependencies [[`69c10fd`](https://github.com/ckb-ecofund/ccc/commit/69c10fdfcd507433c13b15d17015dca4687afb97), [`44c7fee`](https://github.com/ckb-ecofund/ccc/commit/44c7feed37369836268fba21884418682f15254b)]:
+  - @ckb-ccc/core@0.0.13-alpha.6
+
 ## 0.0.13-alpha.5
 
 ### Patch Changes
