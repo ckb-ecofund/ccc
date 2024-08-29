@@ -114,7 +114,7 @@ export class SignersController {
     await this.addSigners(
       "UTXO Global Wallet",
       UTXO_GLOBAL_SVG,
-      UtxoGlobal.getUtxoGlobalSigners(client),
+      UtxoGlobal.getUtxoGlobalSigners(client, preferredNetworks),
       context,
     );
 

@@ -10,6 +10,18 @@ export class SignerBtc extends ccc.SignerBtc {
   constructor(
     client: ccc.Client,
     public readonly provider: Provider,
+    private readonly preferredNetworks: ccc.NetworkPreference[] = [
+      {
+        addressPrefix: "ckb",
+        signerType: ccc.SignerType.BTC,
+        network: "btc",
+      },
+      {
+        addressPrefix: "ckt",
+        signerType: ccc.SignerType.BTC,
+        network: "btcTestnet",
+      },
+    ],
   ) {
     super(client);
   }
@@ -32,11 +44,78 @@ export class SignerBtc extends ccc.SignerBtc {
     return ccc.hexFrom(pubKey.publicKey);
   }
 
+  /**
+   * Ensure the BTC network is the same as CKB network.
+   */
+  async ensureNetwork(): Promise<void> {
+    const network = await this._getNetworkToChange();
+    if (!network) {
+      return;
+    }
+
+    const chain = {
+      btc: "btc",
+      btcTestnet: "btc_testnet",
+      btcTestnet4: "btc_testnet_4",
+      btcSignet: "btc_signet",
+    }[network];
+
+    if (chain) {
+      await this.provider.switchNetwork(chain);
+      return;
+    }
+
+    throw new Error(
+      `UTXO Global wallet doesn't support the requested chain ${network}`,
+    );
+  }
+
+  async _getNetworkToChange(): Promise<string | undefined> {
+    const currentNetwork = {
+      btc: "btc",
+      btc_testnet: "btcTestnet",
+      btc_testnet_4: "btcTestnet4",
+      btc_signet: "btcSignet",
+    }[await this.provider.getNetwork()];
+
+    const { network } = this.matchNetworkPreference(
+      this.preferredNetworks,
+      currentNetwork,
+    ) ?? { network: currentNetwork };
+
+    if (network === currentNetwork) {
+      return;
+    }
+
+    return network;
+  }
+
+  onReplaced(listener: () => void): () => void {
+    const stop: (() => void)[] = [];
+    const replacer = async () => {
+      listener();
+      stop[0]?.();
+    };
+    stop.push(() => {
+      this.provider.removeListener("accountsChanged", replacer);
+      this.provider.removeListener("networkChanged", replacer);
+    });
+
+    this.provider.on("accountsChanged", replacer);
+    this.provider.on("networkChanged", replacer);
+
+    return stop[0];
+  }
+
   async connect(): Promise<void> {
     await this.provider.connect();
+    await this.ensureNetwork();
   }
 
   async isConnected(): Promise<boolean> {
+    if ((await this._getNetworkToChange()) !== undefined) {
+      return false;
+    }
     return await this.provider.isConnected();
   }
 
