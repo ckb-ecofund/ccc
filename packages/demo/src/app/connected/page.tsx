@@ -1,14 +1,12 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import React, { ReactNode, useEffect, useState } from "react";
-import { formatString, useGetExplorerLink } from "@/src/utils";
-import { Dropdown } from "@/src/components/Dropdown";
+import React, { ReactNode, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useApp } from "@/src/context";
 import { icons } from "lucide-react";
 import { BigButton } from "@/src/components/BigButton";
 
+/* eslint-disable react/jsx-key */
 const TABS: [ReactNode, string, keyof typeof icons, string][] = [
   ["Sign", "/connected/Sign", "Signature", "text-orange-500"],
   ["Transfer", "/connected/Transfer", "ArrowLeftRight", "text-lime-500"],
@@ -21,7 +19,9 @@ const TABS: [ReactNode, string, keyof typeof icons, string][] = [
   ["Transfer xUDT", "/connected/TransferXUdt", "BadgeCent", "text-emerald-500"],
   ["Issue xUDT (SUS)", "/connected/IssueXUdtSus", "Rss", "text-sky-500"],
   [
-    "Issue xUDT (Type ID)",
+    <div className="flex flex-col">
+      Issue xUDT <span className="whitespace-nowrap">(Type ID)</span>
+    </div>,
     "/connected/IssueXUdtTypeId",
     "PencilRuler",
     "text-blue-500",
@@ -31,6 +31,7 @@ const TABS: [ReactNode, string, keyof typeof icons, string][] = [
   ["Mnemonic", "/utils/Mnemonic", "SquareAsterisk", "text-fuchsia-500"],
   ["Keystore", "/utils/Keystore", "Notebook", "text-rose-500"],
 ];
+/* eslint-enable react/jsx-key */
 
 export default function Page() {
   const router = useRouter();
