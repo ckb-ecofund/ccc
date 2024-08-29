@@ -254,4 +254,21 @@ export const MAINNET_SCRIPTS: Record<
       },
     ],
   },
+  [KnownScript.NervosDao]: {
+    codeHash:
+      "0x82d76d1b75fe2fd9a27dfbaa65a039221a380d76c926f378d3f81cf3e7e13f2e",
+    hashType: "type",
+    cellDeps: [
+      {
+        cellDep: {
+          outPoint: {
+            txHash:
+              "0xe2fb199810d49a4d8beec56718ba2593b665db9d52299a0f9e6e75416d73ff5c",
+            index: 2,
+          },
+          depType: "code",
+        },
+      },
+    ],
+  },
 });

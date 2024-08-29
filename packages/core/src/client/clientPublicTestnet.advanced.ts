@@ -265,4 +265,21 @@ export const TESTNET_SCRIPTS: Record<
       },
     ],
   },
+  [KnownScript.NervosDao]: {
+    codeHash:
+      "0x82d76d1b75fe2fd9a27dfbaa65a039221a380d76c926f378d3f81cf3e7e13f2e",
+    hashType: "type",
+    cellDeps: [
+      {
+        cellDep: {
+          outPoint: {
+            txHash:
+              "0x8f8c79eb6671709633fe6a46de93c0fedc9c1b8a6527a18d3983879542635c9f",
+            index: 2,
+          },
+          depType: "code",
+        },
+      },
+    ],
+  },
 });
