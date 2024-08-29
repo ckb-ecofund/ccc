@@ -60,18 +60,13 @@ function DaoButton({ dao }: { dao: ccc.Cell }) {
 
   const { explorerTransaction } = useGetExplorerLink();
 
+  const [tip, setTip] = useState<ccc.ClientBlockHeader | undefined>();
   const [infos, setInfos] = useState<
     | [
         ccc.Num,
         ccc.ClientTransactionResponse,
-        (
-          | undefined
-          | [
-              ccc.ClientTransactionResponse,
-              ccc.ClientBlockHeader,
-              ccc.ClientBlockHeader,
-            ]
-        ),
+        ccc.ClientBlockHeader,
+        [undefined | ccc.ClientTransactionResponse, ccc.ClientBlockHeader],
       ]
     | undefined
   >();
@@ -83,6 +78,9 @@ function DaoButton({ dao }: { dao: ccc.Cell }) {
     }
 
     (async () => {
+      const tipHeader = await signer.client.getTipHeader();
+      setTip(tipHeader);
+
       const previousTx = await signer.client.getTransaction(
         dao.outPoint.txHash,
       );
@@ -117,19 +115,20 @@ function DaoButton({ dao }: { dao: ccc.Cell }) {
         }
         return [
           getProfit(dao, depositHeader, previousHeader),
-          previousTx,
-          [depositTx, depositHeader, previousHeader],
+          depositTx,
+          depositHeader,
+          [previousTx, previousHeader],
         ];
       })();
 
       if (claimInfo) {
         setInfos(claimInfo);
       } else {
-        const tipHeader = await signer.client.getTipHeader();
         setInfos([
           getProfit(dao, previousHeader, tipHeader),
           previousTx,
-          undefined,
+          previousHeader,
+          [undefined, tipHeader],
         ]);
       }
     })();
@@ -146,15 +145,15 @@ function DaoButton({ dao }: { dao: ccc.Cell }) {
         }
 
         (async () => {
-          const [profit, previousTx] = infos;
-          if (!previousTx.blockHash || !previousTx.blockNumber) {
+          const [profit, depositTx, depositHeader] = infos;
+          if (!depositTx.blockHash || !depositTx.blockNumber) {
             error(
               "Unexpected empty block info for",
               explorerTransaction(dao.outPoint.txHash),
             );
             return;
           }
-          const { blockHash, blockNumber } = previousTx;
+          const { blockHash, blockNumber } = depositTx;
 
           let tx;
           if (isNew) {
@@ -173,18 +172,22 @@ function DaoButton({ dao }: { dao: ccc.Cell }) {
             await tx.completeInputsByCapacity(signer);
             await tx.completeFeeBy(signer, 1000);
           } else {
-            if (!infos[2]) {
+            if (!infos[3]) {
               error("Unexpected no found deposit info");
               return;
             }
-            const [depositTx, depositHeader, withdrawHeader] = infos[2];
+            const [withdrawTx, withdrawHeader] = infos[3];
+            if (!withdrawTx?.blockHash) {
+              error("Unexpected empty withdraw tx block info");
+              return;
+            }
             if (!depositTx.blockHash) {
-              error("Unexpected empty deposit tx block info for");
+              error("Unexpected empty deposit tx block info");
               return;
             }
 
             tx = ccc.Transaction.from({
-              headerDeps: [blockHash, depositTx.blockHash],
+              headerDeps: [withdrawTx.blockHash, blockHash],
               inputs: [
                 {
                   previousOutput: dao.outPoint,
@@ -230,10 +233,12 @@ function DaoButton({ dao }: { dao: ccc.Cell }) {
       className={`align-center ${isNew ? "text-yellow-400" : "text-orange-400"}`}
     >
       <div className="text-md flex flex-col">
-        {ccc.fixedPointToString(
-          (dao.cellOutput.capacity / ccc.fixedPointFrom("0.01")) *
-            ccc.fixedPointFrom("0.01"),
-        )}
+        <span>
+          {ccc.fixedPointToString(
+            (dao.cellOutput.capacity / ccc.fixedPointFrom("0.01")) *
+              ccc.fixedPointFrom("0.01"),
+          )}
+        </span>
         {infos ? (
           <span className="-mt-1 text-sm">
             +
@@ -244,7 +249,18 @@ function DaoButton({ dao }: { dao: ccc.Cell }) {
           </span>
         ) : undefined}
       </div>
-      <span className="text-sm">{isNew ? "Withdraw" : "Claim"}</span>
+      <div className="flex flex-col text-sm">
+        {infos ? (
+          <div className="flex whitespace-nowrap">
+            {(
+              getClaimEpoch(infos[2], infos[3][1])[0] -
+              (tip?.epoch[0] ?? ccc.numFrom(0))
+            ).toString()}{" "}
+            epoch
+          </div>
+        ) : undefined}
+        <span>{isNew ? "Withdraw" : "Claim"}</span>
+      </div>
     </BigButton>
   );
 }
