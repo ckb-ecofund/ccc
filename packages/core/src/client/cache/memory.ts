@@ -11,24 +11,32 @@ import { ClientCollectableSearchKeyLike } from "../clientTypes.advanced.js";
 import { ClientCache } from "./cache.js";
 import { filterCell } from "./memory.advanced.js";
 
-export class ClientCacheMemory implements ClientCache {
-  private readonly unusableOutPoints: OutPoint[] = [];
-  private readonly usableCells: Cell[] = [];
-  private readonly knownTransactions: Transaction[] = [];
-  private readonly knownCells: Cell[] = [];
+export class ClientCacheMemory extends ClientCache {
+  /**
+   * OutPoint => [isLive, Cell | OutPoint]
+   */
+  private readonly cells: Map<
+    string,
+    | [
+        false,
+        Pick<Cell, "outPoint"> &
+          Partial<Pick<Cell, "cellOutput" | "outputData">>,
+      ]
+    | [true, Cell]
+    | [undefined, Cell]
+  > = new Map();
+
+  /**
+   * TX Hash => Transaction
+   */
+  private readonly knownTransactions: Map<string, Transaction> = new Map();
 
   async markUsable(...cellLikes: (CellLike | CellLike[])[]): Promise<void> {
     cellLikes.flat().forEach((cellLike) => {
       const cell = Cell.from(cellLike).clone();
-      this.usableCells.push(cell);
-      this.knownCells.push(cell);
+      const outPointStr = hexFrom(cell.outPoint.toBytes());
 
-      const index = this.unusableOutPoints.findIndex((o) =>
-        cell.outPoint.eq(o),
-      );
-      if (index !== -1) {
-        this.unusableOutPoints.splice(index, 1);
-      }
+      this.cells.set(outPointStr, [true, cell]);
     });
   }
 
@@ -37,74 +45,68 @@ export class ClientCacheMemory implements ClientCache {
   ): Promise<void> {
     outPointLikes.flat().forEach((outPointLike) => {
       const outPoint = OutPoint.from(outPointLike);
-      this.unusableOutPoints.push(outPoint.clone());
+      const outPointStr = hexFrom(outPoint.toBytes());
 
-      const index = this.usableCells.findIndex((c) => c.outPoint.eq(outPoint));
-      if (index !== -1) {
-        this.usableCells.splice(index, 1);
+      const existed = this.cells.get(outPointStr);
+      if (existed) {
+        existed[0] = false;
+        return;
       }
+      this.cells.set(outPointStr, [false, { outPoint }]);
     });
-  }
-
-  async markTransactions(
-    ...transactionLike: (TransactionLike | TransactionLike[])[]
-  ): Promise<void> {
-    await Promise.all(
-      transactionLike.flat().map(async (transactionLike) => {
-        const tx = Transaction.from(transactionLike);
-        const txHash = tx.hash();
-
-        await Promise.all(
-          tx.inputs.map((i) => this.markUnusable(i.previousOutput)),
-        );
-        await Promise.all(
-          tx.outputs.map((o, i) =>
-            this.markUsable({
-              cellOutput: o,
-              outputData: tx.outputsData[i],
-              outPoint: {
-                txHash,
-                index: i,
-              },
-            }),
-          ),
-        );
-      }),
-    );
   }
 
   async *findCells(
     keyLike: ClientCollectableSearchKeyLike,
   ): AsyncGenerator<Cell> {
-    for (const cell of this.usableCells) {
+    for (const [isLive, cell] of this.cells.values()) {
+      if (!isLive) {
+        continue;
+      }
       if (!filterCell(keyLike, cell)) {
         continue;
       }
 
-      yield cell;
+      yield cell.clone();
+    }
+  }
+  async getCell(outPointLike: OutPointLike): Promise<Cell | undefined> {
+    const outPoint = OutPoint.from(outPointLike);
+
+    const cell = this.cells.get(hexFrom(outPoint.toBytes()))?.[1];
+    if (cell && cell.cellOutput && cell.outputData) {
+      return Cell.from((cell as Cell).clone());
     }
   }
 
   async isUnusable(outPointLike: OutPointLike): Promise<boolean> {
     const outPoint = OutPoint.from(outPointLike);
-    return this.unusableOutPoints.find((o) => o.eq(outPoint)) !== undefined;
+
+    return !(this.cells.get(hexFrom(outPoint.toBytes()))?.[0] ?? true);
   }
 
   async recordTransactions(
     ...transactions: (TransactionLike | TransactionLike[])[]
   ): Promise<void> {
-    this.knownTransactions.push(...transactions.flat().map(Transaction.from));
+    transactions.flat().map((txLike) => {
+      const tx = Transaction.from(txLike);
+      this.knownTransactions.set(tx.hash(), tx);
+    });
   }
   async getTransaction(txHashLike: HexLike): Promise<Transaction | undefined> {
     const txHash = hexFrom(txHashLike);
-    return this.knownTransactions.find((tx) => tx.hash() === txHash);
+    return this.knownTransactions.get(txHash)?.clone();
   }
 
   async recordCells(...cells: (CellLike | CellLike[])[]): Promise<void> {
-    this.knownCells.push(...cells.flat().map(Cell.from));
-  }
-  async getCell(outPointLike: OutPointLike): Promise<Cell | undefined> {
-    const outPoint = OutPoint.from(outPointLike);
-    return this.knownCells.find((cell) => cell.outPoint.eq(outPoint));
+    cells.flat().map((cellLike) => {
+      const cell = Cell.from(cellLike);
+      const outPointStr = hexFrom(cell.outPoint.toBytes());
+
+      if (this.cells.get(outPointStr)) {
+        return;
+      }
+      this.cells.set(outPointStr, [undefined, cell]);
+    });
   }
 }
