@@ -24,8 +24,8 @@ export type FixedPointLike = bigint | string | number;
  * @example
  * ```typescript
  * const str = fixedPointToString(123456789n, 8); // Outputs "1.23456789"
- * const strFromString = fixedPointToString("123456789", 8); // Outputs "1.23456789"
- * const strFromNumber = fixedPointToString(123456789, 8); // Outputs "1.23456789"
+ * const strFromString = fixedPointToString("1.23456789", 8); // Outputs "1.23456789"
+ * const strFromNumber = fixedPointToString(1.23456789, 8); // Outputs "1.23456789"
  * ```
  */
 
@@ -54,7 +54,7 @@ export function fixedPointToString(val: FixedPointLike, decimals = 8): string {
  *
  * @example
  * ```typescript
- * const fixedPoint = fixedPointFrom(1.23456789, 8); // Outputs 123456789n
+ * const fixedPoint = fixedPointFrom(123456789n, 8); // Outputs 123456789n
  * const fixedPointFromString = fixedPointFrom("1.23456789", 8); // Outputs 123456789n
  * const fixedPointFromNumber = fixedPointFrom(1.23456789, 8); // Outputs 123456789n
  * ```
