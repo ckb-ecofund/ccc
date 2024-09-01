@@ -56,6 +56,12 @@ export class ClientCacheMemory extends ClientCache {
     });
   }
 
+  async clear(): Promise<void> {
+    for (const val of this.cells.values()) {
+      val[0] = undefined;
+    }
+  }
+
   async *findCells(
     keyLike: ClientCollectableSearchKeyLike,
   ): AsyncGenerator<Cell> {

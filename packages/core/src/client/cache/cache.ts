@@ -38,32 +38,7 @@ export abstract class ClientCache {
       }),
     ]);
   }
-  async revertTransactions(
-    ...transactionLike: (TransactionLike | TransactionLike[])[]
-  ): Promise<void> {
-    await Promise.all([
-      this.recordTransactions(...transactionLike),
-      ...transactionLike.flat().map((transactionLike) => {
-        const tx = Transaction.from(transactionLike);
-        const txHash = tx.hash();
-
-        return Promise.all([
-          ...tx.inputs.map(async (i) => {
-            const cell = await this.getCell(i.previousOutput);
-            if (cell) {
-              return this.markUsable(cell);
-            }
-          }),
-          ...tx.outputs.map((_, i) =>
-            this.markUnusable({
-              txHash,
-              index: i,
-            }),
-          ),
-        ]);
-      }),
-    ]);
-  }
+  abstract clear(): Promise<void>;
   abstract findCells(
     filter: ClientCollectableSearchKeyLike,
   ): AsyncGenerator<Cell>;
