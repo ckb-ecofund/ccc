@@ -155,6 +155,27 @@ export abstract class Client {
     return cell;
   }
 
+  abstract getCellLiveNoCache(
+    outPointLike: OutPointLike,
+    withData?: boolean | null,
+    includeTxPool?: boolean | null,
+  ): Promise<Cell | undefined>;
+  async getCellLive(
+    outPointLike: OutPointLike,
+    withData?: boolean | null,
+    includeTxPool?: boolean | null,
+  ): Promise<Cell | undefined> {
+    const cell = await this.getCellLiveNoCache(
+      outPointLike,
+      withData,
+      includeTxPool,
+    );
+    if (withData && cell) {
+      await this.cache.recordCells(cell);
+    }
+    return cell;
+  }
+
   abstract findCellsPagedNoCache(
     key: ClientIndexerSearchKeyLike,
     order?: "asc" | "desc",

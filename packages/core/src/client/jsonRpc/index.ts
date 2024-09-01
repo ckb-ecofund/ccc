@@ -1,4 +1,9 @@
-import { OutPoint, TransactionLike } from "../../ckb/index.js";
+import {
+  Cell,
+  OutPoint,
+  OutPointLike,
+  TransactionLike,
+} from "../../ckb/index.js";
 import { Hex, HexLike, hexFrom } from "../../hex/index.js";
 import { Num, NumLike, numFrom, numToHex } from "../../num/index.js";
 import { apply } from "../../utils/index.js";
@@ -19,7 +24,7 @@ import {
   Transport,
   transportFromUri,
 } from "../transports/advanced.js";
-import { JsonRpcTransformers } from "./advanced.js";
+import { JsonRpcCellOutput, JsonRpcTransformers } from "./advanced.js";
 
 /**
  * Applies a transformation function to a value if the transformer is provided.
@@ -208,6 +213,48 @@ export abstract class ClientJsonRpc extends Client {
   ) as (txHash: HexLike) => Promise<ClientTransactionResponse | undefined>;
 
   /**
+   * Get a live cell from node.
+   *
+   * @param outPoint - The out point of the cell.
+   * @param withData - Include data in the response.
+   * @param includeTxPool - Include cells in the tx pool.
+   * @returns The cell
+   */
+  getCellLiveNoCache(
+    outPoint: OutPointLike,
+    withData?: boolean | null,
+    includeTxPool?: boolean | null,
+  ) {
+    return this.buildSender(
+      "get_live_cell",
+      [JsonRpcTransformers.outPointFrom],
+      ({
+        cell,
+      }: {
+        cell?: {
+          output: JsonRpcCellOutput;
+          data?: { content: HexLike; hash: HexLike };
+        };
+      }) =>
+        apply(
+          ({
+            output,
+            data,
+          }: {
+            output: JsonRpcCellOutput;
+            data?: { content: HexLike; hash: HexLike };
+          }) =>
+            Cell.from({
+              cellOutput: JsonRpcTransformers.cellOutputTo(output),
+              outputData: data?.content ?? "0x",
+              outPoint,
+            }),
+          cell,
+        ),
+    )(outPoint, withData ?? true, includeTxPool) as Promise<Cell | undefined>;
+  }
+
+  /**
    * find cells from node.
    *
    * @param key - The search key of cells.
@@ -296,7 +343,12 @@ export abstract class ClientJsonRpc extends Client {
       try {
         return transform(await this.send(payload), outTransformer);
       } catch (errAny: unknown) {
-        if (typeof errAny !== "object" || errAny === null) {
+        if (
+          typeof errAny !== "object" ||
+          errAny === null ||
+          !("data" in errAny) ||
+          typeof errAny.data !== "string"
+        ) {
           throw errAny;
         }
         const err = errAny as ErrorClientBaseLike;

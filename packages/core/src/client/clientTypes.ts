@@ -240,18 +240,16 @@ export type ClientBlock = {
 };
 
 export interface ErrorClientBaseLike {
-  message: string;
-  code: number;
+  message?: string;
+  code?: number;
   data: string;
 }
 export class ErrorClientBase extends Error {
-  public readonly message: string;
-  public readonly code: number;
+  public readonly code?: number;
   public readonly data: string;
 
   constructor(origin: ErrorClientBaseLike) {
     super(origin.message);
-    this.message = origin.message;
     this.code = origin.code;
     this.data = origin.data;
   }
