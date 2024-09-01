@@ -1,5 +1,17 @@
 # @ckb-ccc/core
 
+## 0.0.13-alpha.8
+
+### Patch Changes
+
+- [`8629449`](https://github.com/ckb-ecofund/ccc/commit/86294490e76fc2a1cee20f827883e02fceca6e8b) Thanks [@Hanssen0](https://github.com/Hanssen0)! - feat(core): ClientCache.clear
+
+  replaced ClientCache.revertTransactions
+
+- [`52156f9`](https://github.com/ckb-ecofund/ccc/commit/52156f9df9cae9e0b71b77b49cda0e4d73e76142) Thanks [@Hanssen0](https://github.com/Hanssen0)! - feat(core): ClientCache.revertTransaction
+
+- [`63606db`](https://github.com/ckb-ecofund/ccc/commit/63606db908f95bfc857430083932144d1ef4deef) Thanks [@Hanssen0](https://github.com/Hanssen0)! - feat(coree): typed errors
+
 ## 0.0.13-alpha.7
 
 ### Patch Changes

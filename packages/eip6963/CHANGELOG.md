@@ -1,5 +1,12 @@
 # @ckb-ccc/eip6963
 
+## 0.0.13-alpha.8
+
+### Patch Changes
+
+- Updated dependencies [[`8629449`](https://github.com/ckb-ecofund/ccc/commit/86294490e76fc2a1cee20f827883e02fceca6e8b), [`52156f9`](https://github.com/ckb-ecofund/ccc/commit/52156f9df9cae9e0b71b77b49cda0e4d73e76142), [`63606db`](https://github.com/ckb-ecofund/ccc/commit/63606db908f95bfc857430083932144d1ef4deef)]:
+  - @ckb-ccc/core@0.0.13-alpha.8
+
 ## 0.0.13-alpha.7
 
 ### Patch Changes
