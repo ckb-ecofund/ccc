@@ -1,5 +1,12 @@
 # @ckb-ccc/connector
 
+## 0.0.13-alpha.8
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @ckb-ccc/ccc@0.0.13-alpha.8
+
 ## 0.0.13-alpha.7
 
 ### Patch Changes
