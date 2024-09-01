@@ -1,5 +1,24 @@
 # @ckb-ccc/connector
 
+## 0.0.13
+
+### Patch Changes
+
+- [`6d62032`](https://github.com/ckb-ecofund/ccc/commit/6d620326f42f8c48eff9deb95578cf28d7bf5c97) Thanks [@Hanssen0](https://github.com/Hanssen0)! - fix(core): recordCells should not add usableCells
+
+- [`3658797`](https://github.com/ckb-ecofund/ccc/commit/3658797e67c42c56b20fa66481d0455ed019e69f) Thanks [@Hanssen0](https://github.com/Hanssen0)! - feat(core): node.js websocket
+
+- [#25](https://github.com/ckb-ecofund/ccc/pull/25) [`69c10fd`](https://github.com/ckb-ecofund/ccc/commit/69c10fdfcd507433c13b15d17015dca4687afb97) Thanks [@Hanssen0](https://github.com/Hanssen0)! - feat(utxo-global): switchNetwork
+
+- [`44c7fee`](https://github.com/ckb-ecofund/ccc/commit/44c7feed37369836268fba21884418682f15254b) Thanks [@Hanssen0](https://github.com/Hanssen0)! - fix(core): completeInputs
+
+- [`079e20e`](https://github.com/ckb-ecofund/ccc/commit/079e20ef14cf9a7c06bbaddf3e92cbfbb005da11) Thanks [@Hanssen0](https://github.com/Hanssen0)! - feat(core): more APIs. Since parsing.
+
+- [`ed154d1`](https://github.com/ckb-ecofund/ccc/commit/ed154d189e239907ad686ec51ac8133b6d5eb895) Thanks [@Hanssen0](https://github.com/Hanssen0)! - feat(core): Signer.findCells
+
+- Updated dependencies [[`6d62032`](https://github.com/ckb-ecofund/ccc/commit/6d620326f42f8c48eff9deb95578cf28d7bf5c97), [`3658797`](https://github.com/ckb-ecofund/ccc/commit/3658797e67c42c56b20fa66481d0455ed019e69f), [`69c10fd`](https://github.com/ckb-ecofund/ccc/commit/69c10fdfcd507433c13b15d17015dca4687afb97), [`44c7fee`](https://github.com/ckb-ecofund/ccc/commit/44c7feed37369836268fba21884418682f15254b), [`079e20e`](https://github.com/ckb-ecofund/ccc/commit/079e20ef14cf9a7c06bbaddf3e92cbfbb005da11), [`ed154d1`](https://github.com/ckb-ecofund/ccc/commit/ed154d189e239907ad686ec51ac8133b6d5eb895)]:
+  - @ckb-ccc/ccc@0.0.13
+
 ## 0.0.13-alpha.8
 
 ### Patch Changes
