@@ -1,4 +1,4 @@
-import { TransactionLike } from "../../ckb/index.js";
+import { OutPoint, TransactionLike } from "../../ckb/index.js";
 import { Hex, HexLike, hexFrom } from "../../hex/index.js";
 import { Num, NumLike, numFrom, numToHex } from "../../num/index.js";
 import { apply } from "../../utils/index.js";
@@ -8,6 +8,10 @@ import {
   ClientFindCellsResponse,
   ClientIndexerSearchKeyLike,
   ClientTransactionResponse,
+  ErrorClientBase,
+  ErrorClientBaseLike,
+  ErrorClientResolveUnknown,
+  ErrorClientVerification,
   OutputsValidator,
 } from "../clientTypes.js";
 import {
@@ -289,7 +293,45 @@ export abstract class ClientJsonRpc extends Client {
         ),
       );
 
-      return transform(await this.send(payload), outTransformer);
+      try {
+        return transform(await this.send(payload), outTransformer);
+      } catch (errAny: unknown) {
+        if (typeof errAny !== "object" || errAny === null) {
+          throw errAny;
+        }
+        const err = errAny as ErrorClientBaseLike;
+
+        const unknownOutPointMatch = err.data.match(
+          new RegExp("Resolve\\(Unknown\\(OutPoint\\((0x.*)\\)\\)\\)"),
+        )?.[1];
+        if (unknownOutPointMatch) {
+          throw new ErrorClientResolveUnknown(
+            err,
+            OutPoint.fromBytes(unknownOutPointMatch),
+          );
+        }
+        const verificationFailedMatch = err.data.match(
+          new RegExp(
+            "Verification\\(Error { kind: Script, inner: TransactionScriptError { source: (Inputs|Outputs)\\[([0-9]*)\\].(Lock|Type), cause: ValidationFailure: see error code (-?[0-9])* on page https://nervosnetwork\\.github\\.io/ckb-script-error-codes/by-(type|data)-hash/(.*)\\.html",
+          ),
+        );
+        if (verificationFailedMatch) {
+          throw new ErrorClientVerification(
+            err,
+            verificationFailedMatch[3] === "Lock"
+              ? "lock"
+              : verificationFailedMatch[1] === "Inputs"
+                ? "inputType"
+                : "outputType",
+            verificationFailedMatch[2],
+            Number(verificationFailedMatch[4]),
+            verificationFailedMatch[5] === "data" ? "data" : "type",
+            verificationFailedMatch[6],
+          );
+        }
+
+        throw new ErrorClientBase(err);
+      }
     };
   }
 

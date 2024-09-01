@@ -1,6 +1,13 @@
-import { Cell, Epoch, Script, Transaction } from "../ckb/index.js";
-import { Hex, hexFrom } from "../hex/index.js";
-import { Num, NumLike } from "../num/index.js";
+import {
+  Cell,
+  Epoch,
+  OutPoint,
+  OutPointLike,
+  Script,
+  Transaction,
+} from "../ckb/index.js";
+import { Hex, HexLike, hexFrom } from "../hex/index.js";
+import { Num, NumLike, numFrom } from "../num/index.js";
 import { apply } from "../utils/index.js";
 import {
   ClientCollectableSearchKeyFilterLike,
@@ -231,3 +238,47 @@ export type ClientBlock = {
   transactions: Transaction[];
   uncles: ClientBlockUncle[];
 };
+
+export interface ErrorClientBaseLike {
+  message: string;
+  code: number;
+  data: string;
+}
+export class ErrorClientBase extends Error {
+  public readonly message: string;
+  public readonly code: number;
+  public readonly data: string;
+
+  constructor(origin: ErrorClientBaseLike) {
+    super(origin.message);
+    this.message = origin.message;
+    this.code = origin.code;
+    this.data = origin.data;
+  }
+}
+
+export class ErrorClientResolveUnknown extends ErrorClientBase {
+  public readonly outPoint: OutPoint;
+  constructor(origin: ErrorClientBaseLike, outPointLike: OutPointLike) {
+    super(origin);
+    this.outPoint = OutPoint.from(outPointLike);
+  }
+}
+
+export class ErrorClientVerification extends ErrorClientBase {
+  public readonly sourceIndex: Num;
+  public readonly scriptCodeHash: Hex;
+
+  constructor(
+    origin: ErrorClientBaseLike,
+    public readonly source: "lock" | "inputType" | "outputType",
+    sourceIndex: NumLike,
+    public readonly errorCode: number,
+    public readonly scriptHashType: "data" | "type",
+    scriptCodeHash: HexLike,
+  ) {
+    super(origin);
+    this.sourceIndex = numFrom(sourceIndex);
+    this.scriptCodeHash = hexFrom(scriptCodeHash);
+  }
+}
