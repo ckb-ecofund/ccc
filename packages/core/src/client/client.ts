@@ -193,7 +193,7 @@ export abstract class Client {
     return res;
   }
 
-  async *findCellsOnChin(
+  async *findCellsOnChain(
     key: ClientIndexerSearchKeyLike,
     order?: "asc" | "desc",
     limit = 10,
@@ -236,7 +236,7 @@ export abstract class Client {
       yield cell;
     }
 
-    for await (const cell of this.findCellsOnChin(key, order, limit)) {
+    for await (const cell of this.findCellsOnChain(key, order, limit)) {
       if (
         (await this.cache.isUnusable(cell.outPoint)) ||
         foundedOutPoints.some((founded) => founded.eq(cell.outPoint))

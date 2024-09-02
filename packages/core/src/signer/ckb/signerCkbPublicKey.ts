@@ -1,6 +1,6 @@
 import { Address } from "../../address/index.js";
 import { bytesFrom } from "../../bytes/index.js";
-import { Transaction, TransactionLike } from "../../ckb/index.js";
+import { Script, Transaction, TransactionLike } from "../../ckb/index.js";
 import { Client, KnownScript } from "../../client/index.js";
 import { hashCkb } from "../../hasher/index.js";
 import { Hex, HexLike, hexFrom } from "../../hex/index.js";
@@ -43,24 +43,65 @@ export class SignerCkbPublicKey extends Signer {
     return this.publicKey;
   }
 
+  async getRecommendedAddressObj(_preference?: unknown): Promise<Address> {
+    return Address.fromKnownScript(
+      this.client,
+      KnownScript.Secp256k1Blake160,
+      bytesFrom(hashCkb(this.publicKey)).slice(0, 20),
+    );
+  }
+
   async getAddressObjs(): Promise<Address[]> {
-    return [
-      await Address.fromKnownScript(
+    const recommended = await this.getRecommendedAddressObj();
+
+    const addresses: Address[] = [];
+    let count = 0;
+    for await (const cell of this.client.findCells({
+      script: await Script.fromKnownScript(
         this.client,
-        KnownScript.Secp256k1Blake160,
-        bytesFrom(hashCkb(this.publicKey)).slice(0, 20),
+        KnownScript.AnyoneCanPay,
+        recommended.script.args,
       ),
-    ];
+      scriptType: "lock",
+      scriptSearchMode: "prefix",
+      withData: false,
+    })) {
+      if (count >= 10) {
+        break;
+      }
+      count += 1;
+
+      if (addresses.some(({ script }) => script.eq(cell.cellOutput.lock))) {
+        continue;
+      }
+
+      addresses.push(
+        Address.from({
+          prefix: this.client.addressPrefix,
+          script: cell.cellOutput.lock,
+        }),
+      );
+    }
+
+    return [recommended, ...addresses];
   }
 
   async prepareTransaction(txLike: TransactionLike): Promise<Transaction> {
     const tx = Transaction.from(txLike);
-    const { script } = await this.getRecommendedAddressObj();
+    const addresses = await this.getAddressObjs();
     await tx.addCellDepsOfKnownScripts(
       this.client,
       KnownScript.Secp256k1Blake160,
     );
-    await tx.prepareSighashAllWitness(script, 65, this.client);
+    if (addresses.length > 1) {
+      await tx.addCellDepsOfKnownScripts(this.client, KnownScript.AnyoneCanPay);
+    }
+
+    await Promise.all(
+      addresses.map(({ script }) =>
+        tx.prepareSighashAllWitness(script, 65, this.client),
+      ),
+    );
     return tx;
   }
 }
