@@ -46,7 +46,7 @@ export class SignerCkbPrivateKey extends SignerCkbPublicKey {
   async signOnlyTransaction(txLike: TransactionLike): Promise<Transaction> {
     const tx = Transaction.from(txLike);
 
-    for (const { script } of await this.getAddressObjs()) {
+    for (const { script } of await this.getRelatedScripts(tx)) {
       const info = await tx.getSignHashInfo(script, this.client);
       if (!info) {
         return tx;
