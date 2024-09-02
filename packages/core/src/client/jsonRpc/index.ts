@@ -15,6 +15,8 @@ import {
   ClientTransactionResponse,
   ErrorClientBase,
   ErrorClientBaseLike,
+  ErrorClientDuplicatedTransaction,
+  ErrorClientRBFRejected,
   ErrorClientResolveUnknown,
   ErrorClientVerification,
   OutputsValidator,
@@ -49,6 +51,41 @@ async function transform(
   }
   return value;
 }
+
+const ERROR_PARSERS: [
+  string,
+  (error: ErrorClientBaseLike, match: RegExpMatchArray) => ErrorClientBase,
+][] = [
+  [
+    "Resolve\\(Unknown\\(OutPoint\\((0x.*)\\)\\)\\)",
+    (error, match) =>
+      new ErrorClientResolveUnknown(error, OutPoint.fromBytes(match[1])),
+  ],
+  [
+    "Verification\\(Error { kind: Script, inner: TransactionScriptError { source: (Inputs|Outputs)\\[([0-9]*)\\].(Lock|Type), cause: ValidationFailure: see error code (-?[0-9])* on page https://nervosnetwork\\.github\\.io/ckb-script-error-codes/by-(type|data)-hash/(.*)\\.html",
+    (error, match) =>
+      new ErrorClientVerification(
+        error,
+        match[3] === "Lock"
+          ? "lock"
+          : match[1] === "Inputs"
+            ? "inputType"
+            : "outputType",
+        match[2],
+        Number(match[4]),
+        match[5] === "data" ? "data" : "type",
+        match[6],
+      ),
+  ],
+  [
+    "Duplicated\\(Byte32\\((0x.*)\\)\\)",
+    (error, match) => new ErrorClientDuplicatedTransaction(error, match[1]),
+  ],
+  [
+    'RBFRejected\\("Tx\'s current fee is ([0-9]*), expect it to >= ([0-9]*) to replace old txs"\\)',
+    (error, match) => new ErrorClientRBFRejected(error, match[1], match[2]),
+  ],
+];
 
 /**
  * An abstract class implementing JSON-RPC client functionality for a specific URL and timeout.
@@ -353,33 +390,11 @@ export abstract class ClientJsonRpc extends Client {
         }
         const err = errAny as ErrorClientBaseLike;
 
-        const unknownOutPointMatch = err.data.match(
-          new RegExp("Resolve\\(Unknown\\(OutPoint\\((0x.*)\\)\\)\\)"),
-        )?.[1];
-        if (unknownOutPointMatch) {
-          throw new ErrorClientResolveUnknown(
-            err,
-            OutPoint.fromBytes(unknownOutPointMatch),
-          );
-        }
-        const verificationFailedMatch = err.data.match(
-          new RegExp(
-            "Verification\\(Error { kind: Script, inner: TransactionScriptError { source: (Inputs|Outputs)\\[([0-9]*)\\].(Lock|Type), cause: ValidationFailure: see error code (-?[0-9])* on page https://nervosnetwork\\.github\\.io/ckb-script-error-codes/by-(type|data)-hash/(.*)\\.html",
-          ),
-        );
-        if (verificationFailedMatch) {
-          throw new ErrorClientVerification(
-            err,
-            verificationFailedMatch[3] === "Lock"
-              ? "lock"
-              : verificationFailedMatch[1] === "Inputs"
-                ? "inputType"
-                : "outputType",
-            verificationFailedMatch[2],
-            Number(verificationFailedMatch[4]),
-            verificationFailedMatch[5] === "data" ? "data" : "type",
-            verificationFailedMatch[6],
-          );
+        for (const [regexp, builder] of ERROR_PARSERS) {
+          const match = err.data.match(regexp);
+          if (match) {
+            throw builder(err, match);
+          }
         }
 
         throw new ErrorClientBase(err);

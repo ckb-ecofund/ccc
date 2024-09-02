@@ -280,3 +280,27 @@ export class ErrorClientVerification extends ErrorClientBase {
     this.scriptCodeHash = hexFrom(scriptCodeHash);
   }
 }
+
+export class ErrorClientDuplicatedTransaction extends ErrorClientBase {
+  public readonly txHash: Hex;
+
+  constructor(origin: ErrorClientBaseLike, txHash: HexLike) {
+    super(origin);
+    this.txHash = hexFrom(txHash);
+  }
+}
+
+export class ErrorClientRBFRejected extends ErrorClientBase {
+  public readonly currentFee: Num;
+  public readonly leastFee: Num;
+
+  constructor(
+    origin: ErrorClientBaseLike,
+    currentFee: NumLike,
+    leastFee: NumLike,
+  ) {
+    super(origin);
+    this.currentFee = numFrom(currentFee);
+    this.leastFee = numFrom(leastFee);
+  }
+}
