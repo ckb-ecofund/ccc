@@ -18,5 +18,8 @@
     "@ckb-ccc/uni-sat": "0.0.13",
     "@ckb-ccc/utxo-global": "0.0.13"
   },
-  "changesets": []
+  "changesets": [
+    "funny-shrimps-grow",
+    "tough-adults-worry"
+  ]
 }

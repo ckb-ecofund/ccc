@@ -1,5 +1,16 @@
 # @ckb-ccc/core
 
+## 0.0.14-alpha.0
+
+### Patch Changes
+
+- [`f5b5938`](https://github.com/ckb-ecofund/ccc/commit/f5b5938ab8f9c0a338dfd6765fe717f7ad1b1dd8) Thanks [@Hanssen0](https://github.com/Hanssen0)! - feat(core): ErrorClient types
+
+  - ErrorClientRBFRejected
+  - ErrorClientDuplicatedTransaction
+
+- [`2164efd`](https://github.com/ckb-ecofund/ccc/commit/2164efd6d834c1917ad5f4a514dc25941f937185) Thanks [@Hanssen0](https://github.com/Hanssen0)! - feat(core): Support ACP addresses for private key signer
+
 ## 0.0.13
 
 ### Patch Changes
