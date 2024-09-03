@@ -40,7 +40,9 @@
   },
   "dependencies": {
     "@ckb-ccc/connector": "workspace:*",
-    "@lit/react": "^1.0.5",
-    "react": "^18"
+    "@lit/react": "^1.0.5"
+  },
+  "peerDependencies": {
+    "react": ">=16"
   }
 }

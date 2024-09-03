@@ -1,7 +1,11 @@
 import { ccc } from "@ckb-ccc/connector";
 import React, {
+  CSSProperties,
+  HTMLAttributes,
+  ReactNode,
   createContext,
   useCallback,
+  useContext,
   useEffect,
   useMemo,
   useRef,
@@ -58,8 +62,8 @@ export function Provider({
   defaultClient,
   preferredNetworks,
 }: {
-  children: React.ReactNode;
-  connectorProps?: React.HTMLAttributes<{}>;
+  children: ReactNode;
+  connectorProps?: HTMLAttributes<{}>;
   name?: string;
   icon?: string;
   signerFilter?: (
@@ -146,7 +150,7 @@ export function Provider({
               "--btn-secondary-hover": "#ccc",
               color: "#1e1e1e",
               "--tip-color": "#666",
-            } as React.CSSProperties),
+            } as CSSProperties),
           },
         }}
       />
@@ -156,7 +160,7 @@ export function Provider({
 }
 
 export function useCcc() {
-  const context = React.useContext(CCC_CONTEXT);
+  const context = useContext(CCC_CONTEXT);
   if (!context) {
     throw Error(
       "The component which invokes the useCcc hook should be placed in a ccc.Provider.",

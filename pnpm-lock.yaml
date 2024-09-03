@@ -177,7 +177,7 @@ importers:
         specifier: ^1.0.5
         version: 1.0.5(@types/react@18.2.79)
       react:
-        specifier: ^18
+        specifier: '>=16'
         version: 18.2.0
     devDependencies:
       '@eslint/js':
