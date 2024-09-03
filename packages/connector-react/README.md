@@ -43,6 +43,18 @@
 
 This project is still under active development, and we are looking forward to your feedback. [Try its demo now here](https://app.ckbccc.com/). It showcases how to use CCC for some basic scenarios in CKB.
 
+## Use the Connector UI
+
+Before using the Connector, wrap your UI with the CCC Provider:
+
+```tsx
+<ccc.Provider>
+  {/* Your application */}
+</ccc.Provider>
+```
+
+Check [the document for @ckb-ccc/connector-react](https://docs.ckbccc.com/modules/_ckb_ccc_connector_react.index.ccc.html) for more information.
+
 <h3 align="center">
   Read more about CCC on <a href="https://docs.ckbccc.com">our website</a> or <a href="https://github.com/ckb-ecofund/ccc">GitHub Repo</a>.
 </h3>

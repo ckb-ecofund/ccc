@@ -43,6 +43,27 @@
 
 This project is still under active development, and we are looking forward to your feedback. [Try its demo now here](https://app.ckbccc.com/). It showcases how to use CCC for some basic scenarios in CKB.
 
+## Installing
+
+We design CCC for both front-end and back-end developers. You need only one package to fulfil all your needs:
+
+- [NodeJS](https://www.npmjs.com/package/@ckb-ccc/core): `npm install @ckb-ccc/core`
+- [Custom UI](https://www.npmjs.com/package/@ckb-ccc/ccc): `npm install @ckb-ccc/ccc`
+- [Web Component](https://www.npmjs.com/package/@ckb-ccc/connector): `npm install @ckb-ccc/connector`
+- [React](https://www.npmjs.com/package/@ckb-ccc/connector-react) ([Docs](https://docs.ckbccc.com/modules/_ckb_ccc_connector_react.html)): `npm install @ckb-ccc/connector-react`
+
+CCC exports everything on the `ccc` object:
+
+```typescript
+import { ccc } from "@ckb-ccc/<package-name>";
+```
+
+For advanced developers, we provided the `cccA` object to fulfil all your needs. You should notice that these interfaces are not stable:
+
+```typescript
+import { cccA } from "@ckb-ccc/<package-name>/advanced";
+```
+
 ## Transaction Composing
 
 Here's an example for transferring CKB:
@@ -62,27 +83,6 @@ const txHash = await signer.sendTransaction(tx);
 ```
 
 We have done everything!
-
-## Installing
-
-We design CCC for both front-end and back-end developers. You need only one package to fulfil all your needs:
-
-- [NodeJS](https://www.npmjs.com/package/@ckb-ccc/core): `npm install @ckb-ccc/core`
-- [Custom UI](https://www.npmjs.com/package/@ckb-ccc/ccc): `npm install @ckb-ccc/ccc`
-- [Web Component](https://www.npmjs.com/package/@ckb-ccc/connector): `npm install @ckb-ccc/connector`
-- [React](https://www.npmjs.com/package/@ckb-ccc/connector-react): `npm install @ckb-ccc/connector-react`
-
-CCC exports everything on the `ccc` object:
-
-```typescript
-import { ccc } from "@ckb-ccc/<package-name>";
-```
-
-For advanced developers, we provided the `cccA` object to fulfil all your needs. You should notice that these interfaces are not stable:
-
-```typescript
-import { cccA } from "@ckb-ccc/<package-name>/advanced";
-```
 
 ## Documents
 
@@ -137,6 +137,16 @@ pnpm run dev
 CCC uses JS's [Package Entry Points](https://nodejs.org/api/packages.html#packages_package_entry_points) feature to help tree shaking while exporting everything on the `ccc` object. Ensure in your `tsconfig.json`, `moduleResolution` is set to `node16`, `nodenext`, or `bundler`, and `resolvePackageJsonExports` is not disabled.
 
 Read the [TypeScript's Guide](https://www.typescriptlang.org/docs/handbook/modules/reference.html#packagejson-exports) for more.
+
+### TypeError: (0, react....createContext) is not a function
+
+CCC UI only works on the client side. If you are using the [React Server Component](https://react.dev/reference/rsc/use-client), add
+
+```tsx
+"use client";
+```
+
+at the beginning of files using `ccc.Provider`.
 
 ### Can I use Lumos with CCC?
 
