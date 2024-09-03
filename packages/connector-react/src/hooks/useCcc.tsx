@@ -138,8 +138,7 @@ export function Provider({
         {...{
           ...connectorProps,
           style: {
-            ...connectorProps?.style,
-            zIndex: connectorProps?.style?.zIndex ?? 999,
+            zIndex: 999,
             ...(isOpen ? {} : { display: "none" }),
             ...({
               "--background": "#fff",
@@ -151,6 +150,7 @@ export function Provider({
               color: "#1e1e1e",
               "--tip-color": "#666",
             } as CSSProperties),
+            ...connectorProps?.style,
           },
         }}
       />
