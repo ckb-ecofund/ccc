@@ -167,7 +167,7 @@ export function numFromBytes(val: BytesLike): Num {
  * ```
  */
 export function numLeFromBytes(val: BytesLike): Num {
-  return numBeFromBytes(bytesFrom(val).reverse());
+  return numBeFromBytes([...bytesFrom(val)].reverse());
 }
 
 /**
