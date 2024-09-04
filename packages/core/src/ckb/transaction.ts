@@ -14,8 +14,6 @@ import {
   numBeToBytes,
   numFrom,
   numFromBytes,
-  numLeFromBytes,
-  numLeToBytes,
   numToBytes,
   numToHex,
 } from "../num/index.js";
@@ -537,11 +535,15 @@ export class Since {
    */
 
   toNum(): Num {
-    const flag =
-      ((this.relative === "absolute" ? 0 : 1) << 7) |
-      ({ blockNumber: 0, epoch: 1, timestamp: 2 }[this.metric] << 5);
-
-    return numFrom(bytesConcat([flag], numLeToBytes(this.value, 7)));
+    return (
+      this.value |
+      (this.relative === "absolute" ? Zero : numFrom("0x8000000000000000")) |
+      {
+        blockNumber: numFrom("0x0000000000000000"),
+        epoch: numFrom("0x2000000000000000"),
+        timestamp: numFrom("0x4000000000000000"),
+      }[this.metric]
+    );
   }
 
   /**
@@ -557,13 +559,13 @@ export class Since {
    */
 
   static fromNum(numLike: NumLike): Since {
-    const bytes = numBeToBytes(numLike, 8);
+    const num = numFrom(numLike);
 
-    const relative = bytes[0] >> 7 === 0 ? "absolute" : "relative";
+    const relative = num >> numFrom(63) === Zero ? "absolute" : "relative";
     const metric = (["blockNumber", "epoch", "timestamp"] as Since["metric"][])[
-      (bytes[0] >> 5) & 3
+      Number((num >> numFrom(61)) & numFrom(3))
     ];
-    const value = numLeFromBytes(bytes.slice(1, 8));
+    const value = num & numFrom("0x00ffffffffffffff");
 
     return new Since(relative, metric, value);
   }
