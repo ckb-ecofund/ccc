@@ -13,6 +13,7 @@ import {
   Pause,
   Play,
   Search,
+  SquareTerminal,
   X,
 } from "lucide-react";
 import Link from "next/link";
@@ -33,6 +34,9 @@ function Links(props: React.ComponentPropsWithoutRef<"div">) {
           src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/logo.svg"
           alt="CCC"
         />
+      </Link>
+      <Link href="https://live.ckbccc.com/" target="_blank">
+        <SquareTerminal className="h-6 w-6" strokeWidth={3} />
       </Link>
       <Link href="https://github.com/ckb-ecofund/ccc" target="_blank">
         <svg
