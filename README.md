@@ -15,6 +15,9 @@
   <img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/m/ckb-ecofund/ccc" />
   <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/ckb-ecofund/ccc/master" />
   <img alt="GitHub branch check runs" src="https://img.shields.io/github/check-runs/ckb-ecofund/ccc/master" />
+  <a href="https://live.ckbccc.com/"><img
+    alt="Playground" src="https://img.shields.io/website?url=https%3A%2F%2Flive.ckbccc.com%2F&label=Playground"
+  /></a>
   <a href="https://app.ckbccc.com/"><img
     alt="App" src="https://img.shields.io/website?url=https%3A%2F%2Fapp.ckbccc.com%2F&label=App"
   /></a>
@@ -33,15 +36,55 @@
   Fully enabling CKB's Turing completeness and cryptographic freedom power.
 </p>
 
-## Preview
+## Playground
 
 <p align="center">
-  <a href="https://app.ckbccc.com/">
-    <img src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/preview.png" width="30%" />
+  <a href="https://live.ckbccc.com/">
+    <img src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/preview.png" width="90%" />
   </a>
 </p>
 
-This project is still under active development, and we are looking forward to your feedback. [Try its demo now here](https://app.ckbccc.com/). It showcases how to use CCC for some basic scenarios in CKB.
+This project is still under active development, and we are looking forward to your feedback. You can [experiment instantly in the playground](https://live.ckbccc.com/). If you are new to the CKB, we recommend checking [Nervos CKB Docs](https://docs.nervos.org/) for basic knowledge.
+
+<p align="center">
+  <a href="https://live.ckbccc.com/">
+    <img src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/playgroundCell.png" width="40%" />
+  </a>
+</p>
+
+We represent cells with graphs in the playground. The three layers of cells represent occupancy, type and lock from inside to outside. The filled center circle means that all CKB of this cell is used to store data.
+
+When cells share the same color, the same script governs them. They are owned by the same address (the outside ring) or the same type of assets (the inside ring). Check the script details in the "Scripts" tab.
+
+## App
+
+<p align="center">
+  <a href="https://app.ckbccc.com/">
+    <img src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/appPreview.png" width="50%" />
+  </a>
+</p>
+
+For non-developers, you can also [try CCC's app now here](https://app.ckbccc.com/). It showcases how to use CCC for some basic scenarios in CKB.
+
+## Transaction Composing
+
+Here's an example for transferring CKB:
+
+```typescript
+const tx = ccc.Transaction.from({
+  outputs: [{ lock: toLock, capacity: ccc.fixedPointFrom(amount) }],
+});
+```
+
+Tell CCC what you need, and then...
+
+```typescript
+await tx.completeInputsByCapacity(signer);
+await tx.completeFeeBy(signer, 1000); // Transaction fee rate
+const txHash = await signer.sendTransaction(tx);
+```
+
+We have done everything!
 
 ## Installing
 
@@ -63,26 +106,6 @@ For advanced developers, we provided the `cccA` object to fulfil all your needs.
 ```typescript
 import { cccA } from "@ckb-ccc/<package-name>/advanced";
 ```
-
-## Transaction Composing
-
-Here's an example for transferring CKB:
-
-```typescript
-const tx = ccc.Transaction.from({
-  outputs: [{ lock: toLock, capacity: ccc.fixedPointFrom(amount) }],
-});
-```
-
-Tell CCC what you need, and then...
-
-```typescript
-await tx.completeInputsByCapacity(signer);
-await tx.completeFeeBy(signer, 1000); // Transaction fee rate
-const txHash = await signer.sendTransaction(tx);
-```
-
-We have done everything!
 
 ## Documents
 
@@ -172,6 +195,7 @@ registerCustomLockScriptInfos(generateDefaultScriptInfos());
 
 ## Links
 
+- [CCC Playground](https://live.ckbccc.com/) and its [GitHub Repo](https://github.com/ckb-ecofund/ccc-playground) help you experiment with CCC instantly in browsers.
 - [Nervos CKB Docs](https://docs.nervos.org/) is the documentation website of Nervos CKB.
 - [Lumos](https://github.com/ckb-js/lumos) and its [Docs](https://lumos-website.vercel.app/): Lumos provides utils to help compose CKB transactions.
 - [RGB++ SDK](https://github.com/ckb-cell/rgbpp-sdk) and its [Design](https://github.com/ckb-cell/RGBPlusPlus-design): RGB++ is a protocol for issuing assets with Turing-completed VM on BTC L1.

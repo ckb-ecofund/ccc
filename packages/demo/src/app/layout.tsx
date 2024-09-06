@@ -6,8 +6,8 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "CCC Demo",
-  description: "A demo for the CCC library",
+  title: "CCC App",
+  description: "An app based on the CCC library",
   icons: "/favicon.svg",
 };
 

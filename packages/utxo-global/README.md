@@ -15,6 +15,9 @@
   <img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/m/ckb-ecofund/ccc" />
   <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/ckb-ecofund/ccc/master" />
   <img alt="GitHub branch check runs" src="https://img.shields.io/github/check-runs/ckb-ecofund/ccc/master" />
+  <a href="https://live.ckbccc.com/"><img
+    alt="Playground" src="https://img.shields.io/website?url=https%3A%2F%2Flive.ckbccc.com%2F&label=Playground"
+  /></a>
   <a href="https://app.ckbccc.com/"><img
     alt="App" src="https://img.shields.io/website?url=https%3A%2F%2Fapp.ckbccc.com%2F&label=App"
   /></a>
@@ -33,15 +36,25 @@
   Fully enabling CKB's Turing completeness and cryptographic freedom power.
 </p>
 
-## Preview
+## Playground
 
 <p align="center">
-  <a href="https://app.ckbccc.com/">
-    <img src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/preview.png" width="30%" />
+  <a href="https://live.ckbccc.com/">
+    <img src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/preview.png" width="90%" />
   </a>
 </p>
 
-This project is still under active development, and we are looking forward to your feedback. [Try its demo now here](https://app.ckbccc.com/).
+This project is still under active development, and we are looking forward to your feedback. You can [experiment instantly in the playground](https://live.ckbccc.com/). If you are new to the CKB, we recommend checking [Nervos CKB Docs](https://docs.nervos.org/) for basic knowledge.
+
+## App
+
+<p align="center">
+  <a href="https://app.ckbccc.com/">
+    <img src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/appPreview.png" width="50%" />
+  </a>
+</p>
+
+For non-developers, you can also [try CCC's app now here](https://app.ckbccc.com/). It showcases how to use CCC for some basic scenarios in CKB.
 
 <h3 align="center">
   Read more about CCC on <a href="https://docs.ckbccc.com">our website</a> or <a href="https://github.com/ckb-ecofund/ccc">GitHub Repo</a>.
