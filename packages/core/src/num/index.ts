@@ -15,6 +15,29 @@ export type Num = bigint;
 export type NumLike = string | number | bigint | HexLike;
 
 /**
+ * Get the min among all numbers.
+ * @public
+ *
+ * @param numbers - numbers.
+ * @returns The min numbers among them.
+ *
+ * @example
+ * ```typescript
+ * numMin(1, 2, 3); // Outputs 1n
+ * ```
+ */
+export function numMin(a: NumLike, ...numbers: NumLike[]): Num {
+  let min = numFrom(a);
+  numbers.forEach((nLike) => {
+    const n = numFrom(nLike);
+    if (n < min) {
+      min = n;
+    }
+  });
+  return min;
+}
+
+/**
  * Get the max among all numbers.
  * @public
  *
