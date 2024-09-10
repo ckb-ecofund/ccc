@@ -1,10 +1,16 @@
 import {
   Cell,
+  CellDep,
+  CellDepLike,
   Epoch,
+  HashType,
+  HashTypeLike,
   OutPoint,
   OutPointLike,
   Script,
+  ScriptLike,
   Transaction,
+  hashTypeFrom,
 } from "../ckb/index.js";
 import { Hex, HexLike, hexFrom } from "../hex/index.js";
 import { Num, NumLike, numFrom } from "../num/index.js";
@@ -14,6 +20,87 @@ import {
   ClientCollectableSearchKeyLike,
   clientSearchKeyRangeFrom,
 } from "./clientTypes.advanced.js";
+
+/**
+ * @public
+ */
+export enum KnownScript {
+  NervosDao = "NervosDao",
+  Secp256k1Blake160 = "Secp256k1Blake160",
+  Secp256k1Multisig = "Secp256k1Multisig",
+  AnyoneCanPay = "AnyoneCanPay",
+  TypeId = "TypeId",
+  XUdt = "XUdt",
+  JoyId = "JoyId",
+  COTA = "COTA",
+  PWLock = "PWLock",
+  OmniLock = "OmniLock",
+  NostrLock = "NostrLock",
+  UniqueType = "UniqueType",
+
+  // ckb-proxy-locks https://github.com/ckb-ecofund/ckb-proxy-locks
+  AlwaysSuccess = "AlwaysSuccess",
+  InputTypeProxyLock = "InputTypeProxyLock",
+  OutputTypeProxyLock = "OutputTypeProxyLock",
+  LockProxyLock = "LockProxyLock",
+  SingleUseLock = "SingleUseLock",
+  TypeBurnLock = "TypeBurnLock",
+  EasyToDiscoverType = "EasyToDiscoverType",
+  TimeLock = "TimeLock",
+}
+
+/**
+ * @public
+ */
+export type CellDepInfoLike = {
+  cellDep: CellDepLike;
+  type?: ScriptLike | null;
+};
+
+/**
+ * @public
+ */
+export class CellDepInfo {
+  constructor(
+    public cellDep: CellDep,
+    public type?: Script,
+  ) {}
+
+  static from(cellDepInfoLike: CellDepInfoLike): CellDepInfo {
+    return new CellDepInfo(
+      CellDep.from(cellDepInfoLike.cellDep),
+      apply(Script.from, cellDepInfoLike.type),
+    );
+  }
+}
+
+/**
+ * @public
+ */
+export type ScriptInfoLike = {
+  codeHash: HexLike;
+  hashType: HashTypeLike;
+  cellDeps: CellDepInfoLike[];
+};
+
+/**
+ * @public
+ */
+export class ScriptInfo {
+  constructor(
+    public codeHash: Hex,
+    public hashType: HashType,
+    public cellDeps: CellDepInfo[],
+  ) {}
+
+  static from(scriptInfoLike: ScriptInfoLike): ScriptInfo {
+    return new ScriptInfo(
+      hexFrom(scriptInfoLike.codeHash),
+      hashTypeFrom(scriptInfoLike.hashType),
+      scriptInfoLike.cellDeps.map((c) => CellDepInfo.from(c)),
+    );
+  }
+}
 
 /**
  * @public

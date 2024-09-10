@@ -8,7 +8,7 @@ export type Bytes = Uint8Array;
 /**
  * @public
  */
-export type BytesLike = string | Uint8Array | ArrayBuffer | number[];
+export type BytesLike = string | Uint8Array | ArrayBuffer | ArrayLike<number>;
 
 /**
  * Concatenates multiple byte-like arrays into a single byte array.
@@ -98,22 +98,23 @@ export function bytesFrom(
     return new Uint8Array(bytes);
   }
 
-  if (Array.isArray(bytes)) {
-    if (bytes.some((v) => v < 0 || 0xff < v)) {
-      throw new Error(`Invalid bytes ${JSON.stringify(bytes)}`);
+  if (typeof bytes === "string") {
+    if (encoding !== undefined) {
+      return Buffer.from(bytes, encoding);
     }
-    return new Uint8Array(bytes);
+
+    const str = bytes.startsWith("0x") ? bytes.slice(2) : bytes;
+    const paddedStr = str.length % 2 === 0 ? str : `0${str}`;
+    const data = Buffer.from(paddedStr, "hex");
+    if (data.length * 2 !== paddedStr.length) {
+      throw new Error(`Invalid bytes ${bytes}`);
+    }
+    return data;
   }
 
-  if (encoding !== undefined) {
-    return Buffer.from(bytes, encoding);
+  const bytesArr = Array.from(bytes);
+  if (bytesArr.some((v) => v < 0 || 0xff < v)) {
+    throw new Error(`Invalid bytes ${JSON.stringify(bytes)}`);
   }
-
-  const str = bytes.startsWith("0x") ? bytes.slice(2) : bytes;
-  const paddedStr = str.length % 2 === 0 ? str : `0${str}`;
-  const data = Buffer.from(paddedStr, "hex");
-  if (data.length * 2 !== paddedStr.length) {
-    throw new Error(`Invalid bytes ${bytes}`);
-  }
-  return data;
+  return new Uint8Array(bytes);
 }

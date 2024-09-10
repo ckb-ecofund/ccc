@@ -1,8 +1,7 @@
 import WebSocket from "isomorphic-ws";
-import { Script } from "../ckb/index.js";
 import { ClientCache } from "./cache/index.js";
-import { CellDepInfo, KnownScript } from "./client.js";
 import { MAINNET_SCRIPTS } from "./clientPublicMainnet.advanced.js";
+import { KnownScript, ScriptInfo } from "./clientTypes.js";
 import { ClientJsonRpc } from "./jsonRpc/index.js";
 
 /**
@@ -34,20 +33,13 @@ export class ClientPublicMainnet extends ClientJsonRpc {
     return "ckb";
   }
 
-  async getKnownScript(
-    script: KnownScript,
-  ): Promise<
-    Pick<Script, "codeHash" | "hashType"> & { cellDeps: CellDepInfo[] }
-  > {
+  async getKnownScript(script: KnownScript): Promise<ScriptInfo> {
     const found = this.scripts[script];
     if (!found) {
       throw new Error(
         `No script information was found for ${script} on ${this.addressPrefix}`,
       );
     }
-    return {
-      ...found,
-      cellDeps: found.cellDeps.map((c) => CellDepInfo.from(c)),
-    };
+    return ScriptInfo.from(found);
   }
 }
