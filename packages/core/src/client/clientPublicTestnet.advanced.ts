@@ -384,4 +384,72 @@ export const TESTNET_SCRIPTS: Record<
       },
     ],
   },
+  [KnownScript.TypeBurn]: {
+    codeHash:
+      "0xff78bae0abf17d7a404c0be0f9ad9c9185b3f88dcc60403453d5ba8e1f22f53a",
+    hashType: "data1",
+    cellDeps: [
+      {
+        cellDep: {
+          outPoint: {
+            txHash:
+              "0xb4f171c9c9caf7401f54a8e56225ae21d95032150a87a4678eac3f66a3137b93",
+            index: 5,
+          },
+          depType: "code",
+        },
+      },
+    ],
+  },
+  [KnownScript.LockProxy]: {
+    codeHash:
+      "0x5d41e32e224c15f152b7e6529100ebeac83b162f5f692a5365774dad2c1a1d02",
+    hashType: "data1",
+    cellDeps: [
+      {
+        cellDep: {
+          outPoint: {
+            txHash:
+              "0xb4f171c9c9caf7401f54a8e56225ae21d95032150a87a4678eac3f66a3137b93",
+            index: 3,
+          },
+          depType: "code",
+        },
+      },
+    ],
+  },
+  [KnownScript.Spore]: {
+    codeHash:
+      "0x685a60219309029d01310311dba953d67029170ca4848a4ff638e57002130a0d",
+    hashType: "data1",
+    cellDeps: [
+      {
+        cellDep: {
+          outPoint: {
+            txHash:
+              "0x5e8d2a517d50fd4bb4d01737a7952a1f1d35c8afc77240695bb569cd7d9d5a1f",
+            index: 0,
+          },
+          depType: "code",
+        },
+      },
+    ],
+  },
+  [KnownScript.Cluster]: {
+    codeHash:
+      "0x0bbe768b519d8ea7b96d58f1182eb7e6ef96c541fbd9526975077ee09f049058",
+    hashType: "data1",
+    cellDeps: [
+      {
+        cellDep: {
+          outPoint: {
+            txHash:
+              "0xcebb174d6e300e26074aea2f5dbd7f694bb4fe3de52b6dfe205e54f90164510a",
+            index: 0,
+          },
+          depType: "code",
+        },
+      },
+    ],
+  },
 });

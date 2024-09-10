@@ -72,7 +72,7 @@ export class CellDepInfo {
   constructor(
     public cellDep: CellDep,
     public type?: Script,
-  ) {}
+  ) { }
 
   static from(cellDepInfoLike: CellDepInfoLike): CellDepInfo {
     return new CellDepInfo(
