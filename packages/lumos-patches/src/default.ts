@@ -243,12 +243,12 @@ export function generateDefaultScriptInfos(): LockScriptInfo[] {
   )
     .map(([script, dummyLockLength]) => [
       generateScriptInfo(
-        testnet[script]!.codeHash,
+        ccc.hexFrom(testnet[script]!.codeHash),
         testnet[script]!.cellDeps,
         dummyLockLength,
       ),
       generateScriptInfo(
-        mainnet[script]!.codeHash,
+        ccc.hexFrom(mainnet[script]!.codeHash),
         mainnet[script]!.cellDeps,
         dummyLockLength,
       ),
