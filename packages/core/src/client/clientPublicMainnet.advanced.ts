@@ -407,38 +407,4 @@ export const MAINNET_SCRIPTS: Record<
       },
     ],
   },
-  [KnownScript.Spore]: {
-    codeHash:
-      "0x4a4dce1df3dffff7f8b2cd7dff7303df3b6150c9788cb75dcf6747247132b9f5",
-    hashType: "data1",
-    cellDeps: [
-      {
-        cellDep: {
-          outPoint: {
-            txHash:
-              "0x96b198fb5ddbd1eed57ed667068f1f1e55d07907b4c0dbd38675a69ea1b69824",
-            index: 0,
-          },
-          depType: "code",
-        },
-      },
-    ],
-  },
-  [KnownScript.Cluster]: {
-    codeHash:
-      "0x7366a61534fa7c7e6225ecc0d828ea3b5366adec2b58206f2ee84995fe030075",
-    hashType: "data1",
-    cellDeps: [
-      {
-        cellDep: {
-          outPoint: {
-            txHash:
-              "0xe464b7fb9311c5e2820e61c99afc615d6b98bdefbe318c34868c010cbd0dc938",
-            index: 0,
-          },
-          depType: "code",
-        },
-      },
-    ],
-  },
 });

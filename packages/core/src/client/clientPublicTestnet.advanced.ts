@@ -418,38 +418,4 @@ export const TESTNET_SCRIPTS: Record<
       },
     ],
   },
-  [KnownScript.Spore]: {
-    codeHash:
-      "0x685a60219309029d01310311dba953d67029170ca4848a4ff638e57002130a0d",
-    hashType: "data1",
-    cellDeps: [
-      {
-        cellDep: {
-          outPoint: {
-            txHash:
-              "0x5e8d2a517d50fd4bb4d01737a7952a1f1d35c8afc77240695bb569cd7d9d5a1f",
-            index: 0,
-          },
-          depType: "code",
-        },
-      },
-    ],
-  },
-  [KnownScript.Cluster]: {
-    codeHash:
-      "0x0bbe768b519d8ea7b96d58f1182eb7e6ef96c541fbd9526975077ee09f049058",
-    hashType: "data1",
-    cellDeps: [
-      {
-        cellDep: {
-          outPoint: {
-            txHash:
-              "0xcebb174d6e300e26074aea2f5dbd7f694bb4fe3de52b6dfe205e54f90164510a",
-            index: 0,
-          },
-          depType: "code",
-        },
-      },
-    ],
-  },
 });

@@ -139,6 +139,7 @@ export async function createSpores(params: {
           }),
         );
         tx.addOutput(cluster.cellOutput, cluster.outputData);
+        // add cluster to celldep
         await tx.addCellDepInfos(
           signer.client,
           buildSporeCellDep(
