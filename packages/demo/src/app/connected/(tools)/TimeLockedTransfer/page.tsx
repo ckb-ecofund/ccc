@@ -4,20 +4,19 @@ import React, { useEffect, useState } from "react";
 import { TextInput } from "@/src/components/Input";
 import { Button } from "@/src/components/Button";
 import { Textarea } from "@/src/components/Textarea";
-import { bytesConcat, ccc } from "@ckb-ccc/connector-react";
-import { Since, numFrom, numToBytes } from "@ckb-ccc/core";
+import { ccc } from "@ckb-ccc/connector-react";
 import { bytesFromAnyString, useGetExplorerLink } from "@/src/utils";
 import { useApp } from "@/src/context";
 import { ButtonsPanel } from "@/src/components/ButtonsPanel";
 import { Message } from "@/src/components/Message";
 
 const testnetTimeLockScript = {
-  codeHash: "0xbb5b49aa2e904f573c6d154bc768ac5666445ff6254a8b8aa260ead63a7d1b42",
+  codeHash: "0x6b8eb352f9507db9ba4c1615280aee482a1b382e35b94cb40fa4b334cb2c3198",
   hashType: "type",
 }
 const testnetTimeLockScriptCellDep = {
   outPoint: {
-    txHash: "0x54090200597d544f0c8e8c02a0dc12715260ccc88dfe097ae76198ba71f71bff",
+    txHash: "0x12274385df4795c965557eac20e927ffc7cddff6b59907679e032c160a353c2e",
     index: 0,
   },
   depType: "code",
@@ -26,7 +25,7 @@ const feeRate = 3000;
 
 export default function TimeLockedTransfer() {
   const { signer, createSender } = useApp();
-  const { log, error } = createSender("Transfer");
+  const { log, error } = createSender("Transfer with a time lock");
 
   const { explorerTransaction } = useGetExplorerLink();
 
@@ -47,7 +46,11 @@ export default function TimeLockedTransfer() {
     const toAddress = await ccc.Address.fromString(transferTo, signer.client);
 
     const currentBlockNumber = await signer.client.getTip();
-    const lockedUntil = new Since("absolute", "blockNumber", currentBlockNumber + numFrom(lockedForBlocks));
+    const lockedUntil = ccc.Since.from({
+      relative: "absolute",
+      metric: "blockNumber",
+      value: currentBlockNumber + ccc.numFrom(lockedForBlocks)
+    });
     const lockedUntilToNum = lockedUntil.toNum();
     const timeLockScript = ccc.Script.from({
       ...testnetTimeLockScript,
@@ -84,30 +87,30 @@ export default function TimeLockedTransfer() {
 
   useEffect(() => {
     checkTimeLockedCells();
-  }, []);
+  }, [signer]);
 
   const checkTimeLockedCells = async () => {
     if (!signer) {
       return;
     }
-    // cell ordering is not guaranteed
-    const timeLockedCells: ccc.Cell[] = [];
-    for await (const cell of signer.client.findCells(
-      {
-        script: ccc.Script.from({
-          ...testnetTimeLockScript,
-          args: bytesFromAnyString((await signer.getRecommendedAddressObj()).script.hash()),
-        }),
-        scriptType: "lock",
-        scriptSearchMode: "prefix",
-      },
-      "desc",
-    )) {
-      // Process each cell
-      timeLockedCells.push(cell);
+
+    for await (const address of await signer.getAddressObjs()) {
+      for await (const cell of signer.client.findCells(
+        {
+          script: ccc.Script.from({
+            ...testnetTimeLockScript,
+            args: bytesFromAnyString(address.script.hash()),
+          }),
+          scriptType: "lock",
+          scriptSearchMode: "prefix",
+        },
+        "desc",
+        1,
+      )) {
+        setLiveTimeLockCell(cell);
+        break;
+      }
     }
-    // pick the first one
-    setLiveTimeLockCell(timeLockedCells[0]);
   }
 
   const handleClaim = async () => {
@@ -126,12 +129,16 @@ export default function TimeLockedTransfer() {
 
     tx.outputs[0].capacity = liveTimeLockCell.cellOutput.capacity;
 
-    await tx.completeInputsByCapacity(signer, 233);
+    await tx.completeInputsByCapacity(signer);
     let currentBlockNumber = await signer.client.getTip();
-    const currentBlockNumberInSince = new Since("absolute", "blockNumber", currentBlockNumber);
-    tx.inputs.forEach((input) => { input.since = currentBlockNumberInSince.toNum() });
+    const currentBlockNumberInSince = ccc.Since.from({
+      relative: "absolute",
+      metric: "blockNumber",
+      value: currentBlockNumber,
+    });
 
     await tx.completeFeeBy(signer, feeRate);
+    tx.inputs.forEach((input) => { input.since = currentBlockNumberInSince.toNum() });
 
     signer.sendTransaction(tx).then((hash: string) => {
       log(
@@ -213,12 +220,9 @@ export default function TimeLockedTransfer() {
   );
 }
 
-
 const buildTimeLockArgs = (requiredScriptHash: string, lockedUntil: string) => {
   // requiredScriptHash is 32 bytes
   const requiredScriptHashBytes = bytesFromAnyString(requiredScriptHash);
-
-  const lockedUntilBytes8 = numToBytes(lockedUntil, 8);
-
-  return bytesConcat(requiredScriptHashBytes, lockedUntilBytes8);
+  const lockedUntilBytes8 = ccc.numToBytes(lockedUntil, 8);
+  return ccc.bytesConcat(requiredScriptHashBytes, lockedUntilBytes8);
 }
