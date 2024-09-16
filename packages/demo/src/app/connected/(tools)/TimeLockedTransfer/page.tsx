@@ -120,9 +120,7 @@ export default function TimeLockedTransfer() {
     const toAddress = await signer.getRecommendedAddressObj();
     const tx = ccc.Transaction.from({
       outputs: [{ lock: toAddress.script }],
-      inputs: [ccc.CellInput.from({
-        previousOutput: liveTimeLockCell.outPoint,
-      })],
+      inputs: [{ previousOutput: liveTimeLockCell.outPoint }],
       cellDeps: [ccc.CellDep.from(testnetTimeLockScriptCellDep)],
       outputsData: [bytesFromAnyString(claimData)],
     });
