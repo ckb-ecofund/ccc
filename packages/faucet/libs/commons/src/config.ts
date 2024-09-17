@@ -19,5 +19,5 @@ export function loadConfig() {
   return yaml.load(
     readFileSync(join(process.cwd(), configPath()), "utf8"),
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ) as Record<string, any>;
+  ) as Record;
 }

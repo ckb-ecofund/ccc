@@ -16,7 +16,12 @@ const TABS: [ReactNode, string, keyof typeof icons, string][] = [
     "LampWallDown",
     "text-yellow-500",
   ],
-  ["Time Locked Transfer", "/connected/TimeLockedTransfer", "Clock", "text-amber-500"],
+  [
+    "Time Locked Transfer",
+    "/connected/TimeLockedTransfer",
+    "Clock",
+    "text-amber-500",
+  ],
   ["Transfer xUDT", "/connected/TransferXUdt", "BadgeCent", "text-emerald-500"],
   ["Issue xUDT (SUS)", "/connected/IssueXUdtSus", "Rss", "text-sky-500"],
   [

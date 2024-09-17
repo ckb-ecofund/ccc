@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { TextInput } from "@/src/components/Input";
 import { Button } from "@/src/components/Button";
 import { Textarea } from "@/src/components/Textarea";
@@ -11,16 +11,18 @@ import { ButtonsPanel } from "@/src/components/ButtonsPanel";
 import { Message } from "@/src/components/Message";
 
 const testnetTimeLockScript = {
-  codeHash: "0x6b8eb352f9507db9ba4c1615280aee482a1b382e35b94cb40fa4b334cb2c3198",
+  codeHash:
+    "0x907a4018590da3abd9be783a8a38a03b3772414b32bfe58a6291797a02c53eb0",
   hashType: "type",
-}
+};
 const testnetTimeLockScriptCellDep = {
   outPoint: {
-    txHash: "0x12274385df4795c965557eac20e927ffc7cddff6b59907679e032c160a353c2e",
+    txHash:
+      "0x6124a800ec69dc75cb98be2b99686ccbeace3b648ca84496e01e4e7f8d48c759",
     index: 0,
   },
   depType: "code",
-}
+};
 const feeRate = 3000;
 
 export default function TimeLockedTransfer() {
@@ -33,7 +35,9 @@ export default function TimeLockedTransfer() {
   const [amount, setAmount] = useState<string>("");
   const [data, setData] = useState<string>("");
   const [lockedForBlocks, setLockedForBlocks] = useState<string>("");
-  const [liveTimeLockCell, setLiveTimeLockCell] = useState<ccc.Cell | null>(null);
+  const [liveTimeLockCell, setLiveTimeLockCell] = useState<ccc.Cell | null>(
+    null,
+  );
   const [showClaimPage, setShowClaimPage] = useState<boolean>(false);
   const [claimData, setClaimData] = useState<string>("");
 
@@ -49,13 +53,16 @@ export default function TimeLockedTransfer() {
     const lockedUntil = ccc.Since.from({
       relative: "absolute",
       metric: "blockNumber",
-      value: currentBlockNumber + ccc.numFrom(lockedForBlocks)
+      value: currentBlockNumber + ccc.numFrom(lockedForBlocks),
     });
     const lockedUntilToNum = lockedUntil.toNum();
     const timeLockScript = ccc.Script.from({
       ...testnetTimeLockScript,
-      args: buildTimeLockArgs(toAddress.script.hash(), lockedUntilToNum.toString()),
-    })
+      args: buildTimeLockArgs(
+        toAddress.script.hash(),
+        lockedUntilToNum.toString(),
+      ),
+    });
 
     const timeLockCellOutput = { lock: timeLockScript };
 
@@ -75,21 +82,17 @@ export default function TimeLockedTransfer() {
     await tx.completeInputsByCapacity(signer);
     await tx.completeFeeBy(signer, feeRate);
 
-    signer.sendTransaction(tx).then((hash: string) => {
-      log(
-        "Transaction sent:",
-        explorerTransaction(hash),
-      );
-    }).catch((err: Error) => {
-      error(err.message);
-    });
+    signer
+      .sendTransaction(tx)
+      .then((hash: string) => {
+        log("Transaction sent:", explorerTransaction(hash));
+      })
+      .catch((err: Error) => {
+        error(err.message);
+      });
   };
 
-  useEffect(() => {
-    checkTimeLockedCells();
-  }, [signer]);
-
-  const checkTimeLockedCells = async () => {
+  const checkTimeLockedCells = useCallback(async () => {
     if (!signer) {
       return;
     }
@@ -111,7 +114,11 @@ export default function TimeLockedTransfer() {
         break;
       }
     }
-  }
+  }, [signer]);
+
+  useEffect(() => {
+    checkTimeLockedCells();
+  }, [checkTimeLockedCells]);
 
   const handleClaim = async () => {
     if (!signer || !liveTimeLockCell) {
@@ -136,85 +143,105 @@ export default function TimeLockedTransfer() {
     });
 
     await tx.completeFeeBy(signer, feeRate);
-    tx.inputs.forEach((input) => { input.since = currentBlockNumberInSince.toNum() });
+    tx.inputs[0].since = currentBlockNumberInSince.toNum();
 
-    signer.sendTransaction(tx).then((hash: string) => {
-      log(
-        "Transaction sent:",
-        explorerTransaction(hash),
-      );
+    signer
+      .sendTransaction(tx)
+      .then((hash: string) => {
+        log("Transaction sent:", explorerTransaction(hash));
 
-      setLiveTimeLockCell(null);
-    }).catch((err: Error) => {
-      error(err.message);
-    });
+        setLiveTimeLockCell(null);
+      })
+      .catch((err: Error) => {
+        error(err.message);
+      });
   };
 
   return (
     <div className="flex w-full flex-col items-stretch">
-      {!showClaimPage ?
-        (
-          <>
-            {liveTimeLockCell && <Message title="Notification" type="info">
-              You have locked CKB! Try to <a style={{ cursor: "pointer" }} onClick={(e) => {
-                e.preventDefault();
-                setShowClaimPage(true);
-              }}>CLAIM</a> it now.
-            </Message>}
-            <TextInput
-              label="Address"
-              placeholder="Address to transfer to"
-              state={[transferTo, setTransferTo]}
-            />
-            <TextInput
-              label="Amount"
-              placeholder="Amount to transfer"
-              state={[amount, setAmount]}
-            />
-            <TextInput
-              label="Locked for N Blocks"
-              placeholder="Can be claimed after N new blocks"
-              state={[lockedForBlocks, setLockedForBlocks]}
-            />
-            <Textarea
-              label="Output Data(Options)"
-              state={[data, setData]}
-              placeholder="Leave empty if you don't know what this is. Data in the first output. Hex string will be parsed."
-            />
-            <ButtonsPanel>
-              <Button
-                className="ml-2"
-                onClick={handleTimeLockedTransfer}
-              >
-                Transfer
-              </Button>
-            </ButtonsPanel>
-          </>) : (
-          <>
+      {!showClaimPage ? (
+        <>
+          {liveTimeLockCell && (
             <Message title="Notification" type="info">
-              You have <span className="font-bold">{liveTimeLockCell ? Number(liveTimeLockCell.cellOutput.capacity) / 10 ** 8 : 0}</span> CKB locked in a time-lock output cell. Try to claim it by clicking the button below. <br /><a style={{ cursor: "pointer" }} onClick={(e) => {
+              You have locked CKB! Try to{" "}
+              <a
+                style={{ cursor: "pointer" }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  setShowClaimPage(true);
+                }}
+              >
+                CLAIM
+              </a>{" "}
+              it now.
+            </Message>
+          )}
+          <TextInput
+            label="Address"
+            placeholder="Address to transfer to"
+            state={[transferTo, setTransferTo]}
+          />
+          <TextInput
+            label="Amount"
+            placeholder="Amount to transfer"
+            state={[amount, setAmount]}
+          />
+          <TextInput
+            label="Locked for N Blocks"
+            placeholder="Can be claimed after N new blocks"
+            state={[lockedForBlocks, setLockedForBlocks]}
+          />
+          <Textarea
+            label="Output Data(Options)"
+            state={[data, setData]}
+            placeholder="Leave empty if you don't know what this is. Data in the first output. Hex string will be parsed."
+          />
+          <ButtonsPanel>
+            <Button className="ml-2" onClick={handleTimeLockedTransfer}>
+              Transfer
+            </Button>
+          </ButtonsPanel>
+        </>
+      ) : (
+        <>
+          <Message title="Notification" type="info">
+            You have{" "}
+            <span className="font-bold">
+              {liveTimeLockCell
+                ? Number(liveTimeLockCell.cellOutput.capacity) / 10 ** 8
+                : 0}
+            </span>{" "}
+            CKB locked in a time-lock output cell. Try to claim it by clicking
+            the button below. <br />
+            <a
+              style={{ cursor: "pointer" }}
+              onClick={(e) => {
                 e.preventDefault();
                 setShowClaimPage(false);
                 checkTimeLockedCells();
-              }}>Click here</a> to go back to the Transfer page.
-            </Message>
-            <Textarea
-              label="Output Data(Options)"
-              state={[claimData, setClaimData]}
-              placeholder="Leave empty if you don't know what this is. Data in the first output. Hex string will be parsed."
-            />
-            <ButtonsPanel>
-              <Button
-                className="ml-2"
-                onClick={handleClaim}
-              >
-                Claim {liveTimeLockCell ? Number(liveTimeLockCell.cellOutput.capacity) / 10 ** 8 : 0} CKB
-              </Button>
-            </ButtonsPanel>
-          </>
-        )
-      }
-    </div >
+              }}
+            >
+              Click here
+            </a>{" "}
+            to go back to the Transfer page.
+          </Message>
+          <Textarea
+            label="Output Data(Options)"
+            state={[claimData, setClaimData]}
+            placeholder="Leave empty if you don't know what this is. Data in the first output. Hex string will be parsed."
+          />
+          <ButtonsPanel>
+            <Button className="ml-2" onClick={handleClaim}>
+              Claim{" "}
+              {liveTimeLockCell
+                ? Number(liveTimeLockCell.cellOutput.capacity) / 10 ** 8
+                : 0}{" "}
+              CKB
+            </Button>
+          </ButtonsPanel>
+        </>
+      )}
+    </div>
   );
 }
 
@@ -223,4 +250,4 @@ const buildTimeLockArgs = (requiredScriptHash: string, lockedUntil: string) => {
   const requiredScriptHashBytes = bytesFromAnyString(requiredScriptHash);
   const lockedUntilBytes8 = ccc.numToBytes(lockedUntil, 8);
   return ccc.bytesConcat(requiredScriptHashBytes, lockedUntilBytes8);
-}
+};
