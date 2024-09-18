@@ -135,7 +135,7 @@ export class BitcoinSigner extends ccc.SignerBtc {
       if (this.addressType === "auto") {
         return res.btcAddressType === "p2wpkh" ? res.nativeSegwit : res.taproot;
       }
-      return res.btcAddressType === "p2wpkh" ? res.nativeSegwit : res.taproot;
+      return this.addressType === "p2wpkh" ? res.nativeSegwit : res.taproot;
     })();
 
     this.connection = {
