@@ -1,27 +1,18 @@
-import { Hex } from "@ckb-ccc/core";
+import { ccc } from "@ckb-ccc/core";
 import { bytes, BytesLike } from "@ckb-lumos/codec";
 
-const encoder = new TextEncoder();
-const decoder = new TextDecoder();
-
 export function bytifyRawString(text: string): Uint8Array {
-  return encoder.encode(text);
+  return ccc.bytesFrom(text, "utf8");
 }
 
-export function bufferToRawString(
-  source: BytesLike,
-  options?: TextDecodeOptions,
-): string {
+export function bufferToRawString(source: BytesLike): string {
   const buffer = bytes.bytify(source);
-  return decoder.decode(buffer, options);
+  return ccc.bytesTo(buffer, "utf8");
 }
 
-export function hexify(raw: string | undefined): Hex | undefined {
-  if (raw === undefined) {
+export function hexify(raw: string | undefined): ccc.Hex | undefined {
+  if (!raw) {
     return undefined;
   }
-  if (raw.startsWith("0x")) {
-    raw = raw.slice(2);
-  }
-  return `0x${raw}`;
+  return ccc.hexFrom(raw);
 }

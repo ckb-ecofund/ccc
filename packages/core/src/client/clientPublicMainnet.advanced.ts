@@ -373,7 +373,7 @@ export const MAINNET_SCRIPTS: Record<
       },
     ],
   },
-  [KnownScript.TypeBurn]: {
+  [KnownScript.TypeBurnLock]: {
     codeHash:
       "0xff78bae0abf17d7a404c0be0f9ad9c9185b3f88dcc60403453d5ba8e1f22f53a",
     hashType: "data1",
@@ -390,7 +390,7 @@ export const MAINNET_SCRIPTS: Record<
       },
     ],
   },
-  [KnownScript.LockProxy]: {
+  [KnownScript.LockProxyLock]: {
     codeHash:
       "0x5d41e32e224c15f152b7e6529100ebeac83b162f5f692a5365774dad2c1a1d02",
     hashType: "data1",

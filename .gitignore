@@ -9,6 +9,6 @@ coverage
 packages/*/dist*
 
 .vscode
-.env
+.env.js
 
 *.DS_Store
