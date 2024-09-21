@@ -1,5 +1,15 @@
 # @ckb-ccc/core
 
+## 0.0.14-alpha.1
+
+### Patch Changes
+
+- [`5e942f8`](https://github.com/ckb-ecofund/ccc/commit/5e942f8f1ed678abdb7ab9716f5449f0714cea53) Thanks [@Hanssen0](https://github.com/Hanssen0)! - fix(core): numLeFromBytes should not modify args
+
+- [`e5bd2ad`](https://github.com/ckb-ecofund/ccc/commit/e5bd2ad5de4b42a22c422ecfc42056750f69b88b) Thanks [@Hanssen0](https://github.com/Hanssen0)! - fix(core): since encoding
+
+- [#48](https://github.com/ckb-ecofund/ccc/pull/48) [`aae3e06`](https://github.com/ckb-ecofund/ccc/commit/aae3e0679fb940dd8c12ac9be12a4b53277a339d) Thanks [@Hanssen0](https://github.com/Hanssen0)! - feat(core): readable client error
+
 ## 0.0.14-alpha.0
 
 ### Patch Changes
