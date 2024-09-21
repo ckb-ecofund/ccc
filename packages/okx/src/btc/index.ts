@@ -89,7 +89,11 @@ export class BitcoinSigner extends ccc.SignerBtc {
    */
   async getBtcPublicKey(): Promise<ccc.Hex> {
     if (this.provider.getPublicKey) {
-      return ccc.hexFrom(await this.provider.getPublicKey());
+      const publicKey = await this.provider.getPublicKey();
+      if (publicKey === "") {
+        throw Error("The OKX Wallet returned wrong public key");
+      }
+      return ccc.hexFrom(publicKey);
     }
 
     if (this.provider.getSelectedAccount) {
