@@ -420,7 +420,7 @@ export abstract class ClientJsonRpc extends Client {
       throw new Error(`Id mismatched, got ${res.id}, expected ${payload.id}`);
     }
     if (res.error) {
-      throw res.error;
+      throw new Error(`Client request error ${JSON.stringify(res.error)}`);
     }
     return res.result;
   }
