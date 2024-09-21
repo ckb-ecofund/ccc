@@ -1,5 +1,14 @@
 # ckb-ccc
 
+## 0.0.14-alpha.1
+
+### Patch Changes
+
+- [#48](https://github.com/ckb-ecofund/ccc/pull/48) [`4fb114b`](https://github.com/ckb-ecofund/ccc/commit/4fb114bc421c7250eed7388c16f1c026875153e6) Thanks [@Hanssen0](https://github.com/Hanssen0)! - feat(okx): make okx wallet happy
+
+- Updated dependencies [[`4fb114b`](https://github.com/ckb-ecofund/ccc/commit/4fb114bc421c7250eed7388c16f1c026875153e6)]:
+  - @ckb-ccc/ccc@0.0.14-alpha.1
+
 ## 0.0.14-alpha.0
 
 ### Patch Changes

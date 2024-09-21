@@ -19,7 +19,11 @@
     "@ckb-ccc/utxo-global": "0.0.13"
   },
   "changesets": [
+    "big-berries-behave",
     "funny-shrimps-grow",
-    "tough-adults-worry"
+    "perfect-olives-wait",
+    "tough-adults-worry",
+    "violet-hounds-rest",
+    "wise-countries-wink"
   ]
 }
