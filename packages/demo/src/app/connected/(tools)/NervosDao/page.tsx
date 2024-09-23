@@ -202,10 +202,8 @@ function DaoButton({ dao }: { dao: ccc.Cell }) {
                   since: {
                     relative: "absolute",
                     metric: "epoch",
-                    value: ccc.numLeFromBytes(
-                      ccc.epochToHex(
-                        getClaimEpoch(depositHeader, withdrawHeader),
-                      ),
+                    value: ccc.epochToHex(
+                      getClaimEpoch(depositHeader, withdrawHeader),
                     ),
                   },
                 },
