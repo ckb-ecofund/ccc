@@ -93,6 +93,7 @@ const ERROR_PARSERS: [
  */
 
 export abstract class ClientJsonRpc extends Client {
+  private id = 0;
   private readonly transport: Transport;
 
   /**
@@ -364,7 +365,7 @@ export abstract class ClientJsonRpc extends Client {
     outTransformer?: (_: any) => unknown,
   ): (...req: unknown[]) => Promise<unknown> {
     return async (...req: unknown[]) => {
-      const payload = ClientJsonRpc.buildPayload(
+      const payload = this.buildPayload(
         rpcMethod,
         await Promise.all(
           req
@@ -433,9 +434,9 @@ export abstract class ClientJsonRpc extends Client {
    * @returns The JSON-RPC payload.
    */
 
-  static buildPayload(method: string, req: unknown[]): JsonRpcPayload {
+  buildPayload(method: string, req: unknown[]): JsonRpcPayload {
     return {
-      id: Math.round(Math.random() * 10000),
+      id: this.id++,
       method,
       params: req,
       jsonrpc: "2.0",
