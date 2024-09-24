@@ -69,7 +69,7 @@ export default function Mnemonic() {
       />
       <TextInput
         label="Password"
-        placeholder="Password"
+        placeholder="Set password for Keystore"
         state={[password, setPassword]}
       />
       {accounts.length !== 0 ? (
@@ -99,7 +99,7 @@ export default function Mnemonic() {
             setAccount([
               ...accounts,
               ...Array.from(new Array(count), (_, i) => {
-                const path = `m/44'/309'/0'/0/${i}`;
+                const path = `m/44'/309'/0'/0/${i + accounts.length}`;
                 const derivedKey = hdKey.derive(path);
                 return {
                   publicKey: ccc.hexFrom(derivedKey.publicKey!),
