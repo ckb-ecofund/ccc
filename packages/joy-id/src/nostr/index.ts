@@ -66,9 +66,9 @@ export class NostrSigner extends ccc.SignerNostr {
    * Connects to the provider by requesting authentication.
    * @returns A promise that resolves when the connection is established.
    */
-  async connect(): Promise<void> {
+  async connect(type: 'popup' | 'redirect'): Promise<void> {
     const config = this.getConfig();
-    const res = await createPopup(buildJoyIDURL(config, "popup", "/auth"), {
+    const res = await createPopup(buildJoyIDURL(config, type, "/auth"), {
       ...config,
       type: DappRequestType.Auth,
     });
