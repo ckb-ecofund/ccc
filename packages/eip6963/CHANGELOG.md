@@ -1,5 +1,12 @@
 # @ckb-ccc/eip6963
 
+## 0.0.14-alpha.2
+
+### Patch Changes
+
+- Updated dependencies [[`7ba62a0`](https://github.com/ckb-ecofund/ccc/commit/7ba62a056f17808fe5684786c00c2dff80bb7d1d)]:
+  - @ckb-ccc/core@0.0.14-alpha.2
+
 ## 0.0.14-alpha.1
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @ckb-ccc/core
 
+## 0.0.14-alpha.2
+
+### Patch Changes
+
+- [#50](https://github.com/ckb-ecofund/ccc/pull/50) [`7ba62a0`](https://github.com/ckb-ecofund/ccc/commit/7ba62a056f17808fe5684786c00c2dff80bb7d1d) Thanks [@Hanssen0](https://github.com/Hanssen0)! - fix(core): jsonrpc id conflict
+
 ## 0.0.14-alpha.1
 
 ### Patch Changes

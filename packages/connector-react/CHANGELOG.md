@@ -1,5 +1,14 @@
 # @ckb-ccc/connector-react
 
+## 0.0.14-alpha.2
+
+### Patch Changes
+
+- [#53](https://github.com/ckb-ecofund/ccc/pull/53) [`32bffff`](https://github.com/ckb-ecofund/ccc/commit/32bffff407934ec5d16bf7c5701b128d8b29c452) Thanks [@Hanssen0](https://github.com/Hanssen0)! - feat(connector): select client
+
+- Updated dependencies [[`32bffff`](https://github.com/ckb-ecofund/ccc/commit/32bffff407934ec5d16bf7c5701b128d8b29c452)]:
+  - @ckb-ccc/connector@0.0.14-alpha.2
+
 ## 0.0.14-alpha.1
 
 ### Patch Changes
