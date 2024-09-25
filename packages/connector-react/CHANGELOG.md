@@ -1,5 +1,14 @@
 # @ckb-ccc/connector-react
 
+## 0.0.14-alpha.3
+
+### Patch Changes
+
+- [#54](https://github.com/ckb-ecofund/ccc/pull/54) [`3f49876`](https://github.com/ckb-ecofund/ccc/commit/3f49876826f5a9eeff8d14c7d8d7b9cf2cea0f32) Thanks [@Hanssen0](https://github.com/Hanssen0)! - fix(connector): useless back button
+
+- Updated dependencies [[`3f49876`](https://github.com/ckb-ecofund/ccc/commit/3f49876826f5a9eeff8d14c7d8d7b9cf2cea0f32)]:
+  - @ckb-ccc/connector@0.0.14-alpha.3
+
 ## 0.0.14-alpha.2
 
 ### Patch Changes
