@@ -6,7 +6,7 @@ import { LEFT_SVG } from "../assets/left.svg.js";
 @customElement("ccc-dialog")
 export class Dialog extends LitElement {
   @property()
-  public canBack: any | undefined;
+  public canBack: any | null | undefined;
   @property()
   public header?: string;
 
@@ -16,7 +16,7 @@ export class Dialog extends LitElement {
         class="header text-bold fs-lg ${this.header ? "header-divider" : ""}"
       >
         <div
-          class="back ${this.canBack !== undefined ? "active" : ""}"
+          class="back ${this.canBack != null ? "active" : ""}"
           @click=${() => {
             this.dispatchEvent(new Event("back"));
           }}
