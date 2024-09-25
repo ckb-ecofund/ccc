@@ -122,6 +122,10 @@ export class SelectingScene extends LitElement {
   };
 
   static styles = css`
+    .primary-icon {
+      color: var(--icon-primary);
+    }
+
     :host {
       display: block;
     }

@@ -94,8 +94,12 @@ function Links(props: React.ComponentPropsWithoutRef<"div">) {
 }
 
 function ClientSwitcher() {
-  const { setClient } = ccc.useCcc();
+  const { setClient, client } = ccc.useCcc();
   const [isTestnet, setIsTestnet] = useState(true);
+
+  useEffect(() => {
+    setIsTestnet(client.addressPrefix !== "ckb");
+  }, [client]);
 
   useEffect(() => {
     setClient(
@@ -234,10 +238,22 @@ function Addresses() {
 
 export function LayoutProvider({ children }: { children: ReactNode }) {
   return (
-    <ccc.Provider
-    /*
+    <ccc.Provider /*
       defaultClient={new ccc.ClientPublicTestnet()} // Default client used by connector
-      connectorProps={{ style: { backgroundColor: "#f00" } }} // Custom props on the connector element
+      connectorProps={{
+        style: {
+          "--background": "#fff",
+          "--divider": "#eee",
+          "--btn-primary": "#f8f8f8",
+          "--btn-primary-hover": "#efeeee",
+          "--btn-secondary": "#ddd",
+          "--btn-secondary-hover": "#ccc",
+          "--icon-primary": "#1E1E1E",
+          "--icon-secondary": "#666666",
+          color: "#1e1e1e",
+          "--tip-color": "#666",
+        } as React.CSSProperties,
+      }} // Custom props on the connector element
       name="Custom name" // Custom name for your application, default to website title
       icon="https://custom.icon" // Custom icon for your application, default to website icon
       signerFilter={async (signerInfo, wallet) => true} // Filter out signers that you don't want
@@ -252,6 +268,16 @@ export function LayoutProvider({ children }: { children: ReactNode }) {
         },
       ]}
     */
+      clientOptions={[
+        {
+          name: "CKB Testnet",
+          client: new ccc.ClientPublicTestnet(),
+        },
+        {
+          name: "CKB Mainnet",
+          client: new ccc.ClientPublicMainnet(),
+        },
+      ]} // Optional, remove this property to disable client selecting
     >
       <AppProvider>
         <div className="flex h-dvh flex-col">

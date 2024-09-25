@@ -15,23 +15,25 @@ export class Dialog extends LitElement {
       <div
         class="header text-bold fs-lg ${this.header ? "header-divider" : ""}"
       >
-        <img
+        <div
           class="back ${this.canBack !== undefined ? "active" : ""}"
-          src=${LEFT_SVG}
           @click=${() => {
             this.dispatchEvent(new Event("back"));
           }}
-        />
+        >
+          ${LEFT_SVG}
+        </div>
         ${this.header}
-        <img
+        <span
           class="close active"
-          src=${CLOSE_SVG}
           @click=${() => {
             this.dispatchEvent(
               new Event("close", { bubbles: true, composed: true }),
             );
           }}
-        />
+        >
+          ${CLOSE_SVG}
+        </span>
       </div>
       <div class="body">
         <slot></slot>
@@ -40,6 +42,9 @@ export class Dialog extends LitElement {
   }
 
   static styles = css`
+    .primary-icon {
+      color: var(--icon-primary);
+    }
     .text-bold {
       font-weight: bold;
     }
@@ -71,16 +76,16 @@ export class Dialog extends LitElement {
       border-bottom: 1px solid var(--divider);
     }
 
-    .close,
-    .back {
+    .close svg,
+    .back svg {
       width: 0.8rem;
       height: 0.8rem;
       opacity: 0;
       transition: opacity 0.15s ease-in-out;
     }
 
-    .close.active,
-    .back.active {
+    .close.active svg,
+    .back.active svg {
       opacity: 1;
       cursor: pointer;
     }

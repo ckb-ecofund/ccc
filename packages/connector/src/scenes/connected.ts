@@ -1,9 +1,17 @@
 import { ccc } from "@ckb-ccc/ccc";
 import { css, html, LitElement, PropertyValues } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
+import { repeat } from "lit/directives/repeat.js";
 import { CKB_SVG } from "../assets/chains/index.js";
 import { DISCONNECT_SVG } from "../assets/diconnect.svg.js";
+import { SWAP_SVG } from "../assets/swap.svg.js";
 import { signerTypeToIcon } from "./selecting/signers.js";
+
+export class SelectClientEvent extends Event {
+  constructor(public client: ccc.Client) {
+    super("select-client");
+  }
+}
 
 export function formatString(
   str: string | undefined,
@@ -22,6 +30,8 @@ export class ConnectedScene extends LitElement {
   public wallet?: ccc.Wallet;
   @property()
   public signer?: ccc.Signer;
+  @property()
+  public clientOptions?: { icon?: string; client: ccc.Client; name: string }[];
 
   @state()
   private recommendedAddress?: string;
@@ -29,6 +39,8 @@ export class ConnectedScene extends LitElement {
   private internalAddress?: string;
   @state()
   private balance?: ccc.Num;
+  @state()
+  private selectingClient = false;
 
   willUpdate(changedProperties: PropertyValues<this>): void {
     if (
@@ -53,61 +65,89 @@ export class ConnectedScene extends LitElement {
       return html`<div></div>`;
     }
 
-    return html`
-      <ccc-dialog>
-        <div class="position-relative">
-          <img
-            class="connecting-wallet-icon"
-            src=${wallet.icon}
-            alt=${wallet.name}
-          />
-          <img
-            class="connected-type-icon"
-            src=${signerTypeToIcon(signer.type)}
-            alt=${signer.type}
-          />
-        </div>
-
-        <ccc-copy-button
-          value=${recommendedAddress}
-          class="text-bold fs-xl mt-2"
-        >
-          ${formatString(recommendedAddress)}
-        </ccc-copy-button>
-        <div class="text-bold fs-md">
-          ${ccc.fixedPointToString(balance ?? ccc.Zero)} CKB
-        </div>
-        <ccc-copy-button
-          value=${internalAddress}
-          class="text-bold text-tip fs-md"
-          style="margin-top: 0.5rem"
-        >
-          ${formatString(internalAddress, 11, 9)}
-        </ccc-copy-button>
-
-        <ccc-button
-          class="mt-2"
-          @click=${() => this.dispatchEvent(new Event("disconnect"))}
-        >
-          <img src=${DISCONNECT_SVG} alt="disconnect" />
-          Disconnect
-        </ccc-button>
-
-        <div class="switch-btn-container">
-          <div class="switch-line"></div>
-          <div class="switch-content ml-2 mr-2 fs-sm">
+    const body = (() => {
+      if (!this.selectingClient || !this.clientOptions) {
+        return html`
+          <div class="position-relative">
             <img
-              class="mr-1 sm-chain-logo"
-              src=${CKB_SVG}
-              alt="Nervos Network"
+              class="connecting-wallet-icon"
+              src=${wallet.icon}
+              alt=${wallet.name}
             />
-            ${signer.client.addressPrefix === "ckb" ? "Mainnet" : "Testnet"}
-            ${["ckb", "ckt"].includes(signer.client.addressPrefix)
-              ? ""
-              : ` ${signer.client.addressPrefix}`}
+            <img
+              class="connected-type-icon"
+              src=${signerTypeToIcon(signer.type)}
+              alt=${signer.type}
+            />
           </div>
-          <div class="switch-line"></div>
-        </div>
+
+          <ccc-copy-button
+            value=${recommendedAddress}
+            class="text-bold fs-xl mt-2"
+          >
+            ${formatString(recommendedAddress)}
+          </ccc-copy-button>
+          <div class="text-bold fs-md">
+            ${ccc.fixedPointToString(balance ?? ccc.Zero)} CKB
+          </div>
+          <ccc-copy-button
+            value=${internalAddress}
+            class="text-bold text-tip fs-md"
+            style="margin-top: 0.5rem"
+          >
+            ${formatString(internalAddress, 11, 9)}
+          </ccc-copy-button>
+
+          <ccc-button
+            class="mt-2"
+            @click=${() => this.dispatchEvent(new Event("disconnect"))}
+          >
+            ${DISCONNECT_SVG}
+            Disconnect
+          </ccc-button>
+
+          <div
+            class="switch-btn-container ${this.clientOptions
+              ? "cursor-pointer"
+              : ""}"
+            @click=${() => (this.selectingClient = Boolean(this.clientOptions))}
+          >
+            <div class="switch-line"></div>
+            <div class="switch-content ml-2 mr-2 fs-sm">
+              <img class="sm-chain-logo" src=${CKB_SVG} alt="Nervos Network" />
+              ${signer.client.addressPrefix === "ckb" ? "Mainnet" : "Testnet"}
+              ${["ckb", "ckt"].includes(signer.client.addressPrefix)
+                ? ""
+                : ` ${signer.client.addressPrefix}`}
+              ${this.clientOptions ? SWAP_SVG : undefined}
+            </div>
+            <div class="switch-line"></div>
+          </div>
+        `;
+      }
+
+      return repeat(
+        this.clientOptions,
+        ({ name }) => name,
+        ({ client, name, icon }) => html`
+          <ccc-button
+            class="mt-1"
+            @click=${() => this.dispatchEvent(new SelectClientEvent(client))}
+          >
+            <img src=${icon ?? CKB_SVG} alt=${name} />
+            ${name}
+          </ccc-button>
+        `,
+      );
+    })();
+
+    return html`
+      <ccc-dialog
+        header=${this.selectingClient ? "Select Network" : undefined}
+        ?canBack=${this.selectingClient}
+        @back=${() => (this.selectingClient = false)}
+      >
+        ${body}
       </ccc-dialog>
     `;
   }
@@ -119,6 +159,14 @@ export class ConnectedScene extends LitElement {
       flex-direction: column;
       align-items: center;
     }
+
+    .primary-icon {
+      color: var(--icon-primary);
+    }
+    .secondary-icon {
+      color: var(--icon-secondary);
+    }
+
     .text-bold {
       font-weight: bold;
     }
@@ -142,6 +190,9 @@ export class ConnectedScene extends LitElement {
     }
     .mt-2 {
       margin-top: 1rem;
+    }
+    .ml-1 {
+      margin-left: 0.7em;
     }
     .ml-2 {
       margin-left: 1em;
@@ -180,9 +231,14 @@ export class ConnectedScene extends LitElement {
       align-items: center;
     }
 
+    .cursor-pointer {
+      cursor: pointer;
+    }
+
     .switch-content {
       display: flex;
       align-items: center;
+      gap: 0.7rem;
     }
 
     .switch-line {

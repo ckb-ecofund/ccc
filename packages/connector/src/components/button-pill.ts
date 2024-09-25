@@ -31,7 +31,8 @@ export class ButtonPill extends LitElement {
       background: var(--btn-secondary);
     }
 
-    button ::slotted(img) {
+    button ::slotted(img),
+    button ::slotted(svg) {
       width: 0.8rem;
       height: 0.8rem;
       margin-right: 0.5rem;
