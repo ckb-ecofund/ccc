@@ -60,6 +60,7 @@ export function Provider({
   signerFilter,
   signersController,
   defaultClient,
+  clientOptions,
   preferredNetworks,
 }: {
   children: ReactNode;
@@ -72,6 +73,7 @@ export function Provider({
   ) => Promise<boolean>;
   signersController?: ccc.SignersController;
   defaultClient?: ccc.Client;
+  clientOptions?: { icon?: string; client: ccc.Client; name: string }[];
   preferredNetworks?: ccc.NetworkPreference[];
 }) {
   const [ref, setRef] = useState<ccc.WebComponentConnector | null>(null);
@@ -135,6 +137,7 @@ export function Provider({
         onWillUpdate={() => setFlag((f) => f + 1)}
         onClose={() => setIsOpen(false)}
         preferredNetworks={preferredNetworks}
+        clientOptions={clientOptions}
         {...{
           ...connectorProps,
           style: {
@@ -147,6 +150,8 @@ export function Provider({
               "--btn-primary-hover": "#efeeee",
               "--btn-secondary": "#ddd",
               "--btn-secondary-hover": "#ccc",
+              "--icon-primary": "#1E1E1E",
+              "--icon-secondary": "#666666",
               color: "#1e1e1e",
               "--tip-color": "#666",
             } as CSSProperties),

@@ -2,6 +2,7 @@ import { ccc } from "@ckb-ccc/ccc";
 import { LitElement, PropertyValues, css, html } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { Ref, createRef, ref } from "lit/directives/ref.js";
+import { SelectClientEvent } from "../scenes/connected.js";
 import { ConnectedEvent } from "../scenes/selecting/index.js";
 import { SignersController } from "../signers/index.js";
 
@@ -15,6 +16,8 @@ export class WebComponentConnector extends LitElement {
   public preferredNetworks?: ccc.NetworkPreference[];
   @property()
   public signersController?: ccc.SignersController;
+  @state()
+  public clientOptions?: { icon?: string; client: ccc.Client; name: string }[];
 
   @state()
   public client: ccc.Client = new ccc.ClientPublicTestnet();
@@ -145,7 +148,10 @@ export class WebComponentConnector extends LitElement {
               <ccc-connected-scene
                 .wallet=${this.wallet}
                 .signer=${this.signer.signer}
+                .clientOptions=${this.clientOptions}
                 @disconnect=${() => this.disconnect()}
+                @select-client=${(e: SelectClientEvent) =>
+                  this.setClient(e.client)}
                 ${ref(this.bodyRef)}
               ></ccc-connected-scene>
             `
