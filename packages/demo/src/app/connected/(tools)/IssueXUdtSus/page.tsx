@@ -9,6 +9,7 @@ import { Message } from "@/src/components/Message";
 import React from "react";
 import { useApp } from "@/src/context";
 import { ButtonsPanel } from "@/src/components/ButtonsPanel";
+import Link from "next/link";
 
 export default function IssueXUdtSul() {
   const { signer, createSender } = useApp();
@@ -26,6 +27,15 @@ export default function IssueXUdtSul() {
       <div className="flex w-full flex-col items-stretch">
         <Message title="Hint" type="info">
           You will need to sign two or three transactions.
+          <br />
+          Learn more on{" "}
+          <Link
+            className="underline"
+            href="https://talk.nervos.org/t/en-cn-misc-single-use-seals/8279"
+            target="_blank"
+          >
+            [EN/CN] Misc: Single-Use-Seals - 杂谈：一次性密封
+          </Link>
         </Message>
 
         <TextInput
