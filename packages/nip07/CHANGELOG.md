@@ -1,5 +1,12 @@
 # @ckb-ccc/nip07
 
+## 0.0.14
+
+### Patch Changes
+
+- Updated dependencies [[`5e942f8`](https://github.com/ckb-ecofund/ccc/commit/5e942f8f1ed678abdb7ab9716f5449f0714cea53), [`f5b5938`](https://github.com/ckb-ecofund/ccc/commit/f5b5938ab8f9c0a338dfd6765fe717f7ad1b1dd8), [`f13f4d3`](https://github.com/ckb-ecofund/ccc/commit/f13f4d319ca66b571029a65e945e3a038bfeea25), [`7ba62a0`](https://github.com/ckb-ecofund/ccc/commit/7ba62a056f17808fe5684786c00c2dff80bb7d1d), [`2164efd`](https://github.com/ckb-ecofund/ccc/commit/2164efd6d834c1917ad5f4a514dc25941f937185), [`e5bd2ad`](https://github.com/ckb-ecofund/ccc/commit/e5bd2ad5de4b42a22c422ecfc42056750f69b88b), [`aae3e06`](https://github.com/ckb-ecofund/ccc/commit/aae3e0679fb940dd8c12ac9be12a4b53277a339d)]:
+  - @ckb-ccc/core@0.0.14
+
 ## 0.0.14-alpha.2
 
 ### Patch Changes

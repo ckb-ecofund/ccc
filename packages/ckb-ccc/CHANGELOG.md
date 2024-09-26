@@ -1,5 +1,16 @@
 # ckb-ccc
 
+## 0.0.14
+
+### Patch Changes
+
+- [#56](https://github.com/ckb-ecofund/ccc/pull/56) [`f13f4d3`](https://github.com/ckb-ecofund/ccc/commit/f13f4d319ca66b571029a65e945e3a038bfeea25) Thanks [@Hanssen0](https://github.com/Hanssen0)! - feat(core): Signer.findTransactions
+
+- [#48](https://github.com/ckb-ecofund/ccc/pull/48) [`4fb114b`](https://github.com/ckb-ecofund/ccc/commit/4fb114bc421c7250eed7388c16f1c026875153e6) Thanks [@Hanssen0](https://github.com/Hanssen0)! - feat(okx): make okx wallet happy
+
+- Updated dependencies [[`f13f4d3`](https://github.com/ckb-ecofund/ccc/commit/f13f4d319ca66b571029a65e945e3a038bfeea25), [`4fb114b`](https://github.com/ckb-ecofund/ccc/commit/4fb114bc421c7250eed7388c16f1c026875153e6)]:
+  - @ckb-ccc/ccc@0.0.14
+
 ## 0.0.14-alpha.2
 
 ### Patch Changes
