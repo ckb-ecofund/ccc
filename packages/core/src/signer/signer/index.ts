@@ -2,7 +2,11 @@ import { Address } from "../../address/index.js";
 import { ClientCollectableSearchKeyFilterLike } from "../../advancedBarrel.js";
 import { BytesLike } from "../../bytes/index.js";
 import { Cell, Transaction, TransactionLike } from "../../ckb/index.js";
-import { Client } from "../../client/index.js";
+import {
+  Client,
+  ClientFindTransactionsGroupedResponse,
+  ClientFindTransactionsResponse,
+} from "../../client/index.js";
 import { Hex } from "../../hex/index.js";
 import { Num } from "../../num/index.js";
 import { verifyMessageBtcEcdsa } from "../btc/index.js";
@@ -226,20 +230,99 @@ export abstract class Signer {
     );
   }
 
+  /**
+   * Find cells of this signer
+   *
+   * @returns A async generator that yields all matches cells
+   */
   async *findCells(
     filter: ClientCollectableSearchKeyFilterLike,
     withData?: boolean | null,
+    order?: "asc" | "desc",
+    limit?: number,
   ): AsyncGenerator<Cell> {
     const scripts = await this.getAddressObjs();
     for (const { script } of scripts) {
-      for await (const cell of this.client.findCells({
-        script,
-        scriptType: "lock",
-        filter,
-        scriptSearchMode: "exact",
-        withData,
-      })) {
+      for await (const cell of this.client.findCells(
+        {
+          script,
+          scriptType: "lock",
+          filter,
+          scriptSearchMode: "exact",
+          withData,
+        },
+        order,
+        limit,
+      )) {
         yield cell;
+      }
+    }
+  }
+
+  /**
+   * Find transactions of this signer
+   *
+   * @returns A async generator that yields all matches transactions
+   */
+  findTransactions(
+    filter: ClientCollectableSearchKeyFilterLike,
+    groupByTransaction?: false | null,
+    order?: "asc" | "desc",
+    limit?: number,
+  ): AsyncGenerator<ClientFindTransactionsResponse["transactions"][0]>;
+  /**
+   * Find transactions of this signer
+   *
+   * @returns A async generator that yields all matches transactions
+   */
+  findTransactions(
+    filter: ClientCollectableSearchKeyFilterLike,
+    groupByTransaction: true,
+    order?: "asc" | "desc",
+    limit?: number,
+  ): AsyncGenerator<ClientFindTransactionsGroupedResponse["transactions"][0]>;
+  /**
+   * Find transactions of this signer
+   *
+   * @returns A async generator that yields all matches transactions
+   */
+  findTransactions(
+    filter: ClientCollectableSearchKeyFilterLike,
+    groupByTransaction?: boolean | null,
+    order?: "asc" | "desc",
+    limit?: number,
+  ): AsyncGenerator<
+    | ClientFindTransactionsResponse["transactions"][0]
+    | ClientFindTransactionsGroupedResponse["transactions"][0]
+  >;
+  /**
+   * Find transactions of this signer
+   *
+   * @returns A async generator that yields all matches transactions
+   */
+  async *findTransactions(
+    filter: ClientCollectableSearchKeyFilterLike,
+    groupByTransaction?: boolean | null,
+    order?: "asc" | "desc",
+    limit?: number,
+  ): AsyncGenerator<
+    | ClientFindTransactionsResponse["transactions"][0]
+    | ClientFindTransactionsGroupedResponse["transactions"][0]
+  > {
+    const scripts = await this.getAddressObjs();
+    for (const { script } of scripts) {
+      for await (const transaction of this.client.findTransactions(
+        {
+          script,
+          scriptType: "lock",
+          filter,
+          scriptSearchMode: "exact",
+          groupByTransaction,
+        },
+        order,
+        limit,
+      )) {
+        yield transaction;
       }
     }
   }
