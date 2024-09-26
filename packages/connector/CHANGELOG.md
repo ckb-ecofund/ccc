@@ -1,5 +1,11 @@
 # @ckb-ccc/connector
 
+## 0.0.15
+
+### Patch Changes
+
+- [`2483637`](https://github.com/ckb-ecofund/ccc/commit/2483637c89a2e012ed6408d8cabc123b8a45faa9) Thanks [@Hanssen0](https://github.com/Hanssen0)! - fix(connector): animation
+
 ## 0.0.14
 
 ### Patch Changes
