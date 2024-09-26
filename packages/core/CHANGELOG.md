@@ -1,5 +1,11 @@
 # @ckb-ccc/core
 
+## 0.0.15
+
+### Patch Changes
+
+- [`8f2560a`](https://github.com/ckb-ecofund/ccc/commit/8f2560ab0e5619654fff7c5eacda8425385f908e) Thanks [@Hanssen0](https://github.com/Hanssen0)! - fix(core): typed client errors
+
 ## 0.0.14
 
 ### Patch Changes
