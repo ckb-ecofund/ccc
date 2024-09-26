@@ -5,6 +5,7 @@ import { repeat } from "lit/directives/repeat.js";
 import { CKB_SVG } from "../assets/chains/index.js";
 import { DISCONNECT_SVG } from "../assets/diconnect.svg.js";
 import { SWAP_SVG } from "../assets/swap.svg.js";
+import { USER_SVG } from "../assets/user.svg.js";
 import { signerTypeToIcon } from "./selecting/signers.js";
 
 export class SelectClientEvent extends Event {
@@ -100,10 +101,16 @@ export class ConnectedScene extends LitElement {
 
           <ccc-button
             class="mt-2"
+            @click=${() => window.open("https://mobit.app/", "_blank")}
+          >
+            ${USER_SVG} Manage
+          </ccc-button>
+
+          <ccc-button
+            class="mt-1"
             @click=${() => this.dispatchEvent(new Event("disconnect"))}
           >
-            ${DISCONNECT_SVG}
-            Disconnect
+            ${DISCONNECT_SVG} Disconnect
           </ccc-button>
 
           <div

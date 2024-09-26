@@ -1,4 +1,4 @@
-import { html } from "lit/static-html.js";
+import { html } from "lit";
 
 export const SWAP_SVG = html`
   <svg
