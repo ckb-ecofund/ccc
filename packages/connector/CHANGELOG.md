@@ -1,5 +1,12 @@
 # @ckb-ccc/connector
 
+## 0.0.16
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @ckb-ccc/ccc@0.0.15
+
 ## 0.0.15
 
 ### Patch Changes
