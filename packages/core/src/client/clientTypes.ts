@@ -249,7 +249,7 @@ export class ErrorClientBase extends Error {
   public readonly data: string;
 
   constructor(origin: ErrorClientBaseLike) {
-    super(origin.message);
+    super(`Client request error ${origin.message}`);
     this.code = origin.code;
     this.data = origin.data;
   }
