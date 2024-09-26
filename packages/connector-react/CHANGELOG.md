@@ -1,5 +1,22 @@
 # @ckb-ccc/connector-react
 
+## 0.0.14
+
+### Patch Changes
+
+- [#56](https://github.com/ckb-ecofund/ccc/pull/56) [`b4aa690`](https://github.com/ckb-ecofund/ccc/commit/b4aa69085d69fc0953629fd907212922d7d106dd) Thanks [@Hanssen0](https://github.com/Hanssen0)! - feat(connector): manage button
+
+- [#56](https://github.com/ckb-ecofund/ccc/pull/56) [`f13f4d3`](https://github.com/ckb-ecofund/ccc/commit/f13f4d319ca66b571029a65e945e3a038bfeea25) Thanks [@Hanssen0](https://github.com/Hanssen0)! - feat(core): Signer.findTransactions
+
+- [#48](https://github.com/ckb-ecofund/ccc/pull/48) [`4fb114b`](https://github.com/ckb-ecofund/ccc/commit/4fb114bc421c7250eed7388c16f1c026875153e6) Thanks [@Hanssen0](https://github.com/Hanssen0)! - feat(okx): make okx wallet happy
+
+- [#54](https://github.com/ckb-ecofund/ccc/pull/54) [`3f49876`](https://github.com/ckb-ecofund/ccc/commit/3f49876826f5a9eeff8d14c7d8d7b9cf2cea0f32) Thanks [@Hanssen0](https://github.com/Hanssen0)! - fix(connector): useless back button
+
+- [#53](https://github.com/ckb-ecofund/ccc/pull/53) [`32bffff`](https://github.com/ckb-ecofund/ccc/commit/32bffff407934ec5d16bf7c5701b128d8b29c452) Thanks [@Hanssen0](https://github.com/Hanssen0)! - feat(connector): select client
+
+- Updated dependencies [[`b4aa690`](https://github.com/ckb-ecofund/ccc/commit/b4aa69085d69fc0953629fd907212922d7d106dd), [`f13f4d3`](https://github.com/ckb-ecofund/ccc/commit/f13f4d319ca66b571029a65e945e3a038bfeea25), [`4fb114b`](https://github.com/ckb-ecofund/ccc/commit/4fb114bc421c7250eed7388c16f1c026875153e6), [`3f49876`](https://github.com/ckb-ecofund/ccc/commit/3f49876826f5a9eeff8d14c7d8d7b9cf2cea0f32), [`32bffff`](https://github.com/ckb-ecofund/ccc/commit/32bffff407934ec5d16bf7c5701b128d8b29c452)]:
+  - @ckb-ccc/connector@0.0.14
+
 ## 0.0.14-alpha.3
 
 ### Patch Changes
