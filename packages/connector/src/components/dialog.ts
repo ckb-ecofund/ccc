@@ -2,6 +2,7 @@ import { css, html, LitElement } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import { CLOSE_SVG } from "../assets/close.svg.js";
 import { LEFT_SVG } from "../assets/left.svg.js";
+import { CloseEvent } from "../events/index.js";
 
 @customElement("ccc-dialog")
 export class Dialog extends LitElement {
@@ -27,9 +28,7 @@ export class Dialog extends LitElement {
         <span
           class="close active"
           @click=${() => {
-            this.dispatchEvent(
-              new Event("close", { bubbles: true, composed: true }),
-            );
+            this.dispatchEvent(new CloseEvent());
           }}
         >
           ${CLOSE_SVG}

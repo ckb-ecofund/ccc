@@ -61,9 +61,7 @@ For non-developers, you can also [try CCC's app now here](https://app.ckbccc.com
 Before using the Connector, wrap your UI with the CCC Provider:
 
 ```tsx
-<ccc.Provider>
-  {/* Your application */}
-</ccc.Provider>
+<ccc.Provider>{/* Your application */}</ccc.Provider>
 ```
 
 Check [the document for @ckb-ccc/connector-react](https://docs.ckbccc.com/modules/_ckb_ccc_connector_react.index.ccc.html) for more information.

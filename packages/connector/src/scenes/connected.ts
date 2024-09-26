@@ -6,13 +6,8 @@ import { CKB_SVG } from "../assets/chains/index.js";
 import { DISCONNECT_SVG } from "../assets/diconnect.svg.js";
 import { SWAP_SVG } from "../assets/swap.svg.js";
 import { USER_SVG } from "../assets/user.svg.js";
+import { SelectClientEvent } from "../events/index.js";
 import { signerTypeToIcon } from "./selecting/signers.js";
-
-export class SelectClientEvent extends Event {
-  constructor(public client: ccc.Client) {
-    super("select-client");
-  }
-}
 
 export function formatString(
   str: string | undefined,

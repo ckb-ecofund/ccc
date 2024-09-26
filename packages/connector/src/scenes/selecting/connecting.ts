@@ -31,9 +31,7 @@ export function generateConnectingScene(
         class="mt-2"
         @click=${() => onSignerSelected(wallet, signer)}
       >
-
-        ${RETRY_SVG}
-        Try again
+        ${RETRY_SVG} Try again
       </ccc-button-pill>
     `,
   ];

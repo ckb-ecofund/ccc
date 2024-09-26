@@ -1,18 +1,10 @@
 import { ccc } from "@ckb-ccc/ccc";
 import { css, html, LitElement } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
+import { CloseEvent, ConnectedEvent } from "../../events/index.js";
 import { generateConnectingScene } from "./connecting.js";
 import { generateSignersScene } from "./signers.js";
 import { generateWalletsScene } from "./wallets.js";
-
-export class ConnectedEvent extends Event {
-  constructor(
-    public readonly walletName: string,
-    public readonly signerName: string,
-  ) {
-    super("connected");
-  }
-}
 
 @customElement("ccc-selecting-scene")
 export class SelectingScene extends LitElement {
@@ -55,9 +47,6 @@ export class SelectingScene extends LitElement {
     return html`<ccc-dialog
       header=${title}
       ?canBack=${this.selectedSigner || this.selectedWallet}
-      @close=${() => {
-        this.onClose();
-      }}
       @back=${() => {
         if (
           !this.selectedSigner ||
@@ -116,8 +105,11 @@ export class SelectingScene extends LitElement {
         return;
       }
 
-      this.dispatchEvent(new Event("close", { bubbles: true, composed: true }));
-      this.dispatchEvent(new ConnectedEvent(wallet.name, signerInfo.name));
+      this.dispatchEvent(
+        new CloseEvent(() => {
+          this.dispatchEvent(new ConnectedEvent(wallet.name, signerInfo.name));
+        }),
+      );
     })();
   };
 
