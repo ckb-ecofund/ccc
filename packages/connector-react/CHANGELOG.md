@@ -1,5 +1,14 @@
 # @ckb-ccc/connector-react
 
+## 0.0.17-alpha.1
+
+### Patch Changes
+
+- [#62](https://github.com/ckb-ecofund/ccc/pull/62) [`543c765`](https://github.com/ckb-ecofund/ccc/commit/543c76523b3864f2203631762c27b8fc4c942cd7) Thanks [@Hanssen0](https://github.com/Hanssen0)! - feat(connector): Powered by CCC
+
+- Updated dependencies [[`543c765`](https://github.com/ckb-ecofund/ccc/commit/543c76523b3864f2203631762c27b8fc4c942cd7)]:
+  - @ckb-ccc/connector@0.0.17-alpha.1
+
 ## 0.0.17-alpha.0
 
 ### Patch Changes
