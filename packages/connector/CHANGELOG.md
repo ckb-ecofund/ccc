@@ -1,5 +1,14 @@
 # @ckb-ccc/connector
 
+## 0.0.17-alpha.0
+
+### Patch Changes
+
+- [#60](https://github.com/ckb-ecofund/ccc/pull/60) [`e904963`](https://github.com/ckb-ecofund/ccc/commit/e904963a16f12c410d861eb3ae01b87d68cb3e34) Thanks [@Hanssen0](https://github.com/Hanssen0)! - feat: support Xverse
+
+- Updated dependencies [[`e904963`](https://github.com/ckb-ecofund/ccc/commit/e904963a16f12c410d861eb3ae01b87d68cb3e34)]:
+  - @ckb-ccc/ccc@0.0.16-alpha.0
+
 ## 0.0.16
 
 ### Patch Changes

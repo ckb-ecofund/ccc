@@ -19,5 +19,7 @@
     "@ckb-ccc/utxo-global": "0.0.15",
     "@ckb-ccc/xverse": "0.0.14"
   },
-  "changesets": []
+  "changesets": [
+    "tall-mangos-kneel"
+  ]
 }
