@@ -6,6 +6,7 @@ import { Okx } from "@ckb-ccc/okx";
 import { Rei } from "@ckb-ccc/rei";
 import { UniSat } from "@ckb-ccc/uni-sat";
 import { UtxoGlobal } from "@ckb-ccc/utxo-global";
+import { Xverse } from "@ckb-ccc/xverse";
 import { ETH_SVG } from "./assets/eth.svg.js";
 import { JOY_ID_SVG } from "./assets/joy-id.svg.js";
 import { METAMASK_SVG } from "./assets/metamask.svg.js";
@@ -145,6 +146,11 @@ export class SignersController {
       Okx.getOKXSigners(client, preferredNetworks),
       context,
     );
+
+    await Promise.all(Xverse.getXverseSigners(client, preferredNetworks).map(
+      ({ wallet, signerInfo }) =>
+        this.addSigner(wallet.name, wallet.icon, signerInfo, context),
+    ));
 
     const nostrSigner = Nip07.getNip07Signer(client);
     if (nostrSigner) {

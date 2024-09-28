@@ -1,7 +1,7 @@
 {
-  "name": "@ckb-ccc/ccc",
-  "version": "0.0.15",
-  "description": "CCC - CKBer's Codebase. Common Chains Connector.",
+  "name": "@ckb-ccc/xverse",
+  "version": "0.0.14",
+  "description": "CCC - CKBer's Codebase. Common Chains Connector's support for Xverse",
   "author": "Hanssen0 <hanssen0@hanssen0.com>",
   "license": "MIT",
   "private": false,
@@ -21,13 +21,13 @@
       "import": "./dist/barrel.js",
       "default": "./dist.commonjs/barrel.js"
     },
-    "./advancedBarrel": {
-      "import": "./dist/advancedBarrel.js",
-      "default": "./dist.commonjs/advancedBarrel.js"
-    },
     "./advanced": {
       "import": "./dist/advanced.js",
       "default": "./dist.commonjs/advanced.js"
+    },
+    "./advancedBarrel": {
+      "import": "./dist/advancedBarrel.js",
+      "default": "./dist.commonjs/advancedBarrel.js"
     }
   },
   "scripts": {
@@ -52,13 +52,6 @@
   },
   "dependencies": {
     "@ckb-ccc/core": "workspace:*",
-    "@ckb-ccc/eip6963": "workspace:*",
-    "@ckb-ccc/joy-id": "workspace:*",
-    "@ckb-ccc/nip07": "workspace:*",
-    "@ckb-ccc/okx": "workspace:*",
-    "@ckb-ccc/uni-sat": "workspace:*",
-    "@ckb-ccc/utxo-global": "workspace:*",
-    "@ckb-ccc/rei": "workspace:*",
-    "@ckb-ccc/xverse": "workspace:*"
+    "valibot": "^0.42.1"
   }
 }

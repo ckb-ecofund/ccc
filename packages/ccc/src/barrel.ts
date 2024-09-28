@@ -6,4 +6,5 @@ export * from "@ckb-ccc/okx";
 export * from "@ckb-ccc/rei";
 export * from "@ckb-ccc/uni-sat";
 export * from "@ckb-ccc/utxo-global";
+export * from "@ckb-ccc/xverse";
 export * from "./signersController.js";
