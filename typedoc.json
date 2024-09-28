@@ -10,6 +10,7 @@
     "packages/rei",
     "packages/joy-id",
     "packages/okx",
+    "packages/xverse",
     "packages/uni-sat",
     "packages/nip07",
     "packages/eip6963",
