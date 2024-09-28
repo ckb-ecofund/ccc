@@ -55,6 +55,7 @@ class SignersControllerWithFilter extends ccc.SignersController {
 export function Provider({
   children,
   connectorProps,
+  hideMark,
   name,
   icon,
   signerFilter,
@@ -65,6 +66,7 @@ export function Provider({
 }: {
   children: ReactNode;
   connectorProps?: HTMLAttributes<{}>;
+  hideMark?: boolean,
   name?: string;
   icon?: string;
   signerFilter?: (
@@ -128,6 +130,7 @@ export function Provider({
       }}
     >
       <Connector
+        hideMark={hideMark}
         name={name}
         icon={icon}
         signersController={

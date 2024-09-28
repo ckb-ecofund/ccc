@@ -23,6 +23,8 @@ export function formatString(
 @customElement("ccc-connected-scene")
 export class ConnectedScene extends LitElement {
   @property()
+  public hideMark: any | undefined | null;
+  @property()
   public wallet?: ccc.Wallet;
   @property()
   public signer?: ccc.Signer;
@@ -107,6 +109,10 @@ export class ConnectedScene extends LitElement {
           >
             ${DISCONNECT_SVG} Disconnect
           </ccc-button>
+
+          ${this.hideMark == null
+            ? html`<a href="https://github.com/ckb-ecofund/ccc" class="mark">Powered by CCC</a>`
+            : ""}
 
           <div
             class="switch-btn-container ${this.clientOptions
@@ -227,7 +233,6 @@ export class ConnectedScene extends LitElement {
     .switch-btn-container {
       width: 100%;
       margin-top: 1.2rem;
-      margin-bottom: 0.2rem;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -268,6 +273,21 @@ export class ConnectedScene extends LitElement {
 
     .sm-chain-logo {
       width: 1.125rem;
+    }
+
+    .mark {
+      text-decoration: none;
+      cursor: pointer;
+      opacity: 0.2;
+      margin: 0;
+      margin-top: 0.25rem;
+      margin-bottom: -1.05rem;
+      color: var(--tip-color);
+      font-size: 0.6rem;
+    }
+
+    .mark:hover {
+      opacity: 0.5;
     }
   `;
 
