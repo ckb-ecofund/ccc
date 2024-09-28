@@ -12,6 +12,8 @@ import { SignersController } from "../signers/index.js";
 @customElement("ccc-connector")
 export class WebComponentConnector extends LitElement {
   @property()
+  public hideMark: any | undefined | null;
+  @property()
   public name?: string;
   @property()
   public icon?: string;
@@ -151,6 +153,7 @@ export class WebComponentConnector extends LitElement {
         ${this.wallet && this.signer
           ? html`
               <ccc-connected-scene
+                ?hideMark=${this.hideMark}
                 .wallet=${this.wallet}
                 .signer=${this.signer.signer}
                 .clientOptions=${this.clientOptions}

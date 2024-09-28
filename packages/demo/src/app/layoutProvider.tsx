@@ -267,6 +267,7 @@ export function LayoutProvider({ children }: { children: ReactNode }) {
           network: "btc",
         },
       ]}
+      hideMark // Hide "Powered by CCC"
     */
       clientOptions={[
         {
