@@ -53,9 +53,10 @@ export class EvmSigner extends ccc.SignerEvm {
     return {
       redirectURL: location.href,
       joyidAppURL:
-        this._appUri ?? this.client.addressPrefix === "ckb"
+        this._appUri ??
+        (this.client.addressPrefix === "ckb"
           ? "https://app.joy.id"
-          : "https://testnet.joyid.dev",
+          : "https://testnet.joyid.dev"),
       requestNetwork: `ethereum`,
       name: this.name,
       logo: this.icon,

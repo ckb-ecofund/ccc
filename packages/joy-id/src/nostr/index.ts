@@ -53,9 +53,10 @@ export class NostrSigner extends ccc.SignerNostr {
     return {
       redirectURL: location.href,
       joyidAppURL:
-        this._appUri ?? this.client.addressPrefix === "ckb"
+        this._appUri ??
+        (this.client.addressPrefix === "ckb"
           ? "https://app.joy.id"
-          : "https://testnet.joyid.dev",
+          : "https://testnet.joyid.dev"),
       requestNetwork: "nostr",
       name: this.name,
       logo: this.icon,
