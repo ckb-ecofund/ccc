@@ -1,5 +1,12 @@
 # @ckb-ccc/rei
 
+## 0.0.16-alpha.0
+
+### Patch Changes
+
+- Updated dependencies [[`1720d5a`](https://github.com/ckb-ecofund/ccc/commit/1720d5a398543f1c6e24763eeaf15d84cd2214bf)]:
+  - @ckb-ccc/core@0.0.16-alpha.0
+
 ## 0.0.15
 
 ### Patch Changes

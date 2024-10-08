@@ -1,5 +1,11 @@
 # @ckb-ccc/core
 
+## 0.0.16-alpha.0
+
+### Patch Changes
+
+- [#64](https://github.com/ckb-ecofund/ccc/pull/64) [`1720d5a`](https://github.com/ckb-ecofund/ccc/commit/1720d5a398543f1c6e24763eeaf15d84cd2214bf) Thanks [@Hanssen0](https://github.com/Hanssen0)! - feat(core): ckb proxy locks
+
 ## 0.0.15
 
 ### Patch Changes
