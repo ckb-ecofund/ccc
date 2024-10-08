@@ -5,6 +5,23 @@ export const TESTNET_SCRIPTS: Record<
   KnownScript,
   Pick<Script, "codeHash" | "hashType"> & { cellDeps: CellDepInfoLike[] }
 > = Object.freeze({
+  [KnownScript.NervosDao]: {
+    codeHash:
+      "0x82d76d1b75fe2fd9a27dfbaa65a039221a380d76c926f378d3f81cf3e7e13f2e",
+    hashType: "type",
+    cellDeps: [
+      {
+        cellDep: {
+          outPoint: {
+            txHash:
+              "0x8f8c79eb6671709633fe6a46de93c0fedc9c1b8a6527a18d3983879542635c9f",
+            index: 2,
+          },
+          depType: "code",
+        },
+      },
+    ],
+  },
   [KnownScript.Secp256k1Blake160]: {
     codeHash:
       "0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8",
@@ -231,9 +248,9 @@ export const TESTNET_SCRIPTS: Record<
       },
     ],
   },
-  [KnownScript.SingleUseLock]: {
+  [KnownScript.AlwaysSuccess]: {
     codeHash:
-      "0x8290467a512e5b9a6b816469b0edabba1f4ac474e28ffdd604c2a7c76446bbaf",
+      "0x3b521cc4b552f109d092d8cc468a8048acb53c5952dbe769d2b2f9cf6e47f7f1",
     hashType: "data1",
     cellDeps: [
       {
@@ -241,7 +258,24 @@ export const TESTNET_SCRIPTS: Record<
           outPoint: {
             txHash:
               "0xb4f171c9c9caf7401f54a8e56225ae21d95032150a87a4678eac3f66a3137b93",
-            index: 4,
+            index: 0,
+          },
+          depType: "code",
+        },
+      },
+    ],
+  },
+  [KnownScript.InputTypeProxyLock]: {
+    codeHash:
+      "0x5123908965c711b0ffd8aec642f1ede329649bda1ebdca6bd24124d3796f768a",
+    hashType: "data1",
+    cellDeps: [
+      {
+        cellDep: {
+          outPoint: {
+            txHash:
+              "0xb4f171c9c9caf7401f54a8e56225ae21d95032150a87a4678eac3f66a3137b93",
+            index: 1,
           },
           depType: "code",
         },
@@ -265,17 +299,85 @@ export const TESTNET_SCRIPTS: Record<
       },
     ],
   },
-  [KnownScript.NervosDao]: {
+  [KnownScript.LockProxyLock]: {
     codeHash:
-      "0x82d76d1b75fe2fd9a27dfbaa65a039221a380d76c926f378d3f81cf3e7e13f2e",
-    hashType: "type",
+      "0x5d41e32e224c15f152b7e6529100ebeac83b162f5f692a5365774dad2c1a1d02",
+    hashType: "data1",
     cellDeps: [
       {
         cellDep: {
           outPoint: {
             txHash:
-              "0x8f8c79eb6671709633fe6a46de93c0fedc9c1b8a6527a18d3983879542635c9f",
-            index: 2,
+              "0xb4f171c9c9caf7401f54a8e56225ae21d95032150a87a4678eac3f66a3137b93",
+            index: 3,
+          },
+          depType: "code",
+        },
+      },
+    ],
+  },
+  [KnownScript.SingleUseLock]: {
+    codeHash:
+      "0x8290467a512e5b9a6b816469b0edabba1f4ac474e28ffdd604c2a7c76446bbaf",
+    hashType: "data1",
+    cellDeps: [
+      {
+        cellDep: {
+          outPoint: {
+            txHash:
+              "0xb4f171c9c9caf7401f54a8e56225ae21d95032150a87a4678eac3f66a3137b93",
+            index: 4,
+          },
+          depType: "code",
+        },
+      },
+    ],
+  },
+  [KnownScript.TypeBurnLock]: {
+    codeHash:
+      "0xff78bae0abf17d7a404c0be0f9ad9c9185b3f88dcc60403453d5ba8e1f22f53a",
+    hashType: "data1",
+    cellDeps: [
+      {
+        cellDep: {
+          outPoint: {
+            txHash:
+              "0xb4f171c9c9caf7401f54a8e56225ae21d95032150a87a4678eac3f66a3137b93",
+            index: 5,
+          },
+          depType: "code",
+        },
+      },
+    ],
+  },
+  [KnownScript.EasyToDiscoverType]: {
+    codeHash:
+      "0xaba4430cc7110d699007095430a1faa72973edf2322ddbfd4d1d219cacf237af",
+    hashType: "data1",
+    cellDeps: [
+      {
+        cellDep: {
+          outPoint: {
+            txHash:
+              "0x1b4ffcad55ecd36ffb2715b6816b83da73851f1a24fe594f263c4f34dad90792",
+            index: 0,
+          },
+          depType: "code",
+        },
+      },
+    ],
+  },
+  [KnownScript.TimeLock]: {
+    codeHash:
+      "0x6fac4b2e89360a1e692efcddcb3a28656d8446549fb83da6d896db8b714f4451",
+    hashType: "data1",
+    cellDeps: [
+      {
+        cellDep: {
+          outPoint: {
+            txHash:
+              "0x1b4ffcad55ecd36ffb2715b6816b83da73851f1a24fe594f263c4f34dad90792",
+            index: 1,
           },
           depType: "code",
         },
