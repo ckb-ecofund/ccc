@@ -147,10 +147,12 @@ export class SignersController {
       context,
     );
 
-    await Promise.all(Xverse.getXverseSigners(client, preferredNetworks).map(
-      ({ wallet, signerInfo }) =>
-        this.addSigner(wallet.name, wallet.icon, signerInfo, context),
-    ));
+    await Promise.all(
+      Xverse.getXverseSigners(client, preferredNetworks).map(
+        ({ wallet, signerInfo }) =>
+          this.addSigner(wallet.name, wallet.icon, signerInfo, context),
+      ),
+    );
 
     const nostrSigner = Nip07.getNip07Signer(client);
     if (nostrSigner) {

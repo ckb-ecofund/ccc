@@ -33,6 +33,7 @@ import {
  * @public
  */
 export enum KnownScript {
+  NervosDao = "NervosDao",
   Secp256k1Blake160 = "Secp256k1Blake160",
   Secp256k1Multisig = "Secp256k1Multisig",
   AnyoneCanPay = "AnyoneCanPay",
@@ -44,9 +45,16 @@ export enum KnownScript {
   OmniLock = "OmniLock",
   NostrLock = "NostrLock",
   UniqueType = "UniqueType",
-  SingleUseLock = "SingleUseLock",
+
+  // ckb-proxy-locks https://github.com/ckb-ecofund/ckb-proxy-locks
+  AlwaysSuccess = "AlwaysSuccess",
+  InputTypeProxyLock = "InputTypeProxyLock",
   OutputTypeProxyLock = "OutputTypeProxyLock",
-  NervosDao = "NervosDao",
+  LockProxyLock = "LockProxyLock",
+  SingleUseLock = "SingleUseLock",
+  TypeBurnLock = "TypeBurnLock",
+  EasyToDiscoverType = "EasyToDiscoverType",
+  TimeLock = "TimeLock",
 }
 
 /**

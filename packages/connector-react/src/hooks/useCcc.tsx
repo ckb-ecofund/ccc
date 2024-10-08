@@ -66,7 +66,7 @@ export function Provider({
 }: {
   children: ReactNode;
   connectorProps?: HTMLAttributes<{}>;
-  hideMark?: boolean,
+  hideMark?: boolean;
   name?: string;
   icon?: string;
   signerFilter?: (
