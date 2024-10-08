@@ -37,15 +37,12 @@ import { JsonRpcCellOutput, JsonRpcTransformers } from "./advanced.js";
  *
  * @example
  * ```typescript
- * const result = await transform(5, (x) => x * 2); // Outputs 10
- * const resultWithoutTransformer = await transform(5); // Outputs 5
+ * const result = transform(5, (x) => x * 2); // Outputs 10
+ * const resultWithoutTransformer = transform(5); // Outputs 5
  * ```
  */
 
-async function transform(
-  value: unknown,
-  transformer?: (i: unknown) => unknown,
-) {
+function transform(value: unknown, transformer?: (i: unknown) => unknown) {
   if (transformer) {
     return transformer(value);
   }
@@ -367,15 +364,13 @@ export abstract class ClientJsonRpc extends Client {
     return async (...req: unknown[]) => {
       const payload = this.buildPayload(
         rpcMethod,
-        await Promise.all(
-          req
-            .concat(
-              Array.from(
-                new Array(Math.max(inTransformers.length - req.length, 0)),
-              ),
-            )
-            .map((v, i) => transform(v, inTransformers[i])),
-        ),
+        req
+          .concat(
+            Array.from(
+              new Array(Math.max(inTransformers.length - req.length, 0)),
+            ),
+          )
+          .map((v, i) => transform(v, inTransformers[i])),
       );
 
       try {
