@@ -186,7 +186,7 @@ function DaoButton({ dao }: { dao: ccc.Cell }) {
             }
             const [withdrawTx, withdrawHeader] = infos[3];
             if (!withdrawTx?.blockHash) {
-              error("Unexpected empty withdraw tx block info");
+              error("Unexpected empty redeem tx block info");
               return;
             }
             if (!depositTx.blockHash) {
@@ -267,7 +267,7 @@ function DaoButton({ dao }: { dao: ccc.Cell }) {
             epoch
           </div>
         ) : undefined}
-        <span>{isNew ? "Withdraw" : "Claim"}</span>
+        <span>{isNew ? "Redeem" : "Withdraw"}</span>
       </div>
     </BigButton>
   );
