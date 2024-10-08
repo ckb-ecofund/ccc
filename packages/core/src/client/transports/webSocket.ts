@@ -17,7 +17,7 @@ export class TransportWebSocket implements Transport {
     private readonly timeout = 30000,
   ) {}
 
-  async request(data: JsonRpcPayload) {
+  request(data: JsonRpcPayload) {
     const socket = (() => {
       if (this.socket) {
         return this.socket;
