@@ -373,38 +373,4 @@ export const MAINNET_SCRIPTS: Record<
       },
     ],
   },
-  [KnownScript.TypeBurnLock]: {
-    codeHash:
-      "0xff78bae0abf17d7a404c0be0f9ad9c9185b3f88dcc60403453d5ba8e1f22f53a",
-    hashType: "data1",
-    cellDeps: [
-      {
-        cellDep: {
-          outPoint: {
-            txHash:
-              "0x10d63a996157d32c01078058000052674ca58d15f921bec7f1dcdac2160eb66b",
-            index: 5,
-          },
-          depType: "code",
-        },
-      },
-    ],
-  },
-  [KnownScript.LockProxyLock]: {
-    codeHash:
-      "0x5d41e32e224c15f152b7e6529100ebeac83b162f5f692a5365774dad2c1a1d02",
-    hashType: "data1",
-    cellDeps: [
-      {
-        cellDep: {
-          outPoint: {
-            txHash:
-              "0x10d63a996157d32c01078058000052674ca58d15f921bec7f1dcdac2160eb66b",
-            index: 3,
-          },
-          depType: "code",
-        },
-      },
-    ],
-  },
 });

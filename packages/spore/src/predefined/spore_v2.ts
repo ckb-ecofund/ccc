@@ -1,3 +1,4 @@
+<<<<<<< HEAD:packages/spore/src/predefined.ts
 import { ccc } from "@ckb-ccc/core";
 
 export const COBUILD_INFO_HASH = ccc.hashCkb(
@@ -15,6 +16,9 @@ export type SporeScriptInfo = Record<
     cellDeps: ccc.CellDepInfoLike[];
   }
 >;
+=======
+import { SporeScriptInfo } from ".";
+>>>>>>> 0338e69 (feat: simplify cobuild injection):packages/spore/src/predefined/spore_v2.ts
 
 export const SPORE_MAINNET_SCRIPTS: SporeScriptInfo = Object.freeze({
   [SporeScript.Spore]: {
@@ -89,6 +93,7 @@ export const SPORE_TESTNET_SCRIPTS: SporeScriptInfo = Object.freeze({
     ],
   },
 });
+<<<<<<< HEAD:packages/spore/src/predefined.ts
 
 export function buildSporeScript(
   client: ccc.Client,
@@ -121,3 +126,5 @@ export function buildSporeCellDep(
 
   return info[protocol].cellDeps.map(ccc.CellDepInfo.from);
 }
+=======
+>>>>>>> 0338e69 (feat: simplify cobuild injection):packages/spore/src/predefined/spore_v2.ts

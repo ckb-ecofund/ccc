@@ -160,7 +160,6 @@ describe("createCluster [testnet]", () => {
     console.log("clusterId:", id);
 
     // Complete transaction
-    tx = injectCommonCobuildProof(tx, actions);
     await tx.completeFeeBy(signer, 1000);
     tx = await signer.signTransaction(tx);
     console.log(JSON.stringify(JsonRpcTransformers.transactionFrom(tx)));

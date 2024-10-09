@@ -18,7 +18,7 @@ describe("meltSpore [testnet]", () => {
       signer,
       ids: [
         // Change this if you have a different sporeId
-        "0xe41a6e19b70dcca7d8d9debc98d4c3b413a0fc69e0ae258bf24fbd5f92cca819",
+        "0x683ea7c306697fbef5af6a2fe4da78f9cdc302f30f2c8f50bd63f661a3df0fdf",
       ],
     });
 
@@ -36,11 +36,7 @@ describe("meltSpore [testnet]", () => {
       ],
     });
 
-    // Combine actions
-    const actions = [...meltActions, ...createActions];
-
     // Complete transaction
-    tx = injectCommonCobuildProof(tx, actions);
     await tx.completeFeeBy(signer, 1000);
     tx = await signer.signTransaction(tx);
     console.log(JSON.stringify(JsonRpcTransformers.transactionFrom(tx)));

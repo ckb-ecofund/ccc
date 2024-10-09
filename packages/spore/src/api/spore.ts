@@ -1,5 +1,4 @@
 import { ccc } from "@ckb-ccc/core";
-import { UnpackResult } from "@ckb-lumos/codec";
 import {
   assembleCreateSporeAction,
   assembleMeltSporeAction,

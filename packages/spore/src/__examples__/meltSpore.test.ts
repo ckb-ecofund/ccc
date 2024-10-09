@@ -39,7 +39,6 @@ import { assert, describe, it } from "vitest";
 =======
 >>>>>>> 2de265a (feat: fix issues from comment)
 import { meltSporeCells } from "..";
-import { injectCommonCobuildProof } from "../advanced";
 
 describe("meltSpore [testnet]", () => {
   expect(process.env.PRIVATE_KEY).toBeDefined();
@@ -52,7 +51,7 @@ describe("meltSpore [testnet]", () => {
     );
 
     // Build transaction
-    let { transaction: tx, actions } = await meltSporeCells({
+    let { transaction: tx } = await meltSporeCells({
       signer,
       sporeIdCollection: [
         // Change this if you have a different sporeId
@@ -61,7 +60,6 @@ describe("meltSpore [testnet]", () => {
     });
 
     // Complete transaction
-    tx = injectCommonCobuildProof(tx, actions);
     await tx.completeFeeBy(signer, 1000);
     tx = await signer.signTransaction(tx);
     console.log(JSON.stringify(JsonRpcTransformers.transactionFrom(tx)));

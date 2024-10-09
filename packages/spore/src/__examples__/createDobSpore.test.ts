@@ -58,7 +58,6 @@ import { assert, describe, it } from "vitest";
 =======
 >>>>>>> 2de265a (feat: fix issues from comment)
 import { createSporeCells } from "..";
-import { injectCommonCobuildProof } from "../advanced";
 
 describe("createSpore [testnet]", () => {
   expect(process.env.PRIVATE_KEY).toBeDefined();
@@ -82,11 +81,7 @@ describe("createSpore [testnet]", () => {
     const content = `{"dna":"${hexedDna}"}`;
 
     // Build transaction
-    let {
-      transaction: tx,
-      actions,
-      sporeIds,
-    } = await createSporeCells({
+    let { transaction: tx, sporeIds } = await createSporeCells({
       signer,
       sporeDataCollection: [
         {
@@ -94,7 +89,7 @@ describe("createSpore [testnet]", () => {
             contentType: "dob/1",
             content: ccc.bytesFrom(content, "utf8"),
             clusterId:
-              "0x91b94378902009f359b02ae33613055570e78cd37f364127eb1e4b3a9d77c092",
+              "0x1f0156c10a770ade320082e0874b940010969739773719f9a9fb650775a453a4",
           },
         },
       ],
@@ -103,7 +98,6 @@ describe("createSpore [testnet]", () => {
     console.log("sporeIds:", sporeIds);
 
     // Complete transaction
-    tx = injectCommonCobuildProof(tx, actions);
     await tx.completeFeeBy(signer, 1000);
     tx = await signer.signTransaction(tx);
     console.log(JSON.stringify(JsonRpcTransformers.transactionFrom(tx)));

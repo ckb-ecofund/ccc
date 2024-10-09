@@ -195,3 +195,44 @@ export function injectCommonCobuildProof(
   txSkeleton.witnesses.push(ccc.hexFrom(witnessLayout));
   return txSkeleton;
 }
+
+export function unpackCommonCobuildProof(
+  data: ccc.HexLike,
+): UnpackResult<typeof WitnessLayout> | null {
+  try {
+    return WitnessLayout.unpack(ccc.bytesFrom(data));
+  } catch {
+    return null;
+  }
+}
+
+export function unpackCobuildActionsFromTx(
+  tx: ccc.TransactionLike,
+): UnpackResult<typeof ActionVec> {
+  if (!tx.witnesses || tx.witnesses.length === 0) {
+    return [];
+  }
+  const witnessLayout = unpackCommonCobuildProof(
+    tx.witnesses[tx.witnesses.length - 1],
+  );
+  if (!witnessLayout) {
+    return [];
+  }
+  if (witnessLayout.type !== "SighashAll") {
+    throw new Error("Invalid cobuild proof type: " + witnessLayout.type);
+  }
+  return witnessLayout.value.message.actions;
+}
+
+export async function prepareSporeTransaction(
+  signer: ccc.Signer,
+  tx: ccc.TransactionLike,
+  actions: UnpackResult<typeof ActionVec>,
+): Promise<ccc.Transaction> {
+  const existedActions = unpackCobuildActionsFromTx(tx);
+  if (existedActions.length > 0) {
+    tx.witnesses!.pop();
+  }
+  tx = await signer.prepareTransaction(tx);
+  return injectCommonCobuildProof(tx, [...existedActions, ...actions]);
+}
