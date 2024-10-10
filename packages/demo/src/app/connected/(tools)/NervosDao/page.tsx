@@ -230,10 +230,10 @@ function DaoButton({ dao }: { dao: ccc.Cell }) {
           }
 
           // Sign and send the transaction
-          log(
-            "Transaction sent:",
-            explorerTransaction(await signer.sendTransaction(tx)),
-          );
+          const txHash = await signer.sendTransaction(tx);
+          log("Transaction sent:", explorerTransaction(txHash));
+          await signer.client.waitTransaction(txHash);
+          log("Transaction committed:", explorerTransaction(txHash));
         })();
       }}
       className={`align-center ${isNew ? "text-yellow-400" : "text-orange-400"}`}
@@ -400,10 +400,10 @@ export default function Transfer() {
             await tx.completeFeeBy(signer, feeRate);
 
             // Sign and send the transaction
-            log(
-              "Transaction sent:",
-              explorerTransaction(await signer.sendTransaction(tx)),
-            );
+            const txHash = await signer.sendTransaction(tx);
+            log("Transaction sent:", explorerTransaction(txHash));
+            await signer.client.waitTransaction(txHash);
+            log("Transaction committed:", explorerTransaction(txHash));
           }}
         >
           Deposit

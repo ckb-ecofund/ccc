@@ -1,3 +1,5 @@
+import { NumLike, numFrom } from "../num/index.js";
+
 /**
  * A type safe way to apply a transformer on a value if it's not empty.
  * @public
@@ -164,6 +166,10 @@ export async function reduceAsync<T, V>(
       ),
     Promise.resolve(init),
   );
+}
+
+export function sleep(ms: NumLike) {
+  return new Promise((resolve) => setTimeout(resolve, Number(numFrom(ms))));
 }
 
 /**

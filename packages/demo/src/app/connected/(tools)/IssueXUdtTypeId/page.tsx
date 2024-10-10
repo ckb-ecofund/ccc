@@ -196,10 +196,10 @@ export default function IssueXUdtTypeId() {
                 ccc.bytesFrom(ccc.hashTypeId(mintTx.inputs[0], 2)).slice(0, 20),
               );
               await mintTx.completeFeeBy(signer);
-              log(
-                "Transaction sent:",
-                explorerTransaction(await signer.sendTransaction(mintTx)),
-              );
+              const mintTxHash = await signer.sendTransaction(mintTx);
+              log("Transaction sent:", explorerTransaction(mintTxHash));
+              await signer.client.waitTransaction(mintTxHash);
+              log("Transaction committed:", explorerTransaction(mintTxHash));
             }}
           >
             Issue
