@@ -1,6 +1,5 @@
 import { ccc } from "@ckb-ccc/core";
-import { BytesLike, UnpackResult, molecule } from "@ckb-lumos/codec";
-import { bytify } from "@ckb-lumos/codec/lib/bytes.js";
+import { UnpackResult } from "@ckb-lumos/codec";
 import {
   Action,
   ActionVec,
@@ -13,15 +12,6 @@ import {
   SporeScriptInfo,
   buildSporeScript,
 } from "./predefined/index.js";
-
-/**
- * The codec for packing/unpacking UTF-8 raw strings.
- * Should be packed like so: String.pack('something')
- */
-export const RawString = molecule.byteVecOf({
-  pack: (packable: string) => ccc.bytesFrom(packable, "utf8"),
-  unpack: (unpackable: BytesLike) => ccc.bytesTo(bytify(unpackable), "utf8"),
-});
 
 export async function findClusterById(
   client: ccc.Client,
