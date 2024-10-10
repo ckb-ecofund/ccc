@@ -86,10 +86,10 @@ export default function TransferXUdt() {
             await tx.completeFeeBy(signer);
 
             // Sign and send the transaction
-            log(
-              "Transaction sent:",
-              explorerTransaction(await signer.sendTransaction(tx)),
-            );
+            const txHash = await signer.sendTransaction(tx);
+            log("Transaction sent:", explorerTransaction(txHash));
+            await signer.client.waitTransaction(txHash);
+            log("Transaction committed:", explorerTransaction(txHash));
           }}
         >
           Transfer

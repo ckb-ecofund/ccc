@@ -12,7 +12,7 @@ import {
 import { Zero } from "../fixedPoint/index.js";
 import { Hex, HexLike, hexFrom } from "../hex/index.js";
 import { Num, NumLike, numFrom, numMax } from "../num/index.js";
-import { apply, reduceAsync } from "../utils/index.js";
+import { apply, reduceAsync, sleep } from "../utils/index.js";
 import { ClientCache } from "./cache/index.js";
 import { ClientCacheMemory } from "./cache/memory.js";
 import { ClientCollectableSearchKeyLike } from "./clientTypes.advanced.js";
@@ -26,6 +26,7 @@ import {
   ClientIndexerSearchKeyLike,
   ClientIndexerSearchKeyTransactionLike,
   ClientTransactionResponse,
+  ErrorClientWaitTransactionTimeout,
   OutputsValidator,
 } from "./clientTypes.js";
 
@@ -566,5 +567,49 @@ export abstract class Client {
       ...res,
       transaction: tx,
     };
+  }
+
+  async waitTransaction(
+    txHash: HexLike,
+    confirmations: number = 0,
+    timeout: number = 30000,
+    interval: number = 2000,
+  ): Promise<ClientTransactionResponse | undefined> {
+    const startTime = Date.now();
+    let tx: ClientTransactionResponse | undefined;
+
+    const getTx = async () => {
+      const res = await this.getTransaction(txHash);
+      if (
+        !res ||
+        res.blockNumber == null ||
+        ["sent", "pending", "proposed"].includes(res.status)
+      ) {
+        return undefined;
+      }
+
+      tx = res;
+      return res;
+    };
+
+    while (true) {
+      if (!tx) {
+        if (await getTx()) {
+          continue;
+        }
+      } else if (confirmations === 0) {
+        return tx;
+      } else if (
+        (await this.getTipHeader()).number - tx!.blockNumber! >=
+        confirmations
+      ) {
+        return tx;
+      }
+
+      if (Date.now() - startTime + interval >= timeout) {
+        throw new ErrorClientWaitTransactionTimeout();
+      }
+      await sleep(interval);
+    }
   }
 }

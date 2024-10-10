@@ -83,10 +83,10 @@ function ClaimButton({ cell, lock }: { cell: ccc.Cell; lock: ccc.Script }) {
           await tx.completeInputsByCapacity(signer);
           await tx.completeFeeChangeToOutput(signer, 0);
 
-          log(
-            "Transaction sent:",
-            explorerTransaction(await signer.sendTransaction(tx)),
-          );
+          const txHash = await signer.sendTransaction(tx);
+          log("Transaction sent:", explorerTransaction(txHash));
+          await signer.client.waitTransaction(txHash);
+          log("Transaction committed:", explorerTransaction(txHash));
         })();
       }}
       className="align-center text-yellow-400"
@@ -149,10 +149,10 @@ export default function TimeLockedTransfer() {
     await tx.completeInputsByCapacity(signer);
     await tx.completeFeeBy(signer);
 
-    log(
-      "Transaction sent:",
-      explorerTransaction(await signer.sendTransaction(tx)),
-    );
+    const txHash = await signer.sendTransaction(tx);
+    log("Transaction sent:", explorerTransaction(txHash));
+    await signer.client.waitTransaction(txHash);
+    log("Transaction committed:", explorerTransaction(txHash));
   }, [
     signer,
     amount,

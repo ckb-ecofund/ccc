@@ -113,10 +113,10 @@ export default function TransferLumos() {
               tx.outputsData[0] = ccc.hexFrom(dataBytes);
 
               // Sign and send the transaction
-              log(
-                "Transaction sent:",
-                explorerTransaction(await signer.sendTransaction(tx)),
-              );
+              const txHash = await signer.sendTransaction(tx);
+              log("Transaction sent:", explorerTransaction(txHash));
+              await signer.client.waitTransaction(txHash);
+              log("Transaction committed:", explorerTransaction(txHash));
             }}
           >
             Transfer

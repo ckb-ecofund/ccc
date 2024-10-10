@@ -304,3 +304,9 @@ export class ErrorClientRBFRejected extends ErrorClientBase {
     this.leastFee = numFrom(leastFee);
   }
 }
+
+export class ErrorClientWaitTransactionTimeout extends Error {
+  constructor() {
+    super("Wait transaction timeout");
+  }
+}
