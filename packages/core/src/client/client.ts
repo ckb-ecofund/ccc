@@ -11,7 +11,7 @@ import {
 } from "../ckb/index.js";
 import { Zero } from "../fixedPoint/index.js";
 import { Hex, HexLike, hexFrom } from "../hex/index.js";
-import { Num, NumLike, numFrom } from "../num/index.js";
+import { Num, NumLike, numFrom, numMax } from "../num/index.js";
 import { apply, reduceAsync } from "../utils/index.js";
 import { ClientCache } from "./cache/index.js";
 import { ClientCacheMemory } from "./cache/memory.js";
@@ -100,6 +100,13 @@ export abstract class Client {
   ): Promise<
     Pick<Script, "codeHash" | "hashType"> & { cellDeps: CellDepInfo[] }
   >;
+
+  abstract getFeeRateStatistics(
+    blockRange?: NumLike,
+  ): Promise<{ mean: Num; median: Num }>;
+  async getFeeRate(blockRange?: NumLike): Promise<Num> {
+    return numMax((await this.getFeeRateStatistics(blockRange)).median, 1000);
+  }
 
   abstract getTip(): Promise<Num>;
   abstract getTipHeader(verbosity?: number | null): Promise<ClientBlockHeader>;

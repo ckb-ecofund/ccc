@@ -81,7 +81,7 @@ function ClaimButton({ cell, lock }: { cell: ccc.Cell; lock: ccc.Script }) {
           );
 
           await tx.completeInputsByCapacity(signer);
-          await tx.completeFeeChangeToOutput(signer, 0, 1000);
+          await tx.completeFeeChangeToOutput(signer, 0);
 
           log(
             "Transaction sent:",
@@ -147,7 +147,7 @@ export default function TimeLockedTransfer() {
 
     // Complete missing parts for transaction
     await tx.completeInputsByCapacity(signer);
-    await tx.completeFeeBy(signer, 1000);
+    await tx.completeFeeBy(signer);
 
     log(
       "Transaction sent:",

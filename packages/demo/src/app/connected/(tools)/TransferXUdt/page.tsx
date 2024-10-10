@@ -83,7 +83,7 @@ export default function TransferXUdt() {
               ccc.KnownScript.XUdt,
             );
             await tx.completeInputsByCapacity(signer);
-            await tx.completeFeeBy(signer, 1000);
+            await tx.completeFeeBy(signer);
 
             // Sign and send the transaction
             log(

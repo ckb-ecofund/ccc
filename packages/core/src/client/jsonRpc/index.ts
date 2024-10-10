@@ -120,6 +120,18 @@ export abstract class ClientJsonRpc extends Client {
   }
 
   /**
+   * Get fee rate statistics
+   *
+   * @returns Fee rate statistics
+   */
+
+  getFeeRateStatistics = this.buildSender(
+    "get_fee_rate_statistics",
+    [(n) => apply(numFrom, n)],
+    ({ mean, median }) => ({ mean: numFrom(mean), median: numFrom(median) }),
+  ) as Client["getFeeRateStatistics"];
+
+  /**
    * Get tip block number
    *
    * @returns Tip block number

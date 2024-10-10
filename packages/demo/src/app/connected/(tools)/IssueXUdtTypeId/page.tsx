@@ -104,7 +104,7 @@ export default function IssueXUdtTypeId() {
                   typeIdTx.inputs[0],
                   0,
                 );
-                await typeIdTx.completeFeeBy(signer, 1000);
+                await typeIdTx.completeFeeBy(signer);
                 log(
                   "Transaction sent:",
                   explorerTransaction(await signer.sendTransaction(typeIdTx)),
@@ -130,7 +130,7 @@ export default function IssueXUdtTypeId() {
                 ],
               });
               await lockTx.completeInputsByCapacity(signer);
-              await lockTx.completeFeeBy(signer, 1000);
+              await lockTx.completeFeeBy(signer);
               const lockTxHash = await signer.sendTransaction(lockTx);
               log("Transaction sent:", explorerTransaction(lockTxHash));
 
@@ -195,7 +195,7 @@ export default function IssueXUdtTypeId() {
               mintTx.outputs[2].type!.args = ccc.hexFrom(
                 ccc.bytesFrom(ccc.hashTypeId(mintTx.inputs[0], 2)).slice(0, 20),
               );
-              await mintTx.completeFeeBy(signer, 1000);
+              await mintTx.completeFeeBy(signer);
               log(
                 "Transaction sent:",
                 explorerTransaction(await signer.sendTransaction(mintTx)),

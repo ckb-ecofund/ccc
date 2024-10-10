@@ -16,6 +16,7 @@ export default function Transfer() {
   const { explorerTransaction } = useGetExplorerLink();
 
   const [transferTo, setTransferTo] = useState<string>("");
+  const [feeRate, setFeeRate] = useState<undefined | ccc.Num>();
   const [amount, setAmount] = useState<string>("");
   const [data, setData] = useState<string>("");
 
@@ -62,8 +63,10 @@ export default function Transfer() {
 
             // Complete missing parts for transaction
             await tx.completeInputsAll(signer);
+            const feeRate = await signer.client.getFeeRate();
+            setFeeRate(feeRate);
             // Change all balance to the first output
-            await tx.completeFeeChangeToOutput(signer, 0, 1000);
+            await tx.completeFeeChangeToOutput(signer, 0, feeRate);
             const amount = ccc.fixedPointToString(tx.outputs[0].capacity);
             log("You can transfer at most", amount, "CKB");
             setAmount(amount);
@@ -100,7 +103,7 @@ export default function Transfer() {
 
             // Complete missing parts for transaction
             await tx.completeInputsByCapacity(signer);
-            await tx.completeFeeBy(signer, 1000);
+            await tx.completeFeeBy(signer, feeRate);
 
             // Sign and send the transaction
             log(

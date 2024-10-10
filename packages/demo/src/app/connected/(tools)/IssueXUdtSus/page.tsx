@@ -81,7 +81,7 @@ export default function IssueXUdtSul() {
                 ],
               });
               await susTx.completeInputsByCapacity(signer);
-              await susTx.completeFeeBy(signer, 1000);
+              await susTx.completeFeeBy(signer);
               const susTxHash = await signer.sendTransaction(susTx);
               log("Transaction sent:", explorerTransaction(susTxHash));
               await signer.client.cache.markUnusable({
@@ -106,7 +106,7 @@ export default function IssueXUdtSul() {
                 ],
               });
               await lockTx.completeInputsByCapacity(signer);
-              await lockTx.completeFeeBy(signer, 1000);
+              await lockTx.completeFeeBy(signer);
               const lockTxHash = await signer.sendTransaction(lockTx);
               log("Transaction sent:", explorerTransaction(lockTxHash));
 
@@ -166,7 +166,7 @@ export default function IssueXUdtSul() {
               mintTx.outputs[1].type!.args = ccc.hexFrom(
                 ccc.bytesFrom(ccc.hashTypeId(mintTx.inputs[0], 1)).slice(0, 20),
               );
-              await mintTx.completeFeeBy(signer, 1000);
+              await mintTx.completeFeeBy(signer);
               log(
                 "Transaction sent:",
                 explorerTransaction(await signer.sendTransaction(mintTx)),
