@@ -12,7 +12,7 @@ import {
   SporeScript,
   SporeScriptInfo,
   buildSporeScript,
-} from "./predefined.js";
+} from "./predefined/index.js";
 
 /**
  * The codec for packing/unpacking UTF-8 raw strings.

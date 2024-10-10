@@ -1,4 +1,4 @@
-import { SporeScriptInfo } from ".";
+import { SporeScript, SporeScriptInfo } from "./base.js";
 
 // note: no mainnet scripts
 //
@@ -7,7 +7,7 @@ import { SporeScriptInfo } from ".";
 // });
 
 export const SPORE_TESTNET_SCRIPTS: SporeScriptInfo = Object.freeze({
-  ["spore"]: {
+  [SporeScript.Spore]: {
     codeHash:
       "0xbbad126377d45f90a8ee120da988a2d7332c78ba8fd679aab478a19d6c133494",
     hashType: "data1",
@@ -24,7 +24,7 @@ export const SPORE_TESTNET_SCRIPTS: SporeScriptInfo = Object.freeze({
       },
     ],
   },
-  ["cluster"]: {
+  [SporeScript.Cluster]: {
     codeHash:
       "0x598d793defef36e2eeba54a9b45130e4ca92822e1d193671f490950c3b856080",
     hashType: "data1",

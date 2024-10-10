@@ -1,7 +1,6 @@
 import { ccc } from "@ckb-ccc/core";
 import { JsonRpcTransformers } from "@ckb-ccc/core/advanced";
 import { transferSporeCluster } from "..";
-import { injectCommonCobuildProof } from "../advanced";
 
 describe("transferCluster [testnet]", () => {
   expect(process.env.PRIVATE_KEY).toBeDefined();
@@ -20,7 +19,7 @@ describe("transferCluster [testnet]", () => {
     );
 
     // Build transaction
-    let { tx, actions } = await transferSporeCluster({
+    let { tx } = await transferSporeCluster({
       signer,
       id: "0x91b94378902009f359b02ae33613055570e78cd37f364127eb1e4b3a9d77c092",
       to: owner.script,

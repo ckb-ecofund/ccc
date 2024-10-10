@@ -1,7 +1,6 @@
 import { ccc } from "@ckb-ccc/core";
 import { JsonRpcTransformers } from "@ckb-ccc/core/advanced";
 import "dotenv/config";
-import { injectCommonCobuildProof } from "../advanced";
 import { createSpores } from "../api/spore.js";
 
 describe("createSpore [testnet]", () => {
@@ -15,7 +14,7 @@ describe("createSpore [testnet]", () => {
     );
 
     // Build transaction
-    let { tx, actions, ids } = await createSpores({
+    let { tx, ids } = await createSpores({
       signer,
       spores: [
         {

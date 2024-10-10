@@ -1,6 +1,5 @@
 import { ccc } from "@ckb-ccc/core";
 import { JsonRpcTransformers } from "@ckb-ccc/core/advanced";
-import { injectCommonCobuildProof } from "../advanced";
 import { transferSpores } from "../api/spore";
 
 describe("transferSpore [testnet]", () => {
@@ -20,7 +19,7 @@ describe("transferSpore [testnet]", () => {
     );
 
     // Build transaction
-    let { tx, actions } = await transferSpores({
+    let { tx } = await transferSpores({
       signer,
       spores: [
         {

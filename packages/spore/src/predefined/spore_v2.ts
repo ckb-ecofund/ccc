@@ -1,24 +1,4 @@
-<<<<<<< HEAD:packages/spore/src/predefined.ts
-import { ccc } from "@ckb-ccc/core";
-
-export const COBUILD_INFO_HASH = ccc.hashCkb(
-  ccc.bytesFrom("hello, cobuild", "utf8"),
-);
-
-export enum SporeScript {
-  Spore = "Spore",
-  Cluster = "Cluster",
-}
-
-export type SporeScriptInfo = Record<
-  SporeScript,
-  Pick<ccc.Script, "codeHash" | "hashType"> & {
-    cellDeps: ccc.CellDepInfoLike[];
-  }
->;
-=======
-import { SporeScriptInfo } from ".";
->>>>>>> 0338e69 (feat: simplify cobuild injection):packages/spore/src/predefined/spore_v2.ts
+import { SporeScriptInfo, SporeScript } from "./base.js";
 
 export const SPORE_MAINNET_SCRIPTS: SporeScriptInfo = Object.freeze({
   [SporeScript.Spore]: {
@@ -93,38 +73,3 @@ export const SPORE_TESTNET_SCRIPTS: SporeScriptInfo = Object.freeze({
     ],
   },
 });
-<<<<<<< HEAD:packages/spore/src/predefined.ts
-
-export function buildSporeScript(
-  client: ccc.Client,
-  protocol: SporeScript,
-  args: ccc.HexLike,
-  scriptInfo?: SporeScriptInfo,
-): ccc.Script {
-  const info =
-    scriptInfo ??
-    (client.addressPrefix === "ckb"
-      ? SPORE_MAINNET_SCRIPTS
-      : SPORE_TESTNET_SCRIPTS);
-
-  return ccc.Script.from({
-    args,
-    ...info[protocol],
-  });
-}
-
-export function buildSporeCellDep(
-  client: ccc.Client,
-  protocol: SporeScript,
-  scriptInfo?: SporeScriptInfo,
-): ccc.CellDepInfo[] {
-  const info =
-    scriptInfo ??
-    (client.addressPrefix === "ckb"
-      ? SPORE_MAINNET_SCRIPTS
-      : SPORE_TESTNET_SCRIPTS);
-
-  return info[protocol].cellDeps.map(ccc.CellDepInfo.from);
-}
-=======
->>>>>>> 0338e69 (feat: simplify cobuild injection):packages/spore/src/predefined/spore_v2.ts

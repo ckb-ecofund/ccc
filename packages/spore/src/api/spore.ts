@@ -5,8 +5,9 @@ import {
   assembleTransferClusterAction,
   assembleTransferSporeAction,
   findClusterById,
+  prepareSporeTransaction,
 } from "../advanced.js";
-import { ActionVec, SporeData, packRawSporeData } from "../codec/index.js";
+import { SporeData, packRawSporeData } from "../codec/index.js";
 import {
   computeTypeId,
   injectOneCapacityCell,
@@ -17,7 +18,7 @@ import {
   SporeScriptInfo,
   buildSporeCellDep,
   buildSporeScript,
-} from "../predefined.js";
+} from "../predefined/index.js";
 
 /**
  * Create one or more Spore cells with the specified Spore data.
@@ -45,7 +46,6 @@ export async function createSpores(params: {
   tx?: ccc.TransactionLike;
 }): Promise<{
   tx: ccc.Transaction;
-  actions: UnpackResult<typeof ActionVec>;
   ids: ccc.Hex[];
 }> {
   const { signer, spores, clusterMode, sporeScriptInfo } = params;
@@ -138,7 +138,11 @@ export async function createSpores(params: {
           }),
         );
         tx.addOutput(cluster.cellOutput, cluster.outputData);
-        // add cluster to celldep
+        // note: add cluster as celldep, which will be used in Spore contract
+        tx.addCellDeps({
+          outPoint: cluster.outPoint,
+          depType: "code"
+        });
         await tx.addCellDepInfos(
           signer.client,
           buildSporeCellDep(
@@ -164,8 +168,7 @@ export async function createSpores(params: {
   );
 
   return {
-    tx,
-    actions,
+    tx: await prepareSporeTransaction(signer, tx, actions),
     ids,
   };
 }
@@ -191,7 +194,6 @@ export async function transferSpores(params: {
   tx?: ccc.TransactionLike;
 }): Promise<{
   tx: ccc.Transaction;
-  actions: UnpackResult<typeof ActionVec>;
 }> {
   const { signer, spores, sporeScriptInfo } = params;
 
@@ -243,8 +245,7 @@ export async function transferSpores(params: {
   );
 
   return {
-    tx,
-    actions,
+    tx: await prepareSporeTransaction(signer, tx, actions),
   };
 }
 
@@ -266,7 +267,6 @@ export async function meltSpores(params: {
   tx?: ccc.TransactionLike;
 }): Promise<{
   tx: ccc.Transaction;
-  actions: UnpackResult<typeof ActionVec>;
 }> {
   const { signer, ids, sporeScriptInfo } = params;
 
@@ -305,7 +305,6 @@ export async function meltSpores(params: {
   );
 
   return {
-    tx,
-    actions,
+    tx: await prepareSporeTransaction(signer, tx, actions),
   };
 }

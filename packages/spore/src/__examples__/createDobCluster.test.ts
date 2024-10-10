@@ -1,7 +1,6 @@
 import { ccc } from "@ckb-ccc/core";
 import { JsonRpcTransformers } from "@ckb-ccc/core/advanced";
-import { createSporeCluster, dob } from "..";
-import { injectCommonCobuildProof } from "../advanced";
+import { createSporeCluster, dob } from "../index.js";
 
 function generateClusterDescriptionUnderDobProtocol(
   client: ccc.Client,
@@ -150,7 +149,7 @@ describe("createCluster [testnet]", () => {
     );
 
     // Build transaction
-    let { tx, actions, id } = await createSporeCluster({
+    let { tx, id } = await createSporeCluster({
       signer,
       data: {
         name: "Hello, Cluster",

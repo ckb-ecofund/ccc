@@ -1,6 +1,5 @@
 import { ccc } from "@ckb-ccc/core";
 import { JsonRpcTransformers } from "@ckb-ccc/core/advanced";
-import { injectCommonCobuildProof } from "../advanced.js";
 import { createSpores, meltSpores } from "../index.js";
 
 describe("meltSpore [testnet]", () => {
@@ -14,7 +13,7 @@ describe("meltSpore [testnet]", () => {
     );
 
     // Build melt transaction
-    let { tx: meltTx, actions: meltActions } = await meltSpores({
+    let { tx: meltTx } = await meltSpores({
       signer,
       ids: [
         // Change this if you have a different sporeId
@@ -23,7 +22,7 @@ describe("meltSpore [testnet]", () => {
     });
 
     // Provide create transaction
-    let { tx, actions: createActions } = await createSpores({
+    let { tx } = await createSpores({
       signer,
       tx: meltTx,
       spores: [

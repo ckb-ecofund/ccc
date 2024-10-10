@@ -11,7 +11,7 @@ import {
   SporeScriptInfo,
   buildSporeCellDep,
   buildSporeScript,
-} from "../predefined.js";
+} from "../predefined/index.js";
 
 /**
  * Create a new Cluster cell
@@ -34,7 +34,6 @@ export async function createSporeCluster(params: {
   tx?: ccc.TransactionLike;
 }): Promise<{
   tx: ccc.Transaction;
-  actions: UnpackResult<typeof ActionVec>;
   id: ccc.Hex;
 }> {
   const { signer, data, to, sporeScriptInfo } = params;
@@ -72,8 +71,7 @@ export async function createSporeCluster(params: {
   );
 
   return {
-    tx,
-    actions: [createAction],
+    tx: await prepareSporeTransaction(signer, tx, [createAction]),
     id,
   };
 }
@@ -98,7 +96,6 @@ export async function transferSporeCluster(params: {
   tx?: ccc.TransactionLike;
 }): Promise<{
   tx: ccc.Transaction;
-  actions: UnpackResult<typeof ActionVec>;
 }> {
   const { signer, id, to, sporeScriptInfo } = params;
 
@@ -144,7 +141,6 @@ export async function transferSporeCluster(params: {
   );
 
   return {
-    tx,
-    actions: [transferAction],
+    tx: await prepareSporeTransaction(signer, tx, [transferAction]),
   };
 }
