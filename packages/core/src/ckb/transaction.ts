@@ -1824,9 +1824,11 @@ export class Transaction {
   async completeFee(
     from: Signer,
     change: (tx: Transaction, capacity: Num) => Promise<NumLike> | NumLike,
-    feeRate: NumLike,
+    expectedFeeRate?: NumLike,
     filter?: ClientCollectableSearchKeyFilterLike,
   ): Promise<[number, boolean]> {
+    const feeRate = expectedFeeRate ?? (await from.client.getFeeRate());
+
     // Complete all inputs extra infos for cache
     await this.getInputsCapacity(from.client);
 
@@ -1902,7 +1904,7 @@ export class Transaction {
   completeFeeChangeToLock(
     from: Signer,
     change: ScriptLike,
-    feeRate: NumLike,
+    feeRate?: NumLike,
     filter?: ClientCollectableSearchKeyFilterLike,
   ): Promise<[number, boolean]> {
     const script = Script.from(change);
@@ -1926,7 +1928,7 @@ export class Transaction {
 
   async completeFeeBy(
     from: Signer,
-    feeRate: NumLike,
+    feeRate?: NumLike,
     filter?: ClientCollectableSearchKeyFilterLike,
   ): Promise<[number, boolean]> {
     const { script } = await from.getRecommendedAddressObj();
@@ -1937,7 +1939,7 @@ export class Transaction {
   completeFeeChangeToOutput(
     from: Signer,
     index: NumLike,
-    feeRate: NumLike,
+    feeRate?: NumLike,
     filter?: ClientCollectableSearchKeyFilterLike,
   ): Promise<[number, boolean]> {
     const change = Number(numFrom(index));

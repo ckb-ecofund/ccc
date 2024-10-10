@@ -178,7 +178,7 @@ function DaoButton({ dao }: { dao: ccc.Cell }) {
             );
 
             await tx.completeInputsByCapacity(signer);
-            await tx.completeFeeBy(signer, 1000);
+            await tx.completeFeeBy(signer);
           } else {
             if (!infos[3]) {
               error("Unexpected no found deposit info");
@@ -225,7 +225,7 @@ function DaoButton({ dao }: { dao: ccc.Cell }) {
             );
 
             await tx.completeInputsByCapacity(signer);
-            await tx.completeFeeChangeToOutput(signer, 0, 1000);
+            await tx.completeFeeChangeToOutput(signer, 0);
             tx.outputs[0].capacity += profit;
           }
 
@@ -280,6 +280,7 @@ export default function Transfer() {
   const { explorerTransaction } = useGetExplorerLink();
 
   const [amount, setAmount] = useState<string>("");
+  const [feeRate, setFeeRate] = useState<undefined | ccc.Num>();
   const [daos, setDaos] = useState<ccc.Cell[]>([]);
 
   useEffect(() => {
@@ -347,7 +348,9 @@ export default function Transfer() {
             );
 
             await tx.completeInputsAll(signer);
-            await tx.completeFeeChangeToOutput(signer, 0, 1000);
+            const feeRate = await signer.client.getFeeRate();
+            setFeeRate(feeRate);
+            await tx.completeFeeChangeToOutput(signer, 0, feeRate);
 
             const amount = ccc.fixedPointToString(tx.outputs[0].capacity);
             log("You can deposit at most", amount, "CKB");
@@ -394,7 +397,7 @@ export default function Transfer() {
             tx.outputs[0].capacity = ccc.fixedPointFrom(amount);
 
             await tx.completeInputsByCapacity(signer);
-            await tx.completeFeeBy(signer, 1000);
+            await tx.completeFeeBy(signer, feeRate);
 
             // Sign and send the transaction
             log(
