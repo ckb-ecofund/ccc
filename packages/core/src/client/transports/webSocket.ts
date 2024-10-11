@@ -20,7 +20,11 @@ export class TransportWebSocket implements Transport {
   request(data: JsonRpcPayload) {
     const socket = (this.socket ?? Promise.resolve(undefined)).then(
       (existed) => {
-        if (existed && existed.readyState === existed.OPEN) {
+        if (
+          existed &&
+          existed.readyState !== existed.CLOSING &&
+          existed.readyState !== existed.CLOSED
+        ) {
           return existed;
         }
 
