@@ -24,6 +24,7 @@ export const DID_MAINNET_SCRIPTS: SporeScriptInfo = Object.freeze({
       hashType: "type",
       args: "0x62312cd846659e188b05da11dc3f080b083c27371ea701d6026e11e713e0e3de",
     },
+    cobuild: true,
   },
   [SporeScript.Cluster]: SPORE_MAINNET_SCRIPTS[SporeScript.Cluster],
 });
@@ -51,6 +52,7 @@ export const DID_TESTNET_SCRIPTS: SporeScriptInfo = Object.freeze({
       hashType: "type",
       args: "0x80f0d4bf6b3951911aa6b98cc609d477a8a10b903b35cfd528d098e95c36f680",
     },
+    cobuild: true,
   },
   [SporeScript.Cluster]: SPORE_TESTNET_SCRIPTS[SporeScript.Cluster],
 });

@@ -1,5 +1,5 @@
 import { blockchain } from "@ckb-lumos/base";
-import { BytesLike, molecule, number } from "@ckb-lumos/codec";
+import { molecule, number } from "@ckb-lumos/codec";
 import { RawString } from "../base.js";
 
 const Uint32Opt = molecule.option(number.Uint32LE);

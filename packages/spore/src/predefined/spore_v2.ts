@@ -1,4 +1,4 @@
-import { SporeScriptInfo, SporeScript } from "./base.js";
+import { SporeScript, SporeScriptInfo } from "./base.js";
 
 export const SPORE_MAINNET_SCRIPTS: SporeScriptInfo = Object.freeze({
   [SporeScript.Spore]: {
@@ -17,6 +17,7 @@ export const SPORE_MAINNET_SCRIPTS: SporeScriptInfo = Object.freeze({
         },
       },
     ],
+    cobuild: true,
   },
   [SporeScript.Cluster]: {
     codeHash:
@@ -34,6 +35,7 @@ export const SPORE_MAINNET_SCRIPTS: SporeScriptInfo = Object.freeze({
         },
       },
     ],
+    cobuild: true,
   },
 });
 
@@ -54,6 +56,7 @@ export const SPORE_TESTNET_SCRIPTS: SporeScriptInfo = Object.freeze({
         },
       },
     ],
+    cobuild: true,
   },
   [SporeScript.Cluster]: {
     codeHash:
@@ -71,5 +74,6 @@ export const SPORE_TESTNET_SCRIPTS: SporeScriptInfo = Object.freeze({
         },
       },
     ],
+    cobuild: true,
   },
 });

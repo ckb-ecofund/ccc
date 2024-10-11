@@ -6,26 +6,7 @@ import {
   SporeAction,
   WitnessLayout,
 } from "./codec/index.js";
-import {
-  COBUILD_INFO_HASH,
-  SporeScript,
-  SporeScriptInfo,
-  buildSporeScript,
-} from "./predefined/index.js";
-
-export async function findClusterById(
-  client: ccc.Client,
-  id: ccc.HexLike,
-  scriptInfo?: SporeScriptInfo,
-): Promise<ccc.Cell> {
-  const type = buildSporeScript(client, SporeScript.Cluster, id, scriptInfo);
-  const cell = await client.findSingletonCellByType(type, true);
-  if (!cell) {
-    throw new Error("Cluster not found for clusterId: " + id);
-  }
-
-  return cell;
-}
+import { COBUILD_INFO_HASH } from "./predefined/index.js";
 
 export function assembleCreateSporeAction(
   sporeOutput: ccc.CellOutputLike,

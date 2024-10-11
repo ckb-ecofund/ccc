@@ -24,7 +24,7 @@ describe("transferSpore [testnet]", () => {
       spores: [
         {
           // Change this if you have a different sporeId
-          id: "0x9d6352fd9815badcb543d4260c2ab0f8404ca61da72c8f023dd55818c2c97af8",
+          id: "0x35a201b1552954a75a43e4126a9ccd438129196c4e35fc90b4b55b6794505edf",
           to: owner.script,
         },
       ],
@@ -36,7 +36,7 @@ describe("transferSpore [testnet]", () => {
     console.log(JSON.stringify(JsonRpcTransformers.transactionFrom(tx)));
 
     // Send transaction
-    let txHash = await signer.sendTransaction(tx);
+    let txHash = await signer.client.sendTransaction(tx);
     console.log(txHash);
   }, 60000);
 });
