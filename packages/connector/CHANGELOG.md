@@ -1,5 +1,14 @@
 # @ckb-ccc/connector
 
+## 0.0.17-alpha.4
+
+### Patch Changes
+
+- [#70](https://github.com/ckb-ecofund/ccc/pull/70) [`acfc050`](https://github.com/ckb-ecofund/ccc/commit/acfc0502cd6beb48b9310dec8411dcd630507366) Thanks [@Hanssen0](https://github.com/Hanssen0)! - fix(core): websocket transport
+
+- Updated dependencies [[`acfc050`](https://github.com/ckb-ecofund/ccc/commit/acfc0502cd6beb48b9310dec8411dcd630507366)]:
+  - @ckb-ccc/ccc@0.0.16-alpha.3
+
 ## 0.0.17-alpha.3
 
 ### Patch Changes
