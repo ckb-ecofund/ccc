@@ -39,16 +39,17 @@ export class TransportWebSocket implements Transport {
           if (!req) {
             return;
           }
-          clearTimeout(req[2]);
+          const [resolve, _, timeout] = req;
+          clearTimeout(timeout);
           this.ongoing.delete(res.id);
 
-          req[0](res);
+          resolve(res);
         };
         const onClose = () => {
-          this.socket = undefined;
-          this.ongoing.forEach(([_, onError]) =>
-            onError(new Error("Connection closed")),
-          );
+          this.ongoing.forEach(([_, reject, timeout]) => {
+            clearTimeout(timeout);
+            reject(new Error("Connection closed"));
+          });
           this.ongoing.clear();
         };
 
@@ -68,19 +69,28 @@ export class TransportWebSocket implements Transport {
     );
 
     return new Promise((resolve, reject) => {
-      this.ongoing.set(data.id, [
+      const req: [
+        (res: unknown) => unknown,
+        (err: unknown) => unknown,
+        ReturnType<typeof setTimeout>,
+      ] = [
         resolve,
         reject,
         setTimeout(() => {
+          this.ongoing.delete(data.id);
           socket.then((socket) => socket.close());
           reject(new Error("Request timeout"));
         }, this.timeout),
-      ]);
+      ];
+      this.ongoing.set(data.id, req);
+
       socket.then((socket) => {
         if (
           socket.readyState === socket.CLOSED ||
           socket.readyState === socket.CLOSING
         ) {
+          clearTimeout(req[2]);
+          this.ongoing.delete(data.id);
           reject(new Error("Connection closed"));
         } else {
           socket.send(JSON.stringify(data));
