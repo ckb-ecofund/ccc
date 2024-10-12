@@ -1,5 +1,11 @@
 # @ckb-ccc/core
 
+## 0.0.16-alpha.3
+
+### Patch Changes
+
+- [#72](https://github.com/ckb-ecofund/ccc/pull/72) [`a3d5359`](https://github.com/ckb-ecofund/ccc/commit/a3d53595f6dd11f2f59cdf0086b3d7ce558a2fdd) Thanks [@Hanssen0](https://github.com/Hanssen0)! - fix(core): reopen websocket
+
 ## 0.0.16-alpha.2
 
 ### Patch Changes
