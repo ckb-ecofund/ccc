@@ -10,7 +10,8 @@ export class TransportWebSocket implements Transport {
       ReturnType<typeof setTimeout>,
     ]
   > = new Map();
-  private socket?: Promise<WebSocket>;
+  private socket?: WebSocket;
+  private openSocket?: Promise<WebSocket>;
 
   constructor(
     private readonly url: string,
@@ -18,55 +19,56 @@ export class TransportWebSocket implements Transport {
   ) {}
 
   request(data: JsonRpcPayload) {
-    const socket = (this.socket ?? Promise.resolve(undefined)).then(
-      (existed) => {
-        if (
-          existed &&
-          existed.readyState !== existed.CLOSING &&
-          existed.readyState !== existed.CLOSED
-        ) {
-          return existed;
+    const socket = (() => {
+      if (
+        this.socket &&
+        this.socket.readyState !== this.socket.CLOSING &&
+        this.socket.readyState !== this.socket.CLOSED &&
+        this.openSocket
+      ) {
+        return this.openSocket;
+      }
+      const socket = new WebSocket(this.url);
+      const onMessage = ({ data }: { data: string }) => {
+        const res = JSON.parse(data);
+        if (typeof res !== "object" || res === null) {
+          throw new Error(`Unknown response ${data}`);
         }
 
-        const socket = new WebSocket(this.url);
-        const onMessage = ({ data }: { data: string }) => {
-          const res = JSON.parse(data);
-          if (typeof res !== "object" || res === null) {
-            throw new Error(`Unknown response ${data}`);
-          }
+        const req = this.ongoing.get(res.id);
+        if (!req) {
+          return;
+        }
+        const [resolve, _, timeout] = req;
+        clearTimeout(timeout);
+        this.ongoing.delete(res.id);
 
-          const req = this.ongoing.get(res.id);
-          if (!req) {
-            return;
-          }
-          const [resolve, _, timeout] = req;
+        resolve(res);
+      };
+      const onClose = () => {
+        this.ongoing.forEach(([_, reject, timeout]) => {
           clearTimeout(timeout);
-          this.ongoing.delete(res.id);
+          reject(new Error("Connection closed"));
+        });
+        this.ongoing.clear();
+      };
 
-          resolve(res);
-        };
-        const onClose = () => {
-          this.ongoing.forEach(([_, reject, timeout]) => {
-            clearTimeout(timeout);
-            reject(new Error("Connection closed"));
-          });
-          this.ongoing.clear();
-        };
+      socket.onclose = onClose;
+      socket.onerror = onClose;
+      socket.onmessage = onMessage;
 
-        socket.onclose = onClose;
-        socket.onerror = onClose;
-        socket.onmessage = onMessage;
-
-        this.socket = new Promise((resolve) => {
-          if (socket.readyState === socket.OPEN) {
-            resolve(undefined);
-          } else {
-            socket.onopen = resolve;
-          }
-        }).then(() => socket);
-        return this.socket;
-      },
-    );
+      this.socket = socket;
+      this.openSocket = new Promise<WebSocket>((resolve) => {
+        if (socket.readyState === socket.OPEN) {
+          resolve(socket);
+        } else {
+          socket.onopen = () => {
+            resolve(socket);
+          };
+        }
+      });
+      return this.openSocket;
+    })();
 
     return new Promise((resolve, reject) => {
       const req: [
