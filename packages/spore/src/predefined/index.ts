@@ -46,7 +46,7 @@ export async function findExistedSporeCellAndCelldep(
 }> {
   if (scriptInfo) {
     const script = buildSporeScript(client, protocol, args, scriptInfo);
-    const cell = await client.findSingletonCellByType(script);
+    const cell = await client.findSingletonCellByType(script, true);
     if (cell) {
       return {
         cell,
@@ -65,7 +65,7 @@ export async function findExistedSporeCellAndCelldep(
       args,
       ...info,
     });
-    const cell = await client.findSingletonCellByType(script);
+    const cell = await client.findSingletonCellByType(script, true);
     if (cell) {
       return {
         cell,
@@ -135,11 +135,11 @@ export function cobuildRequired(tx: ccc.Transaction): boolean {
     }
     return scriptInfo.cobuild === true;
   };
-  const input = tx.inputs.find((input) => {
+  const inputIndex = tx.inputs.findIndex((input) => {
     return checkCodeHash(input.cellOutput?.type?.codeHash);
   });
-  const output = tx.outputs.find((output) => {
+  const outputIndex = tx.outputs.findIndex((output) => {
     return checkCodeHash(output.type?.codeHash);
   });
-  return !input || !output;
+  return inputIndex > -1 || outputIndex > -1;
 }
