@@ -17,7 +17,7 @@ describe("meltSpore [testnet]", () => {
       signer,
       ids: [
         // Change this if you have a different sporeId
-        "0x35a201b1552954a75a43e4126a9ccd438129196c4e35fc90b4b55b6794505edf",
+        "0x4abfcdb57a9634b00efb03b92737ac107f5617eb36bb623c9db163fb54052ea4",
       ],
     });
 

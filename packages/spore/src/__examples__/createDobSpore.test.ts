@@ -32,7 +32,7 @@ describe("createSpore [testnet]", () => {
             contentType: "dob/1",
             content: ccc.bytesFrom(content, "utf8"),
             clusterId:
-              "0x91b94378902009f359b02ae33613055570e78cd37f364127eb1e4b3a9d77c092",
+              "0xaf14384d05ef7a9dfaaa51dd6283506ec7a9578ec53ca5ffd23cb790166cbc14",
           },
         },
       ],

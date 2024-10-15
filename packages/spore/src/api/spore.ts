@@ -14,7 +14,7 @@ import {
 } from "../helper.js";
 import {
   SporeScript,
-  SporeScriptInfo,
+  SporeVersion,
   buildSporeCellDep,
   buildSporeScript,
   cobuildRequired,
@@ -42,13 +42,13 @@ export async function createSpores(params: {
     to?: ccc.ScriptLike;
   }[];
   clusterMode?: "lockProxy" | "clusterCell";
-  sporeScriptInfo?: SporeScriptInfo;
+  version?: SporeVersion;
   tx?: ccc.TransactionLike;
 }): Promise<{
   tx: ccc.Transaction;
   ids: ccc.Hex[];
 }> {
-  const { signer, spores, clusterMode, sporeScriptInfo } = params;
+  const { signer, spores, clusterMode, version } = params;
 
   // prepare transaction
   const actions = [];
@@ -70,7 +70,7 @@ export async function createSpores(params: {
       signer.client,
       SporeScript.Spore,
       id,
-      sporeScriptInfo,
+      version,
     );
     const packedData = packRawSporeData(data);
     tx.addOutput(
@@ -101,7 +101,6 @@ export async function createSpores(params: {
         signer.client,
         SporeScript.Cluster,
         data.clusterId,
-        sporeScriptInfo,
       );
     switch (clusterMode) {
       case "lockProxy": {
@@ -163,7 +162,7 @@ export async function createSpores(params: {
   // complete celldeps and cobuild actions
   await tx.addCellDepInfos(
     signer.client,
-    await buildSporeCellDep(signer.client, SporeScript.Spore, sporeScriptInfo),
+    await buildSporeCellDep(signer.client, SporeScript.Spore, version),
   );
 
   return {
@@ -179,7 +178,6 @@ export async function createSpores(params: {
  *
  * @param signer who takes the responsibility to balance and sign the transaction
  * @param spores sporeId with its new owner
- * @param sporeScriptInfo the script info of Spore cell, if not provided, the default script info will be used
  * @param tx the transaction skeleton, if not provided, a new one will be created
  * @returns
  *  - **tx**: a new transaction that contains transferred Spore cells
@@ -190,12 +188,11 @@ export async function transferSpores(params: {
     id: ccc.HexLike;
     to: ccc.ScriptLike;
   }[];
-  sporeScriptInfo?: SporeScriptInfo;
   tx?: ccc.TransactionLike;
 }): Promise<{
   tx: ccc.Transaction;
 }> {
-  const { signer, spores, sporeScriptInfo } = params;
+  const { signer, spores } = params;
 
   // prepare transaction
   const actions = [];
@@ -208,7 +205,6 @@ export async function transferSpores(params: {
       signer.client,
       SporeScript.Spore,
       id,
-      sporeScriptInfo,
     );
     celldep.forEach((value) => celldeps.add(value));
     tx.inputs.push(
@@ -247,7 +243,6 @@ export async function transferSpores(params: {
  *
  * @param signer who takes the responsibility to balance and sign the transaction
  * @param sporeIds collection of sporeId to be melted
- * @param sporeScriptInfo the script info of Spore cell, if not provided, the default script info will be used
  * @param tx the transaction skeleton, if not provided, a new one will be created
  * @returns
  *  - **transaction**: a new transaction that contains melted Spore cells
@@ -256,12 +251,11 @@ export async function transferSpores(params: {
 export async function meltSpores(params: {
   signer: ccc.Signer;
   ids: ccc.HexLike[];
-  sporeScriptInfo?: SporeScriptInfo;
   tx?: ccc.TransactionLike;
 }): Promise<{
   tx: ccc.Transaction;
 }> {
-  const { signer, ids, sporeScriptInfo } = params;
+  const { signer, ids } = params;
 
   // prepare transaction
   const actions = [];
@@ -274,7 +268,6 @@ export async function meltSpores(params: {
       signer.client,
       SporeScript.Spore,
       sporeId,
-      sporeScriptInfo,
     );
     celldep.forEach((value) => celldeps.add(value));
     tx.inputs.push(

@@ -24,7 +24,7 @@ describe("transferSpore [testnet]", () => {
       spores: [
         {
           // Change this if you have a different sporeId
-          id: "0x35a201b1552954a75a43e4126a9ccd438129196c4e35fc90b4b55b6794505edf",
+          id: "0x22cc6272ce14488b27e67519915a5574701eec36a2fdca6c24174ac66c77d01a",
           to: owner.script,
         },
       ],

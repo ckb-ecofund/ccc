@@ -8,7 +8,7 @@ import { ClusterData, packRawClusterData } from "../codec/index.js";
 import { computeTypeId, injectOneCapacityCell } from "../helper.js";
 import {
   SporeScript,
-  SporeScriptInfo,
+  SporeVersion,
   buildSporeCellDep,
   buildSporeScript,
   cobuildRequired,
@@ -21,7 +21,7 @@ import {
  * @param signer who takes the responsibility to balance and sign the transaction
  * @param data specific format of data required by Cluster protocol
  * @param to the owner of the Cluster cell, which will be replaced with signer if not provided
- * @param sporeScriptInfo the script config of Spore cells, if not provided, the default script info will be used
+ * @param version the script indicator that contains different version of deployed Spore script
  * @param tx the transaction skeleton, if not provided, a new one will be created
  * @returns
  *  - **tx**: a new transaction that contains created Cluster cell
@@ -31,13 +31,13 @@ export async function createSporeCluster(params: {
   signer: ccc.Signer;
   data: ClusterData;
   to?: ccc.ScriptLike;
-  sporeScriptInfo?: SporeScriptInfo;
+  version?: SporeVersion;
   tx?: ccc.TransactionLike;
 }): Promise<{
   tx: ccc.Transaction;
   id: ccc.Hex;
 }> {
-  const { signer, data, to, sporeScriptInfo } = params;
+  const { signer, data, to, version } = params;
   // prepare transaction
   const tx = ccc.Transaction.from(params.tx ?? {});
   if (tx.inputs.length === 0) {
@@ -50,7 +50,7 @@ export async function createSporeCluster(params: {
     signer.client,
     SporeScript.Cluster,
     id,
-    sporeScriptInfo,
+    version,
   );
   const packedClusterData = packRawClusterData(data);
   tx.addOutput(
@@ -68,11 +68,7 @@ export async function createSporeCluster(params: {
   // complete celldeps and cobuild actions
   await tx.addCellDepInfos(
     signer.client,
-    await buildSporeCellDep(
-      signer.client,
-      SporeScript.Cluster,
-      sporeScriptInfo,
-    ),
+    await buildSporeCellDep(signer.client, SporeScript.Cluster, version),
   );
 
   return {
@@ -89,7 +85,6 @@ export async function createSporeCluster(params: {
  * @param signer who takes the responsibility to balance and sign the transaction
  * @param id the id of the Cluster cell to be transferred
  * @param to the new owner of the Cluster cell
- * @param sporeScriptInfo the script info of Spore cell, if not provided, the default script info will be used
  * @param tx the transaction skeleton, if not provided, a new one will be created
  * @returns
  *  - **tx**: a new transaction that contains transferred Cluster cell
@@ -98,12 +93,11 @@ export async function transferSporeCluster(params: {
   signer: ccc.Signer;
   id: ccc.HexLike;
   to: ccc.ScriptLike;
-  sporeScriptInfo?: SporeScriptInfo;
   tx?: ccc.TransactionLike;
 }): Promise<{
   tx: ccc.Transaction;
 }> {
-  const { signer, id, to, sporeScriptInfo } = params;
+  const { signer, id, to } = params;
 
   // prepare transaction
   const tx = ccc.Transaction.from(params.tx ?? {});
@@ -113,7 +107,6 @@ export async function transferSporeCluster(params: {
     signer.client,
     SporeScript.Cluster,
     id,
-    sporeScriptInfo,
   );
   tx.inputs.push(
     ccc.CellInput.from({

@@ -1,127 +1,31 @@
 import { ccc } from "@ckb-ccc/core";
-import { ScriptInfo, SporeScript, SporeScriptInfo } from "./base.js";
-import * as did from "./did.js";
-import * as spore_v1 from "./spore_v1.js";
-import * as spore_v2 from "./spore_v2.js";
+import {
+  ScriptInfo,
+  SPORE_DEFAULT_VERSION,
+  SporeScript,
+  SporeVersion,
+} from "./base.js";
+import { SPORE_MAINNET_SCRIPTS } from "./mainnet.js";
+import { SPORE_TESTNET_SCRIPTS } from "./testnet.js";
 export * from "./base.js";
-
-const SPORE_MAINNET_SCRIPTS_COLLECTION = [
-  spore_v2.SPORE_MAINNET_SCRIPTS,
-  did.DID_MAINNET_SCRIPTS,
-];
-
-const SPORE_TESTNET_SCRIPTS_COLLECTION = [
-  spore_v1.SPORE_TESTNET_SCRIPTS,
-  spore_v2.SPORE_TESTNET_SCRIPTS,
-  did.DID_TESTNET_SCRIPTS,
-];
 
 function getScriptInfoByCodeHash(
   codeHash: ccc.HexLike,
 ): ScriptInfo | undefined {
-  for (const scriptInfo of SPORE_MAINNET_SCRIPTS_COLLECTION) {
-    for (const info of Object.values(scriptInfo)) {
-      if (info.codeHash === codeHash) {
-        return info;
+  for (const collection of Object.values(SPORE_MAINNET_SCRIPTS)) {
+    for (const scriptInfo of Object.values(collection)) {
+      if (scriptInfo && scriptInfo.codeHash === codeHash) {
+        return scriptInfo;
       }
     }
   }
-  for (const scriptInfo of SPORE_TESTNET_SCRIPTS_COLLECTION) {
-    for (const info of Object.values(scriptInfo)) {
-      if (info.codeHash === codeHash) {
-        return info;
+  for (const collection of Object.values(SPORE_TESTNET_SCRIPTS)) {
+    for (const scriptInfo of Object.values(collection)) {
+      if (scriptInfo && scriptInfo.codeHash === codeHash) {
+        return scriptInfo;
       }
     }
   }
-}
-
-export async function findExistedSporeCellAndCelldep(
-  client: ccc.Client,
-  protocol: SporeScript,
-  args: ccc.HexLike,
-  scriptInfo?: SporeScriptInfo,
-): Promise<{
-  cell: ccc.Cell;
-  celldep: ccc.CellDepInfo[];
-}> {
-  if (scriptInfo) {
-    const script = buildSporeScript(client, protocol, args, scriptInfo);
-    const cell = await client.findSingletonCellByType(script, true);
-    if (cell) {
-      return {
-        cell,
-        celldep: await buildSporeCellDep(client, protocol, scriptInfo),
-      };
-    }
-    throw new Error(
-      `${protocol} cell not found of args ${args} from specified scriptInfo`,
-    );
-  }
-  for (const scriptInfo of client.addressPrefix === "ckb"
-    ? SPORE_MAINNET_SCRIPTS_COLLECTION
-    : SPORE_TESTNET_SCRIPTS_COLLECTION) {
-    const info = scriptInfo[protocol];
-    const script = ccc.Script.from({
-      args,
-      ...info,
-    });
-    const cell = await client.findSingletonCellByType(script, true);
-    if (cell) {
-      return {
-        cell,
-        celldep: await buildSporeCellDep(client, protocol, scriptInfo),
-      };
-    }
-  }
-  throw new Error(`${protocol} cell not found of args: ${args}`);
-}
-
-export function buildSporeScript(
-  client: ccc.Client,
-  protocol: SporeScript,
-  args: ccc.HexLike,
-  scriptInfo?: SporeScriptInfo,
-): ccc.Script {
-  const collection =
-    scriptInfo ??
-    (client.addressPrefix === "ckb"
-      ? spore_v2.SPORE_MAINNET_SCRIPTS
-      : spore_v2.SPORE_TESTNET_SCRIPTS);
-
-  return ccc.Script.from({
-    args,
-    ...collection[protocol],
-  });
-}
-
-export async function buildSporeCellDep(
-  client: ccc.Client,
-  protocol: SporeScript,
-  scriptInfo?: SporeScriptInfo,
-): Promise<ccc.CellDepInfo[]> {
-  const info =
-    scriptInfo ??
-    (client.addressPrefix === "ckb"
-      ? spore_v2.SPORE_MAINNET_SCRIPTS
-      : spore_v2.SPORE_TESTNET_SCRIPTS);
-
-  const config = info[protocol];
-  if (config.dynamicCelldep) {
-    const cell = await client.findSingletonCellByType(config.dynamicCelldep);
-    if (!cell) {
-      throw new Error(`Dynamic celldep not found of protocol: ${protocol}`);
-    }
-    return [
-      ccc.CellDepInfo.from({
-        cellDep: {
-          outPoint: cell!.outPoint,
-          depType: "code",
-        },
-      }),
-    ];
-  }
-
-  return config.cellDeps.map(ccc.CellDepInfo.from);
 }
 
 export function cobuildRequired(tx: ccc.Transaction): boolean {
@@ -142,4 +46,100 @@ export function cobuildRequired(tx: ccc.Transaction): boolean {
     return checkCodeHash(output.type?.codeHash);
   });
   return inputIndex > -1 || outputIndex > -1;
+}
+
+export async function findExistedSporeCellAndCelldep(
+  client: ccc.Client,
+  protocol: SporeScript,
+  args: ccc.HexLike,
+): Promise<{
+  cell: ccc.Cell;
+  celldep: ccc.CellDepInfo[];
+}> {
+  for (const collection of client.addressPrefix === "ckb"
+    ? Object.values(SPORE_MAINNET_SCRIPTS)
+    : Object.values(SPORE_TESTNET_SCRIPTS)) {
+    for (const version of Object.keys(collection) as Array<SporeVersion>) {
+      const scriptInfo = collection[version];
+      if (!scriptInfo) {
+        continue;
+      }
+      const script = ccc.Script.from({
+        args,
+        ...scriptInfo,
+      });
+      const cell = await client.findSingletonCellByType(script, true);
+      if (cell) {
+        return {
+          cell,
+          celldep: await buildSporeCellDep(client, protocol, version),
+        };
+      }
+    }
+  }
+  throw new Error(`${protocol} cell not found of args: ${args}`);
+}
+
+export function buildSporeScript(
+  client: ccc.Client,
+  protocol: SporeScript,
+  args: ccc.HexLike,
+  version?: SporeVersion,
+): ccc.Script {
+  const collection =
+    client.addressPrefix === "ckb"
+      ? SPORE_MAINNET_SCRIPTS
+      : SPORE_TESTNET_SCRIPTS;
+
+  const scriptInfo = collection[protocol][version ?? SPORE_DEFAULT_VERSION];
+  if (!scriptInfo) {
+    throw new Error(
+      `ScriptInfo not found of ${protocol} protocol with version ${version}`,
+    );
+  }
+
+  return ccc.Script.from({
+    args,
+    ...scriptInfo,
+  });
+}
+
+export async function buildSporeCellDep(
+  client: ccc.Client,
+  protocol: SporeScript,
+  version?: SporeVersion,
+): Promise<ccc.CellDepInfo[]> {
+  const collection =
+    client.addressPrefix === "ckb"
+      ? SPORE_MAINNET_SCRIPTS
+      : SPORE_TESTNET_SCRIPTS;
+
+  const scriptInfo = collection[protocol][version ?? SPORE_DEFAULT_VERSION];
+  if (!scriptInfo) {
+    throw new Error(
+      `ScriptInfo not found of ${protocol} protocol with version ${version}`,
+    );
+  }
+
+  if (scriptInfo.dynamicCelldep) {
+    const cell = await client.findSingletonCellByType(
+      scriptInfo.dynamicCelldep,
+    );
+    if (!cell) {
+      throw new Error(
+        `Dynamic celldep not found of ${protocol} protocol with version ${version}`,
+      );
+    }
+
+    return [
+      ccc.CellDepInfo.from({
+        cellDep: {
+          outPoint: cell!.outPoint,
+          depType: "code",
+        },
+      }),
+    ];
+  }
+
+  return scriptInfo.cellDeps.map(ccc.CellDepInfo.from);
 }
