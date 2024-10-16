@@ -545,7 +545,7 @@ export abstract class Client {
       } else if (confirmations === 0) {
         return tx;
       } else if (
-        (await this.getTipHeader()).number - tx!.blockNumber! >=
+        (await this.getTipHeader()).number - tx.blockNumber! >=
         confirmations
       ) {
         return tx;

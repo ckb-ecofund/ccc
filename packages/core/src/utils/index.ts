@@ -106,7 +106,7 @@ export function apply<T, R>(
  * @param accumulator - A callback to be called for each value. If it returns null, the previous result will be kept.
  * @returns The accumulated result.
  */
-export async function reduceAsync<T, V>(
+export async function reduceAsync<T>(
   values: T[],
   accumulator: (
     a: T,

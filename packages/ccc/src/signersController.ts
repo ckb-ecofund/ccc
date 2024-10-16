@@ -50,10 +50,12 @@ export class SignersController {
   }) {
     const appName =
       configs?.name ??
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
       (document.querySelector("head title") as HTMLTitleElement | null)?.text ??
       "Unknown";
     const appIcon =
       configs?.icon ??
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
       (document.querySelector('link[rel="icon"]') as HTMLLinkElement | null)
         ?.href ??
       "https://fav.farm/%E2%9D%93";

@@ -45,7 +45,7 @@ export async function assertCluster(
   const res = await findCluster(client, args, scripts);
 
   if (!res) {
-    throw new Error(`Cluster ${args} not found`);
+    throw new Error(`Cluster ${ccc.hexFrom(args)} not found`);
   }
 
   return res;
@@ -141,7 +141,7 @@ export async function transferSporeCluster(params: {
   const { signer, id, to, scriptInfoHash } = params;
 
   // prepare transaction
-  let tx = ccc.Transaction.from(params.tx ?? {});
+  const tx = ccc.Transaction.from(params.tx ?? {});
 
   // build cluster cell
   const { cell: cluster, scriptInfo } = await assertCluster(signer.client, id);

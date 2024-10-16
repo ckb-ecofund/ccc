@@ -47,7 +47,7 @@ export function packRawClusterData(
 ): Uint8Array;
 export function packRawClusterData(
   packable: ClusterDataV1 | ClusterDataV2,
-  version?: unknown,
+  version?: ClusterDataVersion,
 ): Uint8Array {
   if (!version) {
     return packRawClusterDataV2(packable);
@@ -58,8 +58,6 @@ export function packRawClusterData(
       return packRawClusterDataV1(packable);
     case "v2":
       return packRawClusterDataV2(packable);
-    default:
-      throw new Error(`Unsupported ClusterData version: ${version}`);
   }
 }
 export function packRawClusterDataV1(packable: ClusterDataV1): Uint8Array {
@@ -91,7 +89,7 @@ export function unpackToRawClusterData(
 ): ClusterDataV2;
 export function unpackToRawClusterData(
   unpackable: ccc.BytesLike,
-  version?: unknown,
+  version?: ClusterDataVersion,
 ): unknown {
   if (version) {
     switch (version) {
@@ -99,8 +97,6 @@ export function unpackToRawClusterData(
         return unpackToRawClusterDataV1(unpackable);
       case "v2":
         return unpackToRawClusterDataV2(unpackable);
-      default:
-        throw new Error(`Unsupported ClusterData version: ${version}`);
     }
   }
 

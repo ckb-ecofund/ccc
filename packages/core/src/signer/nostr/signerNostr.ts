@@ -112,7 +112,7 @@ export abstract class SignerNostr extends Signer {
    * @returns A promise that resolves to a signed Transaction object.
    */
   async signOnlyTransaction(txLike: TransactionLike): Promise<Transaction> {
-    let tx = Transaction.from(txLike);
+    const tx = Transaction.from(txLike);
     const { script } = await this.getRecommendedAddressObj();
     const info = await tx.getSignHashInfo(script, this.client);
     if (!info) {

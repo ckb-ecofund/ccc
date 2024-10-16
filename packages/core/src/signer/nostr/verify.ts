@@ -13,6 +13,7 @@ export function buildNostrEventFromMessage(
 ): NostrEvent {
   if (typeof message === "string") {
     try {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const event = JSON.parse(message);
       if (
         typeof event === "object" &&
@@ -26,7 +27,7 @@ export function buildNostrEventFromMessage(
             (tag as unknown[]).every((v) => typeof v === "string"),
         )
       ) {
-        return event;
+        return event as NostrEvent;
       }
     } catch (_) {}
   }

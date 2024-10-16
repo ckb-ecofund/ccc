@@ -54,7 +54,7 @@ export class NostrSigner extends ccc.SignerNostr {
 
   onReplaced(listener: () => void): () => void {
     const stop: (() => void)[] = [];
-    const replacer = async () => {
+    const replacer = () => {
       listener();
       stop[0]?.();
     };

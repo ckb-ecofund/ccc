@@ -20,8 +20,8 @@ export class BitcoinSigner extends ccc.SignerBtc {
    * @throws Will throw an error if not connected.
    * @returns The current connection.
    */
-  private assertConnection(): Connection {
-    if (!this.isConnected() || !this.connection) {
+  private async assertConnection(): Promise<Connection> {
+    if (!(await this.isConnected()) || !this.connection) {
       throw new Error("Not connected");
     }
 
@@ -107,7 +107,7 @@ export class BitcoinSigner extends ccc.SignerBtc {
    * @returns A promise that resolves to the Bitcoin account address.
    */
   async getBtcAccount(): Promise<string> {
-    const { address } = this.assertConnection();
+    const { address } = await this.assertConnection();
     return address;
   }
 
@@ -116,7 +116,7 @@ export class BitcoinSigner extends ccc.SignerBtc {
    * @returns A promise that resolves to the Bitcoin public key.
    */
   async getBtcPublicKey(): Promise<ccc.Hex> {
-    const { publicKey } = this.assertConnection();
+    const { publicKey } = await this.assertConnection();
     return publicKey;
   }
 
@@ -177,7 +177,7 @@ export class BitcoinSigner extends ccc.SignerBtc {
    * @returns A promise that resolves to the signed message.
    */
   async signMessageRaw(message: string | ccc.BytesLike): Promise<string> {
-    const { address } = this.assertConnection();
+    const { address } = await this.assertConnection();
 
     const challenge =
       typeof message === "string" ? message : ccc.hexFrom(message).slice(2);

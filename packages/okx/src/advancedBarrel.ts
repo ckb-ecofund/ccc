@@ -45,7 +45,6 @@ export interface NostrOnMethod {
    * Adds an event listener to the provider.
    * @param eventName - The name of the event.
    * @param listener - The listener function.
-   * @returns The provider instance.
    */
-  (eventName: string, listener: (...args: unknown[]) => unknown): Promise<void>;
+  (eventName: string, listener: (...args: unknown[]) => unknown): void;
 }

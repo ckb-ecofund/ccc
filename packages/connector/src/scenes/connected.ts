@@ -23,7 +23,7 @@ export function formatString(
 @customElement("ccc-connected-scene")
 export class ConnectedScene extends LitElement {
   @property()
-  public hideMark: any | undefined | null;
+  public hideMark: unknown;
   @property()
   public wallet?: ccc.Wallet;
   @property()
@@ -48,11 +48,13 @@ export class ConnectedScene extends LitElement {
         changedProperties.has("signer")) &&
       this.signer
     ) {
-      this.signer
+      void this.signer
         .getRecommendedAddress()
         .then((v) => (this.recommendedAddress = v));
-      this.signer.getInternalAddress().then((v) => (this.internalAddress = v));
-      this.signer.getBalance().then((v) => (this.balance = v));
+      void this.signer
+        .getInternalAddress()
+        .then((v) => (this.internalAddress = v));
+      void this.signer.getBalance().then((v) => (this.balance = v));
     }
   }
 

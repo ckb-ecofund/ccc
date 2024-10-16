@@ -283,6 +283,7 @@ export class CkbSigner extends ccc.Signer {
       buildJoyIDURL(
         {
           ...config,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           tx: JSON.parse(tx.stringify()),
           signerAddress: (await this.assertConnection()).address,
           witnessIndexes,

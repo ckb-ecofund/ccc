@@ -13,7 +13,7 @@ describe("meltSpore [testnet]", () => {
     );
 
     // Build melt transaction
-    let { tx: meltTx } = await meltSpore({
+    const { tx: meltTx } = await meltSpore({
       signer,
       // Change this if you have a different sporeId
       id: "0xb0b9f846db65aa152b6ae1244f8826f0e8b3f1c473381138726d0e7b84413d7c",
@@ -35,7 +35,7 @@ describe("meltSpore [testnet]", () => {
     console.log(JSON.stringify(JsonRpcTransformers.transactionFrom(tx)));
 
     // Send transaction
-    let txHash = await signer.sendTransaction(tx);
+    const txHash = await signer.sendTransaction(tx);
     console.log(txHash);
   }, 60000);
 });

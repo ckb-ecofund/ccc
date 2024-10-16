@@ -23,13 +23,17 @@ export async function decodeDobBySporeId(
       params: [ccc.hexFrom(sporeId).replace(/^0x/, "")],
     }),
   );
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument
   const decoderResult = JSON.parse(result.data);
   if ("error" in decoderResult) {
     const serverError = getErrorByCode(decoderResult.error.code as number);
     throw new Error(`Decode DOB failed: ${serverError}`);
   }
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument
   const renderResult = JSON.parse(decoderResult.result);
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument
   const renderOutput = JSON.parse(renderResult.render_output);
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   return renderOutput;
 }
 

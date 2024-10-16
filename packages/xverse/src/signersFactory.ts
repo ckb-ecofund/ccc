@@ -3,7 +3,12 @@ import { BtcProvider, Provider } from "./advancedBarrel.js";
 import { Signer } from "./signer.js";
 
 function getProviderById(providerId: string) {
-  return providerId?.split(".").reduce((acc: any, part) => acc?.[part], window);
+  return (
+    providerId
+      ?.split(".")
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-return
+      .reduce((acc: any, part) => acc?.[part], window) as BtcProvider
+  );
 }
 
 /**

@@ -12,12 +12,12 @@ export interface Decoder {
 
 export interface PatternElementDob0 {
   traitName: string;
-  dobType: "String" | "Number" | string;
+  dobType: string; // String | Number
   dnaOffset: number;
   dnaLength: number;
   patternType: "options" | "range" | "rawNumber" | "rawString" | "utf8";
   traitArgs?: string[] | number[]; // can only be `undefined` in case that `patternType` is `rawNumber` or `rawString`
-  toJSON?: Function;
+  toJSON?: () => unknown;
 }
 
 export interface PatternDob0 {
@@ -36,10 +36,10 @@ export type Dob1PatternArgs = string | number[] | ["*"];
 export interface PatternElementDob1 {
   imageName: string;
   svgFields: "attributes" | "elements";
-  traitName: string | ""; // can only be empty in case that `patternType` is `raw`
+  traitName: string; // can only be empty in case that `patternType` is `raw`
   patternType: "options" | "raw";
   traitArgs: Dob1PatternArgs[][] | string; // can only be `string` in case that `patternType` is `raw`
-  toJSON?: Function;
+  toJSON?: () => unknown;
 }
 
 export interface PatternDob1 {

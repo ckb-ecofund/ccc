@@ -1,4 +1,5 @@
 import { ccc } from "@ckb-ccc/core";
+import { cccA } from "@ckb-ccc/core/advanced";
 
 /**
  * Interface representing a provider for interacting with accounts and signing messages.
@@ -99,5 +100,8 @@ export interface RequestMethod {
    * @returns A promise that resolves to the signed message.
    */
 
-  (request: { method: "ckb_signTransaction"; data: any }): Promise<any>;
+  (request: {
+    method: "ckb_signTransaction";
+    data: { txSkeleton: cccA.JsonRpcTransaction };
+  }): Promise<ccc.Transaction>;
 }

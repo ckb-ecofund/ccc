@@ -29,19 +29,26 @@ export class TransportWebSocket implements Transport {
         return this.openSocket;
       }
       const socket = new WebSocket(this.url);
-      const onMessage = ({ data }: { data: string }) => {
-        const res = JSON.parse(data);
-        if (typeof res !== "object" || res === null) {
-          throw new Error(`Unknown response ${data}`);
+      const onMessage = ({ data }: WebSocket.MessageEvent) => {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const res = JSON.parse(data as string);
+        if (
+          typeof res !== "object" ||
+          res === null ||
+          typeof res.id !== "number"
+        ) {
+          throw new Error(`Unknown response ${data as string}`);
         }
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const id: number = res.id;
 
-        const req = this.ongoing.get(res.id);
+        const req = this.ongoing.get(id);
         if (!req) {
           return;
         }
         const [resolve, _, timeout] = req;
         clearTimeout(timeout);
-        this.ongoing.delete(res.id);
+        this.ongoing.delete(id);
 
         resolve(res);
       };
@@ -80,13 +87,13 @@ export class TransportWebSocket implements Transport {
         reject,
         setTimeout(() => {
           this.ongoing.delete(data.id);
-          socket.then((socket) => socket.close());
+          void socket.then((socket) => socket.close());
           reject(new Error("Request timeout"));
         }, this.timeout),
       ];
       this.ongoing.set(data.id, req);
 
-      socket.then((socket) => {
+      void socket.then((socket) => {
         if (
           socket.readyState === socket.CLOSED ||
           socket.readyState === socket.CLOSING
