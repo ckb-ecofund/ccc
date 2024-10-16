@@ -31,7 +31,7 @@ describe("transferCluster [testnet]", () => {
     console.log(JSON.stringify(JsonRpcTransformers.transactionFrom(tx)));
 
     // Send transaction
-    let txHash = await signer.sendTransaction(tx);
+    const txHash = await signer.sendTransaction(tx);
     console.log(txHash);
   }, 60000);
 });

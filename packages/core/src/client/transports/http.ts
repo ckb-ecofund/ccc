@@ -10,6 +10,7 @@ export class TransportHttp implements Transport {
     const aborter = new AbortController();
     const abortTimer = setTimeout(() => aborter.abort(), this.timeout);
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const raw = await (
       await fetch(this.url, {
         method: "POST",
@@ -21,6 +22,7 @@ export class TransportHttp implements Transport {
       })
     ).json();
     clearTimeout(abortTimer);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return raw;
   }
 }

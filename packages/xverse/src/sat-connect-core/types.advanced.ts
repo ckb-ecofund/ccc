@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // From https://github.com/secretkeylabs/sats-connect-core/
 
 import * as v from "valibot";

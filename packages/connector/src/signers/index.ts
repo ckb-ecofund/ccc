@@ -27,7 +27,7 @@ export class SignersController {
   }
 
   refresh() {
-    this.controller.refresh(
+    return this.controller.refresh(
       this.host.client,
       (wallets) => {
         this.wallets = [...wallets];
@@ -43,7 +43,7 @@ export class SignersController {
   }
 
   hostConnected(): void {
-    this.refresh();
+    void this.refresh();
     // Wait for plugins to be loaded
     setTimeout(() => this.refresh(), 500);
   }

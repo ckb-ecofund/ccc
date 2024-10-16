@@ -68,7 +68,7 @@ export function encodeClusterDescriptionForDob1(dob1: Dob1): string {
         };
       } else {
         checkPatternDob1(v);
-        v.toJSON = function () {
+        v.toJSON = () => {
           return [
             v.imageName,
             v.svgFields,

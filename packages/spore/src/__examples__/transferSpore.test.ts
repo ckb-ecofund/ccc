@@ -32,7 +32,7 @@ describe("transferSpore [testnet]", () => {
     console.log(JSON.stringify(JsonRpcTransformers.transactionFrom(tx)));
 
     // Send transaction
-    let txHash = await signer.client.sendTransaction(tx);
+    const txHash = await signer.client.sendTransaction(tx);
     console.log(txHash);
   }, 60000);
 });

@@ -26,7 +26,12 @@ import {
   Transport,
   transportFromUri,
 } from "../transports/advanced.js";
-import { JsonRpcCellOutput, JsonRpcTransformers } from "./advanced.js";
+import {
+  JsonRpcBlock,
+  JsonRpcBlockHeader,
+  JsonRpcCellOutput,
+  JsonRpcTransformers,
+} from "./advanced.js";
 
 /**
  * Applies a transformation function to a value if the transformer is provided.
@@ -127,8 +132,11 @@ export abstract class ClientJsonRpc extends Client {
 
   getFeeRateStatistics = this.buildSender(
     "get_fee_rate_statistics",
-    [(n) => apply(numFrom, n)],
-    ({ mean, median }) => ({ mean: numFrom(mean), median: numFrom(median) }),
+    [(n: NumLike) => apply(numFrom, n)],
+    ({ mean, median }: { mean: NumLike; median: NumLike }) => ({
+      mean: numFrom(mean),
+      median: numFrom(median),
+    }),
   ) as Client["getFeeRateStatistics"];
 
   /**
@@ -149,8 +157,10 @@ export abstract class ClientJsonRpc extends Client {
    * @param verbosity - result format which allows 0 and 1. (Optional, the default is 1.)
    * @returns BlockHeader
    */
-  getTipHeader = this.buildSender("get_tip_header", [], (b) =>
-    apply(JsonRpcTransformers.blockHeaderTo, b),
+  getTipHeader = this.buildSender(
+    "get_tip_header",
+    [],
+    (b: JsonRpcBlockHeader) => apply(JsonRpcTransformers.blockHeaderTo, b),
   ) as Client["getTipHeader"];
 
   /**
@@ -164,7 +174,7 @@ export abstract class ClientJsonRpc extends Client {
   getBlockByNumber = this.buildSender(
     "get_block_by_number",
     [(v: NumLike) => numToHex(numFrom(v))],
-    (b) => apply(JsonRpcTransformers.blockTo, b),
+    (b: JsonRpcBlock) => apply(JsonRpcTransformers.blockTo, b),
   ) as Client["getBlockByNumber"];
 
   /**
@@ -175,7 +185,7 @@ export abstract class ClientJsonRpc extends Client {
    * @param withCycles - whether the return cycles of block transactions. (Optional, default false.)
    * @returns Block
    */
-  getBlockByHash = this.buildSender("get_block", [hexFrom], (b) =>
+  getBlockByHash = this.buildSender("get_block", [hexFrom], (b: JsonRpcBlock) =>
     apply(JsonRpcTransformers.blockTo, b),
   ) as Client["getBlockByHash"];
 
@@ -189,7 +199,7 @@ export abstract class ClientJsonRpc extends Client {
   getHeaderByNumber = this.buildSender(
     "get_header_by_number",
     [(v: NumLike) => numToHex(numFrom(v))],
-    (b) => apply(JsonRpcTransformers.blockHeaderTo, b),
+    (b: JsonRpcBlockHeader) => apply(JsonRpcTransformers.blockHeaderTo, b),
   ) as Client["getHeaderByNumber"];
 
   /**
@@ -199,8 +209,10 @@ export abstract class ClientJsonRpc extends Client {
    * @param verbosity - result format which allows 0 and 1. (Optional, the default is 1.)
    * @returns BlockHeader
    */
-  getHeaderByHash = this.buildSender("get_header", [hexFrom], (b) =>
-    apply(JsonRpcTransformers.blockHeaderTo, b),
+  getHeaderByHash = this.buildSender(
+    "get_header",
+    [hexFrom],
+    (b: JsonRpcBlockHeader) => apply(JsonRpcTransformers.blockHeaderTo, b),
   ) as Client["getHeaderByHash"];
 
   /**
@@ -315,8 +327,8 @@ export abstract class ClientJsonRpc extends Client {
     "get_cells",
     [
       JsonRpcTransformers.indexerSearchKeyFrom,
-      (order) => order ?? "asc",
-      (limit) => numToHex(limit ?? 10),
+      (order?: "asc" | "desc") => order ?? "asc",
+      (limit?: NumLike) => numToHex(limit ?? 10),
     ],
     JsonRpcTransformers.findCellsResponseTo,
   ) as (
@@ -340,8 +352,8 @@ export abstract class ClientJsonRpc extends Client {
     "get_transactions",
     [
       JsonRpcTransformers.indexerSearchKeyTransactionFrom,
-      (order) => order ?? "asc",
-      (limit) => numToHex(limit ?? 10),
+      (order?: "asc" | "desc") => order ?? "asc",
+      (limit?: NumLike) => numToHex(limit ?? 10),
     ],
     JsonRpcTransformers.findTransactionsResponseTo,
   ) as Client["findTransactionsPaged"];
@@ -356,7 +368,7 @@ export abstract class ClientJsonRpc extends Client {
   getCellsCapacity = this.buildSender(
     "get_cells_capacity",
     [JsonRpcTransformers.indexerSearchKeyFrom],
-    ({ capacity }) => numFrom(capacity),
+    ({ capacity }: { capacity: NumLike }) => numFrom(capacity),
   ) as (key: ClientIndexerSearchKeyLike) => Promise<Num>;
 
   /**
@@ -370,7 +382,9 @@ export abstract class ClientJsonRpc extends Client {
 
   buildSender(
     rpcMethod: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     inTransformers: (((_: any) => unknown) | undefined)[],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     outTransformer?: (_: any) => unknown,
   ): (...req: unknown[]) => Promise<unknown> {
     return async (...req: unknown[]) => {

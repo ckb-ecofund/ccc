@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import {
   AuthResponseData,
   DappRequestType,
@@ -31,11 +33,11 @@ export interface PopupReturnType {
   [DappRequestType.SignCotaNFT]: SignCotaNFTResponseData;
   [DappRequestType.SignCkbRawTx]: SignCkbTxResponseData;
   [DappRequestType.SignNostrEvent]: SignNostrEventData;
-  [DappRequestType.EncryptNostrMessage]: any;
-  [DappRequestType.DecryptNostrMessage]: any;
-  [DappRequestType.AuthMiniApp]: any;
-  [DappRequestType.SignMiniAppEvm]: any;
-  [DappRequestType.SignMiniAppMessage]: any;
+  [DappRequestType.EncryptNostrMessage]: unknown;
+  [DappRequestType.DecryptNostrMessage]: unknown;
+  [DappRequestType.AuthMiniApp]: unknown;
+  [DappRequestType.SignMiniAppEvm]: unknown;
+  [DappRequestType.SignMiniAppMessage]: unknown;
   [DappRequestType.EvmWeb2Login]: EvmWeb2LoginResponse;
 }
 

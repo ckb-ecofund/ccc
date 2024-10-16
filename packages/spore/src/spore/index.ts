@@ -47,7 +47,7 @@ export async function assertSpore(
   const res = await findSpore(client, args, scripts);
 
   if (!res) {
-    throw new Error(`Spore ${args} not found`);
+    throw new Error(`Spore ${ccc.hexFrom(args)} not found`);
   }
 
   return res;

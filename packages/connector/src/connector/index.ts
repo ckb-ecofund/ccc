@@ -12,7 +12,7 @@ import { SignersController } from "../signers/index.js";
 @customElement("ccc-connector")
 export class WebComponentConnector extends LitElement {
   @property()
-  public hideMark: any | undefined | null;
+  public hideMark: unknown;
   @property()
   public name?: string;
   @property()
@@ -48,17 +48,14 @@ export class WebComponentConnector extends LitElement {
       this.walletName = undefined;
       this.signerName = undefined;
       this.saveConnection();
-      this.signer?.signer.disconnect();
+      void this.signer?.signer.disconnect();
     });
   }
 
   private loadConnection() {
-    const {
-      signerName,
-      walletName,
-    }: { signerName?: string; walletName?: string } = JSON.parse(
+    const { signerName, walletName } = JSON.parse(
       window.localStorage.getItem("ccc-connection-info") ?? "{}",
-    );
+    ) as { signerName?: string; walletName?: string };
 
     this.signerName = signerName;
     this.walletName = walletName;
@@ -87,7 +84,7 @@ export class WebComponentConnector extends LitElement {
       changedProperties.has("signerFilter") ||
       changedProperties.has("preferredNetworks")
     ) {
-      this.signersControllerInner.refresh();
+      void this.signersControllerInner.refresh();
     }
     if (
       changedProperties.has("walletName") ||
@@ -104,7 +101,7 @@ export class WebComponentConnector extends LitElement {
       ({ name }) => name === this.walletName,
     );
     const signer = wallet?.signers.find(({ name }) => name === this.signerName);
-    this.updateSigner(wallet, signer);
+    void this.updateSigner(wallet, signer);
   }
 
   async updateSigner(
@@ -123,7 +120,7 @@ export class WebComponentConnector extends LitElement {
       this.signer = signerInfo;
       (this.unregisterSignerReplacer as unknown as () => void)?.();
       this.unregisterSignerReplacer = signerInfo.signer.onReplaced(() => {
-        this.signersControllerInner.refresh();
+        void this.signersControllerInner.refresh();
       });
     } else {
       this.wallet = undefined;
