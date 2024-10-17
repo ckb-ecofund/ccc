@@ -15,7 +15,9 @@ import { Connector } from "../components/index.js";
 
 const CCC_CONTEXT = createContext<
   | {
+      isOpen: boolean;
       open: () => unknown;
+      close: () => unknown;
       disconnect: () => unknown;
       setClient: (client: ccc.Client) => unknown;
       client: ccc.Client;
@@ -81,7 +83,7 @@ export function Provider({
   const [ref, setRef] = useState<ccc.WebComponentConnector | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [_, setFlag] = useState(0);
-  const defautlSignersController = useRef<
+  const defaultSignersController = useRef<
     SignersControllerWithFilter | undefined
   >(undefined);
 
@@ -91,6 +93,10 @@ export function Provider({
   );
   const open = useCallback(() => {
     setIsOpen(true);
+    ref?.requestUpdate();
+  }, [setIsOpen, ref, ref?.requestUpdate]);
+  const close = useCallback(() => {
+    setIsOpen(false);
     ref?.requestUpdate();
   }, [setIsOpen, ref, ref?.requestUpdate]);
   const disconnect = useMemo(
@@ -108,19 +114,21 @@ export function Provider({
     }
   }, [setClient]);
   useEffect(() => {
-    if (!defautlSignersController.current) {
-      defautlSignersController.current = new SignersControllerWithFilter(
+    if (!defaultSignersController.current) {
+      defaultSignersController.current = new SignersControllerWithFilter(
         signerFilter,
       );
     } else {
-      defautlSignersController.current.filter = signerFilter;
+      defaultSignersController.current.filter = signerFilter;
     }
   }, [signerFilter]);
 
   return (
     <CCC_CONTEXT.Provider
       value={{
+        isOpen,
         open,
+        close,
         disconnect,
         setClient,
 
@@ -134,11 +142,11 @@ export function Provider({
         name={name}
         icon={icon}
         signersController={
-          signersController ?? defautlSignersController.current
+          signersController ?? defaultSignersController.current
         }
         ref={setRef}
         onWillUpdate={() => setFlag((f) => f + 1)}
-        onClose={() => setIsOpen(false)}
+        onClose={close}
         preferredNetworks={preferredNetworks}
         clientOptions={clientOptions}
         {...{
