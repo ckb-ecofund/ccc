@@ -171,8 +171,8 @@ export function generateScriptInfo(
           cellDeps.map(async (itemLike) => {
             const item = ccc.CellDepInfo.from(itemLike);
             if (item.type && txSkeleton.cellProvider != null) {
-              for await (const cell of txSkeleton
-                .cellProvider!.collector({
+              for await (const cell of txSkeleton.cellProvider
+                .collector({
                   type: item.type,
                 })
                 .collect()) {
@@ -243,12 +243,12 @@ export function generateDefaultScriptInfos(): LockScriptInfo[] {
   )
     .map(([script, dummyLockLength]) => [
       generateScriptInfo(
-        testnet[script]!.codeHash,
-        testnet[script]!.cellDeps,
+        ccc.hexFrom(testnet[script].codeHash),
+        testnet[script].cellDeps,
         dummyLockLength,
       ),
       generateScriptInfo(
-        mainnet[script]!.codeHash,
+        ccc.hexFrom(mainnet[script]!.codeHash),
         mainnet[script]!.cellDeps,
         dummyLockLength,
       ),

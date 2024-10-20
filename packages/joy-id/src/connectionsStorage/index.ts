@@ -83,7 +83,10 @@ export class ConnectionsRepoLocalStorage implements ConnectionsRepo {
    * @returns A promise that resolves to an array of selectors and connections.
    */
   async readConnections(): Promise<[AccountSelector, Connection][]> {
-    return JSON.parse(window.localStorage.getItem(this.storageKey) ?? "[]");
+    return JSON.parse(window.localStorage.getItem(this.storageKey) ?? "[]") as [
+      AccountSelector,
+      Connection,
+    ][];
   }
 
   /**

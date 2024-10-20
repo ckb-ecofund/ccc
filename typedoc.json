@@ -6,6 +6,7 @@
     "packages/ccc",
     "packages/connector",
     "packages/connector-react",
+    "packages/spore",
     "packages/utxo-global",
     "packages/rei",
     "packages/joy-id",

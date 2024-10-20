@@ -7,7 +7,7 @@ import { CloseEvent } from "../events/index.js";
 @customElement("ccc-dialog")
 export class Dialog extends LitElement {
   @property()
-  public canBack: any | null | undefined;
+  public canBack: unknown;
   @property()
   public header?: string;
 

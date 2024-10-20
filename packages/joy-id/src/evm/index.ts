@@ -19,8 +19,8 @@ export class EvmSigner extends ccc.SignerEvm {
    * @throws Will throw an error if not connected.
    * @returns The current connection.
    */
-  private assertConnection(): Connection {
-    if (!this.isConnected() || !this.connection) {
+  private async assertConnection(): Promise<Connection> {
+    if (!(await this.isConnected()) || !this.connection) {
       throw new Error("Not connected");
     }
 
@@ -68,7 +68,7 @@ export class EvmSigner extends ccc.SignerEvm {
    * @returns A promise that resolves to the EVM account address.
    */
   async getEvmAccount(): Promise<ccc.Hex> {
-    return this.assertConnection().address as ccc.Hex;
+    return (await this.assertConnection()).address as ccc.Hex;
   }
 
   /**
@@ -116,7 +116,7 @@ export class EvmSigner extends ccc.SignerEvm {
    * @returns A promise that resolves to the signed message.
    */
   async signMessageRaw(message: string | ccc.BytesLike): Promise<ccc.Hex> {
-    const { address } = this.assertConnection();
+    const { address } = await this.assertConnection();
 
     const challenge =
       typeof message === "string" ? message : ccc.hexFrom(message).slice(2);

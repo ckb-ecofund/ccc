@@ -1,10 +1,8 @@
 import {
   Cell,
   CellDep,
-  CellDepLike,
   OutPoint,
   OutPointLike,
-  Script,
   ScriptLike,
   Transaction,
   TransactionLike,
@@ -12,11 +10,13 @@ import {
 import { Zero } from "../fixedPoint/index.js";
 import { Hex, HexLike, hexFrom } from "../hex/index.js";
 import { Num, NumLike, numFrom, numMax } from "../num/index.js";
-import { apply, reduceAsync, sleep } from "../utils/index.js";
+import { reduceAsync, sleep } from "../utils/index.js";
 import { ClientCache } from "./cache/index.js";
 import { ClientCacheMemory } from "./cache/memory.js";
 import { ClientCollectableSearchKeyLike } from "./clientTypes.advanced.js";
 import {
+  CellDepInfo,
+  CellDepInfoLike,
   ClientBlock,
   ClientBlockHeader,
   ClientFindCellsResponse,
@@ -27,61 +27,10 @@ import {
   ClientIndexerSearchKeyTransactionLike,
   ClientTransactionResponse,
   ErrorClientWaitTransactionTimeout,
+  KnownScript,
   OutputsValidator,
+  ScriptInfo,
 } from "./clientTypes.js";
-
-/**
- * @public
- */
-export enum KnownScript {
-  NervosDao = "NervosDao",
-  Secp256k1Blake160 = "Secp256k1Blake160",
-  Secp256k1Multisig = "Secp256k1Multisig",
-  AnyoneCanPay = "AnyoneCanPay",
-  TypeId = "TypeId",
-  XUdt = "XUdt",
-  JoyId = "JoyId",
-  COTA = "COTA",
-  PWLock = "PWLock",
-  OmniLock = "OmniLock",
-  NostrLock = "NostrLock",
-  UniqueType = "UniqueType",
-
-  // ckb-proxy-locks https://github.com/ckb-ecofund/ckb-proxy-locks
-  AlwaysSuccess = "AlwaysSuccess",
-  InputTypeProxyLock = "InputTypeProxyLock",
-  OutputTypeProxyLock = "OutputTypeProxyLock",
-  LockProxyLock = "LockProxyLock",
-  SingleUseLock = "SingleUseLock",
-  TypeBurnLock = "TypeBurnLock",
-  EasyToDiscoverType = "EasyToDiscoverType",
-  TimeLock = "TimeLock",
-}
-
-/**
- * @public
- */
-export type CellDepInfoLike = {
-  cellDep: CellDepLike;
-  type?: ScriptLike | null;
-};
-
-/**
- * @public
- */
-export class CellDepInfo {
-  constructor(
-    public cellDep: CellDep,
-    public type?: Script,
-  ) {}
-
-  static from(cellDepInfoLike: CellDepInfoLike): CellDepInfo {
-    return new CellDepInfo(
-      CellDep.from(cellDepInfoLike.cellDep),
-      apply(Script.from, cellDepInfoLike.type),
-    );
-  }
-}
 
 /**
  * @public
@@ -96,11 +45,7 @@ export abstract class Client {
   abstract get url(): string;
   abstract get addressPrefix(): string;
 
-  abstract getKnownScript(
-    script: KnownScript,
-  ): Promise<
-    Pick<Script, "codeHash" | "hashType"> & { cellDeps: CellDepInfo[] }
-  >;
+  abstract getKnownScript(script: KnownScript): Promise<ScriptInfo>;
 
   abstract getFeeRateStatistics(
     blockRange?: NumLike,
@@ -600,7 +545,7 @@ export abstract class Client {
       } else if (confirmations === 0) {
         return tx;
       } else if (
-        (await this.getTipHeader()).number - tx!.blockNumber! >=
+        (await this.getTipHeader()).number - tx.blockNumber! >=
         confirmations
       ) {
         return tx;

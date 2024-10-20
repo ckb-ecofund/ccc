@@ -75,7 +75,7 @@ export class SelectingScene extends LitElement {
     this.connectingError = undefined;
     this.selectedWallet = wallet;
     this.selectedSigner = signerInfo;
-    (async () => {
+    void (async () => {
       const { signer } = signerInfo;
       try {
         await signer.connect();

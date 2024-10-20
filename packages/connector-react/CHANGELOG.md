@@ -1,5 +1,18 @@
 # @ckb-ccc/connector-react
 
+## 0.0.17-alpha.7
+
+### Patch Changes
+
+- [#78](https://github.com/ckb-ecofund/ccc/pull/78) [`517dd3a`](https://github.com/ckb-ecofund/ccc/commit/517dd3a28a0d6bf14df68450101f82e94a230801) Thanks [@Hanssen0](https://github.com/Hanssen0)! - feat(connector-react): useCcc().isOpen
+
+## 0.0.17-alpha.6
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @ckb-ccc/connector@0.0.17-alpha.6
+
 ## 0.0.17-alpha.5
 
 ### Patch Changes

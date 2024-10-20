@@ -123,7 +123,7 @@ export class Signer extends ccc.SignerBtc {
 
   onReplaced(listener: () => void): () => void {
     const stop: (() => void)[] = [];
-    const replacer = async () => {
+    const replacer = () => {
       listener();
       stop[0]?.();
     };
@@ -143,7 +143,7 @@ export class Signer extends ccc.SignerBtc {
     try {
       await checkResponse(this.provider.request("getBalance", undefined));
       return true;
-    } catch (error) {
+    } catch (_error) {
       return false;
     }
   }

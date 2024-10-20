@@ -1,6 +1,6 @@
 {
   "name": "@ckb-ccc/utxo-global",
-  "version": "0.0.16-alpha.3",
+  "version": "0.0.16-alpha.4",
   "description": "Common Chains Connector's support for UTXO Global",
   "author": "Trong Dinh <trong@nexm.io>",
   "license": "MIT",
@@ -32,8 +32,8 @@
   },
   "scripts": {
     "build": "rimraf ./dist && rimraf ./dist.commonjs && tsc && tsc --project tsconfig.commonjs.json && copyfiles -u 2 misc/basedirs/**/* .",
-    "lint": "eslint",
-    "format": "prettier --write . && eslint --fix"
+    "lint": "eslint ./src",
+    "format": "prettier --write . && eslint --fix ./src"
   },
   "devDependencies": {
     "@eslint/js": "^9.1.1",

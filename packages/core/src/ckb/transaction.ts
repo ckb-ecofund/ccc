@@ -1175,6 +1175,7 @@ export class Transaction {
       if (typeof value === "bigint") {
         return numToHex(value);
       }
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return value;
     });
   }

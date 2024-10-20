@@ -19,8 +19,8 @@ export class NostrSigner extends ccc.SignerNostr {
    * @throws Will throw an error if not connected.
    * @returns The current connection.
    */
-  private assertConnection(): Connection {
-    if (!this.isConnected() || !this.connection) {
+  private async assertConnection(): Promise<Connection> {
+    if (!(await this.isConnected()) || !this.connection) {
       throw new Error("Not connected");
     }
 
@@ -103,7 +103,7 @@ export class NostrSigner extends ccc.SignerNostr {
   }
 
   async getNostrPublicKey(): Promise<ccc.Hex> {
-    return this.assertConnection().publicKey;
+    return (await this.assertConnection()).publicKey;
   }
 
   async signNostrEvent(
