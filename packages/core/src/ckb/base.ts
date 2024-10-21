@@ -68,9 +68,7 @@ export function extendsBase<
     }
   }
 
-  Object.defineProperty(Impl, "name", {
-    get: () => `${FromBase.name}CCCModel`,
-  });
+  Object.defineProperty(Impl, "name", { value: FromBase.name });
 
   return Impl;
 }
