@@ -7,6 +7,7 @@ import { Hex } from "../hex/index.js";
  * @public
  */
 export class Base {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   static fromBytes<T extends Base>(bytes: BytesLike): T {
     throw new Error(
       `"${this.name}" has to implement the static "fromBytes" method`,
@@ -32,6 +33,7 @@ export class Base {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Constructor<Instance = any, Args extends any[] = any[]> = new (
   ...args: Args
 ) => Instance;
