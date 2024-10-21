@@ -44,7 +44,7 @@ type Constructor<Instance = any, Args extends any[] = any[]> = new (
  *   class Script extends Base {
  *     constructor(public codeHash: Hex, public hashType: HashType, public args: Hex) {}
  *   }
- *   bytesToScript,
+ *   bytesToConstructorParams,
  *   scriptToBytes,
  * )
  * ```
