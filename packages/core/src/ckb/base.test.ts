@@ -42,4 +42,7 @@ test("base", () => {
   expect(script2.hash()).toMatch(/^0x/);
 
   expect(bytesEqual(script1.toBytes(), script2.toBytes())).toBe(true);
+
+  expect(script1.clone()).toEqual(script1);
+  expect(script1.clone()).not.toBe(script1);
 });
