@@ -79,6 +79,26 @@ Cells are represented with graphs in the playground. The three layers of cells r
 
 When cells share the same color, the same script governs them. They are owned by the same address (the outside ring) or the same type of assets (the inside ring). Check the script details in the "Scripts" tab.
 
+### Transaction Composing
+
+Here's an example for transferring CKB:
+
+```typescript
+const tx = ccc.Transaction.from({
+  outputs: [{ lock: toLock, capacity: ccc.fixedPointFrom(amount) }],
+});
+```
+
+Tell CCC what you need, and then...
+
+```typescript
+await tx.completeInputsByCapacity(signer);
+await tx.completeFeeBy(signer); // Transaction fee rate is calculated automatically
+const txHash = await signer.sendTransaction(tx);
+```
+
+We have done everything!
+
 - [Use specified wallet in custom UI.](https://live.ckbccc.com/?src=https://raw.githubusercontent.com/ckb-ecofund/ccc/refs/heads/master/packages/examples/src/customUi.ts)
 - [Use all supported wallets in custom UI.](https://live.ckbccc.com/?src=https://raw.githubusercontent.com/ckb-ecofund/ccc/refs/heads/master/packages/examples/src/customUiWithController.ts)
 - [Sign and verify any message.](https://live.ckbccc.com/?src=https://raw.githubusercontent.com/ckb-ecofund/ccc/refs/heads/master/packages/examples/src/sign.ts)
@@ -106,26 +126,6 @@ For advanced developers, we provided the `cccA` object to fulfil all your needs.
 ```typescript
 import { cccA } from "@ckb-ccc/<package-name>/advanced";
 ```
-
-## Transaction Composing
-
-Here's an example for transferring CKB:
-
-```typescript
-const tx = ccc.Transaction.from({
-  outputs: [{ lock: toLock, capacity: ccc.fixedPointFrom(amount) }],
-});
-```
-
-Tell CCC what you need, and then...
-
-```typescript
-await tx.completeInputsByCapacity(signer);
-await tx.completeFeeBy(signer); // Transaction fee rate is calculated automatically
-const txHash = await signer.sendTransaction(tx);
-```
-
-We have done everything!
 
 ## Build and Run
 
