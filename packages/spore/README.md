@@ -27,31 +27,13 @@
 </p>
 
 <p align="center">
-  "CCC - CKBers' Codebase" is the next step of "Common Chains Connector".
+  CCC - CKBers' Codebase is A one-stop solution for your CKB JS/TS ecosystem development.
   <br />
   Empower yourself with CCC to discover the unlimited potential of CKB.
   <br />
   Interoperate with wallets from different chain ecosystems.
   <br />
   Fully enabling CKB's Turing completeness and cryptographic freedom power.
-</p>
-
-## Playground
-
-<p align="center">
-  <a href="https://live.ckbccc.com/">
-    <img src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/preview.png" width="90%" />
-  </a>
-</p>
-
-This project is still under active development, and we are looking forward to your feedback. You can [experiment instantly in the playground](https://live.ckbccc.com/). If you are new to the CKB, we recommend checking [Nervos CKB Docs](https://docs.nervos.org/) for basic knowledge.
-
-## App
-
-<p align="center">
-  <a href="https://app.ckbccc.com/">
-    <img src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/appPreview.png" width="50%" />
-  </a>
 </p>
 
 For non-developers, you can also [try CCC's app now here](https://app.ckbccc.com/). It showcases how to use CCC for some basic scenarios in CKB.
