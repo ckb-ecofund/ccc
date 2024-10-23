@@ -418,6 +418,43 @@ importers:
         specifier: ^7.7.0
         version: 7.18.0(eslint@9.9.0(jiti@1.21.6))(typescript@5.5.4)
 
+  packages/examples:
+    dependencies:
+      '@ckb-ccc/ccc':
+        specifier: workspace:*
+        version: link:../ccc
+      '@ckb-ccc/playground':
+        specifier: file:./src/playground
+        version: playground@file:packages/examples/src/playground
+    devDependencies:
+      '@eslint/js':
+        specifier: ^9.1.1
+        version: 9.9.0
+      eslint:
+        specifier: ^9.1.0
+        version: 9.9.0(jiti@1.21.6)
+      eslint-config-prettier:
+        specifier: ^9.1.0
+        version: 9.1.0(eslint@9.9.0(jiti@1.21.6))
+      eslint-plugin-prettier:
+        specifier: ^5.1.3
+        version: 5.2.1(@types/eslint@9.6.0)(eslint-config-prettier@9.1.0(eslint@9.9.0(jiti@1.21.6)))(eslint@9.9.0(jiti@1.21.6))(prettier@3.3.3)
+      prettier:
+        specifier: ^3.2.5
+        version: 3.3.3
+      prettier-plugin-organize-imports:
+        specifier: ^3.2.4
+        version: 3.2.4(prettier@3.3.3)(typescript@5.5.4)
+      rimraf:
+        specifier: ^5.0.5
+        version: 5.0.10
+      typescript:
+        specifier: ^5.4.5
+        version: 5.5.4
+      typescript-eslint:
+        specifier: ^7.7.0
+        version: 7.18.0(eslint@9.9.0(jiti@1.21.6))(typescript@5.5.4)
+
   packages/faucet:
     dependencies:
       '@ckb-ccc/core':
@@ -4393,6 +4430,9 @@ packages:
   pkg-dir@4.2.0:
     resolution: {integrity: sha512-HRDzbaKjC+AOWVXxAU/x54COGeIv9eb+6CkDSQoNTt4XyWoIJvuPsXizxu/Fr23EiekbtZwmh1IcIG/l/a10GQ==}
     engines: {node: '>=8'}
+
+  playground@file:packages/examples/src/playground:
+    resolution: {directory: packages/examples/src/playground, type: directory}
 
   pluralize@8.0.0:
     resolution: {integrity: sha512-Nc3IT5yHzflTfbjgqWcCPpo7DaKy4FnpB0l/zCAW0Tc7jxAiuqSxHasntB3D7887LSrA93kDJ9IXovxJYxyLCA==}
@@ -10256,6 +10296,8 @@ snapshots:
   pkg-dir@4.2.0:
     dependencies:
       find-up: 4.1.0
+
+  playground@file:packages/examples/src/playground: {}
 
   pluralize@8.0.0: {}
 

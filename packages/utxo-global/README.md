@@ -27,7 +27,7 @@
 </p>
 
 <p align="center">
-  "CCC - CKBers' Codebase" is the next step of "Common Chains Connector".
+  CCC - CKBers' Codebase is A one-stop solution for your CKB JS/TS ecosystem development.
   <br />
   Empower yourself with CCC to discover the unlimited potential of CKB.
   <br />

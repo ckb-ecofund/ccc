@@ -27,7 +27,7 @@
 </p>
 
 <p align="center">
-  "CCC - CKBers' Codebase" is the next step of "Common Chains Connector".
+  CCC - CKBers' Codebase is A one-stop solution for your CKB JS/TS ecosystem development.
   <br />
   Empower yourself with CCC to discover the unlimited potential of CKB.
   <br />
@@ -36,27 +36,7 @@
   Fully enabling CKB's Turing completeness and cryptographic freedom power.
 </p>
 
-## Playground
-
-<p align="center">
-  <a href="https://live.ckbccc.com/">
-    <img src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/preview.png" width="90%" />
-  </a>
-</p>
-
-This project is still under active development, and we are looking forward to your feedback. You can [experiment instantly in the playground](https://live.ckbccc.com/). If you are new to the CKB, we recommend checking [Nervos CKB Docs](https://docs.nervos.org/) for basic knowledge.
-
-<p align="center">
-  <a href="https://live.ckbccc.com/">
-    <img src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/playgroundCell.png" width="40%" />
-  </a>
-</p>
-
-We represent cells with graphs in the playground. The three layers of cells represent occupancy, type and lock from inside to outside. The filled center circle means that all CKB of this cell is used to store data.
-
-When cells share the same color, the same script governs them. They are owned by the same address (the outside ring) or the same type of assets (the inside ring). Check the script details in the "Scripts" tab.
-
-## App
+## Use Cases
 
 <p align="center">
   <a href="https://app.ckbccc.com/">
@@ -64,27 +44,47 @@ When cells share the same color, the same script governs them. They are owned by
   </a>
 </p>
 
-For non-developers, you can also [try CCC's app now here](https://app.ckbccc.com/). It showcases how to use CCC for some basic scenarios in CKB.
+For non-developers, you can [try CCC's app now here](https://app.ckbccc.com/) ([Project source code](https://github.com/ckb-ecofund/ccc/tree/master/packages/demo)). It showcases how to use CCC for some basic scenarios in CKB:
 
-## Transaction Composing
+- [Sign and verify any message.](<https://github.com/ckb-ecofund/ccc/tree/master/packages/demo/src/app/connected/(tools)/Sign/page.tsx>) ([Playground](https://live.ckbccc.com/?src=https://raw.githubusercontent.com/ckb-ecofund/ccc/refs/heads/master/packages/examples/src/sign.ts))
+- [Transfer native CKB token.](<https://github.com/ckb-ecofund/ccc/tree/master/packages/demo/src/app/connected/(tools)/Transfer/page.tsx>) ([Playground](https://live.ckbccc.com/?src=https://raw.githubusercontent.com/ckb-ecofund/ccc/refs/heads/master/packages/examples/src/transfer.ts))
+- [Transfer xUDT token.](<https://github.com/ckb-ecofund/ccc/tree/master/packages/demo/src/app/connected/(tools)/TransferXUdt/page.tsx>) ([Playground](https://live.ckbccc.com/?src=https://raw.githubusercontent.com/ckb-ecofund/ccc/refs/heads/master/packages/examples/src/transferUdt.ts))
+- See [Misc: Single-Use-Seals](https://talk.nervos.org/t/en-cn-misc-single-use-seals/8279) to learn how token issuing works in the cell model.
+  - [Issue xUDT token with the Single-Use Lock.](<https://github.com/ckb-ecofund/ccc/tree/master/packages/demo/src/app/connected/(tools)/IssueXUdtSus/page.tsx>)
+  - [Issue xUDT token controlled by a Type ID cell.](<https://github.com/ckb-ecofund/ccc/tree/master/packages/demo/src/app/connected/(tools)/IssueXUdtTypeId/page.tsx>)
+- [Manage Nervos DAO.](<https://github.com/ckb-ecofund/ccc/tree/master/packages/demo/src/app/connected/(tools)/NervosDao/page.tsx>)
+- [Transfer native CKB token with time lock.](<https://github.com/ckb-ecofund/ccc/blob/master/packages/demo/src/app/connected/(tools)/TimeLockedTransfer/page.tsx>)
+- [Calculate the CKB hash of any messages.](<https://github.com/ckb-ecofund/ccc/tree/master/packages/demo/src/app/utils/(tools)/Hash/page.tsx>)
+- [Generate mnemonic and keypairs. Encrypt to a keystore.](<https://github.com/ckb-ecofund/ccc/tree/master/packages/demo/src/app/utils/(tools)/Mnemonic/page.tsx>)
+- [Decrypt a keystore.](<https://github.com/ckb-ecofund/ccc/tree/master/packages/demo/src/app/utils/(tools)/Keystore/page.tsx>)
+- [Transfer the native CKB token with the old Lumos SDK.](<https://github.com/ckb-ecofund/ccc/tree/master/packages/demo/src/app/connected/(tools)/TransferLumos/page.tsx>)
 
-Here's an example for transferring CKB:
+## Examples
 
-```typescript
-const tx = ccc.Transaction.from({
-  outputs: [{ lock: toLock, capacity: ccc.fixedPointFrom(amount) }],
-});
-```
+<p align="center">
+  <a href="https://live.ckbccc.com/">
+    <img src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/preview.png" width="90%" />
+  </a>
+</p>
 
-Tell CCC what you need, and then...
+Check our [full documents for all detailed APIs](https://docs.ckbccc.com) to understand these examples better. If you are new to the CKB, we recommend checking [Nervos CKB Docs](https://docs.nervos.org/) for basic knowledge. We build examples based on [the CCC playground](https://live.ckbccc.com/).
 
-```typescript
-await tx.completeInputsByCapacity(signer);
-await tx.completeFeeBy(signer, 1000); // Transaction fee rate
-const txHash = await signer.sendTransaction(tx);
-```
+<p align="center">
+  <a href="https://live.ckbccc.com/">
+    <img src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/playgroundCell.png" width="40%" />
+  </a>
+</p>
 
-We have done everything!
+Cells are represented with graphs in the playground. The three layers of cells represent occupancy, type and lock from inside to outside. The filled center circle means that all CKB of this cell is used to store data.
+
+When cells share the same color, the same script governs them. They are owned by the same address (the outside ring) or the same type of assets (the inside ring). Check the script details in the "Scripts" tab.
+
+- [Use specified wallet in custom UI.](https://live.ckbccc.com/?src=https://raw.githubusercontent.com/ckb-ecofund/ccc/refs/heads/master/packages/examples/src/customUi.ts)
+- [Use all supported wallets in custom UI.](https://live.ckbccc.com/?src=https://raw.githubusercontent.com/ckb-ecofund/ccc/refs/heads/master/packages/examples/src/customUiWithController.ts)
+- [Sign and verify any message.](https://live.ckbccc.com/?src=https://raw.githubusercontent.com/ckb-ecofund/ccc/refs/heads/master/packages/examples/src/sign.ts)
+- [Transfer native CKB token.](https://live.ckbccc.com/?src=https://raw.githubusercontent.com/ckb-ecofund/ccc/refs/heads/master/packages/examples/src/transfer.ts)
+- [Transfer all native CKB token.](https://live.ckbccc.com/?src=https://raw.githubusercontent.com/ckb-ecofund/ccc/refs/heads/master/packages/examples/src/transferAll.ts)
+- [Transfer UDT token.](https://live.ckbccc.com/?src=https://raw.githubusercontent.com/ckb-ecofund/ccc/refs/heads/master/packages/examples/src/transferUdt.ts)
 
 ## Installing
 
@@ -107,24 +107,25 @@ For advanced developers, we provided the `cccA` object to fulfil all your needs.
 import { cccA } from "@ckb-ccc/<package-name>/advanced";
 ```
 
-## Documents
+## Transaction Composing
 
-Check our [full documents for all detailed APIs](https://docs.ckbccc.com).
+Here's an example for transferring CKB:
 
-[The demo source code](https://github.com/ckb-ecofund/ccc/tree/master/packages/demo) contains some basic examples:
+```typescript
+const tx = ccc.Transaction.from({
+  outputs: [{ lock: toLock, capacity: ccc.fixedPointFrom(amount) }],
+});
+```
 
-- [Sign and verify any message.](<https://github.com/ckb-ecofund/ccc/tree/master/packages/demo/src/app/connected/(tools)/Sign/page.tsx>)
-- [Transfer native CKB token.](<https://github.com/ckb-ecofund/ccc/tree/master/packages/demo/src/app/connected/(tools)/Transfer/page.tsx>)
-- [Transfer xUDT token.](<https://github.com/ckb-ecofund/ccc/tree/master/packages/demo/src/app/connected/(tools)/TransferXUdt/page.tsx>)
-- See [Misc: Single-Use-Seals](https://talk.nervos.org/t/en-cn-misc-single-use-seals/8279) to learn how token issuing works in the cell model.
-  - [Issue xUDT token with the Single-Use Lock.](<https://github.com/ckb-ecofund/ccc/tree/master/packages/demo/src/app/connected/(tools)/IssueXUdtSus/page.tsx>)
-  - [Issue xUDT token controlled by a Type ID cell.](<https://github.com/ckb-ecofund/ccc/tree/master/packages/demo/src/app/connected/(tools)/IssueXUdtTypeId/page.tsx>)
-- [Manage Nervos DAO.](<https://github.com/ckb-ecofund/ccc/tree/master/packages/demo/src/app/connected/(tools)/NervosDao/page.tsx>)
-- [Transfer native CKB token with time lock.](<https://github.com/ckb-ecofund/ccc/blob/master/packages/demo/src/app/connected/(tools)/TimeLockedTransfer/page.tsx>)
-- [Calculate the CKB hash of any messages.](<https://github.com/ckb-ecofund/ccc/tree/master/packages/demo/src/app/utils/(tools)/Hash/page.tsx>)
-- [Generate mnemonic and keypairs. Encrypt to a keystore.](<https://github.com/ckb-ecofund/ccc/tree/master/packages/demo/src/app/utils/(tools)/Mnemonic/page.tsx>)
-- [Decrypt a keystore.](<https://github.com/ckb-ecofund/ccc/tree/master/packages/demo/src/app/utils/(tools)/Keystore/page.tsx>)
-- [Transfer the native CKB token with the old Lumos SDK.](<https://github.com/ckb-ecofund/ccc/tree/master/packages/demo/src/app/connected/(tools)/TransferLumos/page.tsx>)
+Tell CCC what you need, and then...
+
+```typescript
+await tx.completeInputsByCapacity(signer);
+await tx.completeFeeBy(signer); // Transaction fee rate is calculated automatically
+const txHash = await signer.sendTransaction(tx);
+```
+
+We have done everything!
 
 ## Build and Run
 
