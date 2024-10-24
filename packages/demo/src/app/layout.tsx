@@ -9,6 +9,11 @@ export const metadata: Metadata = {
   title: "CCC App",
   description: "An app based on the CCC library",
   icons: "/favicon.svg",
+  openGraph: {
+    title: "CCC App",
+    description: "An app based on the CCC library",
+    images: "/opengraph.png",
+  },
 };
 
 export default function RootLayout({
