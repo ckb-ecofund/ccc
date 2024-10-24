@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://app.ckbccc.com/">
-    <img alt="Logo" src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/logo.svg" width="20%" />
+    <img alt="Logo" src="https://raw.githubusercontent.com/ckb-devrel/ccc/master/assets/logo.svg" width="20%" />
   </a>
 </p>
 
@@ -12,9 +12,9 @@
   <a href="https://www.npmjs.com/package/@ckb-ccc/lumos-patches"><img
     alt="NPM Version" src="https://img.shields.io/npm/v/%40ckb-ccc%2Flumos-patches"
   /></a>
-  <img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/m/ckb-ecofund/ccc" />
-  <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/ckb-ecofund/ccc/master" />
-  <img alt="GitHub branch check runs" src="https://img.shields.io/github/check-runs/ckb-ecofund/ccc/master" />
+  <img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/m/ckb-devrel/ccc" />
+  <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/ckb-devrel/ccc/master" />
+  <img alt="GitHub branch check runs" src="https://img.shields.io/github/check-runs/ckb-devrel/ccc/master" />
   <a href="https://live.ckbccc.com/"><img
     alt="Playground" src="https://img.shields.io/website?url=https%3A%2F%2Flive.ckbccc.com%2F&label=Playground"
   /></a>
@@ -37,5 +37,5 @@
 </p>
 
 <h3 align="center">
-  Read more about CCC on <a href="https://docs.ckbccc.com">our website</a> or <a href="https://github.com/ckb-ecofund/ccc">GitHub Repo</a>.
+  Read more about CCC on <a href="https://docs.ckbccc.com">our website</a> or <a href="https://github.com/ckb-devrel/ccc">GitHub Repo</a>.
 </h3>

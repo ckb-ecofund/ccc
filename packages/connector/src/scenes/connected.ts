@@ -113,7 +113,7 @@ export class ConnectedScene extends LitElement {
           </ccc-button>
 
           ${this.hideMark == null
-            ? html`<a href="https://github.com/ckb-ecofund/ccc" class="mark"
+            ? html`<a href="https://github.com/ckb-devrel/ccc" class="mark"
                 >Powered by CCC</a
               >`
             : ""}

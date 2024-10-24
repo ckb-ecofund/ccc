@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://app.ckbccc.com/">
-    <img alt="Logo" src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/logo.svg" width="20%" />
+    <img alt="Logo" src="https://raw.githubusercontent.com/ckb-devrel/ccc/master/assets/logo.svg" width="20%" />
   </a>
 </p>
 
@@ -12,9 +12,9 @@
   <a href="https://www.npmjs.com/package/@ckb-ccc/ccc"><img
     alt="NPM Version" src="https://img.shields.io/npm/v/%40ckb-ccc%2Fccc"
   /></a>
-  <img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/m/ckb-ecofund/ccc" />
-  <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/ckb-ecofund/ccc/master" />
-  <img alt="GitHub branch check runs" src="https://img.shields.io/github/check-runs/ckb-ecofund/ccc/master" />
+  <img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/m/ckb-devrel/ccc" />
+  <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/ckb-devrel/ccc/master" />
+  <img alt="GitHub branch check runs" src="https://img.shields.io/github/check-runs/ckb-devrel/ccc/master" />
   <a href="https://live.ckbccc.com/"><img
     alt="Playground" src="https://img.shields.io/website?url=https%3A%2F%2Flive.ckbccc.com%2F&label=Playground"
   /></a>
@@ -40,30 +40,30 @@
 
 <p align="center">
   <a href="https://app.ckbccc.com/">
-    <img src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/appPreview.png" width="50%" />
+    <img src="https://raw.githubusercontent.com/ckb-devrel/ccc/master/assets/appPreview.png" width="50%" />
   </a>
 </p>
 
-For non-developers, you can [try CCC's app now here](https://app.ckbccc.com/) ([Project source code](https://github.com/ckb-ecofund/ccc/tree/master/packages/demo)). It showcases how to use CCC for some basic scenarios in CKB:
+For non-developers, you can [try CCC's app now here](https://app.ckbccc.com/) ([Project source code](https://github.com/ckb-devrel/ccc/tree/master/packages/demo)). It showcases how to use CCC for some basic scenarios in CKB:
 
-- [Sign and verify any message.](<https://github.com/ckb-ecofund/ccc/tree/master/packages/demo/src/app/connected/(tools)/Sign/page.tsx>) ([Playground](https://live.ckbccc.com/?src=https://raw.githubusercontent.com/ckb-ecofund/ccc/refs/heads/master/packages/examples/src/sign.ts))
-- [Transfer native CKB token.](<https://github.com/ckb-ecofund/ccc/tree/master/packages/demo/src/app/connected/(tools)/Transfer/page.tsx>) ([Playground](https://live.ckbccc.com/?src=https://raw.githubusercontent.com/ckb-ecofund/ccc/refs/heads/master/packages/examples/src/transfer.ts))
-- [Transfer xUDT token.](<https://github.com/ckb-ecofund/ccc/tree/master/packages/demo/src/app/connected/(tools)/TransferXUdt/page.tsx>) ([Playground](https://live.ckbccc.com/?src=https://raw.githubusercontent.com/ckb-ecofund/ccc/refs/heads/master/packages/examples/src/transferUdt.ts))
+- [Sign and verify any message.](<https://github.com/ckb-devrel/ccc/tree/master/packages/demo/src/app/connected/(tools)/Sign/page.tsx>) ([Playground](https://live.ckbccc.com/?src=https://raw.githubusercontent.com/ckb-devrel/ccc/refs/heads/master/packages/examples/src/sign.ts))
+- [Transfer native CKB token.](<https://github.com/ckb-devrel/ccc/tree/master/packages/demo/src/app/connected/(tools)/Transfer/page.tsx>) ([Playground](https://live.ckbccc.com/?src=https://raw.githubusercontent.com/ckb-devrel/ccc/refs/heads/master/packages/examples/src/transfer.ts))
+- [Transfer xUDT token.](<https://github.com/ckb-devrel/ccc/tree/master/packages/demo/src/app/connected/(tools)/TransferXUdt/page.tsx>) ([Playground](https://live.ckbccc.com/?src=https://raw.githubusercontent.com/ckb-devrel/ccc/refs/heads/master/packages/examples/src/transferUdt.ts))
 - See [Misc: Single-Use-Seals](https://talk.nervos.org/t/en-cn-misc-single-use-seals/8279) to learn how token issuing works in the cell model.
-  - [Issue xUDT token with the Single-Use Lock.](<https://github.com/ckb-ecofund/ccc/tree/master/packages/demo/src/app/connected/(tools)/IssueXUdtSus/page.tsx>)
-  - [Issue xUDT token controlled by a Type ID cell.](<https://github.com/ckb-ecofund/ccc/tree/master/packages/demo/src/app/connected/(tools)/IssueXUdtTypeId/page.tsx>)
-- [Manage Nervos DAO.](<https://github.com/ckb-ecofund/ccc/tree/master/packages/demo/src/app/connected/(tools)/NervosDao/page.tsx>)
-- [Transfer native CKB token with time lock.](<https://github.com/ckb-ecofund/ccc/blob/master/packages/demo/src/app/connected/(tools)/TimeLockedTransfer/page.tsx>)
-- [Calculate the CKB hash of any messages.](<https://github.com/ckb-ecofund/ccc/tree/master/packages/demo/src/app/utils/(tools)/Hash/page.tsx>)
-- [Generate mnemonic and keypairs. Encrypt to a keystore.](<https://github.com/ckb-ecofund/ccc/tree/master/packages/demo/src/app/utils/(tools)/Mnemonic/page.tsx>)
-- [Decrypt a keystore.](<https://github.com/ckb-ecofund/ccc/tree/master/packages/demo/src/app/utils/(tools)/Keystore/page.tsx>)
-- [Transfer the native CKB token with the old Lumos SDK.](<https://github.com/ckb-ecofund/ccc/tree/master/packages/demo/src/app/connected/(tools)/TransferLumos/page.tsx>)
+  - [Issue xUDT token with the Single-Use Lock.](<https://github.com/ckb-devrel/ccc/tree/master/packages/demo/src/app/connected/(tools)/IssueXUdtSus/page.tsx>)
+  - [Issue xUDT token controlled by a Type ID cell.](<https://github.com/ckb-devrel/ccc/tree/master/packages/demo/src/app/connected/(tools)/IssueXUdtTypeId/page.tsx>)
+- [Manage Nervos DAO.](<https://github.com/ckb-devrel/ccc/tree/master/packages/demo/src/app/connected/(tools)/NervosDao/page.tsx>)
+- [Transfer native CKB token with time lock.](<https://github.com/ckb-devrel/ccc/blob/master/packages/demo/src/app/connected/(tools)/TimeLockedTransfer/page.tsx>)
+- [Calculate the CKB hash of any messages.](<https://github.com/ckb-devrel/ccc/tree/master/packages/demo/src/app/utils/(tools)/Hash/page.tsx>)
+- [Generate mnemonic and keypairs. Encrypt to a keystore.](<https://github.com/ckb-devrel/ccc/tree/master/packages/demo/src/app/utils/(tools)/Mnemonic/page.tsx>)
+- [Decrypt a keystore.](<https://github.com/ckb-devrel/ccc/tree/master/packages/demo/src/app/utils/(tools)/Keystore/page.tsx>)
+- [Transfer the native CKB token with the old Lumos SDK.](<https://github.com/ckb-devrel/ccc/tree/master/packages/demo/src/app/connected/(tools)/TransferLumos/page.tsx>)
 
 ## Examples
 
 <p align="center">
   <a href="https://live.ckbccc.com/">
-    <img src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/preview.png" width="90%" />
+    <img src="https://raw.githubusercontent.com/ckb-devrel/ccc/master/assets/preview.png" width="90%" />
   </a>
 </p>
 
@@ -71,7 +71,7 @@ Check our [full documents for all detailed APIs](https://docs.ckbccc.com) to und
 
 <p align="center">
   <a href="https://live.ckbccc.com/">
-    <img src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/playgroundCell.png" width="40%" />
+    <img src="https://raw.githubusercontent.com/ckb-devrel/ccc/master/assets/playgroundCell.png" width="40%" />
   </a>
 </p>
 
@@ -99,12 +99,12 @@ const txHash = await signer.sendTransaction(tx);
 
 We have done everything!
 
-- [Use specified wallet in custom UI.](https://live.ckbccc.com/?src=https://raw.githubusercontent.com/ckb-ecofund/ccc/refs/heads/master/packages/examples/src/customUi.ts)
-- [Use all supported wallets in custom UI.](https://live.ckbccc.com/?src=https://raw.githubusercontent.com/ckb-ecofund/ccc/refs/heads/master/packages/examples/src/customUiWithController.ts)
-- [Sign and verify any message.](https://live.ckbccc.com/?src=https://raw.githubusercontent.com/ckb-ecofund/ccc/refs/heads/master/packages/examples/src/sign.ts)
-- [Transfer native CKB token.](https://live.ckbccc.com/?src=https://raw.githubusercontent.com/ckb-ecofund/ccc/refs/heads/master/packages/examples/src/transfer.ts)
-- [Transfer all native CKB token.](https://live.ckbccc.com/?src=https://raw.githubusercontent.com/ckb-ecofund/ccc/refs/heads/master/packages/examples/src/transferAll.ts)
-- [Transfer UDT token.](https://live.ckbccc.com/?src=https://raw.githubusercontent.com/ckb-ecofund/ccc/refs/heads/master/packages/examples/src/transferUdt.ts)
+- [Use specified wallet in custom UI.](https://live.ckbccc.com/?src=https://raw.githubusercontent.com/ckb-devrel/ccc/refs/heads/master/packages/examples/src/customUi.ts)
+- [Use all supported wallets in custom UI.](https://live.ckbccc.com/?src=https://raw.githubusercontent.com/ckb-devrel/ccc/refs/heads/master/packages/examples/src/customUiWithController.ts)
+- [Sign and verify any message.](https://live.ckbccc.com/?src=https://raw.githubusercontent.com/ckb-devrel/ccc/refs/heads/master/packages/examples/src/sign.ts)
+- [Transfer native CKB token.](https://live.ckbccc.com/?src=https://raw.githubusercontent.com/ckb-devrel/ccc/refs/heads/master/packages/examples/src/transfer.ts)
+- [Transfer all native CKB token.](https://live.ckbccc.com/?src=https://raw.githubusercontent.com/ckb-devrel/ccc/refs/heads/master/packages/examples/src/transferAll.ts)
+- [Transfer UDT token.](https://live.ckbccc.com/?src=https://raw.githubusercontent.com/ckb-devrel/ccc/refs/heads/master/packages/examples/src/transferUdt.ts)
 
 ## Installing
 
@@ -149,13 +149,13 @@ pnpm run dev
 
 ## Who uses CCC?
 
-| [<img height="50" src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/projects/nervdao.svg" />](https://nervdao.com/) | [<img height="50" src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/projects/utxoglobal.svg" />](https://utxo.global/) | [<img height="50" src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/projects/mobit.svg" />](https://mobit.app/) | [<img height="50" src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/projects/omiga.svg" />](https://omiga.io/) |
+| [<img height="50" src="https://raw.githubusercontent.com/ckb-devrel/ccc/master/assets/projects/nervdao.svg" />](https://nervdao.com/) | [<img height="50" src="https://raw.githubusercontent.com/ckb-devrel/ccc/master/assets/projects/utxoglobal.svg" />](https://utxo.global/) | [<img height="50" src="https://raw.githubusercontent.com/ckb-devrel/ccc/master/assets/projects/mobit.svg" />](https://mobit.app/) | [<img height="50" src="https://raw.githubusercontent.com/ckb-devrel/ccc/master/assets/projects/omiga.svg" />](https://omiga.io/) |
 | -------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
 
-| [<img height="50" src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/projects/nervape.svg" />](https://www.nervape.com/) | [<img height="50" src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/projects/utxoswap.svg" />](https://utxoswap.xyz/) | [<img height="50" src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/projects/did.svg" />](https://d.id/) | [<img height="50" src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/projects/boolnetwork.svg" />](https://bool.network/) |
+| [<img height="50" src="https://raw.githubusercontent.com/ckb-devrel/ccc/master/assets/projects/nervape.svg" />](https://www.nervape.com/) | [<img height="50" src="https://raw.githubusercontent.com/ckb-devrel/ccc/master/assets/projects/utxoswap.svg" />](https://utxoswap.xyz/) | [<img height="50" src="https://raw.githubusercontent.com/ckb-devrel/ccc/master/assets/projects/did.svg" />](https://d.id/) | [<img height="50" src="https://raw.githubusercontent.com/ckb-devrel/ccc/master/assets/projects/boolnetwork.svg" />](https://bool.network/) |
 | ------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
 
-| [<img height="50" src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/projects/world3.svg" />](https://world3.ai/) | [<img height="50" src="assets/projects/rgbcat.svg" />](https://catnip.rgbcat.io/) |
+| [<img height="50" src="https://raw.githubusercontent.com/ckb-devrel/ccc/master/assets/projects/world3.svg" />](https://world3.ai/) | [<img height="50" src="assets/projects/rgbcat.svg" />](https://catnip.rgbcat.io/) |
 | ----------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
 
 ## FAQs
@@ -197,7 +197,7 @@ registerCustomLockScriptInfos(generateDefaultScriptInfos());
 
 ## Links
 
-- [CCC Playground](https://live.ckbccc.com/) and its [GitHub Repo](https://github.com/ckb-ecofund/ccc-playground) help you experiment with CCC instantly in browsers.
+- [CCC Playground](https://live.ckbccc.com/) and its [GitHub Repo](https://github.com/ckb-devrel/ccc-playground) help you experiment with CCC instantly in browsers.
 - [Nervos CKB Docs](https://docs.nervos.org/) is the documentation website of Nervos CKB.
 - [Lumos](https://github.com/ckb-js/lumos) and its [Docs](https://lumos-website.vercel.app/): Lumos provides utils to help compose CKB transactions.
 - [RGB++ SDK](https://github.com/ckb-cell/rgbpp-sdk) and its [Design](https://github.com/ckb-cell/RGBPlusPlus-design): RGB++ is a protocol for issuing assets with Turing-completed VM on BTC L1.

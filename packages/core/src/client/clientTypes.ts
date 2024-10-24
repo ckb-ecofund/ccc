@@ -38,7 +38,7 @@ export enum KnownScript {
   NostrLock = "NostrLock",
   UniqueType = "UniqueType",
 
-  // ckb-proxy-locks https://github.com/ckb-ecofund/ckb-proxy-locks
+  // ckb-proxy-locks https://github.com/ckb-devrel/ckb-proxy-locks
   AlwaysSuccess = "AlwaysSuccess",
   InputTypeProxyLock = "InputTypeProxyLock",
   OutputTypeProxyLock = "OutputTypeProxyLock",

@@ -2,10 +2,10 @@
   "name": "@ckb-ccc/ccc-demo",
   "version": "0.0.1",
   "private": true,
-  "homepage": "https://github.com/ckb-ecofund/ccc",
+  "homepage": "https://github.com/ckb-devrel/ccc",
   "repository": {
     "type": "git",
-    "url": "git://github.com/ckb-ecofund/ccc.git"
+    "url": "git://github.com/ckb-devrel/ccc.git"
   },
   "scripts": {
     "dev": "next dev",

@@ -5,10 +5,10 @@
   "author": "Hanssen0 <hanssen0@hanssen0.com>",
   "license": "MIT",
   "private": false,
-  "homepage": "https://github.com/ckb-ecofund/ccc",
+  "homepage": "https://github.com/ckb-devrel/ccc",
   "repository": {
     "type": "git",
-    "url": "git://github.com/ckb-ecofund/ccc.git"
+    "url": "git://github.com/ckb-devrel/ccc.git"
   },
   "main": "dist.commonjs/index.js",
   "module": "dist/index.js",

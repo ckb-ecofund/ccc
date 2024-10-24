@@ -31,14 +31,14 @@ function Links(props: React.ComponentPropsWithoutRef<"div">) {
     >
       <Link href="/" className="h-6 w-6">
         <img
-          src="https://raw.githubusercontent.com/ckb-ecofund/ccc/master/assets/logo.svg"
+          src="https://raw.githubusercontent.com/ckb-devrel/ccc/master/assets/logo.svg"
           alt="CCC"
         />
       </Link>
       <Link href="https://live.ckbccc.com/" target="_blank">
         <SquareTerminal className="h-6 w-6" strokeWidth={3} />
       </Link>
-      <Link href="https://github.com/ckb-ecofund/ccc" target="_blank">
+      <Link href="https://github.com/ckb-devrel/ccc" target="_blank">
         <svg
           className="h-6 w-6"
           xmlns="http://www.w3.org/2000/svg"

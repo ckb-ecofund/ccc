@@ -20,7 +20,7 @@
   "entryPointStrategy": "packages",
   "githubPages": true,
   "navigationLinks": {
-    "GitHub": "https://github.com/ckb-ecofund/ccc",
+    "GitHub": "https://github.com/ckb-devrel/ccc",
     "App": "https://app.ckbccc.com",
   },
   "hostedBaseUrl": "https://docs.example.com",
